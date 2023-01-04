@@ -3,7 +3,6 @@ package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.providers;
 import com.google.common.cache.*;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.util.concurrent.UncheckedExecutionException;
-import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.GameProfile;
@@ -32,10 +31,6 @@ public abstract class GameProfileFetcher implements Provider {
             return loadGameProfile(key);
         }
     });
-
-    public boolean isLegacySkinLoadingEnabled(final UserConnection user) {
-        return ViaLegacy.getConfig().isLegacySkinLoading();
-    }
 
     public boolean isUUIDLoaded(String playerName) {
         return UUID_CACHE.getIfPresent(playerName) != null;
