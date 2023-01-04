@@ -29,7 +29,7 @@ public class Chunk1_7_6Type extends PartialType<Chunk, ClientWorld> {
     }
 
     /**
-     * This method is here to allow overriding the code for 1.2.5 -> 1.3.2 because it introduced an unused int
+     * This method is here to allow overriding the code for 1.2.5 -{@literal >} 1.3.2 because it introduced an unused int
      *
      * @param byteBuf     The buffer
      * @param clientWorld The ClientWorld
@@ -38,7 +38,7 @@ public class Chunk1_7_6Type extends PartialType<Chunk, ClientWorld> {
     }
 
     /**
-     * This method is here to allow overriding the code for 1.2.5 -> 1.3.2 because it introduced an unused int
+     * This method is here to allow overriding the code for 1.2.5 -{@literal >} 1.3.2 because it introduced an unused int
      *
      * @param byteBuf     The buffer
      * @param clientWorld The ClientWorld

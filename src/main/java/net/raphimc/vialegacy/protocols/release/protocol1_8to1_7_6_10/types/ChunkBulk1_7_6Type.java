@@ -25,7 +25,7 @@ public class ChunkBulk1_7_6Type extends PartialType<Chunk[], ClientWorld> {
     }
 
     /**
-     * This method is here to allow overriding the code for 1.4.5 -> 1.4.7
+     * This method is here to allow overriding the code for 1.4.5 -{@literal >} 1.4.7
      *
      * @param byteBuf     The buffer
      * @param clientWorld The ClientWorld
@@ -36,7 +36,7 @@ public class ChunkBulk1_7_6Type extends PartialType<Chunk[], ClientWorld> {
     }
 
     /**
-     * This method is here to allow overriding the code for 1.4.5 -> 1.4.7
+     * This method is here to allow overriding the code for 1.4.5 -{@literal >} 1.4.7
      *
      * @param byteBuf     The buffer
      * @param clientWorld The ClientWorld

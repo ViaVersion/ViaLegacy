@@ -41,10 +41,6 @@ java {
     withJavadocJar()
 }
 
-javadoc {
-    failOnError = false
-}
-
 jar {
     from("LICENSE") {
         rename { "${it}_${project.archivesBaseName}" }
