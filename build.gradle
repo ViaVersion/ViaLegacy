@@ -5,7 +5,7 @@ plugins {
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
-compileJava.options.encoding = "UTF-8"
+compileJava.options.encoding = compileTestJava.options.encoding = javadoc.options.encoding = "UTF-8"
 
 group = project.maven_group
 archivesBaseName = project.maven_name
