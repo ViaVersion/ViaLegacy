@@ -8,19 +8,24 @@ import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.ViaLegacyConfig;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_16_2toa1_0_15.Protocola1_0_16_2toa1_0_15;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_17_1_0_17_4toa1_0_16_2.Protocola1_0_17_1_0_17_4toa1_0_16_2;
+import net.raphimc.vialegacy.protocols.alpha.protocola1_0_17_1_0_17_4toa1_0_16_2.task.TimeLockTask;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_1_0_1_1_2_1toa1_0_17_1_0_17_4.Protocola1_1_0_1_1_2_1toa1_0_17_1_0_17_4;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_2_0_1_2_1_1toa1_1_0_1_1_2_1.Protocola1_2_0_1_2_1_1toa1_1_0_1_1_2_1;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_2_2toa1_2_0_1_2_1_1.Protocola1_2_2toa1_2_0_1_2_1_1;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_2_3_1_2_3_4toa1_2_2.Protocola1_2_3_1_2_3_4toa1_2_2;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_2_3_5_1_2_6toa1_2_3_1_2_3_4.Protocola1_2_3_5_1_2_6toa1_2_3_1_2_3_4;
 import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.Protocolb1_0_1_1_1toa1_2_3_5_1_2_6;
+import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.task.AlphaInventoryUpdateTask;
 import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.Protocol1_0_0_1tob1_8_0_1;
+import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.task.PlayerAirTimeUpdateTask;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_1_2tob1_0_1_1.Protocolb1_1_2tob1_0_1_1;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_2_0_2tob1_1_2.Protocolb1_2_0_2tob1_1_2;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.Protocolb1_3_0_1tob1_2_0_2;
+import net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.task.BlockDigTickTask;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_4_0_1tob1_3_0_1.Protocolb1_4_0_1tob1_3_0_1;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_5_0_2tob1_4_0_1.Protocolb1_5_0_2tob1_4_0_1;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_6_0_6tob1_5_0_2.Protocolb1_6_0_6tob1_5_0_2;
+import net.raphimc.vialegacy.protocols.beta.protocolb1_6_0_6tob1_5_0_2.task.TimeTrackTask;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_7_0_3tob1_6_0_6.Protocolb1_7_0_3tob1_6_0_6;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_8_0_1tob1_7_0_3.Protocolb1_8_0_1tob1_7_0_3;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.Protocola1_0_15toc0_30;
@@ -30,10 +35,13 @@ import net.raphimc.vialegacy.protocols.classic.protocolc0_0_19a_06toc0_0_18a_02.
 import net.raphimc.vialegacy.protocols.classic.protocolc0_0_20a_27toc0_0_19a_06.Protocolc0_27toc0_0_19a_06;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_0_20a_27.Protocolc0_30toc0_27;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.Protocolc0_30toc0_30cpe;
+import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.task.ClassicPingTask;
 import net.raphimc.vialegacy.protocols.release.protocol1_1to1_0_0_1.Protocol1_1to1_0_0_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.Protocol1_2_1_3to1_1;
+import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.tasks.BlockReceiveInvalidatorTask;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_4_5to1_2_1_3.Protocol1_2_4_5to1_2_1_3;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.Protocol1_3_1_2to1_2_4_5;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.task.EntityTrackerTickTask;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.Protocol1_4_2to1_3_1_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2.Protocol1_4_4_5to1_4_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5.Protocol1_4_6_7to1_4_4_5;
@@ -117,6 +125,15 @@ public interface ViaLegacyPlatform {
         }
         protocolManager.registerBaseProtocol(new BaseProtocol1_16(), Range.singleton(VersionEnum.s20w14infinite.getVersion()));
         protocolManager.registerBaseProtocol(new BaseProtocol1_16(), Range.singleton(VersionEnum.sCombatTest8c.getVersion()));
+
+        if (ViaLegacy.getConfig().isSoundEmulation()) Via.getPlatform().runRepeatingSync(new EntityTrackerTickTask(), 1L);
+        Via.getPlatform().runRepeatingSync(new BlockReceiveInvalidatorTask(), 1L);
+        Via.getPlatform().runRepeatingSync(new PlayerAirTimeUpdateTask(), 1L);
+        Via.getPlatform().runRepeatingSync(new TimeTrackTask(), 1L);
+        Via.getPlatform().runRepeatingSync(new BlockDigTickTask(), 1L);
+        Via.getPlatform().runRepeatingSync(new AlphaInventoryUpdateTask(), 20L);
+        Via.getPlatform().runRepeatingSync(new TimeLockTask(), 20L);
+        Via.getPlatform().runRepeatingSync(new ClassicPingTask(), 20L);
     }
 
     Logger getLogger();
