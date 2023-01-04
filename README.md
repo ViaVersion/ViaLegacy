@@ -30,8 +30,9 @@ If you just want the latest jar file you can download it from this [Jenkins](htt
 
 ## Usage
 ViaLegacy requires you to have an already functional ViaVersion implementation for your platform.
-If you don't have one you can check out [ViaProtocolHack](https://github.com/RaphiMC/ViaProtocolHack) for an easy and ready to use implementation,
-or you can go to the official [ViaVersion](https://github.com/ViaVersion) repositories and look at their server and proxy implementations.
+If you don't have one you can check out [ViaProtocolHack](https://github.com/RaphiMC/ViaProtocolHack) for an abstracted and simplified, but still customizable implementation,
+or [ViaLoadingBase](https://github.com/FlorianMichael/ViaLoadingBase) for a quick and easy implementation.
+You can also go to the official [ViaVersion](https://github.com/ViaVersion) repositories and look at their server and proxy implementations.
 
 ViaLegacy currently also requires you to have ViaBackwards installed, as ViaLegacy uses some of its classes.
 This will be changed in the future when the snapshots part of ViaLegacy is split off into its own project.
