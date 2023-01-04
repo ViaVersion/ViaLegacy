@@ -84,16 +84,12 @@ public class Protocol1_5_0_1to1_4_6_7 extends AbstractProtocol<ClientboundPacket
                     final byte mode = wrapper.get(Type.BYTE, 2);
 
                     if (mode > 3) {
-                        boolean leftClickFlag = false;
                         boolean startDragging = false;
                         boolean endDragging = false;
                         boolean droppingUsingQ = false;
                         boolean addSlot = false;
 
                         switch (mode) {
-                            case 0:
-                                leftClickFlag = button == 0;
-                                break;
                             case 4:
                                 droppingUsingQ = button + (slot != -999 ? 2 : 0) == 2;
                                 break;
@@ -104,9 +100,8 @@ public class Protocol1_5_0_1to1_4_6_7 extends AbstractProtocol<ClientboundPacket
                                 break;
                         }
 
-                        final boolean leftClick = leftClickFlag || startDragging || addSlot || endDragging;
+                        final boolean leftClick = startDragging || addSlot || endDragging;
                         final boolean clickingOutside = slot == -999 && mode != 5;
-                        final boolean usingShift = mode == 1;
                         final int mouseClick = leftClick ? 0 : 1;
 
                         if (droppingUsingQ) {
@@ -122,7 +117,7 @@ public class Protocol1_5_0_1to1_4_6_7 extends AbstractProtocol<ClientboundPacket
                         }
 
                         wrapper.set(Type.BYTE, 1, (byte) mouseClick);
-                        wrapper.set(Type.BYTE, 2, (byte) (usingShift ? 1 : 0));
+                        wrapper.set(Type.BYTE, 2, (byte) 0);
                         wrapper.set(Types1_7_6.COMPRESSED_ITEM, 0, new DataItem(34, (byte) 0, (short) 0, null));
                     }
                 });
