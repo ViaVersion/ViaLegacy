@@ -72,7 +72,7 @@ public interface ViaLegacyPlatform {
         ViaLegacy.init(this, config);
         VersionEnum.init();
 
-        Via.getManager().getSubPlatforms().add("ViaLegacy-2.0.0");
+        Via.getManager().getSubPlatforms().add("ViaLegacy-" + ViaLegacy.VERSION);
 
         final ProtocolManager protocolManager = Via.getManager().getProtocolManager();
         protocolManager.registerProtocol(new Protocol1_8to1_7_6_10(), VersionEnum.r1_8.getProtocol(), VersionEnum.r1_7_6tor1_7_10.getProtocol());

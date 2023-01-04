@@ -1,6 +1,7 @@
 plugins {
     id "java-library"
     id "maven-publish"
+    id "net.kyori.blossom" version "1.2.0"
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(8)
@@ -31,6 +32,10 @@ dependencies {
     //api "net.lenni0451.mcstructs:all:1.4.0" // Not yet used
 }
 
+blossom {
+    replaceToken("\${version}", project.version, "src/main/java/net/raphimc/vialegacy/ViaLegacy.java")
+}
+
 java {
     withSourcesJar()
     withJavadocJar()
@@ -38,6 +43,12 @@ java {
 
 javadoc {
     failOnError = false
+}
+
+jar {
+    from("LICENSE") {
+        rename { "${it}_${project.archivesBaseName}" }
+    }
 }
 
 publishing {

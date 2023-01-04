@@ -5,6 +5,8 @@ import net.raphimc.vialegacy.platform.ViaLegacyPlatform;
 
 public class ViaLegacy {
 
+    public static final String VERSION = "${version}";
+
     private static ViaLegacyPlatform platform;
     private static ViaLegacyConfig config;
 
