@@ -1,9 +1,11 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
@@ -18,6 +20,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.releas
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.chunks.NibbleArray1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.model.NonFullChunk1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.storage.*;
+import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.tasks.BlockReceiveInvalidatorTask;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types.Chunk1_1Type;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types.Types1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_4_5to1_2_1_3.ClientboundPackets1_2_1;
@@ -329,6 +332,11 @@ public class Protocol1_2_1_3to1_1 extends AbstractProtocol<ClientboundPackets1_1
         wrapper.send(Protocol1_2_1_3to1_1.class);
         entityHeadLook.send(Protocol1_2_1_3to1_1.class);
         wrapper.cancel();
+    }
+
+    @Override
+    public void register(ViaProviders providers) {
+        Via.getPlatform().runRepeatingSync(new BlockReceiveInvalidatorTask(), 1L);
     }
 
     @Override

@@ -1,10 +1,13 @@
 package net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.storage.PlayerAirTimeStorage;
+import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.task.PlayerAirTimeUpdateTask;
 import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.types.Typesb1_8_0_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_1to1_0_0_1.ClientboundPackets1_0;
 import net.raphimc.vialegacy.protocols.release.protocol1_1to1_0_0_1.ServerboundPackets1_0;
@@ -78,6 +81,11 @@ public class Protocol1_0_0_1tob1_8_0_1 extends AbstractProtocol<ClientboundPacke
             }
         });
         this.cancelServerbound(ServerboundPackets1_0.CLICK_WINDOW_BUTTON);
+    }
+
+    @Override
+    public void register(ViaProviders providers) {
+        Via.getPlatform().runRepeatingSync(new PlayerAirTimeUpdateTask(), 1L);
     }
 
     @Override

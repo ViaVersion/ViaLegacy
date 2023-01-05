@@ -1,8 +1,10 @@
 package net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
@@ -10,6 +12,7 @@ import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.api.IdAndData;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.data.BlockHardnessList;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.storage.BlockDigStorage;
+import net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.task.BlockDigTickTask;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.types.Typesb1_2;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_4_0_1tob1_3_0_1.ClientboundPacketsb1_3;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_5_0_2tob1_4_0_1.ServerboundPacketsb1_4;
@@ -111,6 +114,11 @@ public class Protocolb1_3_0_1tob1_2_0_2 extends AbstractProtocol<ClientboundPack
         for (Metadata metadata : metadataList) {
             metadata.setMetaType(MetaTypeb1_4.byId(metadata.metaType().typeId()));
         }
+    }
+
+    @Override
+    public void register(ViaProviders providers) {
+        Via.getPlatform().runRepeatingSync(new BlockDigTickTask(), 1L);
     }
 
     @Override

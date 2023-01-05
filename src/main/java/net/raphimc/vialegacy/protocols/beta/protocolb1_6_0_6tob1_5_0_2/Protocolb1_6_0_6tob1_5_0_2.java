@@ -1,14 +1,17 @@
 package net.raphimc.vialegacy.protocols.beta.protocolb1_6_0_6tob1_5_0_2;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.api.*;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_6_0_6tob1_5_0_2.storage.WorldTimeStorage;
+import net.raphimc.vialegacy.protocols.beta.protocolb1_6_0_6tob1_5_0_2.task.TimeTrackTask;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_8_0_1tob1_7_0_3.ClientboundPacketsb1_7;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_8_0_1tob1_7_0_3.ServerboundPacketsb1_7;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2.types.Types1_4_2;
@@ -134,6 +137,11 @@ public class Protocolb1_6_0_6tob1_5_0_2 extends AbstractProtocol<ClientboundPack
                 });
             }
         });
+    }
+
+    @Override
+    public void register(ViaProviders providers) {
+        Via.getPlatform().runRepeatingSync(new TimeTrackTask(), 1L);
     }
 
     @Override

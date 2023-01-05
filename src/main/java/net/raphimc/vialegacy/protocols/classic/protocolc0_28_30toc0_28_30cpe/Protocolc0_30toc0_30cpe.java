@@ -1,7 +1,9 @@
 package net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.*;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
@@ -21,6 +23,7 @@ import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.types.T
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.data.ClassicProtocolExtension;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.data.ExtendedClassicBlocks;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.storage.*;
+import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.task.ClassicPingTask;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types.Types1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_2to1_6_1.Protocol1_6_2to1_6_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.ClientboundPackets1_6_4;
@@ -325,6 +328,11 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
                 });
             }
         });
+    }
+
+    @Override
+    public void register(ViaProviders providers) {
+        Via.getPlatform().runRepeatingSync(new ClassicPingTask(), 20L);
     }
 
     @Override

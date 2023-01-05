@@ -25,6 +25,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.provider
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.sound.Sound;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.sound.SoundType;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.storage.*;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.task.EntityTrackerTickTask;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.types.Chunk1_2_4Type;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.types.Types1_2_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.ClientboundPackets1_3_1;
@@ -811,6 +812,8 @@ public class Protocol1_3_1_2to1_2_4_5 extends AbstractProtocol<ClientboundPacket
     @Override
     public void register(ViaProviders providers) {
         providers.register(OldAuthProvider.class, new OldAuthProvider());
+
+        if (ViaLegacy.getConfig().isSoundEmulation()) Via.getPlatform().runRepeatingSync(new EntityTrackerTickTask(), 1L);
     }
 
     @Override

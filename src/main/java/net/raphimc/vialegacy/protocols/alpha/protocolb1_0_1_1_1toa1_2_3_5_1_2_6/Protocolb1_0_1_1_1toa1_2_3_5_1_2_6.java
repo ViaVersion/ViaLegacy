@@ -18,6 +18,7 @@ import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.
 import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.providers.TrackingAlphaInventoryProvider;
 import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.storage.AlphaInventoryTracker;
 import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.storage.InventoryStorage;
+import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.task.AlphaInventoryUpdateTask;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_2_0_2tob1_1_2.ClientboundPacketsb1_1;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_2_0_2tob1_1_2.ServerboundPacketsb1_1;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_2_0_2tob1_1_2.types.Typesb1_1;
@@ -502,6 +503,8 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends AbstractProtocol<Clientb
     @Override
     public void register(ViaProviders providers) {
         providers.register(AlphaInventoryProvider.class, new TrackingAlphaInventoryProvider());
+
+        Via.getPlatform().runRepeatingSync(new AlphaInventoryUpdateTask(), 20L);
     }
 
     @Override
