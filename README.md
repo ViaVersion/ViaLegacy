@@ -147,7 +147,7 @@ public class AuthLibGameProfileFetcher extends GameProfileFetcher {
 The old auth provider is used to authenticate the player if the server version is <= 1.2.5 and has online mode enabled.
 This is required as <= 1.2.5 servers do not enable encryption at all and authenticate at a different point in the login process.  
 The implementation of this provider requires the implementer to be able to send a joinServer request to the mojang servers using the supplied server hash.  
-The default implementation of this provider simply throws an Excpetion indicating that online mode is not supported by this implementation.
+The default implementation of this provider simply throws an Exception indicating that online mode is not supported by this implementation.
 
 #### AlphaInventoryProvider
 The alpha inventory provider is used to get/set the inventory contents of the player if the server version is <= Alpha 1.2.6.
@@ -167,7 +167,8 @@ For a reference implementation you can take a look at how [ViaProxy](https://git
 The classic MP pass provider is used to get the MP pass (Authentication token) of a player if the server version is <= Classic 0.30.
 This is required for joining classic servers with enabled online mode.  
 The implementation of this provider requires the implementer to be able to get the MP pass of a given player.  
-The default implementation of this provider simply returns "0" which indicates to the server that the client does not have a valid MP pass.
+The default implementation of this provider simply returns "0" which indicates to the server that the client does not have a valid MP pass.  
+For a reference implementation you can take a look at how [ViaProxy](https://github.com/RaphiMC/ViaProxy/blob/main/src/main/java/net/raphimc/viaproxy/protocolhack/providers/ViaProxyClassicMPPassProvider.java) implements it.
 
 ## Contact
 If you encounter any issues, please report them on the
