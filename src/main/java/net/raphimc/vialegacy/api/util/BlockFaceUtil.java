@@ -1,8 +1,8 @@
-package net.raphimc.vialegacy.util;
+package net.raphimc.vialegacy.api.util;
 
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 
-public class BlockFaceUtils {
+public class BlockFaceUtil {
 
     public static BlockFace getFace(final int direction) {
         switch (direction) {

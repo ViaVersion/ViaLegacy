@@ -6,7 +6,6 @@ import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.data.Cl
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.storage.ClassicBlockRemapper;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_0_20a_27toc0_0_19a_06.ClientboundPacketsc0_19a;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_0_20a_27toc0_0_19a_06.ServerboundPacketsc0_19a;
-import net.raphimc.vialegacy.util.VersionEnum;
 
 public class Protocolc0_0_19a_06toc0_0_18a_02 extends AbstractProtocol<ClientboundPacketsc0_19a, ClientboundPacketsc0_19a, ServerboundPacketsc0_19a, ServerboundPacketsc0_19a> {
 
@@ -20,7 +19,7 @@ public class Protocolc0_0_19a_06toc0_0_18a_02 extends AbstractProtocol<Clientbou
         userConnection.put(new ClassicBlockRemapper(userConnection, previousRemapper.getMapper(), o -> {
             int block = previousRemapper.getReverseMapper().getInt(o);
 
-            if (VersionEnum.fromUserConnection(userConnection).isOlderThanOrEqualTo(VersionEnum.c0_0_18a_02)) {
+            if (userConnection.getProtocolInfo().getPipeline().contains(Protocolc0_0_19a_06toc0_0_18a_02.class)) {
                 if (block != ClassicBlocks.STONE && block != ClassicBlocks.DIRT && block != ClassicBlocks.WOOD && block != ClassicBlocks.SAPLING && block != ClassicBlocks.GRAVEL && block != ClassicBlocks.LOG && block != ClassicBlocks.LEAVES && block != ClassicBlocks.SAND && block != ClassicBlocks.COBBLESTONE) {
                     block = ClassicBlocks.STONE;
                 }

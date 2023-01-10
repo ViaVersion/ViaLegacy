@@ -1,7 +1,9 @@
 package net.raphimc.vialegacy.util;
 
 import com.viaversion.viabackwards.api.data.BackwardsMappings;
-import com.viaversion.viaversion.api.data.*;
+import com.viaversion.viaversion.api.data.MappingDataLoader;
+import com.viaversion.viaversion.api.data.Mappings;
+import com.viaversion.viaversion.api.data.ParticleMappings;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2IntMap;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.gson.JsonObject;
@@ -9,6 +11,7 @@ import com.viaversion.viaversion.util.Int2IntBiHashMap;
 
 import java.util.Map;
 
+@Deprecated // Will be moved into ViaSnapshots
 public class ItemBackwardsMappings extends BackwardsMappings {
 
     public ItemBackwardsMappings(String oldVersion, String newVersion) {

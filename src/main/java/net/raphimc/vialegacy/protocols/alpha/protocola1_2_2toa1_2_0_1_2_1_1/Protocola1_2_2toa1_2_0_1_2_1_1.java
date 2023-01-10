@@ -4,9 +4,9 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_2_3_1_2_3_4toa1_2_2.ClientboundPacketsa1_2_2;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_2_3_1_2_3_4toa1_2_2.ServerboundPacketsa1_2_2;
-import net.raphimc.vialegacy.util.PreNettySplitter;
 
 public class Protocola1_2_2toa1_2_0_1_2_1_1 extends AbstractProtocol<ClientboundPacketsa1_2_0, ClientboundPacketsa1_2_2, ServerboundPacketsa1_2_0, ServerboundPacketsa1_2_2> {
 

@@ -1,4 +1,4 @@
-package net.raphimc.vialegacy.api;
+package net.raphimc.vialegacy.api.remapper;
 
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.libs.fastutil.objects.ObjectArrayList;

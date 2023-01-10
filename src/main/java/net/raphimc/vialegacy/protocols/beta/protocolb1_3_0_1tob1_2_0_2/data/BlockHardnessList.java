@@ -1,6 +1,6 @@
 package net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.data;
 
-import net.raphimc.vialegacy.api.IdAndData;
+import net.raphimc.vialegacy.api.model.IdAndData;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -8,10 +8,14 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.MathUtil;
 import net.raphimc.vialegacy.ViaLegacy;
-import net.raphimc.vialegacy.api.Location;
+import net.raphimc.vialegacy.api.model.Location;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.Protocol1_3_1_2to1_2_4_5;
-import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.model.*;
-import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.sound.*;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.model.AbstractTrackedEntity;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.model.ConfiguredSound;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.model.TrackedLivingEntity;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.sound.Sound;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.sound.SoundEmulation;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.sound.SoundType;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.ClientboundPackets1_3_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Types1_6_4;
 

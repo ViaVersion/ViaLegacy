@@ -2,8 +2,14 @@ package net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
-import net.raphimc.vialegacy.api.*;
-import net.raphimc.vialegacy.util.VersionEnum;
+import net.raphimc.vialegacy.api.data.BlockList1_6;
+import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.remapper.AbstractChunkTracker;
+import net.raphimc.vialegacy.protocols.beta.protocolb1_2_0_2tob1_1_2.Protocolb1_2_0_2tob1_1_2;
+import net.raphimc.vialegacy.protocols.beta.protocolb1_5_0_2tob1_4_0_1.Protocolb1_5_0_2tob1_4_0_1;
+import net.raphimc.vialegacy.protocols.beta.protocolb1_6_0_6tob1_5_0_2.Protocolb1_6_0_6tob1_5_0_2;
+import net.raphimc.vialegacy.protocols.beta.protocolb1_8_0_1tob1_7_0_3.Protocolb1_8_0_1tob1_7_0_3;
+import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.Protocol1_2_1_3to1_1;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -193,17 +199,17 @@ public class ChunkTracker extends AbstractChunkTracker {
         for (int i = 0; i < 16; i++) {
             this.registerReplacement(new IdAndData(BlockList1_6.lockedChest.blockID, i), new IdAndData(BlockList1_6.bedrock.blockID, 0));
         }
-
-        if (VersionEnum.fromUserConnection(user).isOlderThanOrEqualTo(VersionEnum.r1_1)) {
+        if (user.getProtocolInfo().getPipeline().contains(Protocol1_2_1_3to1_1.class)) {
             for (int i = 9; i < 16; i++) {
                 this.registerReplacement(new IdAndData(BlockList1_6.doorWood.blockID, i), new IdAndData(BlockList1_6.doorWood.blockID, 8));
                 this.registerReplacement(new IdAndData(BlockList1_6.doorIron.blockID, i), new IdAndData(BlockList1_6.doorIron.blockID, 8));
             }
         }
-        if (VersionEnum.fromUserConnection(user).isOlderThanOrEqualTo(VersionEnum.b1_5tob1_5_2)) {
+
+        if (user.getProtocolInfo().getPipeline().contains(Protocolb1_6_0_6tob1_5_0_2.class)) {
             this.registerReplacement(new IdAndData(BlockList1_6.jukebox.blockID, 2), new IdAndData(BlockList1_6.jukebox.blockID, 1));
         }
-        if (VersionEnum.fromUserConnection(user).isOlderThanOrEqualTo(VersionEnum.b1_4tob1_4_1)) {
+        if (user.getProtocolInfo().getPipeline().contains(Protocolb1_5_0_2tob1_4_0_1.class)) {
             for (int i = 1; i < 8; i++) {
                 this.registerReplacement(new IdAndData(BlockList1_6.sapling.blockID, i), new IdAndData(BlockList1_6.sapling.blockID, 0));
             }
@@ -211,7 +217,7 @@ public class ChunkTracker extends AbstractChunkTracker {
                 this.registerReplacement(new IdAndData(BlockList1_6.sapling.blockID, i), new IdAndData(BlockList1_6.sapling.blockID, 8));
             }
         }
-        if (VersionEnum.fromUserConnection(user).isOlderThanOrEqualTo(VersionEnum.b1_1_2)) {
+        if (user.getProtocolInfo().getPipeline().contains(Protocolb1_2_0_2tob1_1_2.class)) {
             for (int i = 1; i < 16; i++) {
                 this.registerReplacement(new IdAndData(BlockList1_6.leaves.blockID, i), new IdAndData(BlockList1_6.leaves.blockID, 0));
             }
@@ -220,7 +226,7 @@ public class ChunkTracker extends AbstractChunkTracker {
 
     @Override
     protected void remapBlock(final IdAndData block, final int x, final int y, final int z) {
-        if (block.id == BlockList1_6.chest.blockID && VersionEnum.fromUserConnection(this.getUser()).isOlderThanOrEqualTo(VersionEnum.b1_7tob1_7_3)) {
+        if (block.id == BlockList1_6.chest.blockID && this.getUser().getProtocolInfo().getPipeline().contains(Protocolb1_8_0_1tob1_7_0_3.class)) {
             byte blockData = 3;
             int rot1 = this.getBlockNotNull(x, y, z - 1).id;
             int rot2 = this.getBlockNotNull(x, y, z + 1).id;
@@ -288,7 +294,7 @@ public class ChunkTracker extends AbstractChunkTracker {
 
     @Override
     protected void postRemap(DataPalette palette) {
-        if (VersionEnum.fromUserConnection(this.getUser()).isOlderThanOrEqualTo(VersionEnum.b1_7tob1_7_3)) {
+        if (this.getUser().getProtocolInfo().getPipeline().contains(Protocolb1_8_0_1tob1_7_0_3.class)) {
             palette.replaceId(BlockList1_6.chest.blockID << 4, 0);
             palette.replaceId(BlockList1_6.chest.blockID << 4 | 1, 0);
         }

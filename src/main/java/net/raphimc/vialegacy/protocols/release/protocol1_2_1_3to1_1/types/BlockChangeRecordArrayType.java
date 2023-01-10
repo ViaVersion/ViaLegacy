@@ -4,7 +4,7 @@ import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord1_8;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
-import net.raphimc.vialegacy.api.IdAndData;
+import net.raphimc.vialegacy.api.model.IdAndData;
 
 public class BlockChangeRecordArrayType extends Type<BlockChangeRecord[]> {
 

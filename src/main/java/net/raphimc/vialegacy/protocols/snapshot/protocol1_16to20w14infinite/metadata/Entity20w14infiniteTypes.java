@@ -3,7 +3,9 @@ package net.raphimc.vialegacy.protocols.snapshot.protocol1_16to20w14infinite.met
 import com.viaversion.viaversion.api.minecraft.entities.EntityType;
 import net.raphimc.vialegacy.ViaLegacy;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
 public enum Entity20w14infiniteTypes implements EntityType {
 

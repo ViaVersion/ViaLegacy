@@ -1,4 +1,4 @@
-package net.raphimc.vialegacy.util;
+package net.raphimc.vialegacy.api.splitter;
 
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;

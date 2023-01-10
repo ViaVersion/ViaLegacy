@@ -7,7 +7,10 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.*;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.ByteTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.protocols.base.BaseProtocol1_7;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import net.raphimc.vialegacy.ViaLegacy;
@@ -16,7 +19,9 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.GameP
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.providers.GameProfileFetcher;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 public class Protocol1_7_6_10to1_7_2_5 extends AbstractProtocol<ClientboundPackets1_7_2, ClientboundPackets1_7_2, ServerboundPackets1_7_2, ServerboundPackets1_7_2> {
 

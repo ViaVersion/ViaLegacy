@@ -1,7 +1,7 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.beta;
 
 import net.raphimc.vialegacy.ViaLegacy;
-import net.raphimc.vialegacy.api.ChunkCoord;
+import net.raphimc.vialegacy.api.model.ChunkCoord;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.IWorldChunkManager;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.release.NewBiomeGenBase;
 

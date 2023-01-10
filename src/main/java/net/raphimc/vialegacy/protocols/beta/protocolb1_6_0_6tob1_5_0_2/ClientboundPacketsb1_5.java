@@ -3,11 +3,11 @@ package net.raphimc.vialegacy.protocols.beta.protocolb1_6_0_6tob1_5_0_2;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import io.netty.buffer.ByteBuf;
-import net.raphimc.vialegacy.util.PreNettyPacketType;
+import net.raphimc.vialegacy.api.splitter.PreNettyPacketType;
 
 import java.util.function.BiConsumer;
 
-import static net.raphimc.vialegacy.util.PreNettyTypes.*;
+import static net.raphimc.vialegacy.api.splitter.PreNettyTypes.*;
 
 public enum ClientboundPacketsb1_5 implements ClientboundPacketType, PreNettyPacketType {
 

@@ -9,7 +9,10 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
-import net.raphimc.vialegacy.api.*;
+import net.raphimc.vialegacy.api.data.BlockList1_6;
+import net.raphimc.vialegacy.api.data.ItemList1_6;
+import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_6_0_6tob1_5_0_2.storage.WorldTimeStorage;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_6_0_6tob1_5_0_2.task.TimeTrackTask;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_8_0_1tob1_7_0_3.ClientboundPacketsb1_7;
@@ -19,7 +22,6 @@ import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.Ch
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.PlayerInfoStorage;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Types1_6_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
-import net.raphimc.vialegacy.util.PreNettySplitter;
 
 public class Protocolb1_6_0_6tob1_5_0_2 extends AbstractProtocol<ClientboundPacketsb1_5, ClientboundPacketsb1_7, ServerboundPacketsb1_5, ServerboundPacketsb1_7> {
 

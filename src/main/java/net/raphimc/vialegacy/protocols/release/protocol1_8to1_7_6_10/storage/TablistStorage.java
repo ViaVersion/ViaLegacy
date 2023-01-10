@@ -10,7 +10,9 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.GameProfile;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.TabListEntry;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TablistStorage extends StoredObject {
 

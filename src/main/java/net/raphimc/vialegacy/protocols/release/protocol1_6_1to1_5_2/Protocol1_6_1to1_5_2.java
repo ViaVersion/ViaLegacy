@@ -9,6 +9,7 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.ViaLegacy;
+import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.metadata.MetadataRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.rewriter.SoundRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.storage.AttachTracker;
@@ -18,7 +19,6 @@ import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.Serverboun
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Types1_6_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata.MetaIndex1_8to1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
-import net.raphimc.vialegacy.util.PreNettySplitter;
 
 import java.util.List;
 

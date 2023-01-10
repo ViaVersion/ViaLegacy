@@ -1,8 +1,10 @@
-package net.raphimc.vialegacy.util;
+package net.raphimc.vialegacy.api.util;
 
-import net.raphimc.vialegacy.api.ChunkCoord;
+import net.raphimc.vialegacy.api.model.ChunkCoord;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Spliterator;
+import java.util.Spliterators;
 
 public class ChunkCoordSpiral implements Iterable<ChunkCoord> {
 

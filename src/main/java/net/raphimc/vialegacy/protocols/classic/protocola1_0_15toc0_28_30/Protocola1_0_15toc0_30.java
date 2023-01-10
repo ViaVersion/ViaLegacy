@@ -11,7 +11,11 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import net.raphimc.vialegacy.api.*;
+import net.raphimc.vialegacy.api.data.BlockList1_6;
+import net.raphimc.vialegacy.api.model.ChunkCoord;
+import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
+import net.raphimc.vialegacy.api.util.BlockFaceUtil;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_16_2toa1_0_15.ClientboundPacketsa1_0_15;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_16_2toa1_0_15.ServerboundPacketsa1_0_15;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_17_1_0_17_4toa1_0_16_2.storage.TimeLockStorage;
@@ -27,13 +31,15 @@ import net.raphimc.vialegacy.protocols.beta.protocolb1_8_0_1tob1_7_0_3.Protocolb
 import net.raphimc.vialegacy.protocols.beta.protocolb1_8_0_1tob1_7_0_3.types.Typesb1_7_0_3;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.data.ClassicBlocks;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.model.ClassicLevel;
-import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.providers.*;
+import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.providers.ClassicCustomCommandProvider;
+import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.providers.ClassicMPPassProvider;
+import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.providers.ClassicWorldHeightProvider;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.storage.*;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.types.Typesc0_30;
+import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.Protocolc0_30toc0_30cpe;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.storage.ExtBlockPermissionsStorage;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
-import net.raphimc.vialegacy.util.*;
 
 public class Protocola1_0_15toc0_30 extends AbstractProtocol<ClientboundPacketsc0_28, ClientboundPacketsa1_0_15, ServerboundPacketsc0_28, ServerboundPacketsa1_0_15> {
 
@@ -483,7 +489,7 @@ public class Protocola1_0_15toc0_30 extends AbstractProtocol<ClientboundPacketsc
                         wrapper.cancel();
                         return;
                     }
-                    pos = pos.getRelative(BlockFaceUtils.getFace(direction));
+                    pos = pos.getRelative(BlockFaceUtil.getFace(direction));
 
                     if (pos.y() >= level.getSizeY()) {
                         wrapper.cancel();
@@ -543,7 +549,7 @@ public class Protocola1_0_15toc0_30 extends AbstractProtocol<ClientboundPacketsc
         userConnection.put(new ClassicBlockRemapper(userConnection, i -> ClassicBlocks.MAPPING.get(i), o -> {
             int block = ClassicBlocks.REVERSE_MAPPING.getInt(o);
 
-            if (!VersionEnum.fromUserConnection(userConnection).equals(VersionEnum.c0_30cpe)) {
+            if (!userConnection.getProtocolInfo().getPipeline().contains(Protocolc0_30toc0_30cpe.class)) {
                 if (block == ClassicBlocks.GRASS) block = ClassicBlocks.DIRT;
                 else if (block == ClassicBlocks.BEDROCK) block = ClassicBlocks.STONE;
                 else if (block == ClassicBlocks.STATIONARY_WATER) block = ClassicBlocks.BLUE_WOOL;

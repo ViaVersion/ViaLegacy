@@ -6,13 +6,15 @@ import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.ViaLegacy;
-import net.raphimc.vialegacy.api.IdAndData;
+import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.Protocol1_2_1_3to1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.model.PendingBlockEntry;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_4_5to1_2_1_3.ClientboundPackets1_2_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 
 public class PendingBlocksTracker extends StoredObject {

@@ -4,7 +4,9 @@ import com.viaversion.viaversion.util.Config;
 
 import java.io.File;
 import java.net.URL;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.platform.ViaLegacyConfig {
 

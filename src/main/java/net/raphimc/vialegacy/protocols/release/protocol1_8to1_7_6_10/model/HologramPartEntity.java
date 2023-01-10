@@ -7,7 +7,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import net.raphimc.vialegacy.api.Location;
+import net.raphimc.vialegacy.api.model.Location;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata.MetaIndex1_8to1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata.MetadataRewriter;

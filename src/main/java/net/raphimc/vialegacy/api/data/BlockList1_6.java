@@ -1,4 +1,4 @@
-package net.raphimc.vialegacy.api;
+package net.raphimc.vialegacy.api.data;
 
 import com.google.common.collect.Lists;
 

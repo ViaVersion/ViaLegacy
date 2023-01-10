@@ -3,12 +3,12 @@ package net.raphimc.vialegacy.protocols.release.protocol1_2_4_5to1_2_1_3;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import io.netty.buffer.ByteBuf;
-import net.raphimc.vialegacy.util.PreNettyPacketType;
+import net.raphimc.vialegacy.api.splitter.PreNettyPacketType;
 
 import java.util.function.BiConsumer;
 
-import static net.raphimc.vialegacy.util.PreNettyTypes.readItemStack1_0;
-import static net.raphimc.vialegacy.util.PreNettyTypes.readString;
+import static net.raphimc.vialegacy.api.splitter.PreNettyTypes.readItemStack1_0;
+import static net.raphimc.vialegacy.api.splitter.PreNettyTypes.readString;
 
 public enum ServerboundPackets1_2_1 implements ServerboundPacketType, PreNettyPacketType {
 

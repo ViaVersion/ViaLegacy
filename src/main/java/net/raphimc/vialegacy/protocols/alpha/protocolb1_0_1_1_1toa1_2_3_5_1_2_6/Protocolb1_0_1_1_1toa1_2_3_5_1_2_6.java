@@ -12,7 +12,10 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.*;
 import net.raphimc.vialegacy.ViaLegacy;
-import net.raphimc.vialegacy.api.*;
+import net.raphimc.vialegacy.api.data.BlockList1_6;
+import net.raphimc.vialegacy.api.data.ItemList1_6;
+import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.data.AlphaItems;
 import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.providers.AlphaInventoryProvider;
 import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.providers.TrackingAlphaInventoryProvider;
@@ -31,7 +34,6 @@ import net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2.types.Type
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.ChunkTracker;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.PlayerInfoStorage;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
-import net.raphimc.vialegacy.util.PreNettySplitter;
 
 import java.util.Arrays;
 import java.util.Objects;

@@ -1,6 +1,6 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.rewriter;
 
-import net.raphimc.vialegacy.api.AbstractItemRewriter;
+import net.raphimc.vialegacy.api.remapper.AbstractItemRewriter;
 
 public class ItemRewriter extends AbstractItemRewriter {
 

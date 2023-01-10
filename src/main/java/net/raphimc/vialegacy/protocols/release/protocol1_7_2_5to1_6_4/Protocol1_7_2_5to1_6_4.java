@@ -26,9 +26,12 @@ import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import io.netty.channel.*;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOutboundHandlerAdapter;
+import io.netty.channel.ChannelPromise;
 import net.raphimc.vialegacy.ViaLegacy;
-import net.raphimc.vialegacy.api.IdAndData;
+import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.providers.EncryptionProvider;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.rewriter.*;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.*;
@@ -38,8 +41,10 @@ import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.Clientb
 import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ServerboundPackets1_7_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.providers.GameProfileFetcher;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.*;
-import net.raphimc.vialegacy.util.PreNettySplitter;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Chunk1_7_6Type;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkBulk1_7_6Type;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.MetaType1_7_6;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
 import java.util.List;
 import java.util.logging.Level;

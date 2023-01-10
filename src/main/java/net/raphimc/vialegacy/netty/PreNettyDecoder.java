@@ -8,8 +8,8 @@ import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
 import net.raphimc.vialegacy.ViaLegacy;
-import net.raphimc.vialegacy.util.PreNettyPacketType;
-import net.raphimc.vialegacy.util.PreNettySplitter;
+import net.raphimc.vialegacy.api.splitter.PreNettyPacketType;
+import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 
 import java.util.List;
 

@@ -2,11 +2,13 @@ package net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6
 
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import net.raphimc.vialegacy.api.BlockList1_6;
-import net.raphimc.vialegacy.api.ItemList1_6;
+import net.raphimc.vialegacy.api.data.BlockList1_6;
+import net.raphimc.vialegacy.api.data.ItemList1_6;
 import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.model.CraftingRecipe;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class CraftingManager {
 

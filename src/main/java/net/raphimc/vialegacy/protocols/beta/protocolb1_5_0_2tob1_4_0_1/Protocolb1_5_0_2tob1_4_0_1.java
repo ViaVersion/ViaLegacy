@@ -6,6 +6,7 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_5_0_2tob1_4_0_1.types.Typesb1_4;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_6_0_6tob1_5_0_2.ClientboundPacketsb1_5;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_6_0_6tob1_5_0_2.ServerboundPacketsb1_5;
@@ -15,7 +16,6 @@ import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.types.Type
 import net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2.types.Types1_4_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Types1_6_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
-import net.raphimc.vialegacy.util.PreNettySplitter;
 
 import java.util.List;
 

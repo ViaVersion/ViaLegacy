@@ -7,13 +7,13 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
-import net.raphimc.vialegacy.api.ItemList1_6;
+import net.raphimc.vialegacy.api.data.ItemList1_6;
+import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
+import net.raphimc.vialegacy.api.util.BlockFaceUtil;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.ClientboundPackets1_6_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.ServerboundPackets1_6_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Types1_6_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
-import net.raphimc.vialegacy.util.BlockFaceUtils;
-import net.raphimc.vialegacy.util.PreNettySplitter;
 
 import java.nio.charset.StandardCharsets;
 
@@ -73,7 +73,7 @@ public class Protocol1_6_2to1_6_1 extends AbstractProtocol<ClientboundPackets1_6
                     if (item != null && item.identifier() == ItemList1_6.sign.itemID && direction != 255 && direction != 0) { // If placed item is a sign then cancel and send a OPEN_SIGN_EDITOR packet
                         final PacketWrapper openSignEditor = PacketWrapper.create(ClientboundPackets1_6_4.OPEN_SIGN_EDITOR, wrapper.user());
                         openSignEditor.write(Type.BYTE, (byte) 0); // magic value
-                        openSignEditor.write(Types1_7_6.POSITION_INT, pos.getRelative(BlockFaceUtils.getFace(direction)));
+                        openSignEditor.write(Types1_7_6.POSITION_INT, pos.getRelative(BlockFaceUtil.getFace(direction)));
                         openSignEditor.send(Protocol1_6_2to1_6_1.class);
                     }
                 });

@@ -15,16 +15,26 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.*;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.IntTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.ShortTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import net.raphimc.vialegacy.ViaLegacy;
-import net.raphimc.vialegacy.api.*;
+import net.raphimc.vialegacy.api.data.BlockList1_6;
+import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.model.Location;
+import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.data.EntityList;
-import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.model.*;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.model.AbstractTrackedEntity;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.model.TrackedEntity;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.model.TrackedLivingEntity;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.providers.OldAuthProvider;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.sound.Sound;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.sound.SoundType;
-import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.storage.*;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.storage.ChestStateTracker;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.storage.DimensionTracker;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.storage.EntityTracker;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.task.EntityTrackerTickTask;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.types.Chunk1_2_4Type;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.types.Types1_2_4;
@@ -38,9 +48,11 @@ import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Type
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata.MetaIndex1_8to1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Chunk1_7_6Type;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
-import net.raphimc.vialegacy.util.PreNettySplitter;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.logging.Level;
 
 public class Protocol1_3_1_2to1_2_4_5 extends AbstractProtocol<ClientboundPackets1_2_4, ClientboundPackets1_3_1, ServerboundPackets1_2_4, ServerboundPackets1_3_1> {

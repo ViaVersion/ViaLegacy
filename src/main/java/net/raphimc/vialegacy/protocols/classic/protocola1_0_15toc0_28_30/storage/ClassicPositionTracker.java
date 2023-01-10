@@ -5,7 +5,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
-import net.raphimc.vialegacy.api.ChunkCoord;
+import net.raphimc.vialegacy.api.model.ChunkCoord;
 
 public class ClassicPositionTracker extends StoredObject {
 

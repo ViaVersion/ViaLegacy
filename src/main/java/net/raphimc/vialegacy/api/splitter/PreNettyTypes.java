@@ -1,4 +1,4 @@
-package net.raphimc.vialegacy.util;
+package net.raphimc.vialegacy.api.splitter;
 
 import io.netty.buffer.ByteBuf;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.data.NbtItemList;

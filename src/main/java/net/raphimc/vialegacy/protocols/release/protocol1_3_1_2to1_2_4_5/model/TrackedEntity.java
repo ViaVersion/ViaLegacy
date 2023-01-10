@@ -1,7 +1,7 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.model;
 
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
-import net.raphimc.vialegacy.api.Location;
+import net.raphimc.vialegacy.api.model.Location;
 
 public class TrackedEntity extends AbstractTrackedEntity {
 

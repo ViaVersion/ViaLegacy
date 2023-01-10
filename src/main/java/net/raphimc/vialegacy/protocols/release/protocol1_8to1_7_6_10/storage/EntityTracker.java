@@ -6,7 +6,7 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
-import net.raphimc.vialegacy.api.Location;
+import net.raphimc.vialegacy.api.model.Location;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata.MetaIndex1_8to1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.HologramPartEntity;
 

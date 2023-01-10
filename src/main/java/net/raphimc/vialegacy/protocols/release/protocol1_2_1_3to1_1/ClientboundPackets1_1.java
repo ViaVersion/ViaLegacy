@@ -3,8 +3,8 @@ package net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import io.netty.buffer.ByteBuf;
-import net.raphimc.vialegacy.util.PreNettyPacketType;
-import net.raphimc.vialegacy.util.PreNettyTypes;
+import net.raphimc.vialegacy.api.splitter.PreNettyPacketType;
+import net.raphimc.vialegacy.api.splitter.PreNettyTypes;
 
 import java.util.function.BiConsumer;
 

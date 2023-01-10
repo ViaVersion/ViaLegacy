@@ -9,17 +9,21 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.util.MathUtil;
 import net.raphimc.vialegacy.ViaLegacy;
-import net.raphimc.vialegacy.api.ChunkCoord;
+import net.raphimc.vialegacy.api.model.ChunkCoord;
+import net.raphimc.vialegacy.api.util.ChunkCoordSpiral;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_16_2toa1_0_15.ClientboundPacketsa1_0_15;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.Protocola1_0_15toc0_30;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.model.ClassicLevel;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.providers.ClassicWorldHeightProvider;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.chunks.NibbleArray1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types.Chunk1_1Type;
-import net.raphimc.vialegacy.util.ChunkCoordSpiral;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
 public class ClassicLevelStorage extends StoredObject {

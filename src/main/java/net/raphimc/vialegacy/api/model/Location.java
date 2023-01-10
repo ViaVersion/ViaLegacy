@@ -1,4 +1,4 @@
-package net.raphimc.vialegacy.api;
+package net.raphimc.vialegacy.api.model;
 
 import com.viaversion.viaversion.api.minecraft.Position;
 

@@ -1,6 +1,8 @@
 package net.raphimc.vialegacy.protocols.beta.protocolb1_2_0_2tob1_1_2.rewriter;
 
-import net.raphimc.vialegacy.api.*;
+import net.raphimc.vialegacy.api.data.BlockList1_6;
+import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.remapper.AbstractBlockRemapper;
 
 public class BlockDataRewriter extends AbstractBlockRemapper {
 

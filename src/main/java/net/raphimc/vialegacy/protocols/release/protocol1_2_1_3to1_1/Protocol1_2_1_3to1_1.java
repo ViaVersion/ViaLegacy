@@ -4,7 +4,9 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.minecraft.chunks.*;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -13,13 +15,20 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import net.raphimc.vialegacy.ViaLegacy;
-import net.raphimc.vialegacy.api.IdAndData;
-import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.*;
+import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
+import net.raphimc.vialegacy.protocols.beta.protocolb1_8_0_1tob1_7_0_3.Protocolb1_8_0_1tob1_7_0_3;
+import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.Protocola1_0_15toc0_30;
+import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.EndBiomeGenerator;
+import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.NetherBiomeGenerator;
+import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.PlainsBiomeGenerator;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.beta.WorldChunkManager_b1_7;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.release.WorldChunkManager_r1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.chunks.NibbleArray1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.model.NonFullChunk1_1;
-import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.storage.*;
+import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.storage.DimensionTracker;
+import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.storage.PendingBlocksTracker;
+import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.storage.SeedStorage;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.tasks.BlockReceiveInvalidatorTask;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types.Chunk1_1Type;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types.Types1_1;
@@ -30,8 +39,6 @@ import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.types.Type
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.ChunkTracker;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Types1_6_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
-import net.raphimc.vialegacy.util.PreNettySplitter;
-import net.raphimc.vialegacy.util.VersionEnum;
 
 import java.util.Arrays;
 
@@ -311,9 +318,10 @@ public class Protocol1_2_1_3to1_1 extends AbstractProtocol<ClientboundPackets1_1
             } else if (dimensionId == 1) { // End
                 seedStorage.worldChunkManager = new EndBiomeGenerator();
             } else if (dimensionId == 0) { // Overworld
-                if (VersionEnum.fromUserConnection(user).isNewerThanOrEqualTo(VersionEnum.b1_8tob1_8_1)) {
-                    seedStorage.worldChunkManager = new WorldChunkManager_r1_1(VersionEnum.fromUserConnection(user), seedStorage.seed);
-                } else if (VersionEnum.fromUserConnection(user).isNewerThanOrEqualTo(VersionEnum.a1_0_15)) {
+
+                if (!user.getProtocolInfo().getPipeline().contains(Protocolb1_8_0_1tob1_7_0_3.class)) {
+                    seedStorage.worldChunkManager = new WorldChunkManager_r1_1(user, seedStorage.seed);
+                } else if (!user.getProtocolInfo().getPipeline().contains(Protocola1_0_15toc0_30.class)) {
                     seedStorage.worldChunkManager = new WorldChunkManager_b1_7(seedStorage.seed);
                 } else {
                     seedStorage.worldChunkManager = new PlainsBiomeGenerator();

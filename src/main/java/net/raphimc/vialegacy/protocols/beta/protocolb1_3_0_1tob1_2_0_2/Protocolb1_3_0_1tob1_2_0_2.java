@@ -9,7 +9,8 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
-import net.raphimc.vialegacy.api.IdAndData;
+import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.data.BlockHardnessList;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.storage.BlockDigStorage;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.task.BlockDigTickTask;
@@ -20,7 +21,6 @@ import net.raphimc.vialegacy.protocols.beta.protocolb1_5_0_2tob1_4_0_1.types.Met
 import net.raphimc.vialegacy.protocols.beta.protocolb1_5_0_2tob1_4_0_1.types.Typesb1_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.ChunkTracker;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
-import net.raphimc.vialegacy.util.PreNettySplitter;
 
 import java.util.List;
 

@@ -2,7 +2,9 @@ package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
-import net.raphimc.vialegacy.api.*;
+import net.raphimc.vialegacy.api.data.BlockList1_6;
+import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.remapper.AbstractChunkTracker;
 
 public class ChunkTracker extends AbstractChunkTracker {
 

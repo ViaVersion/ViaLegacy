@@ -9,13 +9,15 @@ import com.viaversion.viaversion.api.type.types.minecraft.BaseChunkType;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
-import net.raphimc.vialegacy.api.IdAndData;
+import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.chunks.ExtendedBlockStorage;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.zip.*;
+import java.util.zip.DataFormatException;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
 public class Chunk1_7_6Type extends PartialType<Chunk, ClientWorld> {
 

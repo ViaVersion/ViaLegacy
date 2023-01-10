@@ -4,7 +4,7 @@ import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectFunction;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2IntFunction;
-import net.raphimc.vialegacy.api.IdAndData;
+import net.raphimc.vialegacy.api.model.IdAndData;
 
 public class ClassicBlockRemapper extends StoredObject {
 

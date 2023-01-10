@@ -1,9 +1,9 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.release;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.IWorldChunkManager;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.release.genlayer.GenLayer;
-import net.raphimc.vialegacy.util.VersionEnum;
 
 public class WorldChunkManager_r1_1 implements IWorldChunkManager {
 
@@ -20,9 +20,9 @@ public class WorldChunkManager_r1_1 implements IWorldChunkManager {
         this.remapBasedOnColor = ViaLegacy.getConfig().isRemapBasedOnColor();
     }
 
-    public WorldChunkManager_r1_1(final VersionEnum version, final long seed) {
+    public WorldChunkManager_r1_1(final UserConnection user, final long seed) {
         this();
-        GenLayer[] agenlayer = GenLayer.func_35497_a(version, seed);
+        GenLayer[] agenlayer = GenLayer.func_35497_a(user, seed);
         biomeIndexLayer = agenlayer[1];
         temperatureLayer = agenlayer[2];
         rainfallLayer = agenlayer[3];
