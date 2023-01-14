@@ -1,5 +1,5 @@
 /*
- * This file is part of ViaProtocolHack - https://github.com/RaphiMC/ViaProtocolHack
+ * This file is part of ViaLegacy - https://github.com/RaphiMC/ViaLegacy
  * Copyright (C) 2023 RK_01/RaphiMC and contributors
  *
  * This program is free software: you can redistribute it and/or modify
@@ -23,7 +23,7 @@ import com.viaversion.viaversion.api.protocol.version.VersionRange;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LegacyProtocolVersions {
+public class LegacyProtocolVersion {
 
     public static final List<ProtocolVersion> PROTOCOLS = new ArrayList<>();
 
@@ -68,10 +68,25 @@ public class LegacyProtocolVersions {
     // Special protocols
     public static final ProtocolVersion c0_30cpe = registerLegacy(-7 << 2 | 2, "c0.30 CPE");
 
-    // Snapshots
-    public static final ProtocolVersion s3d_shareware = ProtocolVersion.register(1, "3D Shareware");
-    public static final ProtocolVersion s20w14infinite = ProtocolVersion.register(709, "20w14infinite");
-    public static final ProtocolVersion sCombatTest8c = ProtocolVersion.register(803, "Combat Test 8c");
+
+    public static int protocolCompare(int a, int b) {
+        if (a > 0 || b > 0) {
+            // If at least one is modern, then a straight compare works fine.
+            return a - b;
+        }
+        // Both are legacy
+        a = Math.abs(a);
+        b = Math.abs(b);
+        final int baseProtocolA = a >> 2;
+        final int baseProtocolB = b >> 2;
+        if (baseProtocolA != baseProtocolB) {
+            return baseProtocolA - baseProtocolB;
+        }
+        // They're either the same version or one where the protocol overlaps.
+        final int discriminatorA = a & 3;
+        final int discriminatorB = b & 3;
+        return discriminatorB - discriminatorA; // Higher discriminator means older version
+    }
 
 
     private static ProtocolVersion registerLegacy(final int version, final String name) {

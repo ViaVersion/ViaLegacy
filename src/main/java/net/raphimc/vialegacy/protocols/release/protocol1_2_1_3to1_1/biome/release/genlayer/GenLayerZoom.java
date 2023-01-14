@@ -1,5 +1,5 @@
 /*
- * This file is part of ViaProtocolHack - https://github.com/RaphiMC/ViaProtocolHack
+ * This file is part of ViaLegacy - https://github.com/RaphiMC/ViaLegacy
  * Copyright (C) 2023 RK_01/RaphiMC and contributors
  *
  * This program is free software: you can redistribute it and/or modify

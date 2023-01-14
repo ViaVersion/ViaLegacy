@@ -1,5 +1,5 @@
 # ViaLegacy
-ViaVersion addon to add support for EVERY minecraft server version (Classic, Alpha, Beta, Release, April Fools).
+ViaVersion addon to add support for EVERY minecraft server version (Classic, Alpha, Beta, Release).
 
 ViaLegacy is not usable by itself as a standalone software, as it is an addon for ViaVersion which adds more protocol translators.
 ViaLegacy is intended to be implemented in a ViaVersion based protocol translator.
@@ -12,8 +12,6 @@ If you just want to use ViaLegacy yourself you can check out some projects which
 - Alpha (a1.0.15 - a1.2.6)
 - Beta (b1.0 - b1.8.1)
 - Release (1.0.0 - 1.7.10)
-- April Fools (3D Shareware, 20w14infinite)
-- Combat Snapshots (Combat Test 8c)
 
 The lowest supported client version from which ViaLegacy can translate is 1.7.2.
 
@@ -33,9 +31,6 @@ ViaLegacy requires you to have an already functional ViaVersion implementation f
 If you don't have one you can check out [ViaProtocolHack](https://github.com/RaphiMC/ViaProtocolHack) for an abstracted and simplified, but still customizable implementation,
 or [ViaLoadingBase](https://github.com/FlorianMichael/ViaLoadingBase) for a quick and easy implementation.
 You can also go to the official [ViaVersion](https://github.com/ViaVersion) repositories and look at their server and proxy implementations.
-
-ViaLegacy currently also requires you to have ViaBackwards installed, as ViaLegacy uses some of its classes.
-This will be changed in the future when the snapshots part of ViaLegacy is split off into its own project.
 
 ### Base Implementation
 #### ViaLegacy platform implementation
