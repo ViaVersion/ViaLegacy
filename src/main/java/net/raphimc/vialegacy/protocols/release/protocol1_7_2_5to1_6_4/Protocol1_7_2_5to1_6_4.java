@@ -1189,19 +1189,21 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
         }
         userConnection.put(new ChunkTracker(userConnection));
 
-        userConnection.getChannel().pipeline().addFirst(new ChannelOutboundHandlerAdapter() {
-            @Override
-            public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-                if (userConnection.getProtocolInfo().getState().equals(State.PLAY) && ctx.channel().isWritable() && userConnection.get(PlayerInfoStorage.class).entityId != -1) {
-                    final PacketWrapper disconnect = PacketWrapper.create(ServerboundPackets1_6_4.DISCONNECT, userConnection);
-                    disconnect.write(Types1_6_4.STRING, "Quitting"); // reason
-                    disconnect.sendToServer(Protocol1_7_2_5to1_6_4.class);
-                    Thread.sleep(50); // Wait for the packet to arrive at the server
-                }
+        if (userConnection.getChannel() != null) {
+            userConnection.getChannel().pipeline().addFirst(new ChannelOutboundHandlerAdapter() {
+                @Override
+                public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+                    if (userConnection.getProtocolInfo().getState().equals(State.PLAY) && ctx.channel().isWritable() && userConnection.get(PlayerInfoStorage.class).entityId != -1) {
+                        final PacketWrapper disconnect = PacketWrapper.create(ServerboundPackets1_6_4.DISCONNECT, userConnection);
+                        disconnect.write(Types1_6_4.STRING, "Quitting"); // reason
+                        disconnect.sendToServer(Protocol1_7_2_5to1_6_4.class);
+                        Thread.sleep(50); // Wait for the packet to arrive at the server
+                    }
 
-                super.close(ctx, promise);
-            }
-        });
+                    super.close(ctx, promise);
+                }
+            });
+        }
     }
 
 }
