@@ -196,6 +196,8 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                     final byte dimensionId = wrapper.get(Type.BYTE, 0);
                     wrapper.user().get(DimensionTracker.class).setDimension(dimensionId);
                     wrapper.user().get(ClientWorld.class).setEnvironment(dimensionId);
+
+                    wrapper.user().put(new ChunkTracker(wrapper.user()));
                 });
             }
         });
@@ -1187,7 +1189,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
         if (!userConnection.has(ClientWorld.class)) {
             userConnection.put(new ClientWorld(userConnection));
         }
-        userConnection.put(new ChunkTracker(userConnection));
+        userConnection.put(new ChunkTracker(userConnection)); // Set again in JOIN_GAME handler for version comparisons to work
 
         if (userConnection.getChannel() != null) {
             userConnection.getChannel().pipeline().addFirst(new ChannelOutboundHandlerAdapter() {
