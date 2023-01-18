@@ -18,63 +18,115 @@
 package net.raphimc.vialegacy.api.remapper;
 
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
+import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.rewriter.ItemRewriter;
+import com.viaversion.viaversion.api.rewriter.RewriterBase;
+import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.libs.fastutil.ints.IntArrayList;
+import com.viaversion.viaversion.libs.fastutil.ints.IntList;
 import com.viaversion.viaversion.libs.fastutil.objects.ObjectArrayList;
 import com.viaversion.viaversion.libs.fastutil.objects.ObjectList;
-import com.viaversion.viaversion.libs.gson.JsonObject;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.*;
 
 import java.util.List;
 
-public abstract class AbstractItemRewriter {
+public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBase<P> implements ItemRewriter<P> {
 
-    private final ObjectList<RewriteEntry> REWRITE_ENTRIES = new ObjectArrayList<>();
-    protected final String HACK_TAG_NAME;
+    private final ObjectList<RewriteEntry> rewriteEntries = new ObjectArrayList<>();
+    private final IntList nonExistentItems = new IntArrayList();
+    protected final String tagName;
     protected final String protocolName;
-    private final boolean jsonName;
 
-    public AbstractItemRewriter(final String protocolName, final boolean jsonName) {
-        this.HACK_TAG_NAME = protocolName.replace(".", "_") + "_ProtocolHack_" + System.currentTimeMillis();
+    public LegacyItemRewriter(final P protocol, final String protocolName) {
+        super(protocol);
+        this.tagName = protocolName.replace(".", "_") + "_ProtocolHack_" + System.currentTimeMillis();
         this.protocolName = protocolName;
-        this.jsonName = jsonName;
     }
 
-    protected void registerRemappedItem(final int oldItemId, final int newItemId, final String newItemName) {
-        registerRemappedItem(oldItemId, newItemId, -1, newItemName);
+    protected void addRemappedItem(final int oldItemId, final int newItemId, final String newItemName) {
+        this.addRemappedItem(oldItemId, newItemId, -1, newItemName);
     }
 
-    protected void registerRemappedItem(final int oldItemId, final int newItemId, final int newItemMeta, final String newItemName) {
-        registerRemappedItem(oldItemId, -1, newItemId, newItemMeta, newItemName);
+    protected void addRemappedItem(final int oldItemId, final int newItemId, final int newItemMeta, final String newItemName) {
+        this.addRemappedItem(oldItemId, -1, newItemId, newItemMeta, newItemName);
     }
 
-    protected void registerRemappedItem(final int oldItemId, final int oldItemMeta, final int newItemId, final int newItemMeta, final String newItemName) {
-        REWRITE_ENTRIES.add(new RewriteEntry(oldItemId, (short) oldItemMeta, newItemId, (short) newItemMeta, newItemName));
+    protected void addRemappedItem(final int oldItemId, final int oldItemMeta, final int newItemId, final int newItemMeta, final String newItemName) {
+        this.rewriteEntries.add(new RewriteEntry(oldItemId, (short) oldItemMeta, newItemId, (short) newItemMeta, newItemName));
     }
 
-    public void rewriteRead(final Item item) {
-        if (item == null) return;
+    protected void addNonExistentItems(final int... itemIds) {
+        for (int itemId : itemIds) {
+            this.nonExistentItems.add(itemId);
+        }
+    }
 
-        for (RewriteEntry rewriteEntry : REWRITE_ENTRIES) {
+    protected void addNonExistentItemRange(final int startItemId, final int endItemId) {
+        for (int i = startItemId; i <= endItemId; i++) {
+            this.nonExistentItems.add(i);
+        }
+    }
+
+
+    public void registerCreativeInventoryAction(final ServerboundPacketType packetType, final Type<Item> type) {
+        this.protocol.registerServerbound(packetType, new PacketRemapper() {
+            @Override
+            public void registerMap() {
+                map(Type.SHORT); // slot
+                map(type); // item
+                handler(itemToServerHandler(type));
+            }
+        });
+    }
+
+    @Override
+    public Item handleItemToClient(final Item item) {
+        if (item == null) return null;
+
+        for (RewriteEntry rewriteEntry : this.rewriteEntries) {
             if (rewriteEntry.rewrites(item)) {
-                setRemappedNameRead(item, rewriteEntry.newItemName);
+                this.setRemappedNameRead(item, rewriteEntry.newItemName);
                 if (rewriteEntry.newItemMeta != -1) {
                     item.setData(rewriteEntry.newItemMeta);
                 }
                 item.setIdentifier(rewriteEntry.newItemID);
             }
         }
+
+        return item;
     }
 
-    public void rewriteWrite(final Item item) {
-        if (item == null) return;
+    @Override
+    public Item handleItemToServer(final Item item) {
+        if (item == null) return null;
 
-        setRemappedTagWrite(item);
+        if (this.nonExistentItems.contains(item.identifier())) {
+            item.setIdentifier(1);
+            item.setData((short) 0);
+            return item;
+        }
+
+        this.setRemappedTagWrite(item);
+
+        return item;
     }
 
+
+    private PacketHandler itemToClientHandler(Type<Item> type) {
+        return wrapper -> handleItemToClient(wrapper.get(type, 0));
+    }
+
+    private PacketHandler itemToServerHandler(Type<Item> type) {
+        return wrapper -> handleItemToServer(wrapper.get(type, 0));
+    }
 
     private void setRemappedNameRead(final Item item, final String name) {
         //Set protocol hack tag for later remapping
-        CompoundTag protocolHackTag = (item.tag() != null && item.tag().contains(HACK_TAG_NAME) ? item.tag().get(HACK_TAG_NAME) : new CompoundTag());
-        if (item.tag() == null || !item.tag().contains(HACK_TAG_NAME)) {
+        final CompoundTag protocolHackTag = (item.tag() != null && item.tag().contains(tagName) ? item.tag().get(tagName) : new CompoundTag());
+        if (item.tag() == null || !item.tag().contains(tagName)) {
             protocolHackTag.put("Id", new IntTag(item.identifier()));
             protocolHackTag.put("Meta", new ShortTag(item.data()));
         }
@@ -86,7 +138,7 @@ public abstract class AbstractItemRewriter {
             item.setTag(tag);
             protocolHackTag.put("RemoveTag", new IntTag(0));
         }
-        tag.put(HACK_TAG_NAME, protocolHackTag);
+        tag.put(tagName, protocolHackTag);
 
         //Set name/lore of item
         CompoundTag display = tag.get("display");
@@ -102,29 +154,21 @@ public abstract class AbstractItemRewriter {
                 display.put("Lore", lore);
                 protocolHackTag.put("RemoveLore", new IntTag(0));
             }
-            if (this.jsonName) {
-                lore.add(new StringTag(this.messageToJson("§r " + this.protocolName + " Item ID: " + item.identifier() + " (" + name + ")").toString()));
-            } else {
-                lore.add(new StringTag("§r " + this.protocolName + " Item ID: " + item.identifier() + " (" + name + ")"));
-            }
+            lore.add(new StringTag("§r " + this.protocolName + " Item ID: " + item.identifier() + " (" + name + ")"));
             protocolHackTag.put("RemoveLastLore", new IntTag(0));
         } else {
-            if (this.jsonName) {
-                display.put("Name", new StringTag(this.messageToJson("§r" + this.protocolName + " " + name).toString()));
-            } else {
-                display.put("Name", new StringTag("§r" + this.protocolName + " " + name));
-            }
+            display.put("Name", new StringTag("§r" + this.protocolName + " " + name));
             protocolHackTag.put("RemoveDisplayName", new IntTag(0));
         }
     }
 
     private void setRemappedTagWrite(final Item item) {
         if (item.tag() == null) return;
-        if (!item.tag().contains(HACK_TAG_NAME)) return;
+        if (!item.tag().contains(tagName)) return;
 
-        CompoundTag tag = item.tag();
-        CompoundTag protocolHackTag = tag.get(HACK_TAG_NAME);
-        tag.remove(HACK_TAG_NAME);
+        final CompoundTag tag = item.tag();
+        final CompoundTag protocolHackTag = tag.get(tagName);
+        tag.remove(tagName);
 
         item.setIdentifier(((IntTag) protocolHackTag.get("Id")).asInt());
         item.setData(((ShortTag) protocolHackTag.get("Meta")).asShort());
@@ -146,12 +190,6 @@ public abstract class AbstractItemRewriter {
         if (protocolHackTag.contains("RemoveTag")) {
             item.setTag(null);
         }
-    }
-
-    private JsonObject messageToJson(final String s) {
-        JsonObject ob = new JsonObject();
-        ob.addProperty("text", s);
-        return ob;
     }
 
 

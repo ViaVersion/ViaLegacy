@@ -48,6 +48,7 @@ import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.providers.EncryptionProvider;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.rewriter.*;
@@ -62,13 +63,14 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Chunk
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkBulk1_7_6Type;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.MetaType1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
 import java.util.logging.Level;
 
 public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1_6_4, ClientboundPackets1_7_2, ServerboundPackets1_6_4, ServerboundPackets1_7_2> {
 
-    public static ItemRewriter ITEM_REWRITER = new ItemRewriter();
+    private final LegacyItemRewriter<Protocol1_7_2_5to1_6_4> itemRewriter = new ItemRewriter(this);
 
     public Protocol1_7_2_5to1_6_4() {
         super(ClientboundPackets1_6_4.class, ClientboundPackets1_7_2.class, ServerboundPackets1_6_4.class, ServerboundPackets1_7_2.class);
@@ -76,6 +78,8 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
 
     @Override
     protected void registerPackets() {
+        this.itemRewriter.register();
+
         this.registerClientbound(State.STATUS, ClientboundPackets1_6_4.DISCONNECT.getId(), ClientboundStatusPackets.STATUS_RESPONSE.getId(), new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -213,7 +217,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                 map(Type.INT); // entity id
                 map(Type.SHORT); // slot
                 map(Types1_7_6.COMPRESSED_ITEM); // item
-                handler(wrapper -> ITEM_REWRITER.rewriteRead(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
+                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.RESPAWN, new PacketRemapper() {
@@ -392,7 +396,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                 map(Type.BYTE); // pitch
                 handler(wrapper -> {
                     final Item currentItem = new DataItem(wrapper.read(Type.UNSIGNED_SHORT), (byte) 1, (short) 0, null); // item
-                    ITEM_REWRITER.rewriteRead(currentItem);
+                    itemRewriter.handleItemToClient(currentItem);
                     wrapper.write(Type.SHORT, (short) currentItem.identifier());
                 });
                 map(Types1_6_4.METADATA_LIST, Types1_7_6.METADATA_LIST); // metadata
@@ -726,7 +730,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                 map(Type.BYTE); // window id
                 map(Type.SHORT); // slot
                 map(Types1_7_6.COMPRESSED_ITEM); // item
-                handler(wrapper -> ITEM_REWRITER.rewriteRead(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
+                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.WINDOW_ITEMS, new PacketRemapper() {
@@ -736,7 +740,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                 handler(wrapper -> {
                     final Item[] items = wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM_ARRAY); // items
                     for (Item item : items) {
-                        ITEM_REWRITER.rewriteRead(item);
+                        itemRewriter.handleItemToClient(item);
                     }
                 });
             }
@@ -867,10 +871,10 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                         wrapper.passthrough(Type.INT); // window id
                         final int count = wrapper.passthrough(Type.UNSIGNED_BYTE); // count
                         for (int i = 0; i < count; i++) {
-                            ITEM_REWRITER.rewriteRead(wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM)); // item 1
-                            ITEM_REWRITER.rewriteRead(wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM)); // item 3
+                            itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM)); // item 1
+                            itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM)); // item 3
                             if (wrapper.passthrough(Type.BOOLEAN)) { // has 3 items
-                                ITEM_REWRITER.rewriteRead(wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM)); // item 2
+                                itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM)); // item 2
                             }
                             wrapper.passthrough(Type.BOOLEAN); // unavailable
                         }
@@ -1012,7 +1016,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                 map(Types1_7_6.POSITION_UBYTE); // position
                 map(Type.UNSIGNED_BYTE); // direction
                 map(Types1_7_6.COMPRESSED_ITEM); // item
-                handler(wrapper -> ITEM_REWRITER.rewriteWrite(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
+                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
                 map(Type.UNSIGNED_BYTE); // offset x
                 map(Type.UNSIGNED_BYTE); // offset y
                 map(Type.UNSIGNED_BYTE); // offset z
@@ -1027,15 +1031,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                 map(Type.SHORT); // action
                 map(Type.BYTE); // mode
                 map(Types1_7_6.COMPRESSED_ITEM); // item
-                handler(wrapper -> ITEM_REWRITER.rewriteWrite(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
-            }
-        });
-        this.registerServerbound(ServerboundPackets1_7_2.CREATIVE_INVENTORY_ACTION, new PacketRemapper() {
-            @Override
-            public void registerMap() {
-                map(Type.SHORT); // slot
-                map(Types1_7_6.COMPRESSED_ITEM); // item
-                handler(wrapper -> ITEM_REWRITER.rewriteWrite(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
+                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
             }
         });
         this.registerServerbound(ServerboundPackets1_7_2.UPDATE_SIGN, new PacketRemapper() {
@@ -1127,7 +1123,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                         case "MC|BEdit":
                         case "MC|BSign":
                             final Item item = wrapper.read(Types1_7_6.COMPRESSED_ITEM); // book
-                            ITEM_REWRITER.rewriteWrite(item);
+                            itemRewriter.handleItemToServer(item);
 
                             lengthPacketWrapper.write(Types1_7_6.COMPRESSED_ITEM, item);
                             lengthPacketWrapper.writeToBuffer(lengthBuffer);
@@ -1168,7 +1164,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
     private void rewriteMetadata(final List<Metadata> metadataList) {
         for (Metadata metadata : metadataList) {
             if (metadata.metaType().equals(MetaType1_6_4.Slot)) {
-                ITEM_REWRITER.rewriteRead(metadata.value());
+                itemRewriter.handleItemToClient(metadata.value());
             }
             metadata.setMetaType(MetaType1_7_6.byId(metadata.metaType().typeId()));
         }
@@ -1206,6 +1202,12 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                 }
             });
         }
+    }
+
+    @Nullable
+    @Override
+    public LegacyItemRewriter<Protocol1_7_2_5to1_6_4> getItemRewriter() {
+        return this.itemRewriter;
     }
 
 }

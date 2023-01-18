@@ -23,38 +23,41 @@ import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
-import net.raphimc.vialegacy.api.remapper.AbstractItemRewriter;
+import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.Protocol1_7_6_10to1_7_2_5;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.GameProfile;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.providers.GameProfileFetcher;
 
 import java.util.UUID;
 
-public class ItemRewriter extends AbstractItemRewriter {
+public class ItemRewriter extends LegacyItemRewriter<Protocol1_8to1_7_6_10> {
 
-    public ItemRewriter() {
-        super("1.7", false);
-        registerRemappedItem(8, 326, "Water Block");
-        registerRemappedItem(9, 326, "Stationary Water Block");
-        registerRemappedItem(10, 327, "Lava Block");
-        registerRemappedItem(11, 327, "Stationary Lava Block");
-        registerRemappedItem(51, 385, "Fire");
-        registerRemappedItem(90, 399, "Nether portal");
-        registerRemappedItem(119, 381, "End portal");
-        registerRemappedItem(127, 351, 3, "Cocoa Block");
-        registerRemappedItem(141, 391, "Carrot Crops");
-        registerRemappedItem(142, 392, "Potato Crops");
-        registerRemappedItem(43, 44, "Double Stone Slab");
-        registerRemappedItem(125, 126, "Double Wood Slab");
+    public ItemRewriter(final Protocol1_8to1_7_6_10 protocol) {
+        super(protocol, "1.7");
+        addRemappedItem(8, 326, "Water Block");
+        addRemappedItem(9, 326, "Stationary Water Block");
+        addRemappedItem(10, 327, "Lava Block");
+        addRemappedItem(11, 327, "Stationary Lava Block");
+        addRemappedItem(51, 385, "Fire");
+        addRemappedItem(90, 399, "Nether portal");
+        addRemappedItem(119, 381, "End portal");
+        addRemappedItem(127, 351, 3, "Cocoa Block");
+        addRemappedItem(141, 391, "Carrot Crops");
+        addRemappedItem(142, 392, "Potato Crops");
+        addRemappedItem(43, 44, "Double Stone Slab");
+        addRemappedItem(125, 126, "Double Wood Slab");
+
+        addNonExistentItems(2);
     }
 
     @Override
-    public void rewriteRead(Item item) {
-        super.rewriteRead(item);
-        if (item == null) return;
+    public Item handleItemToClient(Item item) {
+        super.handleItemToClient(item);
+        if (item == null) return null;
 
         if (item.identifier() == ItemList1_6.skull.itemID && item.data() == 3 && item.tag() != null) { // player_skull
-            if (!item.tag().contains("SkullOwner")) return;
+            if (!item.tag().contains("SkullOwner")) return item;
 
             String skullOwnerName = null;
             if (item.tag().get("SkullOwner") instanceof StringTag) {
@@ -71,26 +74,28 @@ public class ItemRewriter extends AbstractItemRewriter {
 
             if (skullOwnerName != null) {
                 final GameProfileFetcher gameProfileFetcher = Via.getManager().getProviders().get(GameProfileFetcher.class);
-                if (!ViaLegacy.getConfig().isLegacySkullLoading()) return;
+                if (!ViaLegacy.getConfig().isLegacySkullLoading()) return item;
 
                 if (gameProfileFetcher.isUUIDLoaded(skullOwnerName)) {
                     final UUID uuid = gameProfileFetcher.getMojangUUID(skullOwnerName);
                     if (gameProfileFetcher.isGameProfileLoaded(uuid)) {
                         final GameProfile skullProfile = gameProfileFetcher.getGameProfile(uuid);
-                        if (skullProfile == null || skullProfile.isOffline()) return;
+                        if (skullProfile == null || skullProfile.isOffline()) return item;
                         item.tag().put("SkullOwner", Protocol1_7_6_10to1_7_2_5.writeGameProfileToTag(skullProfile));
-                        return;
+                        return item;
                     }
                 }
 
                 gameProfileFetcher.getMojangUUIDAsync(skullOwnerName).thenAccept(gameProfileFetcher::getGameProfile);
             }
         }
+
+        return item;
     }
 
     @Override
-    public void rewriteWrite(Item item) {
-        if (item == null) return;
+    public Item handleItemToServer(Item item) {
+        if (item == null) return null;
 
         NOT_VALID:
         if (item.identifier() == ItemList1_6.skull.itemID && item.data() == 3 && item.tag() != null) { // player_skull
@@ -100,7 +105,7 @@ public class ItemRewriter extends AbstractItemRewriter {
             }
         }
 
-        super.rewriteWrite(item);
+        return super.handleItemToServer(item);
     }
 
 }

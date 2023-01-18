@@ -27,7 +27,6 @@ import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import net.raphimc.vialegacy.api.model.Location;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata.MetaIndex1_8to1_7_6;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata.MetadataRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage.EntityTracker;
 
 import java.util.*;
@@ -306,7 +305,7 @@ public class HologramPartEntity {
         for (final Map.Entry<MetaIndex1_8to1_7_6, Object> entry : this.metadata.entrySet()) {
             metadataList.add(new Metadata(entry.getKey().getOldIndex(), entry.getKey().getOldType(), entry.getValue()));
         }
-        MetadataRewriter.transform(this.entityType, metadataList);
+        this.user.getProtocolInfo().getPipeline().getProtocol(Protocol1_8to1_7_6_10.class).getMetadataRewriter().transform(this.entityType, metadataList);
         return metadataList;
     }
 
