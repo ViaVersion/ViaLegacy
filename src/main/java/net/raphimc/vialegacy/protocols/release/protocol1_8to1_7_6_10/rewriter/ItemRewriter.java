@@ -35,18 +35,31 @@ public class ItemRewriter extends LegacyItemRewriter<Protocol1_8to1_7_6_10> {
 
     public ItemRewriter(final Protocol1_8to1_7_6_10 protocol) {
         super(protocol, "1.7");
-        addRemappedItem(8, 326, "Water Block");
-        addRemappedItem(9, 326, "Stationary Water Block");
-        addRemappedItem(10, 327, "Lava Block");
-        addRemappedItem(11, 327, "Stationary Lava Block");
-        addRemappedItem(51, 385, "Fire");
-        addRemappedItem(90, 399, "Nether portal");
-        addRemappedItem(119, 381, "End portal");
-        addRemappedItem(127, 351, 3, "Cocoa Block");
-        addRemappedItem(141, 391, "Carrot Crops");
-        addRemappedItem(142, 392, "Potato Crops");
-        addRemappedItem(43, 44, "Double Stone Slab");
-        addRemappedItem(125, 126, "Double Wood Slab");
+
+        this.addRemappedItem(8, 326, "Water Block");
+        this.addRemappedItem(9, 326, "Stationary Water Block");
+        this.addRemappedItem(10, 327, "Lava Block");
+        this.addRemappedItem(11, 327, "Stationary Lava Block");
+        this.addRemappedItem(51, 385, "Fire");
+        this.addRemappedItem(90, 399, "Nether portal");
+        this.addRemappedItem(119, 381, "End portal");
+        this.addRemappedItem(127, 351, 3, "Cocoa Block");
+        this.addRemappedItem(141, 391, "Carrot Crops");
+        this.addRemappedItem(142, 392, "Potato Crops");
+        this.addRemappedItem(43, 44, "Double Stone Slab");
+        this.addRemappedItem(125, 126, "Double Wood Slab");
+
+        this.addNonExistentItem(1, 1, 6);
+        this.addNonExistentItem(3, 1);
+        this.addNonExistentItem(19, 1);
+        this.addNonExistentItemRange(165, 169);
+        this.addNonExistentItemRange(179, 192);
+        this.addNonExistentItem(383, 67);
+        this.addNonExistentItem(383, 68);
+        this.addNonExistentItem(383, 101);
+        this.addNonExistentItemRange(409, 416);
+        this.addNonExistentItemRange(423, 425);
+        this.addNonExistentItemRange(427, 431);
     }
 
     @Override

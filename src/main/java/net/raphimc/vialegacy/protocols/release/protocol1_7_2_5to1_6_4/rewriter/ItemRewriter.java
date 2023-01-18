@@ -26,33 +26,47 @@ public class ItemRewriter extends LegacyItemRewriter<Protocol1_7_2_5to1_6_4> {
 
     public ItemRewriter(final Protocol1_7_2_5to1_6_4 protocol) {
         super(protocol, "1.6.4");
-        addRemappedItem(26, 355, "Bed Block");
-        addRemappedItem(34, 33, "Piston Head");
-        addRemappedItem(36, 33, "Piston Moving");
-        addRemappedItem(55, 331, "Redstone Wire");
-        addRemappedItem(59, 295, "Wheat Crops");
-        addRemappedItem(63, 323, "Standing Sign");
-        addRemappedItem(64, 324, "Oak Door Block");
-        addRemappedItem(68, 323, "Wall Sign");
-        addRemappedItem(71, 330, "Iron Door Block");
-        addRemappedItem(74, 73, "Lit Redstone Ore");
-        addRemappedItem(75, 76, "Unlit Redstone Torch");
-        addRemappedItem(83, 338, "Sugar Cane Block");
-        addRemappedItem(92, 354, "Cake Block");
-        addRemappedItem(93, 356, "Unlit Redstone Repeater");
-        addRemappedItem(94, 356, "Lit Redstone Repeater");
-        addRemappedItem(95, 146, "Locked Chest");
-        addRemappedItem(104, 361, "Pumpkin Stem");
-        addRemappedItem(105, 362, "Melon Stem");
-        addRemappedItem(115, 372, "Nether Wart Block");
-        addRemappedItem(117, 379, "Brewing Stand Block");
-        addRemappedItem(118, 380, "Cauldron Block");
-        addRemappedItem(124, 123, "Lit Redstone Lamp");
-        addRemappedItem(132, 287, "Tripwire");
-        addRemappedItem(140, 390, "Flower Pot");
-        addRemappedItem(144, 397, "Undefined Mob Head");
-        addRemappedItem(149, 404, "Unlit Redstone Comparator");
-        addRemappedItem(150, 404, "Lit Redstone Comparator");
+
+        this.addRemappedItem(26, 355, "Bed Block");
+        this.addRemappedItem(34, 33, "Piston Head");
+        this.addRemappedItem(36, 33, "Piston Moving");
+        this.addRemappedItem(55, 331, "Redstone Wire");
+        this.addRemappedItem(59, 295, "Wheat Crops");
+        this.addRemappedItem(63, 323, "Standing Sign");
+        this.addRemappedItem(64, 324, "Oak Door Block");
+        this.addRemappedItem(68, 323, "Wall Sign");
+        this.addRemappedItem(71, 330, "Iron Door Block");
+        this.addRemappedItem(74, 73, "Lit Redstone Ore");
+        this.addRemappedItem(75, 76, "Unlit Redstone Torch");
+        this.addRemappedItem(83, 338, "Sugar Cane Block");
+        this.addRemappedItem(92, 354, "Cake Block");
+        this.addRemappedItem(93, 356, "Unlit Redstone Repeater");
+        this.addRemappedItem(94, 356, "Lit Redstone Repeater");
+        this.addRemappedItem(95, 146, "Locked Chest");
+        this.addRemappedItem(104, 361, "Pumpkin Stem");
+        this.addRemappedItem(105, 362, "Melon Stem");
+        this.addRemappedItem(115, 372, "Nether Wart Block");
+        this.addRemappedItem(117, 379, "Brewing Stand Block");
+        this.addRemappedItem(118, 380, "Cauldron Block");
+        this.addRemappedItem(124, 123, "Lit Redstone Lamp");
+        this.addRemappedItem(132, 287, "Tripwire");
+        this.addRemappedItem(140, 390, "Flower Pot");
+        this.addRemappedItem(144, 397, "Undefined Mob Head");
+        this.addRemappedItem(149, 404, "Unlit Redstone Comparator");
+        this.addRemappedItem(150, 404, "Lit Redstone Comparator");
+
+        this.addNonExistentItems(3, 2);
+        this.addNonExistentItem(5, 4, 5);
+        this.addNonExistentItem(6, 4, 5);
+        this.addNonExistentItems(12, 1);
+        this.addNonExistentItem(38, 1, 8);
+        this.addNonExistentItems(95);
+        this.addNonExistentItem(97, 3, 5);
+        this.addNonExistentItem(126, 4, 5);
+        this.addNonExistentItemRange(160, 164);
+        this.addNonExistentItemRange(174, 175);
+        this.addNonExistentItem(349, 1, 3);
+        this.addNonExistentItemRange(350, 1);
     }
 
     @Override

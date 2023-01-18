@@ -25,8 +25,6 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.libs.fastutil.ints.IntArrayList;
-import com.viaversion.viaversion.libs.fastutil.ints.IntList;
 import com.viaversion.viaversion.libs.fastutil.objects.ObjectArrayList;
 import com.viaversion.viaversion.libs.fastutil.objects.ObjectList;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.*;
@@ -36,7 +34,7 @@ import java.util.List;
 public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBase<P> implements ItemRewriter<P> {
 
     private final ObjectList<RewriteEntry> rewriteEntries = new ObjectArrayList<>();
-    private final IntList nonExistentItems = new IntArrayList();
+    private final ObjectList<NonExistentEntry> nonExistentItems = new ObjectArrayList<>();
     protected final String tagName;
     protected final String protocolName;
 
@@ -58,15 +56,25 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
         this.rewriteEntries.add(new RewriteEntry(oldItemId, (short) oldItemMeta, newItemId, (short) newItemMeta, newItemName));
     }
 
+    protected void addNonExistentItem(final int itemId, final int itemMeta) {
+        this.nonExistentItems.add(new NonExistentEntry(itemId, (short) itemMeta));
+    }
+
+    protected void addNonExistentItem(final int itemId, final int startItemMeta, final int endItemMeta) {
+        for (int i = startItemMeta; i <= endItemMeta; i++) {
+            this.nonExistentItems.add(new NonExistentEntry(itemId, (short) i));
+        }
+    }
+
     protected void addNonExistentItems(final int... itemIds) {
         for (int itemId : itemIds) {
-            this.nonExistentItems.add(itemId);
+            this.nonExistentItems.add(new NonExistentEntry(itemId, (short) -1));
         }
     }
 
     protected void addNonExistentItemRange(final int startItemId, final int endItemId) {
         for (int i = startItemId; i <= endItemId; i++) {
-            this.nonExistentItems.add(i);
+            this.nonExistentItems.add(new NonExistentEntry(i, (short) -1));
         }
     }
 
@@ -103,10 +111,12 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
     public Item handleItemToServer(final Item item) {
         if (item == null) return null;
 
-        if (this.nonExistentItems.contains(item.identifier())) {
-            item.setIdentifier(1);
-            item.setData((short) 0);
-            return item;
+        for (NonExistentEntry nonExistentEntry : this.nonExistentItems) {
+            if (nonExistentEntry.rewrites(item)) {
+                item.setIdentifier(1);
+                item.setData((short) 0);
+                return item;
+            }
         }
 
         this.setRemappedTagWrite(item);
@@ -193,7 +203,7 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
     }
 
 
-    public static class RewriteEntry {
+    private static class RewriteEntry {
 
         private final int oldItemID;
         private final short oldItemMeta;
@@ -219,6 +229,22 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
 
         public boolean rewrites(final Item item) {
             return item.identifier() == this.oldItemID && (this.oldItemMeta == -1 || this.oldItemMeta == item.data());
+        }
+
+    }
+
+    private static class NonExistentEntry {
+
+        private final int itemId;
+        private final short itemMeta;
+
+        public NonExistentEntry(final int itemId, final short itemMeta) {
+            this.itemId = itemId;
+            this.itemMeta = itemMeta;
+        }
+
+        public boolean rewrites(final Item item) {
+            return item.identifier() == this.itemId && (this.itemMeta == -1 || this.itemMeta == item.data());
         }
 
     }
