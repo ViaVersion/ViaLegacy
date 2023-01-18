@@ -47,8 +47,6 @@ public class ItemRewriter extends LegacyItemRewriter<Protocol1_8to1_7_6_10> {
         addRemappedItem(142, 392, "Potato Crops");
         addRemappedItem(43, 44, "Double Stone Slab");
         addRemappedItem(125, 126, "Double Wood Slab");
-
-        addNonExistentItems(2);
     }
 
     @Override
