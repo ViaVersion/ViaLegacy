@@ -34,7 +34,7 @@ import java.util.UUID;
 public class ItemRewriter extends LegacyItemRewriter<Protocol1_8to1_7_6_10> {
 
     public ItemRewriter(final Protocol1_8to1_7_6_10 protocol) {
-        super(protocol, "1.7");
+        super(protocol, "1.7.10");
 
         this.addRemappedItem(8, 326, "Water Block");
         this.addRemappedItem(9, 326, "Stationary Water Block");

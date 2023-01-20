@@ -55,10 +55,10 @@ public class ItemRewriter extends LegacyItemRewriter<Protocol1_7_2_5to1_6_4> {
         this.addRemappedItem(149, 404, "Unlit Redstone Comparator");
         this.addRemappedItem(150, 404, "Lit Redstone Comparator");
 
-        this.addNonExistentItems(3, 2);
+        this.addNonExistentItem(3, 2);
         this.addNonExistentItem(5, 4, 5);
         this.addNonExistentItem(6, 4, 5);
-        this.addNonExistentItems(12, 1);
+        this.addNonExistentItem(12, 1);
         this.addNonExistentItem(38, 1, 8);
         this.addNonExistentItems(95);
         this.addNonExistentItem(97, 3, 5);

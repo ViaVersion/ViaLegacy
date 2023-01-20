@@ -22,7 +22,9 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
+import net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2.types.Types1_4_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5.ClientboundPackets1_4_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.ServerboundPackets1_5_2;
@@ -33,12 +35,16 @@ import java.util.List;
 
 public class Protocol1_4_4_5to1_4_2 extends AbstractProtocol<ClientboundPackets1_4_2, ClientboundPackets1_4_4, ServerboundPackets1_5_2, ServerboundPackets1_5_2> {
 
+    private final LegacyItemRewriter<Protocol1_4_4_5to1_4_2> itemRewriter = new ItemRewriter(this);
+
     public Protocol1_4_4_5to1_4_2() {
         super(ClientboundPackets1_4_2.class, ClientboundPackets1_4_4.class, ServerboundPackets1_5_2.class, ServerboundPackets1_5_2.class);
     }
 
     @Override
     protected void registerPackets() {
+        this.itemRewriter.register();
+
         this.registerClientbound(ClientboundPackets1_4_2.MAP_DATA, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -99,6 +105,11 @@ public class Protocol1_4_4_5to1_4_2 extends AbstractProtocol<ClientboundPackets1
     @Override
     public void init(UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(userConnection, Protocol1_4_4_5to1_4_2.class, ClientboundPackets1_4_2::getPacket));
+    }
+
+    @Override
+    public LegacyItemRewriter<Protocol1_4_4_5to1_4_2> getItemRewriter() {
+        return this.itemRewriter;
     }
 
 }

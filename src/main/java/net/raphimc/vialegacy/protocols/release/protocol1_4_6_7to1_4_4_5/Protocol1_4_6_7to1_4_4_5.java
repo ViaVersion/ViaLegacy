@@ -27,7 +27,9 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
+import net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5.types.ChunkBulk1_4_4Type;
 import net.raphimc.vialegacy.protocols.release.protocol1_5_0_1to1_4_6_7.ClientboundPackets1_4_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.ServerboundPackets1_5_2;
@@ -39,12 +41,16 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 
 public class Protocol1_4_6_7to1_4_4_5 extends AbstractProtocol<ClientboundPackets1_4_4, ClientboundPackets1_4_6, ServerboundPackets1_5_2, ServerboundPackets1_5_2> {
 
+    private final LegacyItemRewriter<Protocol1_4_6_7to1_4_4_5> itemRewriter = new ItemRewriter(this);
+
     public Protocol1_4_6_7to1_4_4_5() {
         super(ClientboundPackets1_4_4.class, ClientboundPackets1_4_6.class, ServerboundPackets1_5_2.class, ServerboundPackets1_5_2.class);
     }
 
     @Override
     protected void registerPackets() {
+        this.itemRewriter.register();
+
         this.registerClientbound(ClientboundPackets1_4_4.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -151,6 +157,11 @@ public class Protocol1_4_6_7to1_4_4_5 extends AbstractProtocol<ClientboundPacket
         if (!userConnection.has(ClientWorld.class)) {
             userConnection.put(new ClientWorld(userConnection));
         }
+    }
+
+    @Override
+    public LegacyItemRewriter<Protocol1_4_6_7to1_4_4_5> getItemRewriter() {
+        return this.itemRewriter;
     }
 
 }

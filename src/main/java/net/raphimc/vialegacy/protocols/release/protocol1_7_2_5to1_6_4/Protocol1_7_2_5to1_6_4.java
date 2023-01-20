@@ -63,7 +63,6 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Chunk
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkBulk1_7_6Type;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.MetaType1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -1204,7 +1203,6 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
         }
     }
 
-    @Nullable
     @Override
     public LegacyItemRewriter<Protocol1_7_2_5to1_6_4> getItemRewriter() {
         return this.itemRewriter;

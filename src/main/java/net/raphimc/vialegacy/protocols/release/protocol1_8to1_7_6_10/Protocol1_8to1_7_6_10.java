@@ -66,7 +66,6 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage.*;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Chunk1_7_6Type;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkBulk1_7_6Type;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -1593,7 +1592,6 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         userConnection.put(new ChunkTracker(userConnection));
     }
 
-    @Nullable
     @Override
     public LegacyItemRewriter<Protocol1_8to1_7_6_10> getItemRewriter() {
         return this.itemRewriter;

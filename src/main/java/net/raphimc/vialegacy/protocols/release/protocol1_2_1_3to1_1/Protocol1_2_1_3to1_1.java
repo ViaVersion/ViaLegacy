@@ -33,6 +33,7 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_8_0_1tob1_7_0_3.Protocolb1_8_0_1tob1_7_0_3;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.Protocola1_0_15toc0_30;
@@ -43,6 +44,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.beta.W
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.release.WorldChunkManager_r1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.chunks.NibbleArray1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.model.NonFullChunk1_1;
+import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.storage.DimensionTracker;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.storage.PendingBlocksTracker;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.storage.SeedStorage;
@@ -61,12 +63,16 @@ import java.util.Arrays;
 
 public class Protocol1_2_1_3to1_1 extends AbstractProtocol<ClientboundPackets1_1, ClientboundPackets1_2_1, ServerboundPackets1_1, ServerboundPackets1_2_1> {
 
+    private final LegacyItemRewriter<Protocol1_2_1_3to1_1> itemRewriter = new ItemRewriter(this);
+
     public Protocol1_2_1_3to1_1() {
         super(ClientboundPackets1_1.class, ClientboundPackets1_2_1.class, ServerboundPackets1_1.class, ServerboundPackets1_2_1.class);
     }
 
     @Override
     protected void registerPackets() {
+        this.itemRewriter.register();
+
         this.registerClientbound(ClientboundPackets1_1.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -374,6 +380,11 @@ public class Protocol1_2_1_3to1_1 extends AbstractProtocol<ClientboundPackets1_1
         if (!userConnection.has(ClientWorld.class)) {
             userConnection.put(new ClientWorld(userConnection));
         }
+    }
+
+    @Override
+    public LegacyItemRewriter<Protocol1_2_1_3to1_1> getItemRewriter() {
+        return this.itemRewriter;
     }
 
 }

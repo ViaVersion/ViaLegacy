@@ -41,12 +41,14 @@ import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.model.Location;
+import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.data.EntityList;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.model.AbstractTrackedEntity;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.model.TrackedEntity;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.model.TrackedLivingEntity;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.providers.OldAuthProvider;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.sound.Sound;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.sound.SoundType;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.storage.ChestStateTracker;
@@ -74,12 +76,16 @@ import java.util.logging.Level;
 
 public class Protocol1_3_1_2to1_2_4_5 extends AbstractProtocol<ClientboundPackets1_2_4, ClientboundPackets1_3_1, ServerboundPackets1_2_4, ServerboundPackets1_3_1> {
 
+    private final LegacyItemRewriter<Protocol1_3_1_2to1_2_4_5> itemRewriter = new ItemRewriter(this);
+
     public Protocol1_3_1_2to1_2_4_5() {
         super(ClientboundPackets1_2_4.class, ClientboundPackets1_3_1.class, ServerboundPackets1_2_4.class, ServerboundPackets1_3_1.class);
     }
 
     @Override
     protected void registerPackets() {
+        this.itemRewriter.register();
+
         this.registerClientbound(State.LOGIN, ClientboundPackets1_2_4.HANDSHAKE.getId(), ClientboundPackets1_3_1.SHARED_KEY.getId(), new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -717,6 +723,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends AbstractProtocol<ClientboundPacket
             public void registerMap() {
                 map(Type.SHORT); // slot
                 map(Types1_7_6.COMPRESSED_ITEM, Types1_2_4.COMPRESSED_NBT_ITEM); // item
+                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_2_4.COMPRESSED_NBT_ITEM, 0)));
             }
         });
         this.registerServerbound(ServerboundPackets1_3_1.PLAYER_ABILITIES, new PacketRemapper() {
@@ -799,7 +806,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends AbstractProtocol<ClientboundPacket
                 }
                 break;
             } else if (index == MetaIndex1_8to1_7_6.CREEPER_STATE) {
-                if(metadata.<Byte>value() > 0) {
+                if (metadata.<Byte>value() > 0) {
                     tracker.playSoundAt(entity.getLocation(), Sound.RANDOM_FUSE, 1.0F, 0.5F);
                 }
             }
@@ -855,6 +862,11 @@ public class Protocol1_3_1_2to1_2_4_5 extends AbstractProtocol<ClientboundPacket
         if (!userConnection.has(ClientWorld.class)) {
             userConnection.put(new ClientWorld(userConnection));
         }
+    }
+
+    @Override
+    public LegacyItemRewriter<Protocol1_3_1_2to1_2_4_5> getItemRewriter() {
+        return this.itemRewriter;
     }
 
 }

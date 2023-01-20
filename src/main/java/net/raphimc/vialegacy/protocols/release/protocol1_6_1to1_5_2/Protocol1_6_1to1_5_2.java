@@ -26,8 +26,10 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.ViaLegacy;
+import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.metadata.MetadataRewriter;
+import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.rewriter.SoundRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.storage.AttachTracker;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.storage.EntityTracker;
@@ -41,12 +43,16 @@ import java.util.List;
 
 public class Protocol1_6_1to1_5_2 extends AbstractProtocol<ClientboundPackets1_5_2, ClientboundPackets1_6_1, ServerboundPackets1_5_2, ServerboundPackets1_6_4> {
 
+    private final LegacyItemRewriter<Protocol1_6_1to1_5_2> itemRewriter = new ItemRewriter(this);
+
     public Protocol1_6_1to1_5_2() {
         super(ClientboundPackets1_5_2.class, ClientboundPackets1_6_1.class, ServerboundPackets1_5_2.class, ServerboundPackets1_6_4.class);
     }
 
     @Override
     protected void registerPackets() {
+        this.itemRewriter.register();
+
         this.registerClientbound(ClientboundPackets1_5_2.JOIN_GAME, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -350,6 +356,11 @@ public class Protocol1_6_1to1_5_2 extends AbstractProtocol<ClientboundPackets1_5
 
         userConnection.put(new EntityTracker(userConnection));
         userConnection.put(new AttachTracker(userConnection));
+    }
+
+    @Override
+    public LegacyItemRewriter<Protocol1_6_1to1_5_2> getItemRewriter() {
+        return this.itemRewriter;
     }
 
 }

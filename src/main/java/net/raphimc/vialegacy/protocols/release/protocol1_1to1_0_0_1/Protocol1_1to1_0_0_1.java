@@ -22,8 +22,10 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_1to1_0_0_1.rewriter.ChatFilter;
+import net.raphimc.vialegacy.protocols.release.protocol1_1to1_0_0_1.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.ClientboundPackets1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.ServerboundPackets1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Types1_6_4;
@@ -31,12 +33,16 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 
 public class Protocol1_1to1_0_0_1 extends AbstractProtocol<ClientboundPackets1_0, ClientboundPackets1_1, ServerboundPackets1_0, ServerboundPackets1_1> {
 
+    private final LegacyItemRewriter<Protocol1_1to1_0_0_1> itemRewriter = new ItemRewriter(this);
+
     public Protocol1_1to1_0_0_1() {
         super(ClientboundPackets1_0.class, ClientboundPackets1_1.class, ServerboundPackets1_0.class, ServerboundPackets1_1.class);
     }
 
     @Override
     protected void registerPackets() {
+        this.itemRewriter.register();
+
         this.registerServerbound(State.LOGIN, ServerboundPackets1_0.LOGIN.getId(), ServerboundPackets1_1.LOGIN.getId(), new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -124,6 +130,11 @@ public class Protocol1_1to1_0_0_1 extends AbstractProtocol<ClientboundPackets1_0
     @Override
     public void init(UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(userConnection, Protocol1_1to1_0_0_1.class, ClientboundPackets1_0::getPacket));
+    }
+
+    @Override
+    public LegacyItemRewriter<Protocol1_1to1_0_0_1> getItemRewriter() {
+        return this.itemRewriter;
     }
 
 }

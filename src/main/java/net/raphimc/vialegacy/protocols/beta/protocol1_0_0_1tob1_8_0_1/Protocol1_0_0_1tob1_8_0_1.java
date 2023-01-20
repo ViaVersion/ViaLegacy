@@ -23,7 +23,9 @@ import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
 import com.viaversion.viaversion.api.type.Type;
+import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
+import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.storage.PlayerAirTimeStorage;
 import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.task.PlayerAirTimeUpdateTask;
 import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.types.Typesb1_8_0_1;
@@ -35,12 +37,16 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 
 public class Protocol1_0_0_1tob1_8_0_1 extends AbstractProtocol<ClientboundPacketsb1_8, ClientboundPackets1_0, ServerboundPacketsb1_8, ServerboundPackets1_0> {
 
+    private final LegacyItemRewriter<Protocol1_0_0_1tob1_8_0_1> itemRewriter = new ItemRewriter(this);
+
     public Protocol1_0_0_1tob1_8_0_1() {
         super(ClientboundPacketsb1_8.class, ClientboundPackets1_0.class, ServerboundPacketsb1_8.class, ServerboundPackets1_0.class);
     }
 
     @Override
     protected void registerPackets() {
+        this.itemRewriter.register();
+
         this.registerClientbound(ClientboundPacketsb1_8.SET_EXPERIENCE, new PacketRemapper() {
             @Override
             public void registerMap() {
@@ -95,6 +101,7 @@ public class Protocol1_0_0_1tob1_8_0_1 extends AbstractProtocol<ClientboundPacke
             public void registerMap() {
                 map(Type.SHORT); // slot
                 map(Types1_2_4.COMPRESSED_NBT_ITEM, Typesb1_8_0_1.CREATIVE_ITEM); // item
+                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Typesb1_8_0_1.CREATIVE_ITEM, 0)));
             }
         });
         this.cancelServerbound(ServerboundPackets1_0.CLICK_WINDOW_BUTTON);
@@ -110,6 +117,11 @@ public class Protocol1_0_0_1tob1_8_0_1 extends AbstractProtocol<ClientboundPacke
         userConnection.put(new PreNettySplitter(userConnection, Protocol1_0_0_1tob1_8_0_1.class, ClientboundPacketsb1_8::getPacket));
 
         userConnection.put(new PlayerAirTimeStorage(userConnection));
+    }
+
+    @Override
+    public LegacyItemRewriter<Protocol1_0_0_1tob1_8_0_1> getItemRewriter() {
+        return this.itemRewriter;
     }
 
 }
