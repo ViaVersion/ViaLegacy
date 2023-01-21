@@ -219,14 +219,6 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
             this.newItemName = newItemName;
         }
 
-        public int getOldItemID() {
-            return this.oldItemID;
-        }
-
-        public short getOldItemMeta() {
-            return this.oldItemMeta;
-        }
-
         public boolean rewrites(final Item item) {
             return item.identifier() == this.oldItemID && (this.oldItemMeta == -1 || this.oldItemMeta == item.data());
         }
