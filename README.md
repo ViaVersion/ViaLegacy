@@ -95,7 +95,7 @@ If your platform supports online mode authentication you also should not always 
 
 #### GameProfileFetcher
 The game profile fetcher is used to fetch the game profile of a player if the server version is <= 1.7.10.
-Thia is required because the game profile or UUID of players is not sent by the server in <= 1.7.10.
+This is required because the game profile or UUID of players is not sent by the server in <= 1.7.10.
 Here is an example implementation using the [Steveice10 AuthLib](https://github.com/GeyserMC/MCAuthLib):
 ```java
 public class AuthLibGameProfileFetcher extends GameProfileFetcher {
