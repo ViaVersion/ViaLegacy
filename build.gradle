@@ -24,11 +24,12 @@ repositories {
 }
 
 dependencies {
-    compileOnly "com.viaversion:viaversion:4.6.0-23w04a-SNAPSHOT"
+    compileOnly "com.viaversion:viaversion:4.6.0-23w06a-SNAPSHOT"
     compileOnly "org.yaml:snakeyaml:1.33"
     compileOnly "com.google.guava:guava:31.1-jre"
     compileOnly "io.netty:netty-handler:4.1.87.Final"
-    //api "net.lenni0451.mcstructs:all:1.4.0" // Not yet used
+
+    api "net.lenni0451.mcstructs:text:2.2.0"
 }
 
 blossom {
