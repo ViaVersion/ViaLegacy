@@ -889,7 +889,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
         });
         this.cancelClientbound(ClientboundPackets1_6_4.CREATIVE_INVENTORY_ACTION);
 
-        this.registerServerbound(State.STATUS, ServerboundPackets1_6_4.SERVER_PING.getId(), ServerboundStatusPackets.STATUS_REQUEST.getId(), new PacketHandlers() {
+        this.registerServerbound(State.STATUS, ServerboundStatusPackets.STATUS_REQUEST.getId(), ServerboundPackets1_6_4.SERVER_PING.getId(), new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
@@ -906,7 +906,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                 });
             }
         });
-        this.registerServerbound(State.STATUS, -1, ServerboundStatusPackets.PING_REQUEST.getId(), new PacketHandlers() {
+        this.registerServerbound(State.STATUS, ServerboundStatusPackets.PING_REQUEST.getId(), -1, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
@@ -917,7 +917,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                 });
             }
         });
-        this.registerServerbound(State.LOGIN, ServerboundPackets1_6_4.CLIENT_PROTOCOL.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketHandlers() {
+        this.registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundPackets1_6_4.CLIENT_PROTOCOL.getId(), new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
@@ -935,7 +935,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                 });
             }
         });
-        this.registerServerbound(State.LOGIN, ServerboundPackets1_6_4.SHARED_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId());
+        this.registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundPackets1_6_4.SHARED_KEY.getId());
         this.registerServerbound(ServerboundPackets1_7_2.CHAT_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {

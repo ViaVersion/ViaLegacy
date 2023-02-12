@@ -224,7 +224,7 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        this.registerServerbound(State.STATUS, -1, ServerboundPacketsb1_8.SERVER_PING.getId(), new PacketHandlers() {
+        this.registerServerbound(State.STATUS, ServerboundPacketsb1_8.SERVER_PING.getId(), -1, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
@@ -236,7 +236,7 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends AbstractProtocol<ClientboundPack
             }
         });
         this.cancelServerbound(ServerboundPacketsb1_8.SERVER_PING);
-        this.registerServerbound(State.LOGIN, ServerboundPacketsb1_7.LOGIN.getId(), ServerboundPacketsb1_8.LOGIN.getId(), new PacketHandlers() {
+        this.registerServerbound(State.LOGIN, ServerboundPacketsb1_8.LOGIN.getId(), ServerboundPacketsb1_7.LOGIN.getId(), new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // protocol id

@@ -267,7 +267,7 @@ public class Protocol1_4_2to1_3_1_2 extends AbstractProtocol<ClientboundPackets1
             }
         });
 
-        this.registerServerbound(State.STATUS, ServerboundPackets1_3_1.SERVER_PING.getId(), ServerboundPackets1_5_2.SERVER_PING.getId(), new PacketHandlers() {
+        this.registerServerbound(State.STATUS, ServerboundPackets1_5_2.SERVER_PING.getId(), ServerboundPackets1_3_1.SERVER_PING.getId(), new PacketHandlers() {
             @Override
             public void register() {
                 handler(PacketWrapper::clearPacket);
