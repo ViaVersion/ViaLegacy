@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
@@ -49,9 +49,9 @@ public class Protocolb1_3_0_1tob1_2_0_2 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsb1_2.SPAWN_MOB, new PacketRemapper() {
+        this.registerClientbound(ClientboundPacketsb1_2.SPAWN_MOB, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // entity id
                 map(Type.UNSIGNED_BYTE); // type id
                 map(Type.INT); // x
@@ -63,18 +63,18 @@ public class Protocolb1_3_0_1tob1_2_0_2 extends AbstractProtocol<ClientboundPack
                 handler(wrapper -> rewriteMetadata(wrapper.get(Typesb1_4.METADATA_LIST, 0)));
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_2.ENTITY_METADATA, new PacketRemapper() {
+        this.registerClientbound(ClientboundPacketsb1_2.ENTITY_METADATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // entity id
                 map(Typesb1_2.METADATA_LIST, Typesb1_4.METADATA_LIST); // metadata
                 handler(wrapper -> rewriteMetadata(wrapper.get(Typesb1_4.METADATA_LIST, 0)));
             }
         });
 
-        this.registerServerbound(ServerboundPacketsb1_4.PLAYER_DIGGING, new PacketRemapper() {
+        this.registerServerbound(ServerboundPacketsb1_4.PLAYER_DIGGING, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     wrapper.cancel();
                     final short status = wrapper.read(Type.UNSIGNED_BYTE); // status
@@ -114,9 +114,9 @@ public class Protocolb1_3_0_1tob1_2_0_2 extends AbstractProtocol<ClientboundPack
                 });
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_4.ENTITY_ACTION, new PacketRemapper() {
+        this.registerServerbound(ServerboundPacketsb1_4.ENTITY_ACTION, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // entity id
                 map(Type.BYTE); // action id
                 handler(wrapper -> {

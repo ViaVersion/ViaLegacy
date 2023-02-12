@@ -22,7 +22,7 @@ import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
@@ -42,9 +42,9 @@ public class Protocol1_6_2to1_6_1 extends AbstractProtocol<ClientboundPackets1_6
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPackets1_6_1.JOIN_GAME, new PacketRemapper() {
+        this.registerClientbound(ClientboundPackets1_6_1.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     final PacketWrapper brand = PacketWrapper.create(ClientboundPackets1_6_4.PLUGIN_MESSAGE, wrapper.user());
                     brand.write(Types1_6_4.STRING, "MC|Brand");
@@ -58,9 +58,9 @@ public class Protocol1_6_2to1_6_1 extends AbstractProtocol<ClientboundPackets1_6
                 });
             }
         });
-        this.registerClientbound(ClientboundPackets1_6_1.ENTITY_PROPERTIES, new PacketRemapper() {
+        this.registerClientbound(ClientboundPackets1_6_1.ENTITY_PROPERTIES, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // entity id
                 handler(wrapper -> {
                     final int amount = wrapper.passthrough(Type.INT); // count
@@ -73,9 +73,9 @@ public class Protocol1_6_2to1_6_1 extends AbstractProtocol<ClientboundPackets1_6
             }
         });
 
-        this.registerServerbound(ServerboundPackets1_6_4.PLAYER_BLOCK_PLACEMENT, new PacketRemapper() {
+        this.registerServerbound(ServerboundPackets1_6_4.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Types1_7_6.POSITION_UBYTE); // position
                 map(Type.UNSIGNED_BYTE); // direction
                 map(Types1_7_6.COMPRESSED_ITEM); // item

@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_17_1_0_17_4toa1_0_16_2.ClientboundPacketsa1_0_16;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_1_0_1_1_2_1toa1_0_17_1_0_17_4.ServerboundPacketsa1_0_17;
@@ -35,9 +35,9 @@ public class Protocola1_0_16_2toa1_0_15 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void registerPackets() {
-        this.registerServerbound(State.LOGIN, -1, ServerboundPacketsa1_0_17.HANDSHAKE.getId(), new PacketRemapper() {
+        this.registerServerbound(State.LOGIN, -1, ServerboundPacketsa1_0_17.HANDSHAKE.getId(), new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     wrapper.cancel();
                     final PacketWrapper handshake = PacketWrapper.create(ClientboundPacketsa1_0_16.HANDSHAKE, wrapper.user());

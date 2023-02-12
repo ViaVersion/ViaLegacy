@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.types.Typesc0_30;
@@ -36,9 +36,9 @@ public class Protocolc0_0_16a_02to0_0_15a_1 extends AbstractProtocol<Clientbound
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsc0_15a.JOIN_GAME, new PacketRemapper() {
+        this.registerClientbound(ClientboundPacketsc0_15a.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     final String username = wrapper.read(Typesc0_30.STRING); // username
 
@@ -48,9 +48,9 @@ public class Protocolc0_0_16a_02to0_0_15a_1 extends AbstractProtocol<Clientbound
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsc0_15a.ENTITY_TELEPORT, new PacketRemapper() {
+        this.registerClientbound(ClientboundPacketsc0_15a.ENTITY_TELEPORT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.BYTE); // entity id
                 map(Type.SHORT); // x
                 map(Type.SHORT); // y
@@ -74,9 +74,9 @@ public class Protocolc0_0_16a_02to0_0_15a_1 extends AbstractProtocol<Clientbound
             }
         });
 
-        this.registerServerbound(State.LOGIN, ServerboundPacketsc0_15a.LOGIN.getId(), ServerboundPacketsc0_19a.LOGIN.getId(), new PacketRemapper() {
+        this.registerServerbound(State.LOGIN, ServerboundPacketsc0_15a.LOGIN.getId(), ServerboundPacketsc0_19a.LOGIN.getId(), new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     wrapper.clearPacket();
                     wrapper.write(Typesc0_30.STRING, wrapper.user().getProtocolInfo().getUsername()); // username

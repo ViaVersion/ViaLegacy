@@ -26,7 +26,7 @@ import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.CustomByteType;
 import net.raphimc.vialegacy.ViaLegacy;
@@ -69,9 +69,9 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsc0_30cpe.JOIN_GAME, new PacketRemapper() {
+        this.registerClientbound(ClientboundPacketsc0_30cpe.JOIN_GAME, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_6_2to1_6_1.class)) {
                         final ExtensionProtocolMetadataStorage protocolMetadataStorage = wrapper.user().get(ExtensionProtocolMetadataStorage.class);
@@ -88,9 +88,9 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsc0_30cpe.EXTENSION_PROTOCOL_INFO, null, new PacketRemapper() {
+        this.registerClientbound(ClientboundPacketsc0_30cpe.EXTENSION_PROTOCOL_INFO, null, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     wrapper.cancel();
                     final ExtensionProtocolMetadataStorage protocolMetadataStorage = wrapper.user().get(ExtensionProtocolMetadataStorage.class);
@@ -104,9 +104,9 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsc0_30cpe.EXTENSION_PROTOCOL_ENTRY, null, new PacketRemapper() {
+        this.registerClientbound(ClientboundPacketsc0_30cpe.EXTENSION_PROTOCOL_ENTRY, null, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     wrapper.cancel();
                     final ExtensionProtocolMetadataStorage protocolMetadataStorage = wrapper.user().get(ExtensionProtocolMetadataStorage.class);
@@ -156,9 +156,9 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsc0_30cpe.EXT_CUSTOM_BLOCKS_SUPPORT_LEVEL, null, new PacketRemapper() {
+        this.registerClientbound(ClientboundPacketsc0_30cpe.EXT_CUSTOM_BLOCKS_SUPPORT_LEVEL, null, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     wrapper.cancel();
                     final byte level = wrapper.read(Type.BYTE); // support level
@@ -171,9 +171,9 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsc0_30cpe.EXT_HACK_CONTROL, ClientboundPacketsc0_28.CHAT_MESSAGE, new PacketRemapper() {
+        this.registerClientbound(ClientboundPacketsc0_30cpe.EXT_HACK_CONTROL, ClientboundPacketsc0_28.CHAT_MESSAGE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     final ExtHackControlStorage hackControlStorage = wrapper.user().get(ExtHackControlStorage.class);
                     final boolean flying = wrapper.read(Type.BOOLEAN); // flying
@@ -205,9 +205,9 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsc0_30cpe.EXT_SET_BLOCK_PERMISSION, null, new PacketRemapper() {
+        this.registerClientbound(ClientboundPacketsc0_30cpe.EXT_SET_BLOCK_PERMISSION, null, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     wrapper.cancel();
                     final ExtBlockPermissionsStorage blockPermissionsStorage = wrapper.user().get(ExtBlockPermissionsStorage.class);
@@ -228,9 +228,9 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsc0_30cpe.EXT_BULK_BLOCK_UPDATE, null, new PacketRemapper() {
+        this.registerClientbound(ClientboundPacketsc0_30cpe.EXT_BULK_BLOCK_UPDATE, null, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     wrapper.cancel();
                     final ClassicLevelStorage levelStorage = wrapper.user().get(ClassicLevelStorage.class);
@@ -267,9 +267,9 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsc0_30cpe.EXT_TWO_WAY_PING, ClientboundPacketsc0_28.KEEP_ALIVE, new PacketRemapper() {
+        this.registerClientbound(ClientboundPacketsc0_30cpe.EXT_TWO_WAY_PING, ClientboundPacketsc0_28.KEEP_ALIVE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 handler(wrapper -> {
                     final byte direction = wrapper.read(Type.BYTE); // direction
                     final short data = wrapper.read(Type.SHORT); // data
@@ -284,9 +284,9 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
             }
         });
 
-        this.registerServerbound(State.LOGIN, ServerboundPacketsc0_30cpe.LOGIN.getId(), ServerboundPacketsc0_28.LOGIN.getId(), new PacketRemapper() {
+        this.registerServerbound(State.LOGIN, ServerboundPacketsc0_30cpe.LOGIN.getId(), ServerboundPacketsc0_28.LOGIN.getId(), new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.BYTE); // protocol id
                 map(Typesc0_30.STRING); // username
                 map(Typesc0_30.STRING); // mp pass
@@ -296,9 +296,9 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
                 });
             }
         });
-        this.registerServerbound(ServerboundPacketsc0_28.CHAT_MESSAGE, new PacketRemapper() {
+        this.registerServerbound(ServerboundPacketsc0_28.CHAT_MESSAGE, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.BYTE); // sender id
                 map(Typesc0_30.STRING); // message
                 handler(wrapper -> {
@@ -319,9 +319,9 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
                 });
             }
         });
-        this.registerServerbound(ServerboundPacketsc0_28.PLAYER_BLOCK_PLACEMENT, new PacketRemapper() {
+        this.registerServerbound(ServerboundPacketsc0_28.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Typesc0_30.POSITION); // position
                 map(Type.BOOLEAN); // place block
                 map(Type.BYTE); // block id

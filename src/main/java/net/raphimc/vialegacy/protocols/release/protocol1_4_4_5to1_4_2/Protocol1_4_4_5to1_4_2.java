@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.remapper.PacketRemapper;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
@@ -45,17 +45,17 @@ public class Protocol1_4_4_5to1_4_2 extends AbstractProtocol<ClientboundPackets1
     protected void registerPackets() {
         this.itemRewriter.register();
 
-        this.registerClientbound(ClientboundPackets1_4_2.MAP_DATA, new PacketRemapper() {
+        this.registerClientbound(ClientboundPackets1_4_2.MAP_DATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.SHORT); // item id
                 map(Type.SHORT); // map id
                 map(Types1_4_2.UNSIGNED_BYTE_BYTE_ARRAY, Type.SHORT_BYTE_ARRAY); // data
             }
         });
-        this.registerClientbound(ClientboundPackets1_4_2.SPAWN_PLAYER, new PacketRemapper() {
+        this.registerClientbound(ClientboundPackets1_4_2.SPAWN_PLAYER, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // entity id
                 map(Types1_6_4.STRING); // name
                 map(Type.INT); // x
@@ -68,9 +68,9 @@ public class Protocol1_4_4_5to1_4_2 extends AbstractProtocol<ClientboundPackets1
                 handler(wrapper -> rewriteMetadata(wrapper.get(Types1_6_4.METADATA_LIST, 0)));
             }
         });
-        this.registerClientbound(ClientboundPackets1_4_2.SPAWN_MOB, new PacketRemapper() {
+        this.registerClientbound(ClientboundPackets1_4_2.SPAWN_MOB, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // entity id
                 map(Type.UNSIGNED_BYTE); // type id
                 map(Type.INT); // x
@@ -86,9 +86,9 @@ public class Protocol1_4_4_5to1_4_2 extends AbstractProtocol<ClientboundPackets1
                 handler(wrapper -> rewriteMetadata(wrapper.get(Types1_6_4.METADATA_LIST, 0)));
             }
         });
-        this.registerClientbound(ClientboundPackets1_4_2.ENTITY_METADATA, new PacketRemapper() {
+        this.registerClientbound(ClientboundPackets1_4_2.ENTITY_METADATA, new PacketHandlers() {
             @Override
-            public void registerMap() {
+            public void register() {
                 map(Type.INT); // entity id
                 map(Types1_4_2.METADATA_LIST, Types1_6_4.METADATA_LIST); // metadata
                 handler(wrapper -> rewriteMetadata(wrapper.get(Types1_6_4.METADATA_LIST, 0)));
