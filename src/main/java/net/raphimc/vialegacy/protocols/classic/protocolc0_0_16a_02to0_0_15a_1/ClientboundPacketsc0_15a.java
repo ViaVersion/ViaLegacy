@@ -24,53 +24,32 @@ import net.raphimc.vialegacy.api.splitter.PreNettyPacketType;
 
 import java.util.function.BiConsumer;
 
-import static net.raphimc.vialegacy.api.splitter.PreNettyTypes.readByteArray1024;
-import static net.raphimc.vialegacy.api.splitter.PreNettyTypes.readString64;
-
 public enum ClientboundPacketsc0_15a implements ClientboundPacketType, PreNettyPacketType {
 
     JOIN_GAME(0, (user, buf) -> {
-        readString64(buf);
+        buf.skipBytes(64);
     }),
     KEEP_ALIVE(1, (user, buf) -> {
     }),
     LEVEL_INIT(2, (user, buf) -> {
     }),
     LEVEL_DATA(3, (user, buf) -> {
-        buf.readShort();
-        readByteArray1024(buf);
-        buf.readByte();
+        buf.skipBytes(1027);
     }),
     LEVEL_FINALIZE(4, (user, buf) -> {
-        buf.readShort();
-        buf.readShort();
-        buf.readShort();
+        buf.skipBytes(6);
     }),
     BLOCK_CHANGE(6, (user, buf) -> {
-        buf.readShort();
-        buf.readShort();
-        buf.readShort();
-        buf.readByte();
+        buf.skipBytes(7);
     }),
     SPAWN_PLAYER(7, (user, buf) -> {
-        buf.readByte();
-        readString64(buf);
-        buf.readShort();
-        buf.readShort();
-        buf.readShort();
-        buf.readByte();
-        buf.readByte();
+        buf.skipBytes(73);
     }),
     ENTITY_TELEPORT(8, (user, buf) -> {
-        buf.readByte();
-        buf.readShort();
-        buf.readShort();
-        buf.readShort();
-        buf.readByte();
-        buf.readByte();
+        buf.skipBytes(9);
     }),
     DESTROY_ENTITIES(9, (user, buf) -> {
-        buf.readByte();
+        buf.skipBytes(1);
     });
 
     private static final ClientboundPacketsc0_15a[] REGISTRY = new ClientboundPacketsc0_15a[256];
