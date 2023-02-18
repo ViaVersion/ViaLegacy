@@ -24,6 +24,8 @@ import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_17_1_0_17_4toa1_0_16_2.Protocola1_0_17_1_0_17_4toa1_0_16_2;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_17_1_0_17_4toa1_0_16_2.storage.TimeLockStorage;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_1_0_1_1_2_1toa1_0_17_1_0_17_4.ClientboundPacketsa1_0_17;
+import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.Protocol1_6_1to1_5_2;
+import net.raphimc.vialegacy.protocols.release.protocol1_6_2to1_6_1.ClientboundPackets1_6_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.PlayerInfoStorage;
 
 public class TimeLockTask implements Runnable {
@@ -35,9 +37,19 @@ public class TimeLockTask implements Runnable {
             final PlayerInfoStorage playerInfoStorage = info.get(PlayerInfoStorage.class);
             if (timeLockStorage != null && playerInfoStorage != null && playerInfoStorage.entityId != -1) {
                 try {
-                    final PacketWrapper updateTime = PacketWrapper.create(ClientboundPacketsa1_0_17.TIME_UPDATE, info);
-                    updateTime.write(Type.LONG, timeLockStorage.getTime() % 24_000L);
-                    updateTime.send(Protocola1_0_17_1_0_17_4toa1_0_16_2.class);
+                    if (info.getProtocolInfo().getPipeline().contains(Protocol1_6_1to1_5_2.class)) {
+                        if (timeLockStorage.getTime() == 0) { // 0 always does the daylight cycle
+                            timeLockStorage.setTime(1); // Set it to 1 which is close enough
+                        }
+                        final PacketWrapper updateTime = PacketWrapper.create(ClientboundPackets1_6_1.TIME_UPDATE, info);
+                        updateTime.write(Type.LONG, timeLockStorage.getTime()); // time
+                        updateTime.write(Type.LONG, -(timeLockStorage.getTime() % 24000)); // time of day
+                        updateTime.send(Protocol1_6_1to1_5_2.class);
+                    } else {
+                        final PacketWrapper updateTime = PacketWrapper.create(ClientboundPacketsa1_0_17.TIME_UPDATE, info);
+                        updateTime.write(Type.LONG, timeLockStorage.getTime()); // time
+                        updateTime.send(Protocola1_0_17_1_0_17_4toa1_0_16_2.class);
+                    }
                 } catch (Throwable ignored) {
                 }
             }
