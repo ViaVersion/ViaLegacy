@@ -24,35 +24,35 @@ import com.viaversion.viaversion.libs.fastutil.ints.IntSet;
 
 public class ExtBlockPermissionsStorage extends StoredObject {
 
-    private final IntSet placingAllowed = new IntOpenHashSet();
-    private final IntSet breakingAllowed = new IntOpenHashSet();
+    private final IntSet placingDenied = new IntOpenHashSet();
+    private final IntSet breakingDenied = new IntOpenHashSet();
 
     public ExtBlockPermissionsStorage(final UserConnection user) {
         super(user);
     }
 
     public void addPlaceable(final int block) {
-        this.placingAllowed.add(block);
+        this.placingDenied.remove(block);
     }
 
     public void addBreakable(final int block) {
-        this.breakingAllowed.add(block);
+        this.breakingDenied.remove(block);
     }
 
     public void removePlaceable(final int block) {
-        this.placingAllowed.remove(block);
+        this.placingDenied.add(block);
     }
 
     public void removeBreakable(final int block) {
-        this.breakingAllowed.remove(block);
+        this.breakingDenied.add(block);
     }
 
-    public boolean isPlacingAllowed(final int block) {
-        return this.placingAllowed.contains(block);
+    public boolean isPlacingDenied(final int block) {
+        return this.placingDenied.contains(block);
     }
 
-    public boolean isBreakingAllowed(final int block) {
-        return this.breakingAllowed.contains(block);
+    public boolean isBreakingDenied(final int block) {
+        return this.breakingDenied.contains(block);
     }
 
 }

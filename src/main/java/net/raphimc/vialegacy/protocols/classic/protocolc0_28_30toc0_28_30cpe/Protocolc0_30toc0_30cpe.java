@@ -316,7 +316,7 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
                     final int blockId = wrapper.get(Type.BYTE, 0);
 
                     int block = level.getBlock(position);
-                    final boolean disallow = (placeBlock && !blockPermissions.isPlacingAllowed(blockId)) || (!placeBlock && !blockPermissions.isBreakingAllowed(block));
+                    final boolean disallow = (placeBlock && blockPermissions.isPlacingDenied(blockId)) || (!placeBlock && blockPermissions.isBreakingDenied(block));
 
                     if (disallow) {
                         wrapper.cancel();
