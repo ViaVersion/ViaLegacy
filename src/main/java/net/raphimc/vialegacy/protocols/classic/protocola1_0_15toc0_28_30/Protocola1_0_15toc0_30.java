@@ -129,6 +129,7 @@ public class Protocola1_0_15toc0_30 extends AbstractProtocol<ClientboundPacketsc
                         gameEvent.write(Type.BYTE, (byte) 1); // value (creative)
                         gameEvent.send(Protocolb1_8_0_1tob1_7_0_3.class);
                     }
+                    wrapper.user().get(ClassicOpLevelStorage.class).updateAbilities();
 
                     wrapper.user().put(new ClassicLevelStorage(wrapper.user()));
 
@@ -355,8 +356,9 @@ public class Protocola1_0_15toc0_30 extends AbstractProtocol<ClientboundPacketsc
             public void register() {
                 handler(wrapper -> {
                     wrapper.cancel();
+                    final ClassicOpLevelStorage opLevelStorage = wrapper.user().get(ClassicOpLevelStorage.class);
                     final byte opLevel = wrapper.read(Type.BYTE); // op level
-                    wrapper.user().get(ClassicOpLevelStorage.class).setOpLevel(opLevel);
+                    opLevelStorage.setOpLevel(opLevel);
                 });
             }
         });

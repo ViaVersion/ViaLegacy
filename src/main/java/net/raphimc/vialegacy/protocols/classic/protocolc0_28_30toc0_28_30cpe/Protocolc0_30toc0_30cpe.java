@@ -42,12 +42,12 @@ import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.data.Cl
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.model.ClassicLevel;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.storage.ClassicBlockRemapper;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.storage.ClassicLevelStorage;
+import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.storage.ClassicOpLevelStorage;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.storage.ClassicProgressStorage;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.types.Typesc0_30;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.data.ClassicProtocolExtension;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.data.ExtendedClassicBlocks;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.storage.ExtBlockPermissionsStorage;
-import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.storage.ExtHackControlStorage;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.storage.ExtensionProtocolMetadataStorage;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.task.ClassicPingTask;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types.Types1_1;
@@ -134,15 +134,12 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
                             }
                         }
 
-                        if (supportedExtensions.contains(ClassicProtocolExtension.HACK_CONTROL)) {
-                            wrapper.user().put(new ExtHackControlStorage(wrapper.user()));
-                        }
                         if (supportedExtensions.contains(ClassicProtocolExtension.BLOCK_PERMISSIONS)) {
                             wrapper.user().put(new ExtBlockPermissionsStorage(wrapper.user()));
                         }
 
                         final PacketWrapper extensionProtocolInfo = PacketWrapper.create(ServerboundPacketsc0_30cpe.EXTENSION_PROTOCOL_INFO, wrapper.user());
-                        extensionProtocolInfo.write(Typesc0_30.STRING, "ClassiCube 1.3.2"); // app name
+                        extensionProtocolInfo.write(Typesc0_30.STRING, "ClassiCube 1.3.5"); // app name
                         extensionProtocolInfo.write(Type.SHORT, (short) supportedExtensions.size()); // extension count
                         extensionProtocolInfo.sendToServer(Protocolc0_30toc0_30cpe.class);
 
@@ -171,37 +168,20 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsc0_30cpe.EXT_HACK_CONTROL, ClientboundPacketsc0_28.CHAT_MESSAGE, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsc0_30cpe.EXT_HACK_CONTROL, null, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final ExtHackControlStorage hackControlStorage = wrapper.user().get(ExtHackControlStorage.class);
+                    wrapper.cancel();
+                    final ClassicOpLevelStorage opLevelStorage = wrapper.user().get(ClassicOpLevelStorage.class);
                     final boolean flying = wrapper.read(Type.BOOLEAN); // flying
                     final boolean noClip = wrapper.read(Type.BOOLEAN); // no clip
                     final boolean speed = wrapper.read(Type.BOOLEAN); // speed
                     final boolean respawn = wrapper.read(Type.BOOLEAN); // respawn key
-                    final boolean thirdPerson = wrapper.read(Type.BOOLEAN); // third person view
-                    final short jumpHeight = wrapper.read(Type.SHORT); // jump height
+                    wrapper.read(Type.BOOLEAN); // third person view
+                    wrapper.read(Type.SHORT); // jump height
 
-                    if (!hackControlStorage.update(flying, noClip, speed, respawn, thirdPerson, jumpHeight)) {
-                        wrapper.cancel();
-                        return;
-                    }
-
-                    String statusMessage = "&6Hack control: ";
-                    statusMessage += hackControlStorage.flying ? "&aFlying" : "&cFlying";
-                    statusMessage += " ";
-                    statusMessage += hackControlStorage.noClip ? "&aNoClip" : "&cNoClip";
-                    statusMessage += " ";
-                    statusMessage += hackControlStorage.speed ? "&aSpeed" : "&cSpeed";
-                    statusMessage += " ";
-                    statusMessage += hackControlStorage.respawn ? "&aRespawn" : "&cRespawn";
-                    statusMessage += " ";
-                    statusMessage += hackControlStorage.thirdPerson ? "&aThird-Person" : "&cThird-Person";
-                    statusMessage += " &aJump-Height: " + hackControlStorage.jumpHeight;
-
-                    wrapper.write(Type.BYTE, (byte) 0); // sender id
-                    wrapper.write(Typesc0_30.STRING, statusMessage); // message
+                    opLevelStorage.updateHax(flying, noClip, speed, respawn);
                 });
             }
         });

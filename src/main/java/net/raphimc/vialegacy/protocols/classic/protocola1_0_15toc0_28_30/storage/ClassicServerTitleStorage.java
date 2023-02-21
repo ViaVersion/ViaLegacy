@@ -39,4 +39,68 @@ public class ClassicServerTitleStorage extends StoredObject {
         return this.motd;
     }
 
+    public boolean isHaxEnabled() {
+        return this.motd.contains("+hax");
+    }
+
+    public boolean isHaxDisabled() {
+        return this.motd.contains("-hax");
+    }
+
+    public boolean isFlyEnabled() {
+        return this.motd.contains("+fly");
+    }
+
+    public boolean isFlyDisabled() {
+        return this.motd.contains("-fly");
+    }
+
+    public boolean isFlyEffectivelyEnabled() {
+        final boolean isOp = this.getUser().get(ClassicOpLevelStorage.class).getOpLevel() >= 100;
+        return (this.isHaxDisabled() ? this.isFlyEnabled() : !this.isFlyDisabled()) || (isOp && this.isOphaxEnabled());
+    }
+
+    public boolean isNoclipEnabled() {
+        return this.motd.contains("+noclip");
+    }
+
+    public boolean isNoclipDisabled() {
+        return this.motd.contains("-noclip");
+    }
+
+    public boolean isNoclipEffectivelyEnabled() {
+        final boolean isOp = this.getUser().get(ClassicOpLevelStorage.class).getOpLevel() >= 100;
+        return (this.isHaxDisabled() ? this.isNoclipEnabled() : !this.isNoclipDisabled()) || (isOp && this.isOphaxEnabled());
+    }
+
+    public boolean isRespawnEnabled() {
+        return this.motd.contains("+respawn");
+    }
+
+    public boolean isRespawnDisabled() {
+        return this.motd.contains("-respawn");
+    }
+
+    public boolean isRespawnEffectivelyEnabled() {
+        final boolean isOp = this.getUser().get(ClassicOpLevelStorage.class).getOpLevel() >= 100;
+        return (this.isHaxDisabled() ? this.isRespawnEnabled() : !this.isRespawnDisabled()) || (isOp && this.isOphaxEnabled());
+    }
+
+    public boolean isSpeedEnabled() {
+        return this.motd.contains("+speed");
+    }
+
+    public boolean isSpeedDisabled() {
+        return this.motd.contains("-speed");
+    }
+
+    public boolean isSpeedEffectivelyEnabled() {
+        final boolean isOp = this.getUser().get(ClassicOpLevelStorage.class).getOpLevel() >= 100;
+        return (this.isHaxDisabled() ? this.isSpeedEnabled() : !this.isSpeedDisabled()) || (isOp && this.isOphaxEnabled());
+    }
+
+    public boolean isOphaxEnabled() {
+        return this.motd.contains("+ophax");
+    }
+
 }
