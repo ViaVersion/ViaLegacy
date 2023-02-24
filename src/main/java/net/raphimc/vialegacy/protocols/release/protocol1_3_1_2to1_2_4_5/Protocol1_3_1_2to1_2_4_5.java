@@ -17,6 +17,7 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5;
 
+import com.google.common.collect.Lists;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -59,6 +60,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.types.Ch
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.types.Types1_2_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.ClientboundPackets1_3_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.ServerboundPackets1_3_1;
+import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.types.MetaType1_3_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.types.Types1_3_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.metadata.MetaIndex1_6_1to1_5_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.ChunkTracker;
@@ -171,7 +173,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends AbstractProtocol<ClientboundPacket
                 map(Type.BYTE); // yaw
                 map(Type.BYTE); // pitch
                 map(Type.UNSIGNED_SHORT); // item
-                create(Types1_3_1.METADATA_LIST, new ArrayList<>()); // metadata
+                handler(wrapper -> wrapper.write(Types1_3_1.METADATA_LIST, Lists.newArrayList(new Metadata(0, MetaType1_3_1.Byte, (byte) 0)))); // metadata
                 handler(wrapper -> {
                     final int entityId = wrapper.get(Type.INT, 0);
                     final double x = wrapper.get(Type.INT, 1) / 32.0D;

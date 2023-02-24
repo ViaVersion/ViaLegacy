@@ -41,8 +41,6 @@ import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.types.Type
 import net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2.types.Types1_4_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
-import java.util.ArrayList;
-
 public class Protocolb1_2_0_2tob1_1_2 extends AbstractProtocol<ClientboundPacketsb1_1, ClientboundPacketsb1_2, ServerboundPacketsb1_1, ServerboundPacketsb1_2> {
 
     private final BlockDataRewriter BLOCK_DATA_REWRITER = new BlockDataRewriter();
@@ -132,7 +130,7 @@ public class Protocolb1_2_0_2tob1_1_2 extends AbstractProtocol<ClientboundPacket
                 map(Type.INT); // z
                 map(Type.BYTE); // yaw
                 map(Type.BYTE); // pitch
-                create(Typesb1_2.METADATA_LIST, new ArrayList<>()); // metadata
+                handler(wrapper -> wrapper.write(Typesb1_2.METADATA_LIST, Lists.newArrayList(new Metadata(0, MetaTypeb1_2.Byte, (byte) 0)))); // metadata
             }
         });
         this.registerClientbound(ClientboundPacketsb1_1.CHUNK_DATA, new PacketHandlers() {
