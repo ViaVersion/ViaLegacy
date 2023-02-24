@@ -59,7 +59,7 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends AbstractProtocol<ClientboundPack
         this.registerClientbound(ClientboundPacketsb1_7.KEEP_ALIVE, new PacketHandlers() {
             @Override
             public void register() {
-                create(Type.INT, ThreadLocalRandom.current().nextInt(Short.MAX_VALUE)); // key
+                handler(wrapper -> wrapper.write(Type.INT, ThreadLocalRandom.current().nextInt(Short.MAX_VALUE))); // key
             }
         });
         this.registerClientbound(ClientboundPacketsb1_7.JOIN_GAME, new PacketHandlers() {
