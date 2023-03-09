@@ -56,11 +56,8 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsb1_7.KEEP_ALIVE, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> wrapper.write(Type.INT, ThreadLocalRandom.current().nextInt(Short.MAX_VALUE))); // key
-            }
+        this.registerClientbound(ClientboundPacketsb1_7.KEEP_ALIVE, wrapper -> {
+            wrapper.write(Type.INT, ThreadLocalRandom.current().nextInt(1, Short.MAX_VALUE)); // key
         });
         this.registerClientbound(ClientboundPacketsb1_7.JOIN_GAME, new PacketHandlers() {
             @Override
@@ -323,7 +320,11 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends AbstractProtocol<ClientboundPack
                 });
             }
         });
-        this.cancelServerbound(ServerboundPacketsb1_8.KEEP_ALIVE); // beta client only sends this packet every second if in downloading terrain screen
+        this.registerServerbound(ServerboundPacketsb1_8.KEEP_ALIVE, wrapper -> {
+            if (wrapper.read(Type.INT) != 0) { // beta client only sends this packet with the key set to 0 every second if in downloading terrain screen
+                wrapper.cancel();
+            }
+        });
     }
 
     @Override
