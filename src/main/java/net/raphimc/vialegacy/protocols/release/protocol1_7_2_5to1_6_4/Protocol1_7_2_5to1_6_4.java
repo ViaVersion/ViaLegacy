@@ -1194,7 +1194,6 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                         final PacketWrapper disconnect = PacketWrapper.create(ServerboundPackets1_6_4.DISCONNECT, userConnection);
                         disconnect.write(Types1_6_4.STRING, "Quitting"); // reason
                         disconnect.sendToServer(Protocol1_7_2_5to1_6_4.class);
-                        Thread.sleep(50); // Wait for the packet to arrive at the server
                     }
 
                     super.close(ctx, promise);
