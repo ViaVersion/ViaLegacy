@@ -71,8 +71,8 @@ public class MetadataRewriter {
                     continue;
                 } else if (metaIndex == MetaIndex1_8to1_7_6.HUMAN_SKIN_FLAGS) {
                     byte flags = (byte) value;
-                    boolean cape = flags == 2;
-                    flags = (byte) (cape ? 127 : 125);
+                    boolean cape = (flags & 2) == 0;
+                    flags = (byte) (cape ? 127 : 126);
                     entry.setValue(flags);
                     continue;
                 }

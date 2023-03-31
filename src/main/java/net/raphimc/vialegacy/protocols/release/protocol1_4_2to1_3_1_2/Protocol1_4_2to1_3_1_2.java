@@ -17,6 +17,7 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2;
 
+import com.google.common.collect.Lists;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
@@ -42,6 +43,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2.types.Type
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.ServerboundPackets1_5_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.storage.EntityTracker;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Types1_6_4;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata.MetaIndex1_8to1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
 import java.util.List;
@@ -73,6 +75,27 @@ public class Protocol1_4_2to1_3_1_2 extends AbstractProtocol<ClientboundPackets1
                         ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Could not parse 1.3.1 ping: " + reason, e);
                         wrapper.cancel();
                     }
+                });
+            }
+        });
+        this.registerClientbound(ClientboundPackets1_3_1.JOIN_GAME, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Type.INT); // entity id
+                map(Types1_6_4.STRING); // level type
+                map(Type.BYTE); // game mode
+                map(Type.BYTE); // dimension id
+                map(Type.BYTE); // difficulty
+                map(Type.BYTE); // world height
+                map(Type.BYTE); // max players
+                handler(wrapper -> {
+                    wrapper.send(Protocol1_4_2to1_3_1_2.class);
+                    wrapper.cancel();
+
+                    final PacketWrapper entityMetadata = PacketWrapper.create(ClientboundPackets1_4_2.ENTITY_METADATA, wrapper.user());
+                    entityMetadata.write(Type.INT, wrapper.get(Type.INT, 0)); // entity id
+                    entityMetadata.write(Types1_4_2.METADATA_LIST, Lists.newArrayList(new Metadata(MetaIndex1_8to1_7_6.HUMAN_SKIN_FLAGS.getOldIndex(), MetaType1_4_2.Byte, (byte) 0))); // metadata
+                    entityMetadata.send(Protocol1_4_2to1_3_1_2.class);
                 });
             }
         });
@@ -118,6 +141,11 @@ public class Protocol1_4_2to1_3_1_2 extends AbstractProtocol<ClientboundPackets1
                 map(Type.UNSIGNED_SHORT); // item
                 map(Types1_3_1.METADATA_LIST, Types1_4_2.METADATA_LIST); // metadata
                 handler(wrapper -> rewriteMetadata(wrapper.get(Types1_4_2.METADATA_LIST, 0)));
+                handler(wrapper -> {
+                    final List<Metadata> metadataList = wrapper.get(Types1_4_2.METADATA_LIST, 0);
+                    metadataList.removeIf(metadata -> metadata.metaType() == MetaType1_4_2.Byte && metadata.id() == MetaIndex1_8to1_7_6.HUMAN_SKIN_FLAGS.getOldIndex());
+                    metadataList.add(new Metadata(MetaIndex1_8to1_7_6.HUMAN_SKIN_FLAGS.getOldIndex(), MetaType1_4_2.Byte, (byte) 0));
+                });
             }
         });
         this.registerClientbound(ClientboundPackets1_3_1.SPAWN_ITEM, new PacketHandlers() {
