@@ -27,7 +27,9 @@ public class BlockDigTickTask implements Runnable {
     public void run() {
         for (UserConnection info : Via.getManager().getConnectionManager().getConnections()) {
             final BlockDigStorage blockDigStorage = info.get(BlockDigStorage.class);
-            if (blockDigStorage != null) blockDigStorage.tick();
+            if (blockDigStorage != null) {
+                info.getChannel().eventLoop().submit(blockDigStorage::tick);
+            }
         }
     }
 

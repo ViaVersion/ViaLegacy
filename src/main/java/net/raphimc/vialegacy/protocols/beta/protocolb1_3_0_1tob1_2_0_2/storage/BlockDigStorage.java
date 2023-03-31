@@ -20,7 +20,10 @@ package net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.storage;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
+import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.Protocolb1_3_0_1tob1_2_0_2;
+
+import java.util.logging.Level;
 
 public class BlockDigStorage extends StoredObject {
 
@@ -44,7 +47,7 @@ public class BlockDigStorage extends StoredObject {
             }
             Protocolb1_3_0_1tob1_2_0_2.sendBlockDigPacket(this.getUser(), (byte) 1, position, facing);
         } catch (Throwable e) {
-            e.printStackTrace();
+            ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error while ticking BlockDigStorage", e);
         }
     }
 

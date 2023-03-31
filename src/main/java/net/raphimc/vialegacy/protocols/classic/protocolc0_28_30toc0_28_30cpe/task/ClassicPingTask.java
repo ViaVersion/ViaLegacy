@@ -38,14 +38,16 @@ public class ClassicPingTask implements Runnable {
             final ExtensionProtocolMetadataStorage protocolMetadata = info.get(ExtensionProtocolMetadataStorage.class);
             if (protocolMetadata == null) continue;
             if (!protocolMetadata.hasServerExtension(ClassicProtocolExtension.TWO_WAY_PING, 1)) continue;
-            try {
-                final PacketWrapper pingRequest = PacketWrapper.create(ServerboundPacketsc0_30cpe.EXT_TWO_WAY_PING, info);
-                pingRequest.write(Type.BYTE, (byte) 0); // direction
-                pingRequest.write(Type.SHORT, (short) (ThreadLocalRandom.current().nextInt() % Short.MAX_VALUE)); // data
-                pingRequest.sendToServer(Protocolc0_30toc0_30cpe.class);
-            } catch (Throwable e) {
-                ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error sending TwoWayPing extension ping packet", e);
-            }
+            info.getChannel().eventLoop().submit(() -> {
+                try {
+                    final PacketWrapper pingRequest = PacketWrapper.create(ServerboundPacketsc0_30cpe.EXT_TWO_WAY_PING, info);
+                    pingRequest.write(Type.BYTE, (byte) 0); // direction
+                    pingRequest.write(Type.SHORT, (short) (ThreadLocalRandom.current().nextInt() % Short.MAX_VALUE)); // data
+                    pingRequest.sendToServer(Protocolc0_30toc0_30cpe.class);
+                } catch (Throwable e) {
+                    ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error sending TwoWayPing extension ping packet", e);
+                }
+            });
         }
     }
 

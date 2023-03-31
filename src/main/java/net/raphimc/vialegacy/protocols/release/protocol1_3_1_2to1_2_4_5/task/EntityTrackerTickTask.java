@@ -27,7 +27,9 @@ public class EntityTrackerTickTask implements Runnable {
     public void run() {
         for (UserConnection info : Via.getManager().getConnectionManager().getConnections()) {
             final EntityTracker entityTracker = info.get(EntityTracker.class);
-            if (entityTracker != null) entityTracker.tick();
+            if (entityTracker != null) {
+                info.getChannel().eventLoop().submit(entityTracker::tick);
+            }
         }
     }
 
