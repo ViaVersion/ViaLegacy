@@ -23,20 +23,27 @@ import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.ByteToMessageCodec;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.splitter.PreNettyPacketType;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 
 import java.util.List;
 
-public class PreNettyDecoder extends ByteToMessageDecoder {
+public class PreNettyLengthCodec extends ByteToMessageCodec<ByteBuf> {
 
     protected final UserConnection user;
     private final EvictingQueue<Integer> lastPackets = EvictingQueue.create(8);
 
-    public PreNettyDecoder(final UserConnection user) {
+    public PreNettyLengthCodec(final UserConnection user) {
         this.user = user;
+    }
+
+    @Override
+    protected void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) {
+        Type.VAR_INT.readPrimitive(in); // length
+        out.writeByte(Type.VAR_INT.readPrimitive(in) & 255); // id
+        out.writeBytes(in); // content
     }
 
     @Override
