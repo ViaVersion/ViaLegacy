@@ -18,30 +18,24 @@
 package net.raphimc.vialegacy.netty;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.ByteToMessageCodec;
+import io.netty.handler.codec.MessageToByteEncoder;
 
-import java.util.List;
+public class PreNettyLengthRemover extends MessageToByteEncoder<ByteBuf> {
 
-public class PreNettyLengthCodec extends ByteToMessageCodec<ByteBuf> {
+    protected final UserConnection user;
 
-    protected final PreNettyLengthRemover encoder;
-    protected final PreNettyLengthPrepender decoder;
-
-    public PreNettyLengthCodec(final UserConnection user) {
-        this.encoder = new PreNettyLengthRemover(user);
-        this.decoder = new PreNettyLengthPrepender(user);
+    public PreNettyLengthRemover(final UserConnection user) {
+        this.user = user;
     }
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) {
-        this.encoder.encode(ctx, in, out);
-    }
-
-    @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-        this.decoder.decode(ctx, in, out);
+        Type.VAR_INT.readPrimitive(in); // length
+        out.writeByte(Type.VAR_INT.readPrimitive(in) & 255); // id
+        out.writeBytes(in); // content
     }
 
 }
