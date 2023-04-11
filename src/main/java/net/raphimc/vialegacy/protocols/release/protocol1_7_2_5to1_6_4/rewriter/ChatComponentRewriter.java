@@ -28,7 +28,7 @@ public class ChatComponentRewriter {
     public static String toClient(final String text) {
         final ATextComponent component = TextComponentSerializer.V1_6.deserialize(text);
         // Convert all section sign formatted strings to json formatted ones with styles so the formatting isn't reset on chat line split
-        final ATextComponent newComponent = TextUtils.replace(component, ".*", c -> LegacyStringDeserializer.parse(c.asSingleString(), true).setStyle(c.getStyle()));
+        final ATextComponent newComponent = TextUtils.replace(component, ".*", c -> LegacyStringDeserializer.parse(c.asSingleString(), true).setParentStyle(c.getStyle()));
         // Also convert "using" -> "with" in translatable components
         return TextComponentSerializer.V1_7.serialize(newComponent);
     }
