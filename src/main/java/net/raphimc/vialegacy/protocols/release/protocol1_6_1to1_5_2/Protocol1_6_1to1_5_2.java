@@ -25,6 +25,8 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import net.lenni0451.mcstructs.text.components.StringComponent;
+import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
@@ -69,6 +71,12 @@ public class Protocol1_6_1to1_5_2 extends AbstractProtocol<ClientboundPackets1_5
                     tracker.getTrackedEntities().put(entityId, Entity1_10Types.EntityType.PLAYER);
                     tracker.setPlayerID(entityId);
                 });
+            }
+        });
+        this.registerClientbound(ClientboundPackets1_5_2.CHAT_MESSAGE, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Types1_6_4.STRING, Types1_6_4.STRING, msg -> TextComponentSerializer.V1_6.serialize(new StringComponent(msg))); // message
             }
         });
         this.registerClientbound(ClientboundPackets1_5_2.UPDATE_HEALTH, new PacketHandlers() {
