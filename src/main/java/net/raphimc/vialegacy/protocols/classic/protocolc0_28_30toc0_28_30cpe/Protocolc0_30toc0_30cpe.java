@@ -139,7 +139,7 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
                         }
 
                         final PacketWrapper extensionProtocolInfo = PacketWrapper.create(ServerboundPacketsc0_30cpe.EXTENSION_PROTOCOL_INFO, wrapper.user());
-                        extensionProtocolInfo.write(Typesc0_30.STRING, "ClassiCube 1.3.5"); // app name
+                        extensionProtocolInfo.write(Typesc0_30.STRING, ViaLegacy.getPlatform().getCpeAppName()); // app name
                         extensionProtocolInfo.write(Type.SHORT, (short) supportedExtensions.size()); // extension count
                         extensionProtocolInfo.sendToServer(Protocolc0_30toc0_30cpe.class);
 

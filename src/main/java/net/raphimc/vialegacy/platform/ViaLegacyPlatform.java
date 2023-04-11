@@ -126,4 +126,13 @@ public interface ViaLegacyPlatform {
 
     File getDataFolder();
 
+    /**
+     * Returns the name which will be sent to classic CPE servers as the client's application name.
+     *
+     * @return The CPE application name.
+     */
+    default String getCpeAppName() {
+        return "ViaLegacy " + ViaLegacy.VERSION;
+    }
+
 }
