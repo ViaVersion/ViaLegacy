@@ -17,24 +17,24 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.rewriter;
 
-import com.viaversion.viaversion.libs.gson.JsonElement;
-import com.viaversion.viaversion.libs.gson.JsonObject;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import net.lenni0451.mcstructs.text.ATextComponent;
+import net.lenni0451.mcstructs.text.components.StringComponent;
+import net.lenni0451.mcstructs.text.serializer.LegacyStringDeserializer;
+import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
+import net.lenni0451.mcstructs.text.utils.TextUtils;
 
 public class ChatComponentRewriter {
 
-    private static final ComponentRewriter FIX_COMPONENT = new ComponentRewriter() {
-        @Override
-        protected void handleTranslate(JsonObject object, String translate) {
-            final JsonElement args = object.remove("using");
-            if (args != null) {
-                object.add("with", args);
-            }
-        }
-    };
-
     public static String toClient(final String text) {
-        return FIX_COMPONENT.processText(text).toString();
+        final ATextComponent component = TextComponentSerializer.V1_6.deserialize(text);
+        // Convert all section sign formatted strings to json formatted ones with styles so the formatting isn't reset on chat line split
+        final ATextComponent newComponent = TextUtils.replace(component, ".*", c -> LegacyStringDeserializer.parse(c.asSingleString(), true).setStyle(c.getStyle()));
+        // Also convert "using" -> "with" in translatable components
+        return TextComponentSerializer.V1_7.serialize(newComponent);
+    }
+
+    public static String toClientDisconnect(final String reason) {
+        return TextComponentSerializer.V1_7.serialize(new StringComponent(reason));
     }
 
 }

@@ -29,9 +29,10 @@ import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.ShortTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import net.lenni0451.mcstructs.snbt.SNbtSerializer;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
-import net.raphimc.vialegacy.util.ViaStringTagReader1_11_2;
+import net.raphimc.vialegacy.util.NbtConverter;
 
 import java.io.IOException;
 
@@ -375,8 +376,8 @@ public class ChatItemRewriter {
 
                 final CompoundTag tag;
                 try {
-                    tag = ViaStringTagReader1_11_2.getTagFromJson(text);
-                } catch (Exception e) {
+                    tag = (CompoundTag) NbtConverter.mcStructToVia(SNbtSerializer.V1_7.deserialize(text));
+                } catch (Throwable e) {
                     ViaLegacy.getPlatform().getLogger().warning("Error reading NBT in show_item:" + text);
                     throw new RuntimeException(e);
                 }

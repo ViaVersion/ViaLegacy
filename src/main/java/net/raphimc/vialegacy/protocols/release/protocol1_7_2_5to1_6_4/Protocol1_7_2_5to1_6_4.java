@@ -155,7 +155,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
         this.registerClientbound(State.LOGIN, ClientboundPackets1_6_4.DISCONNECT.getId(), ClientboundLoginPackets.LOGIN_DISCONNECT.getId(), new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_6_4.STRING, Type.STRING, ChatComponentRewriter::toClient); // reason
+                map(Types1_6_4.STRING, Type.STRING, ChatComponentRewriter::toClientDisconnect); // reason
             }
         });
         this.cancelClientbound(State.LOGIN, ClientboundPackets1_6_4.PLUGIN_MESSAGE.getId());
@@ -884,7 +884,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
         this.registerClientbound(ClientboundPackets1_6_4.DISCONNECT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_6_4.STRING, Type.STRING, ChatComponentRewriter::toClient);
+                map(Types1_6_4.STRING, Type.STRING, ChatComponentRewriter::toClientDisconnect); // reason
             }
         });
         this.cancelClientbound(ClientboundPackets1_6_4.CREATIVE_INVENTORY_ACTION);
