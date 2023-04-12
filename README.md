@@ -85,11 +85,11 @@ if (serverTargetVersion.isOlderThanOrEqualTo(VersionEnum.r1_6_4)) { // Only add 
     // You can either use a length codec from the modern Netty or two single prepender and splitter.
     channel.pipeline().addBefore("length-codec", "vialegacy-pre-netty-length-codec", new PreNettyLengthCodec(user));
     
-    // channel.pipeline().addBefore("prepender", "via-pre-netty-encoder", new PreNettyEncoder(user));
-    // channel.pipeline().addBefore("splitter", "via-pre-netty-decoder", new PreNettyDecoder(user));
+    // channel.pipeline().addBefore("prepender", "via-pre-netty-prepender", new PreNettyLengthPrepender(user));
+    // channel.pipeline().addBefore("splitter", "via-pre-netty-remover", new PreNettyLengthRemover(user));
 }
 ```
-In case you use [ViaProtocolHack](https://github.com/RaphiMC/ViaProtocolHack) and the VPH pipeline, you don't need to make these modifications anymore, as the VPH pipeline already does it automatically.
+In case you use [ViaProtocolHack](https://github.com/RaphiMC/ViaProtocolHack) and the [VPHpipeline](https://github.com/RaphiMC/ViaProtocolHack/blob/main/src/main/java/net/raphimc/viaprotocolhack/netty/VPHPipeline.java), you don't need to make these modifications anymore, as the VPHpipeline already does it automatically.
 ### Implementing the platform specific providers
 The platform specific providers are all optional (except for ``EncryptionProvider`` and ``GameProfileFetcher``) and only required if you want to use the features which require them.  
 To implement a provider you can simply call ``Via.getManager().getProviders().use(TheNameOfTheProvider.class, new YouImplementationOfThatProvider());`` after the Via manager is initialized.
