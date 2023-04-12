@@ -82,11 +82,11 @@ To implement the changes you should add something similar to the following lines
 if (serverTargetVersion.isOlderThanOrEqualTo(VersionEnum.r1_6_4)) { // Only add those handlers if the server version is <= 1.6.4
     user.getProtocolInfo().getPipeline().add(PreNettyBaseProtocol.INSTANCE); // Allow to intercept the handshake packet
     
-    // You can either use a length codec from the modern Netty or two single prepender and splitter.
+    // You can either add a codec (if your pipeline is built for that)
     channel.pipeline().addBefore("length-codec", "vialegacy-pre-netty-length-codec", new PreNettyLengthCodec(user));
-    
-    // channel.pipeline().addBefore("prepender", "vialegacy-pre-netty-length-prepender", new PreNettyLengthPrepender(user));
-    // channel.pipeline().addBefore("splitter", "vialegacy-pre-netty-length-remover", new PreNettyLengthRemover(user));
+    // or two seperate netty handlers
+    // channel.pipeline().addBefore("length-decoder", "vialegacy-pre-netty-length-prepender", new PreNettyLengthPrepender(user));
+    // channel.pipeline().addBefore("length-encoder", "vialegacy-pre-netty-length-remover", new PreNettyLengthRemover(user));
 }
 ```
 In case you use [ViaProtocolHack](https://github.com/RaphiMC/ViaProtocolHack) and the [VPHpipeline](https://github.com/RaphiMC/ViaProtocolHack/blob/main/src/main/java/net/raphimc/viaprotocolhack/netty/VPHPipeline.java), you don't need to make these modifications anymore, as the VPHpipeline already does it automatically.
