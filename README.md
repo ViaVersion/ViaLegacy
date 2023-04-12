@@ -1,5 +1,5 @@
 # ViaLegacy
-ViaVersion addon to add support for EVERY minecraft server version (Classic, Alpha, Beta, Release).
+ViaVersion addon to add support for EVERY Minecraft server version (Classic, Alpha, Beta, Release).
 
 ViaLegacy is not usable by itself as a standalone software, as it is an addon for ViaVersion which adds more protocol translators.
 ViaLegacy is intended to be implemented in a ViaVersion based protocol translator.
@@ -16,8 +16,8 @@ If you just want to use ViaLegacy yourself you can check out some projects which
 The lowest supported client version from which ViaLegacy can translate is 1.7.2.
 
 ### Projects implementing ViaLegacy
- - [ViaProxy](https://github.com/RaphiMC/ViaProxy): Standalone proxy which uses ViaVersion to translate between minecraft versions. Allows Minecraft 1.7+ clients to join to any version server.
- - [ViaFabricPlus](https://github.com/FlorianMichael/ViaFabricPlus): Fabric mod for the latest minecraft version with QoL fixes and enhancements to the gameplay.
+ - [ViaProxy](https://github.com/RaphiMC/ViaProxy): Standalone proxy which uses ViaVersion to translate between Minecraft versions. Allows Minecraft 1.7+ clients to join to any version server.
+ - [ViaFabricPlus](https://github.com/FlorianMichael/ViaFabricPlus): Fabric mod for the latest Minecraft version with QoL fixes and enhancements to the gameplay.
 
 ## Releases
 ### Gradle/Maven
