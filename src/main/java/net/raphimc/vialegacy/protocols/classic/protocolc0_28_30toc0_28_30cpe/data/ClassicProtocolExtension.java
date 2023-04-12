@@ -59,7 +59,8 @@ public enum ClassicProtocolExtension {
     SET_SPAWNPOINT("SetSpawnpoint"),
     VELOCITY_CONTROL("VelocityControl"),
     CUSTOM_PARTICLES("CustomParticles"),
-    CUSTOM_MODELS("CustomModels");
+    CUSTOM_MODELS("CustomModels"),
+    EXT_ENTITY_TELEPORT("ExtEntityTeleport");
 
     private final String name;
     private final IntSet supportedVersions;
