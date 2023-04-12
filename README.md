@@ -81,10 +81,10 @@ To implement the changes you should add something similar to the following lines
 ```java
 if (serverTargetVersion.isOlderThanOrEqualTo(VersionEnum.r1_6_4)) { // Only add those handlers if the server version is <= 1.6.4
     user.getProtocolInfo().getPipeline().add(PreNettyBaseProtocol.INSTANCE); // Allow to intercept the handshake packet
-    channel.pipeline().addBefore("prepender", "via-pre-netty-encoder", new PreNettyEncoder(user));
-    channel.pipeline().addBefore("splitter", "via-pre-netty-decoder", new PreNettyDecoder(user));
+    channel.pipeline().addBefore("length-codec", "vialegacy-pre-netty-length-codec", new PreNettyLengthCodec(user));
 }
 ```
+In case you use [ViaProtocolHack](https://github.com/RaphiMC/ViaProtocolHack), you don't need to make these modifications, because ViaProtocolHack already does it automatically.
 ### Implementing the platform specific providers
 The platform specific providers are all optional (except for ``EncryptionProvider`` and ``GameProfileFetcher``) and only required if you want to use the features which require them.  
 To implement a provider you can simply call ``Via.getManager().getProviders().use(TheNameOfTheProvider.class, new YouImplementationOfThatProvider());`` after the Via manager is initialized.
