@@ -63,7 +63,7 @@ public abstract class GameProfileFetcher implements Provider {
             while (e instanceof ExecutionException || e instanceof UncheckedExecutionException || e instanceof CompletionException) e = e.getCause();
             ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Failed to load uuid for player '" + playerName + "' (" + e.getClass().getName() + ")");
         }
-        final UUID uuid = this.getOfflineUUID(playerName);
+        final UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + playerName).getBytes(StandardCharsets.UTF_8));
         UUID_CACHE.put(playerName, uuid);
         return uuid;
     }
@@ -107,10 +107,6 @@ public abstract class GameProfileFetcher implements Provider {
             });
         }
         return future;
-    }
-
-    public UUID getOfflineUUID(final String playerName) {
-        return UUID.nameUUIDFromBytes(("OfflinePlayer:" + playerName).getBytes(StandardCharsets.UTF_8));
     }
 
     public abstract UUID loadMojangUUID(final String playerName) throws Exception;

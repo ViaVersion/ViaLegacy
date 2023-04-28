@@ -28,7 +28,6 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
@@ -60,7 +59,6 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.GameP
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.MapData;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.MapIcon;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.TabListEntry;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.providers.GameProfileFetcher;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.ChatItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.TranslationRewriter;
@@ -1572,11 +1570,6 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         else if (type == Entity1_10Types.EntityType.EXPERIENCE_ORB)
             yOffset = 0.5F / 2F;
         return (int) Math.floor((yPos - yOffset) * 32F);
-    }
-
-    @Override
-    public void register(ViaProviders providers) {
-        providers.require(GameProfileFetcher.class);
     }
 
     @Override

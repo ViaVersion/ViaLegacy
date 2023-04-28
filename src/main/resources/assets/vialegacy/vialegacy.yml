@@ -7,7 +7,7 @@ dynamic-onground: true
 ignore-long-1_8-channel-names: true
 #
 # Load <= 1.7.2 player skull skins
-legacy-skull-loading: true
+legacy-skull-loading: false
 #
 # Load <= 1.6.4 skins. (Adds max 500ms delay to player spawn packets)
 legacy-skin-loading: false

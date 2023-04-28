@@ -50,7 +50,7 @@ public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.pla
     private void loadFields() {
         this.dynamicOnground = this.getBoolean("dynamic-onground", true);
         this.ignoreLongChannelNames = this.getBoolean("ignore-long-1_8-channel-names", true);
-        this.legacySkullLoading = this.getBoolean("legacy-skull-loading", true);
+        this.legacySkullLoading = this.getBoolean("legacy-skull-loading", false);
         this.legacySkinLoading = this.getBoolean("legacy-skin-loading", false);
         this.soundEmulation = this.getBoolean("sound-emulation", true);
         this.oldBiomes = this.getBoolean("old-biomes", true);

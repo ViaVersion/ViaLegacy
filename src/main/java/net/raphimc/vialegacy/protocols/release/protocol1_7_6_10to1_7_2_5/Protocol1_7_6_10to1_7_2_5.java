@@ -84,8 +84,6 @@ public class Protocol1_7_6_10to1_7_2_5 extends AbstractProtocol<ClientboundPacke
                 map(Type.UNSIGNED_BYTE); // type
                 map(Types1_7_6.COMPRESSED_NBT); // data
                 handler(wrapper -> {
-                    final GameProfileFetcher gameProfileFetcher = Via.getManager().getProviders().get(GameProfileFetcher.class);
-
                     final Position pos = wrapper.get(Types1_7_6.POSITION_SHORT, 0);
                     final short type = wrapper.get(Type.UNSIGNED_BYTE, 0);
                     final CompoundTag tag = wrapper.get(Types1_7_6.COMPRESSED_NBT, 0);
@@ -95,38 +93,40 @@ public class Protocol1_7_6_10to1_7_2_5 extends AbstractProtocol<ClientboundPacke
 
                     final StringTag extraType = tag.remove("ExtraType");
 
-                    if (!ViaLegacy.getConfig().isLegacySkullLoading()) return;
+                    if (ViaLegacy.getConfig().isLegacySkullLoading()) {
+                        final GameProfileFetcher gameProfileFetcher = Via.getManager().getProviders().get(GameProfileFetcher.class);
 
-                    final String skullName = extraType == null ? "" : extraType.getValue();
-                    final CompoundTag newTag = tag.clone();
+                        final String skullName = extraType == null ? "" : extraType.getValue();
+                        final CompoundTag newTag = tag.clone();
 
-                    if (gameProfileFetcher.isUUIDLoaded(skullName)) { // short cut if skull is already loaded
-                        final UUID uuid = gameProfileFetcher.getMojangUUID(skullName);
-                        if (gameProfileFetcher.isGameProfileLoaded(uuid)) {
+                        if (gameProfileFetcher.isUUIDLoaded(skullName)) { // short cut if skull is already loaded
+                            final UUID uuid = gameProfileFetcher.getMojangUUID(skullName);
+                            if (gameProfileFetcher.isGameProfileLoaded(uuid)) {
+                                final GameProfile skullProfile = gameProfileFetcher.getGameProfile(uuid);
+                                if (skullProfile == null || skullProfile.isOffline()) return;
+
+                                newTag.put("Owner", writeGameProfileToTag(skullProfile));
+                                wrapper.set(Types1_7_6.COMPRESSED_NBT, 0, newTag);
+                                return;
+                            }
+                        }
+
+                        gameProfileFetcher.getMojangUUIDAsync(skullName).thenAccept(uuid -> {
                             final GameProfile skullProfile = gameProfileFetcher.getGameProfile(uuid);
                             if (skullProfile == null || skullProfile.isOffline()) return;
 
                             newTag.put("Owner", writeGameProfileToTag(skullProfile));
-                            wrapper.set(Types1_7_6.COMPRESSED_NBT, 0, newTag);
-                            return;
-                        }
+                            try {
+                                final PacketWrapper updateSkull = PacketWrapper.create(ClientboundPackets1_7_2.BLOCK_ENTITY_DATA, wrapper.user());
+                                updateSkull.write(Types1_7_6.POSITION_SHORT, pos);
+                                updateSkull.write(Type.UNSIGNED_BYTE, type);
+                                updateSkull.write(Types1_7_6.COMPRESSED_NBT, newTag);
+                                updateSkull.send(Protocol1_7_6_10to1_7_2_5.class);
+                            } catch (Throwable e) {
+                                e.printStackTrace();
+                            }
+                        });
                     }
-
-                    gameProfileFetcher.getMojangUUIDAsync(skullName).thenAccept(uuid -> {
-                        final GameProfile skullProfile = gameProfileFetcher.getGameProfile(uuid);
-                        if (skullProfile == null || skullProfile.isOffline()) return;
-
-                        newTag.put("Owner", writeGameProfileToTag(skullProfile));
-                        try {
-                            final PacketWrapper updateSkull = PacketWrapper.create(ClientboundPackets1_7_2.BLOCK_ENTITY_DATA, wrapper.user());
-                            updateSkull.write(Types1_7_6.POSITION_SHORT, pos);
-                            updateSkull.write(Type.UNSIGNED_BYTE, type);
-                            updateSkull.write(Types1_7_6.COMPRESSED_NBT, newTag);
-                            updateSkull.send(Protocol1_7_6_10to1_7_2_5.class);
-                        } catch (Throwable e) {
-                            e.printStackTrace();
-                        }
-                    });
                 });
             }
         });

@@ -83,9 +83,8 @@ public class ItemRewriter extends LegacyItemRewriter<Protocol1_8to1_7_6_10> {
                 }
             }
 
-            if (skullOwnerName != null) {
+            if (skullOwnerName != null && ViaLegacy.getConfig().isLegacySkullLoading()) {
                 final GameProfileFetcher gameProfileFetcher = Via.getManager().getProviders().get(GameProfileFetcher.class);
-                if (!ViaLegacy.getConfig().isLegacySkullLoading()) return item;
 
                 if (gameProfileFetcher.isUUIDLoaded(skullOwnerName)) {
                     final UUID uuid = gameProfileFetcher.getMojangUUID(skullOwnerName);

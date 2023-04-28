@@ -58,6 +58,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Type
 import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ClientboundPackets1_7_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ServerboundPackets1_7_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.GameProfile;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.providers.GameProfileFetcher;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Chunk1_7_6Type;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkBulk1_7_6Type;
@@ -384,8 +385,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                 map(Type.INT, Type.VAR_INT); // entity id
                 handler(wrapper -> {
                     final String name = wrapper.read(Types1_6_4.STRING); // name
-                    final GameProfileFetcher gameProfileFetcher = Via.getManager().getProviders().get(GameProfileFetcher.class);
-                    wrapper.write(Type.STRING, (ViaLegacy.getConfig().isLegacySkinLoading() ? gameProfileFetcher.getMojangUUID(name) : gameProfileFetcher.getOfflineUUID(name)).toString().replace("-", "")); // uuid
+                    wrapper.write(Type.STRING, (ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUUID(name) : new GameProfile(name).uuid).toString().replace("-", "")); // uuid
                     wrapper.write(Type.STRING, name);
                 });
                 map(Type.INT); // x
@@ -924,9 +924,8 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                     final String name = wrapper.read(Type.STRING); // user name
                     final ProtocolInfo info = wrapper.user().getProtocolInfo();
                     final HandshakeStorage handshakeStorage = wrapper.user().get(HandshakeStorage.class);
-                    final GameProfileFetcher gameProfileFetcher = Via.getManager().getProviders().get(GameProfileFetcher.class);
                     info.setUsername(name);
-                    info.setUuid(ViaLegacy.getConfig().isLegacySkinLoading() ? gameProfileFetcher.getMojangUUID(info.getUsername()) : gameProfileFetcher.getOfflineUUID(info.getUsername()));
+                    info.setUuid(ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUUID(name) : new GameProfile(name).uuid);
 
                     wrapper.write(Type.UNSIGNED_BYTE, (short) (-info.getServerProtocolVersion() >> 2)); // protocol id
                     wrapper.write(Types1_6_4.STRING, name); // user name
