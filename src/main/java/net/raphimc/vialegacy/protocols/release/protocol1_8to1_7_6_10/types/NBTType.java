@@ -42,7 +42,7 @@ public class NBTType extends Type<CompoundTag> {
     @Override
     public CompoundTag read(ByteBuf buffer) throws IOException {
         final short length = buffer.readShort();
-        if (length <= 0) {
+        if (length < 0) {
             return null;
         }
 
