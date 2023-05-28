@@ -21,7 +21,7 @@ The lowest supported client version from which ViaLegacy can translate is 1.7.2.
 
 ## Releases
 ### Gradle/Maven
-To use ViaProxy with Gradle/Maven you can use the ViaVersion maven server:
+To use ViaLegacy with Gradle/Maven you can use the ViaVersion maven server:
 ```groovy
 repositories {
     maven { url "https://repo.viaversion.com" }
