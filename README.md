@@ -21,11 +21,36 @@ The lowest supported client version from which ViaLegacy can translate is 1.7.2.
 
 ## Releases
 ### Gradle/Maven
-To use ViaLegacy with Gradle/Maven you can use this [Maven server](https://maven.lenni0451.net/#/releases/net/raphimc/ViaLegacy) or [Jitpack](https://jitpack.io/#RaphiMC/ViaLegacy).  
-You can also find instructions how to implement it into your build script there.
+To use ViaProxy with Gradle/Maven you can use the ViaVersion maven server:
+```groovy
+repositories {
+    maven { url "https://repo.viaversion.com" }
+}
+
+dependencies {
+    implementation("net.raphimc:ViaLegacy:2.2.17-SNAPSHOT") // Get latest version from releases
+}
+```
+
+```xml
+<repositories>
+    <repository>
+        <id>viaversion</id>
+        <url>https://repo.viaversion.com</url>
+    </repository>
+</repositories>
+
+<dependencies>
+    <dependency>
+        <groupId>net.raphimc</groupId>
+        <artifactId>ViaLegacy</artifactId>
+        <version>2.2.17-SNAPSHOT</version> <!-- Get latest version from releases -->
+    </dependency>
+</dependencies>
+```
 
 ### Jar File
-If you just want the latest jar file you can download it from this [Jenkins](https://build.lenni0451.net/job/ViaLegacy/).
+If you just want the latest jar file you can download it from this [Jenkins](https://ci.viaversion.com/view/All/job/ViaLegacy/).
 
 ## Usage
 ViaLegacy requires you to have an already functional ViaVersion implementation for your platform.
