@@ -200,5 +200,5 @@ For a reference implementation you can take a look at how [ViaProxy](https://git
 ## Contact
 If you encounter any issues, please report them on the
 [issue tracker](https://github.com/RaphiMC/ViaLegacy/issues).  
-If you just want to talk or need help implementing ViaLegacy feel free to join my
-[Discord](https://discord.gg/dCzT9XHEWu).
+If you just want to talk or need help implementing ViaLegacy feel free to join the ViaVersion
+[Discord](https://discord.gg/viaversion).
