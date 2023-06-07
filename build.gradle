@@ -22,7 +22,7 @@ repositories {
 dependencies {
     compileOnly "com.viaversion:viaversion:4.7.0"
     compileOnly "org.yaml:snakeyaml:2.0"
-    compileOnly "com.google.guava:guava:31.1-jre"
+    compileOnly "com.google.guava:guava:32.0.0-jre"
     compileOnly "io.netty:netty-handler:4.1.93.Final"
 
     api "net.lenni0451.mcstructs:text:2.2.5"
