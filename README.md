@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    implementation("net.raphimc:ViaLegacy:2.2.17-SNAPSHOT") // Get latest version from releases
+    implementation("net.raphimc:ViaLegacy:2.2.17") // Get latest version from releases
 }
 ```
 
@@ -44,7 +44,7 @@ dependencies {
     <dependency>
         <groupId>net.raphimc</groupId>
         <artifactId>ViaLegacy</artifactId>
-        <version>2.2.17-SNAPSHOT</version> <!-- Get latest version from releases -->
+        <version>2.2.17</version> <!-- Get latest version from releases -->
     </dependency>
 </dependencies>
 ```
