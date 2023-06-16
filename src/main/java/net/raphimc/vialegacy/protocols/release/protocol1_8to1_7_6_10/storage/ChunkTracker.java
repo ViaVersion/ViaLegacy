@@ -34,6 +34,7 @@ public class ChunkTracker extends AbstractChunkTracker {
         for (int i = 1; i < 16; i++) { // air
             this.registerReplacement(new IdAndData(0, i), new IdAndData(0, 0));
         }
+        this.registerReplacement(new IdAndData(BlockList1_6.chest.blockID, 0), new IdAndData(BlockList1_6.chest.blockID, 3));
     }
 
     @Override
