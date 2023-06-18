@@ -16,8 +16,8 @@ If you just want to use ViaLegacy yourself you can check out some projects which
 The lowest supported client version from which ViaLegacy can translate is 1.7.2.
 
 ### Projects implementing ViaLegacy
- - [ViaProxy](https://github.com/RaphiMC/ViaProxy): Standalone proxy which uses ViaVersion to translate between Minecraft versions. Allows Minecraft 1.7+ clients to join to any version server.
- - [ViaFabricPlus](https://github.com/FlorianMichael/ViaFabricPlus): Fabric mod for the latest Minecraft version with QoL fixes and enhancements to the gameplay.
+ - [ViaProxy](https://github.com/ViaVersion/ViaProxy): Standalone proxy which uses ViaVersion to translate between Minecraft versions. Allows Minecraft 1.7+ clients to join to any version server.
+ - [ViaFabricPlus](https://github.com/ViaVersion/ViaFabricPlus): Fabric mod for the latest Minecraft version with QoL fixes and enhancements to the gameplay.
 
 ## Releases
 ### Gradle/Maven
@@ -54,11 +54,12 @@ If you just want the latest jar file you can download it from this [Jenkins](htt
 
 ## Usage
 ViaLegacy requires you to have an already functional ViaVersion implementation for your platform.
-If you don't have one you can check out [ViaProtocolHack](https://github.com/RaphiMC/ViaProtocolHack) for an abstracted and simplified, but still customizable implementation,
-or [ViaLoadingBase](https://github.com/FlorianMichael/ViaLoadingBase) for a quick and easy implementation.
-You can also go to the official [ViaVersion](https://github.com/ViaVersion) repositories and look at their server and proxy implementations.
+If you don't have one you can check out [ViaLoader](https://github.com/ViaVersion/ViaLoader) for an abstracted and simplified, but still customizable implementation. 
+You can also go to the other [ViaVersion](https://github.com/ViaVersion) repositories and look at their server and proxy implementations.
 
 ### Base Implementation
+Note: In case you use [ViaLoader](https://github.com/ViaVersion/ViaLoader) you can skip "ViaLegacy platform implementation" and "Loading the platform" as ViaLoader already does that for you.
+
 #### ViaLegacy platform implementation
 To get started you should create a class which implements the ViaLegacy platform interface.
 Here is an example:
@@ -114,7 +115,7 @@ if (serverTargetVersion.isOlderThanOrEqualTo(VersionEnum.r1_6_4)) { // Only add 
     // channel.pipeline().addBefore("length-encoder", "vialegacy-pre-netty-length-remover", new PreNettyLengthRemover(user));
 }
 ```
-In case you use [ViaProtocolHack](https://github.com/RaphiMC/ViaProtocolHack) and the [VPHpipeline](https://github.com/RaphiMC/ViaProtocolHack/blob/main/src/main/java/net/raphimc/viaprotocolhack/netty/VPHPipeline.java), you don't need to make these modifications anymore, as the VPHpipeline already does it automatically.
+In case you use [ViaLoader](https://github.com/ViaVersion/ViaLoader) and the [VLPipeline](https://github.com/ViaVersion/ViaLoader/blob/main/src/main/java/net/raphimc/vialoader/netty/VLPipeline.java) (or the [VLLegacyPipeline](https://github.com/ViaVersion/ViaLoader/blob/main/src/main/java/net/raphimc/vialoader/netty/VLLegacyPipeline.java)), you don't need to make these modifications anymore, as the VPHpipeline already does it automatically.
 ### Implementing the platform specific providers
 The platform specific providers are all optional (except for ``EncryptionProvider`` and ``GameProfileFetcher``) and only required if you want to use the features which require them.  
 To implement a provider you can simply call ``Via.getManager().getProviders().use(TheNameOfTheProvider.class, new YouImplementationOfThatProvider());`` after the Via manager is initialized.
@@ -188,17 +189,17 @@ The implementation of this provider requires the implementer to be able to deter
 The default implementation of this provider states that the client supports 128 blocks high worlds.  
 
 **Implementing this provider to have worlds higher than 256 blocks requires heavy modification of ViaVersion code which the implementer has to do on their own.**
-For a reference implementation you can take a look at how [ViaProxy](https://github.com/RaphiMC/ViaProxy) implements it.
+For a reference implementation you can take a look at how [ViaProxy](https://github.com/ViaVersion/ViaProxy) implements it.
 
 #### ClassicMPPassProvider
 The classic MP pass provider is used to get the MP pass (Authentication token) of a player if the server version is <= Classic 0.30.
 This is required for joining classic servers with enabled online mode.  
 The implementation of this provider requires the implementer to be able to get the MP pass of a given player.  
 The default implementation of this provider simply returns "0" which indicates to the server that the client does not have a valid MP pass.  
-For a reference implementation you can take a look at how [ViaProxy](https://github.com/RaphiMC/ViaProxy/blob/main/src/main/java/net/raphimc/viaproxy/protocolhack/providers/ViaProxyClassicMPPassProvider.java) implements it.
+For a reference implementation you can take a look at how [ViaProxy](https://github.com/ViaVersion/ViaProxy/blob/main/src/main/java/net/raphimc/viaproxy/protocolhack/providers/ViaProxyClassicMPPassProvider.java) implements it.
 
 ## Contact
 If you encounter any issues, please report them on the
-[issue tracker](https://github.com/RaphiMC/ViaLegacy/issues).  
+[issue tracker](https://github.com/ViaVersion/ViaLegacy/issues).  
 If you just want to talk or need help implementing ViaLegacy feel free to join the ViaVersion
 [Discord](https://discord.gg/viaversion).
