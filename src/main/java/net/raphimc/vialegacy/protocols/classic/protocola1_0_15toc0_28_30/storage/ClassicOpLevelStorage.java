@@ -31,16 +31,27 @@ public class ClassicOpLevelStorage extends StoredObject {
 
     private byte opLevel;
 
-    private boolean flying = true;
-    private boolean noClip = true;
-    private boolean speed = true;
-    private boolean respawn = true;
+    private final boolean haxEnabled;
+    private boolean flying = false;
+    private boolean noClip = false;
+    private boolean speed = false;
+    private boolean respawn = false;
 
-    public ClassicOpLevelStorage(final UserConnection user) {
+    public ClassicOpLevelStorage(final UserConnection user, final boolean haxEnabled) {
         super(user);
+        this.haxEnabled = haxEnabled;
+
+        if (haxEnabled) {
+            this.flying = true;
+            this.noClip = true;
+            this.speed = true;
+            this.respawn = true;
+        }
     }
 
     public void updateHax(final boolean flying, final boolean noClip, final boolean speed, final boolean respawn) throws Exception {
+        if (!this.haxEnabled) return;
+
         boolean changed = this.flying != flying;
         changed |= this.noClip != noClip;
         changed |= this.speed != speed;
@@ -75,10 +86,12 @@ public class ClassicOpLevelStorage extends StoredObject {
         final boolean changed = this.opLevel != opLevel;
         this.opLevel = opLevel;
 
-        final ClassicServerTitleStorage serverTitleStorage = this.getUser().get(ClassicServerTitleStorage.class);
-        this.updateHax(serverTitleStorage.isFlyEffectivelyEnabled(), serverTitleStorage.isNoclipEffectivelyEnabled(), serverTitleStorage.isSpeedEffectivelyEnabled(), serverTitleStorage.isRespawnEffectivelyEnabled());
-        if (changed) {
-            this.updateAbilities();
+        if (this.haxEnabled) {
+            final ClassicServerTitleStorage serverTitleStorage = this.getUser().get(ClassicServerTitleStorage.class);
+            this.updateHax(serverTitleStorage.isFlyEffectivelyEnabled(), serverTitleStorage.isNoclipEffectivelyEnabled(), serverTitleStorage.isSpeedEffectivelyEnabled(), serverTitleStorage.isRespawnEffectivelyEnabled());
+            if (changed) {
+                this.updateAbilities();
+            }
         }
     }
 
@@ -93,7 +106,7 @@ public class ClassicOpLevelStorage extends StoredObject {
             playerAbilities.write(Type.BOOLEAN, false); // flying
             playerAbilities.write(Type.BOOLEAN, this.flying); // allow flying
             playerAbilities.write(Type.BOOLEAN, true); // creative mode
-            playerAbilities.send(Protocol1_2_4_5to1_2_1_3.class);
+            playerAbilities.scheduleSend(Protocol1_2_4_5to1_2_1_3.class);
         }
     }
 

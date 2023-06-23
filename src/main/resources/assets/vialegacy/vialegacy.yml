@@ -26,3 +26,6 @@ classic-chunk-range: 10
 #
 # How many chunks should be sent to the client per movement tick (-1 for auto)
 chunks-per-tick: -1
+#
+# Enable fly on regular (non CPE) classic servers
+enable-classic-fly: false

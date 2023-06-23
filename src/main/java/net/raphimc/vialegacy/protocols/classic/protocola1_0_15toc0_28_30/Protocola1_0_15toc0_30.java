@@ -28,6 +28,7 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.model.ChunkCoord;
 import net.raphimc.vialegacy.api.model.IdAndData;
@@ -563,7 +564,7 @@ public class Protocola1_0_15toc0_30 extends AbstractProtocol<ClientboundPacketsc
         userConnection.put(new PreNettySplitter(userConnection, Protocola1_0_15toc0_30.class, ClientboundPacketsc0_28::getPacket));
 
         userConnection.put(new ClassicPositionTracker(userConnection));
-        userConnection.put(new ClassicOpLevelStorage(userConnection));
+        userConnection.put(new ClassicOpLevelStorage(userConnection, ViaLegacy.getConfig().enableClassicFly()));
         userConnection.put(new ClassicProgressStorage(userConnection));
         userConnection.put(new ClassicBlockRemapper(userConnection, i -> ClassicBlocks.MAPPING.get(i), o -> {
             int block = ClassicBlocks.REVERSE_MAPPING.getInt(o);

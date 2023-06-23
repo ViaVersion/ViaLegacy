@@ -36,6 +36,7 @@ public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.pla
     private boolean remapBasedOnColor;
     private int classicChunkRange;
     private int chunksPerTick;
+    private boolean enableClassicFly;
 
     public ViaLegacyConfig(final File configFile) {
         super(configFile);
@@ -57,6 +58,7 @@ public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.pla
         this.remapBasedOnColor = this.getBoolean("remap-based-on-color", true);
         this.classicChunkRange = this.getInt("classic-chunk-range", 10);
         this.chunksPerTick = this.getInt("chunks-per-tick", -1);
+        this.enableClassicFly = this.getBoolean("enable-classic-fly", false);
     }
 
     @Override
@@ -116,6 +118,11 @@ public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.pla
     @Override
     public int getChunksPerTick() {
         return this.chunksPerTick;
+    }
+
+    @Override
+    public boolean enableClassicFly() {
+        return this.enableClassicFly;
     }
 
 }

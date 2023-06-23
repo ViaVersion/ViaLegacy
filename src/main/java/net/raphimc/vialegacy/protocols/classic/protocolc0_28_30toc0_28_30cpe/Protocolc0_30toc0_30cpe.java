@@ -348,6 +348,7 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
         userConnection.put(new PreNettySplitter(userConnection, Protocolc0_30toc0_30cpe.class, ClientboundPacketsc0_30cpe::getPacket));
 
         userConnection.put(new ExtensionProtocolMetadataStorage(userConnection));
+        userConnection.put(new ClassicOpLevelStorage(userConnection, true));
 
         final ClassicBlockRemapper previousRemapper = userConnection.get(ClassicBlockRemapper.class);
         userConnection.put(new ClassicBlockRemapper(userConnection, i -> {
