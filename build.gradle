@@ -25,7 +25,7 @@ dependencies {
     compileOnly "com.google.guava:guava:32.0.1-jre"
     compileOnly "io.netty:netty-handler:4.1.94.Final"
 
-    api "net.lenni0451.mcstructs:text:2.2.6"
+    api "net.lenni0451.mcstructs:text:2.3.0"
 }
 
 blossom {
