@@ -37,6 +37,7 @@ import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.types.Type
 import net.raphimc.vialegacy.protocols.beta.protocolb1_8_0_1tob1_7_0_3.storage.PlayerHealthTracker;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_8_0_1tob1_7_0_3.storage.PlayerNameTracker;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_8_0_1tob1_7_0_3.types.Typesb1_7_0_3;
+import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_0_20a_27.Protocolc0_30toc0_27;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.chunks.NibbleArray1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.storage.SeedStorage;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types.Chunk1_1Type;
@@ -221,11 +222,19 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        this.registerServerbound(State.STATUS, ServerboundPacketsb1_8.SERVER_PING.getId(), -1, new PacketHandlers() {
+        this.registerServerbound(State.STATUS, ServerboundPacketsb1_8.SERVER_PING.getId(), -2, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
-                    wrapper.cancel();
+                    if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocolc0_30toc0_27.class)) {
+                        // Classic servers have issues with sockets connecting and disconnecting without sending any data.
+                        // Because of that we send an invalid packet id to force the server to disconnect us.
+                        // This is the reason why the packet id is mapped to -2. (-1 gets handled internally by ViaVersion)
+                        // This fix is needed for <= c0.27, >= c0.28 closes the socket after 3 seconds of inactivity.
+                        wrapper.clearPacket();
+                    } else {
+                        wrapper.cancel();
+                    }
                     final PacketWrapper pingResponse = PacketWrapper.create(ClientboundPacketsb1_8.DISCONNECT, wrapper.user());
                     pingResponse.write(Types1_6_4.STRING, "The server seems to be running!\nWait 5 seconds between each connection§0§1");
                     pingResponse.send(Protocolb1_8_0_1tob1_7_0_3.class);
