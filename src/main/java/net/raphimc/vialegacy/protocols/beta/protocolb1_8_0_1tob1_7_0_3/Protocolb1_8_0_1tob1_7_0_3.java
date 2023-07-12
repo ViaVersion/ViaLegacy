@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
+import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
@@ -29,6 +30,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
+import net.raphimc.vialegacy.api.data.ItemList1_6;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.storage.AlphaInventoryTracker;
 import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.ClientboundPacketsb1_8;
@@ -41,6 +43,7 @@ import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_0_20a_27.Pro
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.chunks.NibbleArray1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.storage.SeedStorage;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types.Chunk1_1Type;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.storage.EntityTracker;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.types.Types1_3_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2.types.Types1_4_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.ChunkTracker;
@@ -284,13 +287,24 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends AbstractProtocol<ClientboundPack
                 map(Type.UNSIGNED_BYTE); // direction
                 map(Types1_4_2.NBTLESS_ITEM); // item
                 handler(wrapper -> {
-                    final Position pos = wrapper.get(Types1_7_6.POSITION_UBYTE, 0);
-                    if (wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos).id == BlockList1_6.cake.blockID) {
-                        final PacketWrapper updateHealth = PacketWrapper.create(ClientboundPacketsb1_8.UPDATE_HEALTH, wrapper.user());
-                        updateHealth.write(Type.SHORT, wrapper.user().get(PlayerHealthTracker.class).getHealth()); // health
-                        updateHealth.write(Type.SHORT, (short) 6); // food
-                        updateHealth.write(Type.FLOAT, 0F); // saturation
-                        updateHealth.send(Protocolb1_8_0_1tob1_7_0_3.class);
+                    if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 255) {
+                        final Item item = wrapper.get(Types1_4_2.NBTLESS_ITEM, 0);
+                        if (item != null && isSword(item)) {
+                            wrapper.cancel();
+                            final PacketWrapper entityStatus = PacketWrapper.create(ClientboundPacketsb1_8.ENTITY_STATUS, wrapper.user());
+                            entityStatus.write(Type.INT, wrapper.user().get(EntityTracker.class).getPlayerID()); // entity id
+                            entityStatus.write(Type.BYTE, (byte) 9); // status | 9 = STOP_ITEM_USE
+                            entityStatus.send(Protocolb1_8_0_1tob1_7_0_3.class);
+                        }
+                    } else {
+                        final Position pos = wrapper.get(Types1_7_6.POSITION_UBYTE, 0);
+                        if (wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos).id == BlockList1_6.cake.blockID) {
+                            final PacketWrapper updateHealth = PacketWrapper.create(ClientboundPacketsb1_8.UPDATE_HEALTH, wrapper.user());
+                            updateHealth.write(Type.SHORT, wrapper.user().get(PlayerHealthTracker.class).getHealth()); // health
+                            updateHealth.write(Type.SHORT, (short) 6); // food
+                            updateHealth.write(Type.FLOAT, 0F); // saturation
+                            updateHealth.send(Protocolb1_8_0_1tob1_7_0_3.class);
+                        }
                     }
                 });
             }
@@ -342,6 +356,14 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends AbstractProtocol<ClientboundPack
 
         userConnection.put(new PlayerNameTracker(userConnection));
         userConnection.put(new PlayerHealthTracker(userConnection));
+    }
+
+    private boolean isSword(final Item item) {
+        return item.identifier() == ItemList1_6.swordWood.itemID ||
+                item.identifier() == ItemList1_6.swordStone.itemID ||
+                item.identifier() == ItemList1_6.swordIron.itemID ||
+                item.identifier() == ItemList1_6.swordGold.itemID ||
+                item.identifier() == ItemList1_6.swordDiamond.itemID;
     }
 
 }
