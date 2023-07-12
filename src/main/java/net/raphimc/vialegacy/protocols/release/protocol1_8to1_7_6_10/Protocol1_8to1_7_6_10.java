@@ -189,6 +189,11 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                         wrapper.user().get(EntityTracker.class).clear();
                     }
                 });
+                handler(wrapper -> {
+                    final ProtocolInfo protocolInfo = wrapper.user().getProtocolInfo();
+                    final TablistStorage tablistStorage = wrapper.user().get(TablistStorage.class);
+                    tablistStorage.sendTempEntry(new TabListEntry(protocolInfo.getUsername(), protocolInfo.getUuid())); // load own skin
+                });
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.PLAYER_POSITION, new PacketHandlers() {
