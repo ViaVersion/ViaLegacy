@@ -80,9 +80,13 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends AbstractProtocol<ClientboundPack
                     playerListEntry.write(Type.BOOLEAN, true); // online
                     playerListEntry.write(Type.SHORT, (short) 0); // ping
 
+                    final PacketWrapper updateHealth = PacketWrapper.create(ClientboundPacketsb1_7.UPDATE_HEALTH, wrapper.user());
+                    updateHealth.write(Type.SHORT, (short) 20); // health
+
                     wrapper.send(Protocolb1_8_0_1tob1_7_0_3.class);
-                    playerListEntry.send(Protocolb1_8_0_1tob1_7_0_3.class);
                     wrapper.cancel();
+                    playerListEntry.send(Protocolb1_8_0_1tob1_7_0_3.class);
+                    updateHealth.send(Protocolb1_8_0_1tob1_7_0_3.class, false);
                 });
             }
         });
@@ -299,11 +303,9 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends AbstractProtocol<ClientboundPack
                     } else {
                         final Position pos = wrapper.get(Types1_7_6.POSITION_UBYTE, 0);
                         if (wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos).id == BlockList1_6.cake.blockID) {
-                            final PacketWrapper updateHealth = PacketWrapper.create(ClientboundPacketsb1_8.UPDATE_HEALTH, wrapper.user());
+                            final PacketWrapper updateHealth = PacketWrapper.create(ClientboundPacketsb1_7.UPDATE_HEALTH, wrapper.user());
                             updateHealth.write(Type.SHORT, wrapper.user().get(PlayerHealthTracker.class).getHealth()); // health
-                            updateHealth.write(Type.SHORT, (short) 6); // food
-                            updateHealth.write(Type.FLOAT, 0F); // saturation
-                            updateHealth.send(Protocolb1_8_0_1tob1_7_0_3.class);
+                            updateHealth.send(Protocolb1_8_0_1tob1_7_0_3.class, false);
                         }
                     }
                 });
