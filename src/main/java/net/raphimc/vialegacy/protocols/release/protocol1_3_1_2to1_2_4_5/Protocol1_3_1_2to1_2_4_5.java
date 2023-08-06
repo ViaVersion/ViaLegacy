@@ -56,7 +56,6 @@ import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.storage.
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.storage.DimensionTracker;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.storage.EntityTracker;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.task.EntityTrackerTickTask;
-import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.types.Chunk1_2_4Type;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.types.Types1_2_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.ClientboundPackets1_3_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.ServerboundPackets1_3_1;
@@ -450,7 +449,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends AbstractProtocol<ClientboundPacket
             public void register() {
                 handler(wrapper -> {
                     final ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    Chunk chunk = wrapper.read(new Chunk1_2_4Type(clientWorld));
+                    Chunk chunk = wrapper.read(Types1_2_4.CHUNK);
 
                     wrapper.user().get(ChestStateTracker.class).unload(chunk.getX(), chunk.getZ());
 
@@ -458,16 +457,23 @@ public class Protocol1_3_1_2to1_2_4_5 extends AbstractProtocol<ClientboundPacket
                         ViaLegacy.getPlatform().getLogger().warning("Received empty 1.2.5 chunk packet");
                         chunk = new BaseChunk(chunk.getX(), chunk.getZ(), true, false, 65535, new ChunkSection[16], new int[256], new ArrayList<>());
                         for (int i = 0; i < chunk.getSections().length; i++) {
-                            final ChunkSection chunkSection = chunk.getSections()[i] = new ChunkSectionImpl(true);
-                            chunkSection.palette(PaletteType.BLOCKS).addId(0);
+                            final ChunkSection section = chunk.getSections()[i] = new ChunkSectionImpl(true);
+                            section.palette(PaletteType.BLOCKS).addId(0);
                             if (clientWorld.getEnvironment() == Environment.NORMAL) {
                                 final byte[] skyLight = new byte[2048];
                                 Arrays.fill(skyLight, (byte) 255);
-                                chunkSection.getLight().setSkyLight(skyLight);
+                                section.getLight().setSkyLight(skyLight);
                             }
                         }
                     }
 
+                    if (clientWorld.getEnvironment() != Environment.NORMAL) {
+                        for (ChunkSection section : chunk.getSections()) {
+                            if (section != null) {
+                                section.getLight().setSkyLight(null);
+                            }
+                        }
+                    }
                     wrapper.write(new Chunk1_7_6Type(clientWorld), chunk);
                 });
             }

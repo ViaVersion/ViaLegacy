@@ -30,7 +30,6 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
@@ -49,11 +48,10 @@ import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.storage.Dime
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.storage.PendingBlocksTracker;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.storage.SeedStorage;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.tasks.BlockReceiveInvalidatorTask;
-import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types.Chunk1_1Type;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types.Types1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_4_5to1_2_1_3.ClientboundPackets1_2_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_4_5to1_2_1_3.ServerboundPackets1_2_1;
-import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.types.Chunk1_2_4Type;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.types.Types1_2_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.types.Types1_3_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.ChunkTracker;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Types1_6_4;
@@ -151,11 +149,10 @@ public class Protocol1_2_1_3to1_1 extends AbstractProtocol<ClientboundPackets1_1
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
                     final ChunkTracker chunkTracker = wrapper.user().get(ChunkTracker.class);
                     final SeedStorage seedStorage = wrapper.user().get(SeedStorage.class);
                     final PendingBlocksTracker pendingBlocksTracker = wrapper.user().get(PendingBlocksTracker.class);
-                    Chunk chunk = wrapper.read(new Chunk1_1Type(clientWorld));
+                    final Chunk chunk = wrapper.read(Types1_1.CHUNK);
 
                     if (chunk instanceof NonFullChunk1_1) {
                         if (!chunkTracker.isChunkLoaded(chunk.getX(), chunk.getZ())) { // Cancel because update in unloaded area is ignored by mc
@@ -191,23 +188,19 @@ public class Protocol1_2_1_3to1_1 extends AbstractProtocol<ClientboundPackets1_1
                         if (section == null) continue;
                         final NibbleArray1_1 oldBlockLight = new NibbleArray1_1(section.getLight().getBlockLight(), 4);
                         final NibbleArray newBlockLight = new NibbleArray(oldBlockLight.size());
-                        NibbleArray1_1 oldSkyLight = null;
-                        NibbleArray newSkyLight = null;
-                        if (section.getLight().hasSkyLight()) {
-                            oldSkyLight = new NibbleArray1_1(section.getLight().getSkyLight(), 4);
-                            newSkyLight = new NibbleArray(oldSkyLight.size());
-                        }
+                        final NibbleArray1_1 oldSkyLight = new NibbleArray1_1(section.getLight().getSkyLight(), 4);
+                        final NibbleArray newSkyLight = new NibbleArray(oldSkyLight.size());
 
                         for (int x = 0; x < 16; x++) {
                             for (int y = 0; y < 16; y++) {
                                 for (int z = 0; z < 16; z++) {
                                     newBlockLight.set(x, y, z, oldBlockLight.get(x, y, z));
-                                    if (oldSkyLight != null) newSkyLight.set(x, y, z, oldSkyLight.get(x, y, z));
+                                    newSkyLight.set(x, y, z, oldSkyLight.get(x, y, z));
                                 }
                             }
                         }
                         section.getLight().setBlockLight(newBlockLight.getHandle());
-                        if (newSkyLight != null) section.getLight().setSkyLight(newSkyLight.getHandle());
+                        section.getLight().setSkyLight(newSkyLight.getHandle());
                     }
 
                     if (chunk.getSections().length < 16) { // Increase available sections to match new world height
@@ -216,7 +209,7 @@ public class Protocol1_2_1_3to1_1 extends AbstractProtocol<ClientboundPackets1_1
                         chunk.setSections(newArray);
                     }
 
-                    wrapper.write(new Chunk1_2_4Type(clientWorld), chunk);
+                    wrapper.write(Types1_2_4.CHUNK, chunk);
                 });
             }
         });
@@ -328,7 +321,6 @@ public class Protocol1_2_1_3to1_1 extends AbstractProtocol<ClientboundPackets1_1
     }
 
     private void handleRespawn(final int dimensionId, final UserConnection user) {
-        user.get(ClientWorld.class).setEnvironment(dimensionId);
         if (user.get(DimensionTracker.class).getDimensionId() != dimensionId) {
             user.get(DimensionTracker.class).setDimension(dimensionId);
             user.get(PendingBlocksTracker.class).clear();
@@ -377,9 +369,6 @@ public class Protocol1_2_1_3to1_1 extends AbstractProtocol<ClientboundPackets1_1
         userConnection.put(new SeedStorage(userConnection));
         userConnection.put(new PendingBlocksTracker(userConnection));
         userConnection.put(new DimensionTracker(userConnection));
-        if (!userConnection.has(ClientWorld.class)) {
-            userConnection.put(new ClientWorld(userConnection));
-        }
     }
 
     @Override

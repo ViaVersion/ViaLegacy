@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import com.viaversion.viaversion.util.MathUtil;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.model.ChunkCoord;
@@ -33,7 +32,7 @@ import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.Protoco
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.model.ClassicLevel;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.providers.ClassicWorldHeightProvider;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.chunks.NibbleArray1_1;
-import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types.Chunk1_1Type;
+import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types.Types1_1;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -158,7 +157,7 @@ public class ClassicLevelStorage extends StoredObject {
 
         final Chunk viaChunk = new BaseChunk(coord.chunkX, coord.chunkZ, true, false, this.sectionBitmask, modernSections, new int[256], new ArrayList<>());
         final PacketWrapper chunkData = PacketWrapper.create(ClientboundPacketsa1_0_15.CHUNK_DATA, this.getUser());
-        chunkData.write(new Chunk1_1Type(this.getUser().get(ClientWorld.class)), viaChunk);
+        chunkData.write(Types1_1.CHUNK, viaChunk);
         chunkData.send(Protocola1_0_15toc0_30.class);
     }
 

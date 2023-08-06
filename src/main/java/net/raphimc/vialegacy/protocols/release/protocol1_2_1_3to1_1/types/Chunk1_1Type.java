@@ -17,14 +17,11 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types;
 
-import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
-import com.viaversion.viaversion.api.type.PartialType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.CustomByteType;
 import com.viaversion.viaversion.api.type.types.minecraft.BaseChunkType;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import io.netty.buffer.ByteBuf;
 import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.chunks.NibbleArray1_1;
@@ -35,10 +32,10 @@ import java.util.ArrayList;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
-public class Chunk1_1Type extends PartialType<Chunk, ClientWorld> {
+public class Chunk1_1Type extends Type<Chunk> {
 
-    public Chunk1_1Type(ClientWorld clientWorld) {
-        super(clientWorld, Chunk.class);
+    public Chunk1_1Type() {
+        super(Chunk.class);
     }
 
     @Override
@@ -47,7 +44,7 @@ public class Chunk1_1Type extends PartialType<Chunk, ClientWorld> {
     }
 
     @Override
-    public Chunk read(ByteBuf byteBuf, ClientWorld clientWorld) throws Exception {
+    public Chunk read(ByteBuf byteBuf) throws Exception {
         final int xPosition = byteBuf.readInt();
         final int yPosition = byteBuf.readShort();
         final int zPosition = byteBuf.readInt();
@@ -67,15 +64,15 @@ public class Chunk1_1Type extends PartialType<Chunk, ClientWorld> {
             inflater.end();
         }
 
-        return deserialize(xPosition, yPosition, zPosition, xSize, ySize, zSize, clientWorld.getEnvironment() == Environment.NORMAL, uncompressedData);
+        return deserialize(xPosition, yPosition, zPosition, xSize, ySize, zSize, uncompressedData);
     }
 
     @Override
-    public void write(ByteBuf byteBuf, ClientWorld clientWorld, Chunk chunk) throws Exception {
+    public void write(ByteBuf byteBuf, Chunk chunk) throws Exception {
         throw new UnsupportedOperationException();
     }
 
-    public static Chunk deserialize(final int xPosition, final int yPosition, final int zPosition, final int xSize, final int ySize, final int zSize, final boolean skyLight, final byte[] chunkData) {
+    public static Chunk deserialize(final int xPosition, final int yPosition, final int zPosition, final int xSize, final int ySize, final int zSize, final byte[] chunkData) {
         final int chunkX = xPosition >> 4;
         final int chunkZ = zPosition >> 4;
         final int endChunkX = xPosition + xSize - 1 >> 4;
@@ -165,9 +162,7 @@ public class Chunk1_1Type extends PartialType<Chunk, ClientWorld> {
             }
 
             section.getLight().setBlockLight(sectionBlockLight.getHandle());
-            if (skyLight) {
-                section.getLight().setSkyLight(sectionSkyLight.getHandle());
-            }
+            section.getLight().setSkyLight(sectionSkyLight.getHandle());
         }
 
         if (fullChunk) {

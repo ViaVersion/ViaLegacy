@@ -35,7 +35,6 @@ import net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.Clientbou
 import net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.ServerboundPacketsb1_2;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.types.MetaTypeb1_2;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.types.Typesb1_2;
-import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types.Chunk1_1Type;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types.Types1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.types.Types1_3_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2.types.Types1_4_2;
@@ -139,7 +138,7 @@ public class Protocolb1_2_0_2tob1_1_2 extends AbstractProtocol<ClientboundPacket
                 handler(wrapper -> {
                     final ClientWorld clientWorld = new ClientWorld(wrapper.user());
                     clientWorld.setEnvironment(0);
-                    BLOCK_DATA_REWRITER.remapChunk(wrapper.passthrough(new Chunk1_1Type(clientWorld)));
+                    BLOCK_DATA_REWRITER.remapChunk(wrapper.passthrough(Types1_1.CHUNK));
                 });
             }
         });

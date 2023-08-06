@@ -28,7 +28,6 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
@@ -42,7 +41,7 @@ import net.raphimc.vialegacy.protocols.beta.protocolb1_8_0_1tob1_7_0_3.types.Typ
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_0_20a_27.Protocolc0_30toc0_27;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.chunks.NibbleArray1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.storage.SeedStorage;
-import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types.Chunk1_1Type;
+import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types.Types1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.storage.EntityTracker;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.types.Types1_3_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2.types.Types1_4_2;
@@ -189,7 +188,7 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends AbstractProtocol<ClientboundPack
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final Chunk chunk = wrapper.passthrough(new Chunk1_1Type(wrapper.user().get(ClientWorld.class)));
+                    final Chunk chunk = wrapper.passthrough(Types1_1.CHUNK);
 
                     boolean hasChest = false;
                     for (ChunkSection section : chunk.getSections()) {
