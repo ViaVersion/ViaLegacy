@@ -47,6 +47,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import net.raphimc.vialegacy.ViaLegacy;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
@@ -900,7 +901,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                     wrapper.write(Type.UNSIGNED_BYTE, (short) 250); // packet id
                     wrapper.write(Types1_6_4.STRING, "MC|PingHost"); // channel
                     wrapper.write(Type.UNSIGNED_SHORT, 3 + 2 * ip.length() + 4); // length
-                    wrapper.write(Type.UNSIGNED_BYTE, (short) (-wrapper.user().getProtocolInfo().getServerProtocolVersion() >> 2)); // protocol Id
+                    wrapper.write(Type.UNSIGNED_BYTE, (short) LegacyProtocolVersion.getRealProtocolVersion(wrapper.user().getProtocolInfo().getServerProtocolVersion())); // protocol Id
                     wrapper.write(Types1_6_4.STRING, ip); // hostname
                     wrapper.write(Type.INT, port); // port
                 });
@@ -927,7 +928,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                     info.setUsername(name);
                     info.setUuid(ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUUID(name) : new GameProfile(name).uuid);
 
-                    wrapper.write(Type.UNSIGNED_BYTE, (short) (-info.getServerProtocolVersion() >> 2)); // protocol id
+                    wrapper.write(Type.UNSIGNED_BYTE, (short) LegacyProtocolVersion.getRealProtocolVersion(info.getServerProtocolVersion())); // protocol id
                     wrapper.write(Types1_6_4.STRING, name); // user name
                     wrapper.write(Types1_6_4.STRING, handshakeStorage.getHostname()); // hostname
                     wrapper.write(Type.INT, handshakeStorage.getPort()); // port

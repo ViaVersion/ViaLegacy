@@ -39,6 +39,7 @@ import com.viaversion.viaversion.libs.opennbt.tag.builtin.ShortTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import net.raphimc.vialegacy.ViaLegacy;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.model.Location;
@@ -838,7 +839,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends AbstractProtocol<ClientboundPacket
         }
 
         final PacketWrapper login = PacketWrapper.create(ServerboundPackets1_2_4.LOGIN, wrapper.user());
-        login.write(Type.INT, -(info.getServerProtocolVersion() >> 2)); // protocol id
+        login.write(Type.INT, LegacyProtocolVersion.getRealProtocolVersion(info.getServerProtocolVersion())); // protocol id
         login.write(Types1_6_4.STRING, info.getUsername()); // username
         login.write(Types1_6_4.STRING, ""); // level type
         login.write(Type.INT, 0); // game mode

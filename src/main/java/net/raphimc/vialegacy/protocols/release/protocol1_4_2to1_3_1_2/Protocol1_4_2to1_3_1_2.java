@@ -31,6 +31,7 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.ViaLegacy;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
@@ -69,7 +70,7 @@ public class Protocol1_4_2to1_3_1_2 extends AbstractProtocol<ClientboundPackets1
                     try {
                         final ProtocolInfo info = wrapper.user().getProtocolInfo();
                         final String[] pingParts = reason.split("§");
-                        final String out = "§1\0" + (-info.getServerProtocolVersion() >> 2) + "\0" + ProtocolVersion.getProtocol(info.getServerProtocolVersion()).getName() + "\0" + pingParts[0] + "\0" + pingParts[1] + "\0" + pingParts[2];
+                        final String out = "§1\0" + LegacyProtocolVersion.getRealProtocolVersion(info.getServerProtocolVersion()) + "\0" + ProtocolVersion.getProtocol(info.getServerProtocolVersion()).getName() + "\0" + pingParts[0] + "\0" + pingParts[1] + "\0" + pingParts[2];
                         wrapper.write(Types1_6_4.STRING, out);
                     } catch (Throwable e) {
                         ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Could not parse 1.3.1 ping: " + reason, e);

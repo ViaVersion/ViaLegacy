@@ -70,13 +70,13 @@ public class LegacyProtocolVersion {
 
 
     public static int protocolCompare(int a, int b) {
-        if (a > 0 || b > 0) {
+        if (a >= 0 || b >= 0) {
             // If at least one is modern, then a straight compare works fine.
             return a - b;
         }
         // Both are legacy
-        a = Math.abs(a);
-        b = Math.abs(b);
+        a = -a;
+        b = -b;
         final int baseProtocolA = a >> 2;
         final int baseProtocolB = b >> 2;
         if (baseProtocolA != baseProtocolB) {
@@ -86,6 +86,14 @@ public class LegacyProtocolVersion {
         final int discriminatorA = a & 3;
         final int discriminatorB = b & 3;
         return discriminatorB - discriminatorA; // Higher discriminator means older version
+    }
+
+    public static int getRealProtocolVersion(final int protocolVersion) {
+        if (protocolVersion >= 0) {
+            return protocolVersion;
+        }
+
+        return -protocolVersion >> 2;
     }
 
 
