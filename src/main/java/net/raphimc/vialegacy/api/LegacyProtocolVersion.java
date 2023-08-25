@@ -75,10 +75,8 @@ public class LegacyProtocolVersion {
             return a - b;
         }
         // Both are legacy
-        a = -a;
-        b = -b;
-        final int baseProtocolA = a >> 2;
-        final int baseProtocolB = b >> 2;
+        final int baseProtocolA = getRealProtocolVersion(a);
+        final int baseProtocolB = getRealProtocolVersion(b);
         if (baseProtocolA != baseProtocolB) {
             return baseProtocolA - baseProtocolB;
         }
@@ -93,7 +91,7 @@ public class LegacyProtocolVersion {
             return protocolVersion;
         }
 
-        return -protocolVersion >> 2;
+        return -(protocolVersion >> 2);
     }
 
 
