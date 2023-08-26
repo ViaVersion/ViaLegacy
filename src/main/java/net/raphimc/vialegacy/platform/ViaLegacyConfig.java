@@ -35,8 +35,6 @@ public interface ViaLegacyConfig {
 
     int getClassicChunkRange();
 
-    int getChunksPerTick();
-
     boolean enableClassicFly();
 
 }

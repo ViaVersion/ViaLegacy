@@ -35,7 +35,6 @@ public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.pla
     private boolean oldBiomes;
     private boolean remapBasedOnColor;
     private int classicChunkRange;
-    private int chunksPerTick;
     private boolean enableClassicFly;
 
     public ViaLegacyConfig(final File configFile) {
@@ -57,7 +56,6 @@ public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.pla
         this.oldBiomes = this.getBoolean("old-biomes", true);
         this.remapBasedOnColor = this.getBoolean("remap-based-on-color", true);
         this.classicChunkRange = this.getInt("classic-chunk-range", 10);
-        this.chunksPerTick = this.getInt("chunks-per-tick", -1);
         this.enableClassicFly = this.getBoolean("enable-classic-fly", false);
     }
 
@@ -113,11 +111,6 @@ public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.pla
     @Override
     public int getClassicChunkRange() {
         return this.classicChunkRange;
-    }
-
-    @Override
-    public int getChunksPerTick() {
-        return this.chunksPerTick;
     }
 
     @Override

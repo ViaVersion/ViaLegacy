@@ -53,6 +53,7 @@ import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.provide
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.providers.ClassicMPPassProvider;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.providers.ClassicWorldHeightProvider;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.storage.*;
+import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.task.ClassicLevelStorageTickTask;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.types.Typesc0_30;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.Protocolc0_30toc0_30cpe;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.storage.ExtBlockPermissionsStorage;
@@ -397,12 +398,7 @@ public class Protocola1_0_15toc0_30 extends AbstractProtocol<ClientboundPacketsc
             @Override
             public void register() {
                 read(Type.BOOLEAN); // onGround
-                handler(wrapper -> {
-                    final ClassicPositionTracker positionTracker = wrapper.user().get(ClassicPositionTracker.class);
-                    final ClassicLevelStorage levelStorage = wrapper.user().get(ClassicLevelStorage.class);
-                    positionTracker.writeToPacket(wrapper);
-                    if (levelStorage != null) levelStorage.tickChunks(positionTracker.getChunkPosition());
-                });
+                handler(wrapper -> wrapper.user().get(ClassicPositionTracker.class).writeToPacket(wrapper));
             }
         });
         this.registerServerbound(ServerboundPacketsa1_0_15.PLAYER_POSITION, ServerboundPacketsc0_28.PLAYER_POSITION_AND_ROTATION, new PacketHandlers() {
@@ -410,7 +406,6 @@ public class Protocola1_0_15toc0_30 extends AbstractProtocol<ClientboundPacketsc
             public void register() {
                 handler(wrapper -> {
                     final ClassicPositionTracker positionTracker = wrapper.user().get(ClassicPositionTracker.class);
-                    final ClassicLevelStorage levelStorage = wrapper.user().get(ClassicLevelStorage.class);
                     positionTracker.posX = wrapper.read(Type.DOUBLE); // x
                     wrapper.read(Type.DOUBLE); // y
                     positionTracker.stance = wrapper.read(Type.DOUBLE); // stance
@@ -418,7 +413,6 @@ public class Protocola1_0_15toc0_30 extends AbstractProtocol<ClientboundPacketsc
                     wrapper.read(Type.BOOLEAN); // onGround
 
                     positionTracker.writeToPacket(wrapper);
-                    if (levelStorage != null) levelStorage.tickChunks(positionTracker.getChunkPosition());
                 });
             }
         });
@@ -427,13 +421,11 @@ public class Protocola1_0_15toc0_30 extends AbstractProtocol<ClientboundPacketsc
             public void register() {
                 handler(wrapper -> {
                     final ClassicPositionTracker positionTracker = wrapper.user().get(ClassicPositionTracker.class);
-                    final ClassicLevelStorage levelStorage = wrapper.user().get(ClassicLevelStorage.class);
                     positionTracker.yaw = wrapper.read(Type.FLOAT); // yaw
                     positionTracker.pitch = wrapper.read(Type.FLOAT); // pitch
                     wrapper.read(Type.BOOLEAN); // onGround
 
                     positionTracker.writeToPacket(wrapper);
-                    if (levelStorage != null) levelStorage.tickChunks(positionTracker.getChunkPosition());
                 });
             }
         });
@@ -442,7 +434,6 @@ public class Protocola1_0_15toc0_30 extends AbstractProtocol<ClientboundPacketsc
             public void register() {
                 handler(wrapper -> {
                     final ClassicPositionTracker positionTracker = wrapper.user().get(ClassicPositionTracker.class);
-                    final ClassicLevelStorage levelStorage = wrapper.user().get(ClassicLevelStorage.class);
                     positionTracker.posX = wrapper.read(Type.DOUBLE); // x
                     wrapper.read(Type.DOUBLE); // y
                     positionTracker.stance = wrapper.read(Type.DOUBLE); // stance
@@ -452,7 +443,6 @@ public class Protocola1_0_15toc0_30 extends AbstractProtocol<ClientboundPacketsc
                     wrapper.read(Type.BOOLEAN); // onGround
 
                     positionTracker.writeToPacket(wrapper);
-                    if (levelStorage != null) levelStorage.tickChunks(positionTracker.getChunkPosition());
                 });
             }
         });
@@ -557,6 +547,8 @@ public class Protocola1_0_15toc0_30 extends AbstractProtocol<ClientboundPacketsc
         providers.register(ClassicWorldHeightProvider.class, new ClassicWorldHeightProvider());
         providers.register(ClassicMPPassProvider.class, new ClassicMPPassProvider());
         providers.register(ClassicCustomCommandProvider.class, new ClassicCustomCommandProvider());
+
+        Via.getPlatform().runRepeatingSync(new ClassicLevelStorageTickTask(), 2L);
     }
 
     @Override

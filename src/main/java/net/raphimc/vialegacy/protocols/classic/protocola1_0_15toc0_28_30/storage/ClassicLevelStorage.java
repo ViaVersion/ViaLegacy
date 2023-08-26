@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.util.MathUtil;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.model.ChunkCoord;
 import net.raphimc.vialegacy.api.util.ChunkCoordSpiral;
@@ -58,10 +57,8 @@ public class ClassicLevelStorage extends StoredObject {
 
     private int sectionBitmask;
 
-    private int chunksPerTick = ViaLegacy.getConfig().getChunksPerTick();
-
     private final Set<ChunkCoord> loadedChunks = new HashSet<>();
-    private long lastPosPacket;
+    private long eventLoopPing = 0;
 
     public ClassicLevelStorage(final UserConnection user) {
         super(user);
@@ -98,19 +95,31 @@ public class ClassicLevelStorage extends StoredObject {
         this.subChunkZLength = Math.min(16, sizeZ);
         this.sectionBitmask = 0;
         for (int i = 0; i < this.sectionYCount; i++) this.sectionBitmask = (this.sectionBitmask << 1) | 1;
-
-        if (this.chunksPerTick <= 0) {
-            this.chunksPerTick = MathUtil.clamp(32 / this.sectionYCount, 1, 8);
-        }
     }
 
-    public void tickChunks(final ChunkCoord center) throws Exception {
-        if (!this.getUser().get(ClassicPositionTracker.class).spawned) return;
-        if (System.currentTimeMillis() - this.lastPosPacket < 50) {
-            return;
+    public void tick() throws Exception {
+        final ClassicPositionTracker positionTracker = this.getUser().get(ClassicPositionTracker.class);
+        if (!positionTracker.spawned) return;
+
+        final long start = System.currentTimeMillis();
+        this.getUser().getChannel().eventLoop().submit(() -> {
+            ClassicLevelStorage.this.eventLoopPing = System.currentTimeMillis() - start;
+        });
+
+        System.out.println(this.eventLoopPing);
+        int limit = 0;
+        if (this.eventLoopPing < 50) {
+            limit = 12;
+        } else if (this.eventLoopPing < 100) {
+            limit = 6;
+        } else if (this.eventLoopPing < 250) {
+            limit = 3;
+        } else if (this.eventLoopPing < 400) {
+            limit = 1;
         }
-        this.lastPosPacket = System.currentTimeMillis();
-        this.sendChunks(center, ViaLegacy.getConfig().getClassicChunkRange(), this.chunksPerTick);
+        if (limit != 0) {
+            this.sendChunks(positionTracker.getChunkPosition(), ViaLegacy.getConfig().getClassicChunkRange(), limit);
+        }
     }
 
     public void sendChunks(final ChunkCoord center, final int radius) throws Exception {
