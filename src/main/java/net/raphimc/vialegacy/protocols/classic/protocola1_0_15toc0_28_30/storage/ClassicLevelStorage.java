@@ -106,7 +106,6 @@ public class ClassicLevelStorage extends StoredObject {
             ClassicLevelStorage.this.eventLoopPing = System.currentTimeMillis() - start;
         });
 
-        System.out.println(this.eventLoopPing);
         int limit = 0;
         if (this.eventLoopPing < 50) {
             limit = 12;
