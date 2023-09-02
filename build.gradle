@@ -4,12 +4,14 @@ plugins {
     id "net.kyori.blossom" version "1.3.1"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(8)
-compileJava.options.encoding = compileTestJava.options.encoding = javadoc.options.encoding = "UTF-8"
+base {
+    java.toolchain.languageVersion = JavaLanguageVersion.of(8)
+    compileJava.options.encoding = compileTestJava.options.encoding = javadoc.options.encoding = "UTF-8"
 
-group = project.maven_group
-archivesBaseName = project.maven_name
-version = project.maven_version
+    group = project.maven_group ?: rootProject.maven_group
+    archivesName = project.maven_name ?: rootProject.maven_name
+    version = project.maven_version ?: rootProject.maven_version
+}
 
 repositories {
     mavenCentral()
@@ -30,7 +32,7 @@ dependencies {
 
 blossom {
     replaceToken("\${version}", project.version, "src/main/java/net/raphimc/vialegacy/ViaLegacy.java")
-    replaceToken("\${impl_version}", "git-${project.archivesBaseName}-${project.version}:${latestCommitHash()}", "src/main/java/net/raphimc/vialegacy/ViaLegacy.java")
+    replaceToken("\${impl_version}", "git-${project.name}-${project.version}:${latestCommitHash()}", "src/main/java/net/raphimc/vialegacy/ViaLegacy.java")
 }
 
 java {
@@ -40,7 +42,7 @@ java {
 
 jar {
     from("LICENSE") {
-        rename { "${it}_${project.archivesBaseName}" }
+        rename { "${it}_${project.name ?: rootProject.name}" }
     }
 }
 
