@@ -22,10 +22,10 @@ repositories {
 }
 
 dependencies {
-    implementation "com.viaversion:viaversion:4.8.0-23w31a-SNAPSHOT"
-    implementation "org.yaml:snakeyaml:2.2"
-    implementation "com.google.guava:guava:32.1.2-jre"
-    implementation "io.netty:netty-handler:4.1.97.Final"
+    compileOnly "com.viaversion:viaversion:4.8.0-23w31a-SNAPSHOT"
+    compileOnly "org.yaml:snakeyaml:2.2"
+    compileOnly "com.google.guava:guava:32.1.2-jre"
+    compileOnly "io.netty:netty-handler:4.1.97.Final"
 
     api "net.lenni0451.mcstructs:text:2.3.1"
 }
