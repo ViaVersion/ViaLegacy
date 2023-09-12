@@ -278,8 +278,22 @@ public class Protocol1_6_1to1_5_2 extends AbstractProtocol<ClientboundPackets1_5
             @Override
             public void register() {
                 map(Type.BYTE); // flags
-                map(Type.BYTE, Type.FLOAT, b -> b / 255F); // fly speed
-                map(Type.BYTE, Type.FLOAT, b -> b / 255F); // walk speed
+                handler(wrapper -> {
+                    final float flySpeed = wrapper.read(Type.BYTE) / 255F; // fly speed
+                    final float walkSpeed = wrapper.read(Type.BYTE) / 255F; // walk speed
+                    wrapper.write(Type.FLOAT, flySpeed);
+                    wrapper.write(Type.FLOAT, walkSpeed);
+
+                    final PacketWrapper entityProperties = PacketWrapper.create(ClientboundPackets1_6_1.ENTITY_PROPERTIES, wrapper.user());
+                    entityProperties.write(Type.INT, wrapper.user().get(EntityTracker.class).getPlayerID()); // entity id
+                    entityProperties.write(Type.INT, 1); // count
+                    entityProperties.write(Types1_6_4.STRING, "generic.movementSpeed"); // id
+                    entityProperties.write(Type.DOUBLE, (double) walkSpeed); // value
+
+                    wrapper.send(Protocol1_6_1to1_5_2.class);
+                    entityProperties.send(Protocol1_6_1to1_5_2.class);
+                    wrapper.cancel();
+                });
             }
         });
 
