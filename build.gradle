@@ -25,7 +25,7 @@ dependencies {
     compileOnly "com.viaversion:viaversion:4.8.0"
     compileOnly "org.yaml:snakeyaml:2.2"
     compileOnly "com.google.guava:guava:32.1.2-jre"
-    compileOnly "io.netty:netty-handler:4.1.98.Final"
+    compileOnly "io.netty:netty-handler:4.1.99.Final"
 
     api "net.lenni0451.mcstructs:text:2.3.1"
 }
