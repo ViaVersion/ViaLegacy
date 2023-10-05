@@ -848,10 +848,10 @@ public class Protocol1_3_1_2to1_2_4_5 extends AbstractProtocol<ClientboundPacket
         login.write(Type.BYTE, (byte) 0); // world height
         login.write(Type.BYTE, (byte) 0); // max players
 
-        final State oldState = info.getState();
+        final State oldState = info.getClientState();
         info.setState(State.LOGIN);
         login.sendToServer(Protocol1_3_1_2to1_2_4_5.class);
-        info.setState(oldState);
+        info.setClientState(oldState);
     }
 
     @Override

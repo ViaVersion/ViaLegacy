@@ -17,12 +17,14 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.baseprotocols;
 
+import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.AbstractSimpleProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.base.ServerboundHandshakePackets;
+import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.HandshakeStorage;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.ProtocolMetadataStorage;
 
@@ -47,6 +49,12 @@ public class PreNettyBaseProtocol extends AbstractSimpleProtocol {
                     wrapper.user().put(new HandshakeStorage(wrapper.user(), hostname, port));
                 });
             }
+        });
+
+        // Copied from BaseProtocol1_7
+        this.registerServerbound(State.LOGIN, ServerboundLoginPackets.LOGIN_ACKNOWLEDGED.getId(), ServerboundLoginPackets.LOGIN_ACKNOWLEDGED.getId(), wrapper -> {
+            final ProtocolInfo info = wrapper.user().getProtocolInfo();
+            info.setState(State.CONFIGURATION);
         });
     }
 

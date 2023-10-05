@@ -33,6 +33,7 @@ import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
+import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2IntMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2IntMap;
@@ -124,9 +125,13 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                     if (!protocolMetadata.skipEncryption) {
                         Via.getManager().getProviders().get(EncryptionProvider.class).enableDecryption(wrapper.user());
                     }
-                    info.setState(State.PLAY);
+
+                    // Parts of BaseProtocol1_7 GAME_PROFILE handler
+                    if (info.getProtocolVersion() < ProtocolVersion.v1_20_2.getVersion()) {
+                        info.setState(State.PLAY);
+                    }
                     Via.getManager().getConnectionManager().onLoginSuccess(wrapper.user());
-                    if (info.getPipeline().pipes().stream().allMatch(Via.getManager().getProtocolManager()::isBaseProtocol)) {
+                    if (!info.getPipeline().hasNonBaseProtocols()) {
                         wrapper.user().setActive(false);
                     }
                     if (Via.getManager().isDebug()) {
@@ -481,8 +486,8 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                     for (int i = 0; i < amount; i++) {
                         wrapper.write(Type.STRING, wrapper.read(Types1_6_4.STRING)); // id
                         wrapper.passthrough(Type.DOUBLE); // baseValue
-                        final int modifierlength = wrapper.passthrough(Type.SHORT); // modifier count
-                        for (int x = 0; x < modifierlength; x++) {
+                        final int modifierCount = wrapper.passthrough(Type.SHORT); // modifier count
+                        for (int x = 0; x < modifierCount; x++) {
                             wrapper.passthrough(Type.UUID); // modifier uuid
                             wrapper.passthrough(Type.DOUBLE); // modifier amount
                             wrapper.passthrough(Type.BYTE); // modifier operation
@@ -1190,7 +1195,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
             userConnection.getChannel().pipeline().addFirst(new ChannelOutboundHandlerAdapter() {
                 @Override
                 public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-                    if (userConnection.getProtocolInfo().getState().equals(State.PLAY) && ctx.channel().isWritable() && userConnection.get(PlayerInfoStorage.class).entityId != -1) {
+                    if (ctx.channel().isWritable() && userConnection.getProtocolInfo().getClientState().equals(State.PLAY) && userConnection.get(PlayerInfoStorage.class).entityId != -1) {
                         final PacketWrapper disconnect = PacketWrapper.create(ServerboundPackets1_6_4.DISCONNECT, userConnection);
                         disconnect.write(Types1_6_4.STRING, "Quitting"); // reason
                         disconnect.sendToServer(Protocol1_7_2_5to1_6_4.class);

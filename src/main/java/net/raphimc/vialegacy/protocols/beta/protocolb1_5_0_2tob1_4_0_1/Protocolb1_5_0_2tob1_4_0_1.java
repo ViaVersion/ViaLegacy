@@ -50,6 +50,12 @@ public class Protocolb1_5_0_2tob1_4_0_1 extends AbstractProtocol<ClientboundPack
                 map(Typesb1_7_0_3.STRING, Types1_6_4.STRING); // server hash
             }
         });
+        this.registerClientbound(ClientboundPacketsb1_4.HANDSHAKE, ClientboundPacketsb1_5.HANDSHAKE, new PacketHandlers() {
+            @Override
+            public void register() {
+                map(Typesb1_7_0_3.STRING, Types1_6_4.STRING); // server hash
+            }
+        });
         this.registerClientbound(State.LOGIN, ClientboundPacketsb1_4.DISCONNECT.getId(), ClientboundPacketsb1_5.DISCONNECT.getId(), new PacketHandlers() {
             @Override
             public void register() {
