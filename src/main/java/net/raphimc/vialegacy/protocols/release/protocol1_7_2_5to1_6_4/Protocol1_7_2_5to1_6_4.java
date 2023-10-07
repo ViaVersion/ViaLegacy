@@ -29,9 +29,9 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
+import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
@@ -39,7 +39,10 @@ import com.viaversion.viaversion.libs.fastutil.ints.Int2IntMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2IntMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2IntOpenHashMap;
 import com.viaversion.viaversion.libs.gson.JsonObject;
-import com.viaversion.viaversion.protocols.base.*;
+import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
+import com.viaversion.viaversion.protocols.base.ClientboundStatusPackets;
+import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
+import com.viaversion.viaversion.protocols.base.ServerboundStatusPackets;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import io.netty.buffer.ByteBuf;
@@ -50,6 +53,7 @@ import io.netty.channel.ChannelPromise;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.protocol.StatelessTransitionProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.providers.EncryptionProvider;
@@ -70,7 +74,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 import java.util.List;
 import java.util.logging.Level;
 
-public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1_6_4, ClientboundPackets1_7_2, ServerboundPackets1_6_4, ServerboundPackets1_7_2> {
+public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<ClientboundPackets1_6_4, ClientboundPackets1_7_2, ServerboundPackets1_6_4, ServerboundPackets1_7_2> {
 
     private final LegacyItemRewriter<Protocol1_7_2_5to1_6_4> itemRewriter = new ItemRewriter(this);
 
@@ -82,135 +86,52 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
     protected void registerPackets() {
         this.itemRewriter.register();
 
-        this.registerClientbound(State.STATUS, ClientboundPackets1_6_4.DISCONNECT.getId(), ClientboundStatusPackets.STATUS_RESPONSE.getId(), new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final String reason = wrapper.read(Types1_6_4.STRING); // reason
-                    try {
-                        final String[] motdParts = reason.split("\0");
-                        final JsonObject rootObject = new JsonObject();
-                        final JsonObject descriptionObject = new JsonObject();
-                        final JsonObject playersObject = new JsonObject();
-                        final JsonObject versionObject = new JsonObject();
+        this.registerClientboundTransition(ClientboundPackets1_6_4.JOIN_GAME,
+                ClientboundPackets1_7_2.JOIN_GAME, new PacketHandlers() {
+                    @Override
+                    public void register() {
+                        map(Type.INT); // entity id
+                        handler(wrapper -> {
+                            wrapper.user().get(PlayerInfoStorage.class).entityId = wrapper.get(Type.INT, 0);
+                            final String terrainType = wrapper.read(Types1_6_4.STRING); // level type
+                            final short gameType = wrapper.read(Type.BYTE); // game mode
+                            final byte dimension = wrapper.read(Type.BYTE); // dimension id
+                            final short difficulty = wrapper.read(Type.BYTE); // difficulty
+                            wrapper.read(Type.BYTE); // world height
+                            final short maxPlayers = wrapper.read(Type.BYTE); // max players
 
-                        descriptionObject.addProperty("text", motdParts[3]);
-                        playersObject.addProperty("max", Integer.parseInt(motdParts[5]));
-                        playersObject.addProperty("online", Integer.parseInt(motdParts[4]));
-                        versionObject.addProperty("name", motdParts[2]);
-                        versionObject.addProperty("protocol", Integer.parseInt(motdParts[1]));
-                        rootObject.add("description", descriptionObject);
-                        rootObject.add("players", playersObject);
-                        rootObject.add("version", versionObject);
+                            wrapper.write(Type.UNSIGNED_BYTE, gameType);
+                            wrapper.write(Type.BYTE, dimension);
+                            wrapper.write(Type.UNSIGNED_BYTE, difficulty);
+                            wrapper.write(Type.UNSIGNED_BYTE, maxPlayers);
+                            wrapper.write(Type.STRING, terrainType);
+                        });
+                        handler(wrapper -> {
+                            final byte dimensionId = wrapper.get(Type.BYTE, 0);
+                            wrapper.user().get(DimensionTracker.class).setDimension(dimensionId);
+                            wrapper.user().get(ClientWorld.class).setEnvironment(dimensionId);
 
-                        wrapper.write(Type.STRING, rootObject.toString());
-                    } catch (Throwable e) {
-                        ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Could not parse 1.6.4 ping: " + reason, e);
-                        wrapper.cancel();
+                            wrapper.user().put(new ChunkTracker(wrapper.user()));
+                        });
                     }
-                });
-            }
-        });
-        this.registerClientbound(State.LOGIN, ClientboundPackets1_6_4.SHARED_KEY.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final ProtocolInfo info = wrapper.user().getProtocolInfo();
-                    final ProtocolMetadataStorage protocolMetadata = wrapper.user().get(ProtocolMetadataStorage.class);
-                    wrapper.read(Type.SHORT_BYTE_ARRAY); // shared secret
-                    wrapper.read(Type.SHORT_BYTE_ARRAY); // verify token
-                    wrapper.write(Type.STRING, info.getUuid().toString().replace("-", "")); // uuid
-                    wrapper.write(Type.STRING, info.getUsername()); // user name
+                }, State.LOGIN, new PacketHandlers() {
+                    @Override
+                    protected void register() {
+                        handler(wrapper -> {
+                            ViaLegacy.getPlatform().getLogger().warning("Server skipped LOGIN state");
+                            final PacketWrapper sharedKey = PacketWrapper.create(ClientboundPackets1_6_4.SHARED_KEY, wrapper.user());
+                            sharedKey.write(Type.SHORT_BYTE_ARRAY, new byte[0]);
+                            sharedKey.write(Type.SHORT_BYTE_ARRAY, new byte[0]);
+                            wrapper.user().get(ProtocolMetadataStorage.class).skipEncryption = true;
+                            sharedKey.send(Protocol1_7_2_5to1_6_4.class, false); // switch to play state
+                            wrapper.user().get(ProtocolMetadataStorage.class).skipEncryption = false;
 
-                    if (!protocolMetadata.skipEncryption) {
-                        Via.getManager().getProviders().get(EncryptionProvider.class).enableDecryption(wrapper.user());
+                            wrapper.send(Protocol1_7_2_5to1_6_4.class, false);
+                            wrapper.cancel();
+                        });
                     }
-
-                    // Parts of BaseProtocol1_7 GAME_PROFILE handler
-                    if (info.getProtocolVersion() < ProtocolVersion.v1_20_2.getVersion()) {
-                        info.setState(State.PLAY);
-                    }
-                    Via.getManager().getConnectionManager().onLoginSuccess(wrapper.user());
-                    if (!info.getPipeline().hasNonBaseProtocols()) {
-                        wrapper.user().setActive(false);
-                    }
-                    if (Via.getManager().isDebug()) {
-                        ViaLegacy.getPlatform().getLogger().log(Level.INFO, "{0} logged in with protocol {1}, Route: {2}", new Object[]{info.getUsername(), info.getProtocolVersion(), Joiner.on(", ").join(info.getPipeline().pipes(), ", ")});
-                    }
-
-                    final PacketWrapper respawn = PacketWrapper.create(ServerboundPackets1_6_4.CLIENT_STATUS, wrapper.user());
-                    respawn.write(Type.BYTE, (byte) 0); // force respawn
-                    respawn.sendToServer(Protocol1_7_2_5to1_6_4.class);
-                });
-            }
-        });
-        this.cancelClientbound(ClientboundPackets1_6_4.SHARED_KEY);
-        this.registerClientbound(State.LOGIN, ClientboundPackets1_6_4.SERVER_AUTH_DATA.getId(), ClientboundLoginPackets.HELLO.getId(), new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types1_6_4.STRING, Type.STRING); // server hash
-                map(Type.SHORT_BYTE_ARRAY); // public key
-                map(Type.SHORT_BYTE_ARRAY); // verify token
-                handler(wrapper -> {
-                    final ProtocolMetadataStorage protocolMetadata = wrapper.user().get(ProtocolMetadataStorage.class);
-                    final String serverHash = wrapper.get(Type.STRING, 0);
-                    protocolMetadata.authenticate = !serverHash.equals("-");
-                });
-            }
-        });
-        this.cancelClientbound(ClientboundPackets1_6_4.SERVER_AUTH_DATA);
-        this.registerClientbound(State.LOGIN, ClientboundPackets1_6_4.DISCONNECT.getId(), ClientboundLoginPackets.LOGIN_DISCONNECT.getId(), new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Types1_6_4.STRING, Type.STRING, ChatComponentRewriter::toClientDisconnect); // reason
-            }
-        });
-        this.cancelClientbound(State.LOGIN, ClientboundPackets1_6_4.PLUGIN_MESSAGE.getId());
-        this.registerClientbound(State.LOGIN, ClientboundPackets1_6_4.JOIN_GAME.getId(), ClientboundPackets1_6_4.JOIN_GAME.getId(), new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    ViaLegacy.getPlatform().getLogger().warning("Server skipped LOGIN state");
-                    final PacketWrapper sharedKey = PacketWrapper.create(ClientboundPackets1_6_4.SHARED_KEY, wrapper.user());
-                    sharedKey.write(Type.SHORT_BYTE_ARRAY, new byte[0]);
-                    sharedKey.write(Type.SHORT_BYTE_ARRAY, new byte[0]);
-                    wrapper.user().get(ProtocolMetadataStorage.class).skipEncryption = true;
-                    sharedKey.send(BaseProtocol.class); // switch to play state
-                    wrapper.user().get(ProtocolMetadataStorage.class).skipEncryption = false;
-
-                    wrapper.send(BaseProtocol.class);
-                    wrapper.cancel();
-                });
-            }
-        });
-        this.registerClientbound(ClientboundPackets1_6_4.JOIN_GAME, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Type.INT); // entity id
-                handler(wrapper -> {
-                    wrapper.user().get(PlayerInfoStorage.class).entityId = wrapper.get(Type.INT, 0);
-                    final String terrainType = wrapper.read(Types1_6_4.STRING); // level type
-                    final short gameType = wrapper.read(Type.BYTE); // game mode
-                    final byte dimension = wrapper.read(Type.BYTE); // dimension id
-                    final short difficulty = wrapper.read(Type.BYTE); // difficulty
-                    wrapper.read(Type.BYTE); // world height
-                    final short maxPlayers = wrapper.read(Type.BYTE); // max players
-
-                    wrapper.write(Type.UNSIGNED_BYTE, gameType);
-                    wrapper.write(Type.BYTE, dimension);
-                    wrapper.write(Type.UNSIGNED_BYTE, difficulty);
-                    wrapper.write(Type.UNSIGNED_BYTE, maxPlayers);
-                    wrapper.write(Type.STRING, terrainType);
-                });
-                handler(wrapper -> {
-                    final byte dimensionId = wrapper.get(Type.BYTE, 0);
-                    wrapper.user().get(DimensionTracker.class).setDimension(dimensionId);
-                    wrapper.user().get(ClientWorld.class).setEnvironment(dimensionId);
-
-                    wrapper.user().put(new ChunkTracker(wrapper.user()));
-                });
-            }
-        });
+                }
+        );
         this.registerClientbound(ClientboundPackets1_6_4.CHAT_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {
@@ -865,37 +786,120 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                 });
             }
         });
-        this.registerClientbound(ClientboundPackets1_6_4.PLUGIN_MESSAGE, new PacketHandlers() {
+        this.registerClientboundTransition(ClientboundPackets1_6_4.PLUGIN_MESSAGE,
+                ClientboundPackets1_7_2.PLUGIN_MESSAGE, new PacketHandlers() {
+                    @Override
+                    public void register() {
+                        map(Types1_6_4.STRING, Type.STRING); // channel
+                        handler(wrapper -> {
+                            final String channel = wrapper.get(Type.STRING, 0);
+                            wrapper.passthrough(Type.SHORT); // length
+                            if (channel.equals("MC|TrList")) {
+                                wrapper.passthrough(Type.INT); // window id
+                                final int count = wrapper.passthrough(Type.UNSIGNED_BYTE); // count
+                                for (int i = 0; i < count; i++) {
+                                    itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM)); // item 1
+                                    itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM)); // item 3
+                                    if (wrapper.passthrough(Type.BOOLEAN)) { // has 3 items
+                                        itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM)); // item 2
+                                    }
+                                    wrapper.passthrough(Type.BOOLEAN); // unavailable
+                                }
+                            }
+                        });
+                    }
+                }, State.LOGIN, (PacketHandler) PacketWrapper::cancel
+        );
+        this.registerClientboundTransition(ClientboundPackets1_6_4.SHARED_KEY, ClientboundLoginPackets.GAME_PROFILE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_6_4.STRING, Type.STRING); // channel
                 handler(wrapper -> {
-                    final String channel = wrapper.get(Type.STRING, 0);
-                    wrapper.passthrough(Type.SHORT); // length
-                    if (channel.equals("MC|TrList")) {
-                        wrapper.passthrough(Type.INT); // window id
-                        final int count = wrapper.passthrough(Type.UNSIGNED_BYTE); // count
-                        for (int i = 0; i < count; i++) {
-                            itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM)); // item 1
-                            itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM)); // item 3
-                            if (wrapper.passthrough(Type.BOOLEAN)) { // has 3 items
-                                itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM)); // item 2
-                            }
-                            wrapper.passthrough(Type.BOOLEAN); // unavailable
-                        }
+                    final ProtocolInfo info = wrapper.user().getProtocolInfo();
+                    final ProtocolMetadataStorage protocolMetadata = wrapper.user().get(ProtocolMetadataStorage.class);
+                    wrapper.read(Type.SHORT_BYTE_ARRAY); // shared secret
+                    wrapper.read(Type.SHORT_BYTE_ARRAY); // verify token
+                    wrapper.write(Type.STRING, info.getUuid().toString().replace("-", "")); // uuid
+                    wrapper.write(Type.STRING, info.getUsername()); // user name
+
+                    if (!protocolMetadata.skipEncryption) {
+                        Via.getManager().getProviders().get(EncryptionProvider.class).enableDecryption(wrapper.user());
                     }
+
+                    // Parts of BaseProtocol1_7 GAME_PROFILE handler
+                    if (info.getProtocolVersion() < ProtocolVersion.v1_20_2.getVersion()) {
+                        info.setState(State.PLAY);
+                    }
+                    Via.getManager().getConnectionManager().onLoginSuccess(wrapper.user());
+                    if (!info.getPipeline().hasNonBaseProtocols()) {
+                        wrapper.user().setActive(false);
+                    }
+                    if (Via.getManager().isDebug()) {
+                        ViaLegacy.getPlatform().getLogger().log(Level.INFO, "{0} logged in with protocol {1}, Route: {2}", new Object[]{info.getUsername(), info.getProtocolVersion(), Joiner.on(", ").join(info.getPipeline().pipes(), ", ")});
+                    }
+
+                    final PacketWrapper respawn = PacketWrapper.create(ServerboundPackets1_6_4.CLIENT_STATUS, wrapper.user());
+                    respawn.write(Type.BYTE, (byte) 0); // force respawn
+                    respawn.sendToServer(Protocol1_7_2_5to1_6_4.class);
                 });
             }
         });
-        this.registerClientbound(ClientboundPackets1_6_4.DISCONNECT, new PacketHandlers() {
+        this.registerClientboundTransition(ClientboundPackets1_6_4.SERVER_AUTH_DATA, ClientboundLoginPackets.HELLO, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_6_4.STRING, Type.STRING, ChatComponentRewriter::toClientDisconnect); // reason
+                map(Types1_6_4.STRING, Type.STRING); // server hash
+                map(Type.SHORT_BYTE_ARRAY); // public key
+                map(Type.SHORT_BYTE_ARRAY); // verify token
+                handler(wrapper -> {
+                    final ProtocolMetadataStorage protocolMetadata = wrapper.user().get(ProtocolMetadataStorage.class);
+                    final String serverHash = wrapper.get(Type.STRING, 0);
+                    protocolMetadata.authenticate = !serverHash.equals("-");
+                });
             }
         });
+        this.registerClientboundTransition(ClientboundPackets1_6_4.DISCONNECT,
+                ClientboundStatusPackets.STATUS_RESPONSE, new PacketHandlers() {
+                    @Override
+                    protected void register() {
+                        handler(wrapper -> {
+                            final String reason = wrapper.read(Types1_6_4.STRING); // reason
+                            try {
+                                final String[] motdParts = reason.split("\0");
+                                final JsonObject rootObject = new JsonObject();
+                                final JsonObject descriptionObject = new JsonObject();
+                                final JsonObject playersObject = new JsonObject();
+                                final JsonObject versionObject = new JsonObject();
+
+                                descriptionObject.addProperty("text", motdParts[3]);
+                                playersObject.addProperty("max", Integer.parseInt(motdParts[5]));
+                                playersObject.addProperty("online", Integer.parseInt(motdParts[4]));
+                                versionObject.addProperty("name", motdParts[2]);
+                                versionObject.addProperty("protocol", Integer.parseInt(motdParts[1]));
+                                rootObject.add("description", descriptionObject);
+                                rootObject.add("players", playersObject);
+                                rootObject.add("version", versionObject);
+
+                                wrapper.write(Type.STRING, rootObject.toString());
+                            } catch (Throwable e) {
+                                ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Could not parse 1.6.4 ping: " + reason, e);
+                                wrapper.cancel();
+                            }
+                        });
+                    }
+                }, ClientboundLoginPackets.LOGIN_DISCONNECT, new PacketHandlers() {
+                    @Override
+                    protected void register() {
+                        map(Types1_6_4.STRING, Type.STRING, ChatComponentRewriter::toClientDisconnect); // reason
+                    }
+                }, ClientboundPackets1_7_2.DISCONNECT, new PacketHandlers() {
+                    @Override
+                    public void register() {
+                        map(Types1_6_4.STRING, Type.STRING, ChatComponentRewriter::toClientDisconnect); // reason
+                    }
+                }
+        );
         this.cancelClientbound(ClientboundPackets1_6_4.CREATIVE_INVENTORY_ACTION);
 
-        this.registerServerbound(State.STATUS, ServerboundStatusPackets.STATUS_REQUEST.getId(), ServerboundPackets1_6_4.SERVER_PING.getId(), new PacketHandlers() {
+        this.registerServerboundTransition(ServerboundStatusPackets.STATUS_REQUEST, ServerboundPackets1_6_4.SERVER_PING, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
@@ -903,7 +907,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                     final String ip = handshakeStorage.getHostname();
                     final int port = handshakeStorage.getPort();
                     wrapper.write(Type.UNSIGNED_BYTE, (short) 1); // always 1
-                    wrapper.write(Type.UNSIGNED_BYTE, (short) 250); // packet id
+                    wrapper.write(Type.UNSIGNED_BYTE, (short) ServerboundPackets1_6_4.PLUGIN_MESSAGE.getId()); // packet id
                     wrapper.write(Types1_6_4.STRING, "MC|PingHost"); // channel
                     wrapper.write(Type.UNSIGNED_SHORT, 3 + 2 * ip.length() + 4); // length
                     wrapper.write(Type.UNSIGNED_BYTE, (short) LegacyProtocolVersion.getRealProtocolVersion(wrapper.user().getProtocolInfo().getServerProtocolVersion())); // protocol Id
@@ -912,7 +916,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                 });
             }
         });
-        this.registerServerbound(State.STATUS, ServerboundStatusPackets.PING_REQUEST.getId(), -1, new PacketHandlers() {
+        this.registerServerboundTransition(ServerboundStatusPackets.PING_REQUEST, null, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
@@ -923,7 +927,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                 });
             }
         });
-        this.registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundPackets1_6_4.CLIENT_PROTOCOL.getId(), new PacketHandlers() {
+        this.registerServerboundTransition(ServerboundLoginPackets.HELLO, ServerboundPackets1_6_4.CLIENT_PROTOCOL, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
@@ -940,7 +944,7 @@ public class Protocol1_7_2_5to1_6_4 extends AbstractProtocol<ClientboundPackets1
                 });
             }
         });
-        this.registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundPackets1_6_4.SHARED_KEY.getId());
+        this.registerServerboundTransition(ServerboundLoginPackets.ENCRYPTION_KEY, ServerboundPackets1_6_4.SHARED_KEY, null);
         this.registerServerbound(ServerboundPackets1_7_2.CHAT_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {

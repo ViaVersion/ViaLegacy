@@ -19,10 +19,9 @@ package net.raphimc.vialegacy.protocols.beta.protocolb1_5_0_2tob1_4_0_1;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_5_0_2tob1_4_0_1.types.Typesb1_4;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_6_0_6tob1_5_0_2.ClientboundPacketsb1_5;
@@ -36,7 +35,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 
 import java.util.List;
 
-public class Protocolb1_5_0_2tob1_4_0_1 extends AbstractProtocol<ClientboundPacketsb1_4, ClientboundPacketsb1_5, ServerboundPacketsb1_4, ServerboundPacketsb1_5> {
+public class Protocolb1_5_0_2tob1_4_0_1 extends StatelessProtocol<ClientboundPacketsb1_4, ClientboundPacketsb1_5, ServerboundPacketsb1_4, ServerboundPacketsb1_5> {
 
     public Protocolb1_5_0_2tob1_4_0_1() {
         super(ClientboundPacketsb1_4.class, ClientboundPacketsb1_5.class, ServerboundPacketsb1_4.class, ServerboundPacketsb1_5.class);
@@ -44,22 +43,10 @@ public class Protocolb1_5_0_2tob1_4_0_1 extends AbstractProtocol<ClientboundPack
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(State.LOGIN, ClientboundPacketsb1_4.HANDSHAKE.getId(), ClientboundPacketsb1_5.HANDSHAKE.getId(), new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_4.HANDSHAKE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Typesb1_7_0_3.STRING, Types1_6_4.STRING); // server hash
-            }
-        });
-        this.registerClientbound(ClientboundPacketsb1_4.HANDSHAKE, ClientboundPacketsb1_5.HANDSHAKE, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Typesb1_7_0_3.STRING, Types1_6_4.STRING); // server hash
-            }
-        });
-        this.registerClientbound(State.LOGIN, ClientboundPacketsb1_4.DISCONNECT.getId(), ClientboundPacketsb1_5.DISCONNECT.getId(), new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Typesb1_7_0_3.STRING, Types1_6_4.STRING); // reason
             }
         });
         this.registerClientbound(ClientboundPacketsb1_4.JOIN_GAME, new PacketHandlers() {
@@ -144,13 +131,13 @@ public class Protocolb1_5_0_2tob1_4_0_1 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        this.registerServerbound(State.LOGIN, ServerboundPacketsb1_4.HANDSHAKE.getId(), ServerboundPacketsb1_5.HANDSHAKE.getId(), new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsb1_5.HANDSHAKE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types1_6_4.STRING, Typesb1_7_0_3.STRING); // username
             }
         });
-        this.registerServerbound(State.LOGIN, ServerboundPacketsb1_5.LOGIN.getId(), ServerboundPacketsb1_4.LOGIN.getId(), new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsb1_5.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // protocol id

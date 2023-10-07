@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.baseprotocols;
+package net.raphimc.vialegacy.api.protocol;
 
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;

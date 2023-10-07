@@ -20,14 +20,13 @@ package net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import net.lenni0451.mcstructs.text.components.StringComponent;
 import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
 import net.raphimc.vialegacy.ViaLegacy;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.metadata.MetadataRewriter;
@@ -43,7 +42,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 
 import java.util.List;
 
-public class Protocol1_6_1to1_5_2 extends AbstractProtocol<ClientboundPackets1_5_2, ClientboundPackets1_6_1, ServerboundPackets1_5_2, ServerboundPackets1_6_4> {
+public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_5_2, ClientboundPackets1_6_1, ServerboundPackets1_5_2, ServerboundPackets1_6_4> {
 
     private final LegacyItemRewriter<Protocol1_6_1to1_5_2> itemRewriter = new ItemRewriter(this);
 
@@ -297,7 +296,7 @@ public class Protocol1_6_1to1_5_2 extends AbstractProtocol<ClientboundPackets1_5
             }
         });
 
-        this.registerServerbound(State.STATUS, ServerboundPackets1_6_4.SERVER_PING.getId(), ServerboundPackets1_5_2.SERVER_PING.getId(), new PacketHandlers() {
+        this.registerServerbound(ServerboundPackets1_6_4.SERVER_PING, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {

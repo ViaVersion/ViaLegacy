@@ -18,10 +18,9 @@
 package net.raphimc.vialegacy.protocols.classic.protocolc0_0_20a_27toc0_0_19a_06;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.ServerboundPacketsc0_28;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.data.ClassicBlocks;
@@ -30,7 +29,7 @@ import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.types.T
 import net.raphimc.vialegacy.protocols.classic.protocolc0_0_19a_06toc0_0_18a_02.Protocolc0_0_19a_06toc0_0_18a_02;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_0_20a_27.ClientboundPacketsc0_20a;
 
-public class Protocolc0_27toc0_0_19a_06 extends AbstractProtocol<ClientboundPacketsc0_19a, ClientboundPacketsc0_20a, ServerboundPacketsc0_19a, ServerboundPacketsc0_28> {
+public class Protocolc0_27toc0_0_19a_06 extends StatelessProtocol<ClientboundPacketsc0_19a, ClientboundPacketsc0_20a, ServerboundPacketsc0_19a, ServerboundPacketsc0_28> {
 
     public Protocolc0_27toc0_0_19a_06() {
         super(ClientboundPacketsc0_19a.class, ClientboundPacketsc0_20a.class, ServerboundPacketsc0_19a.class, ServerboundPacketsc0_28.class);
@@ -48,7 +47,7 @@ public class Protocolc0_27toc0_0_19a_06 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        this.registerServerbound(State.LOGIN, ServerboundPacketsc0_28.LOGIN.getId(), ServerboundPacketsc0_19a.LOGIN.getId(), new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsc0_28.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.BYTE); // protocol id

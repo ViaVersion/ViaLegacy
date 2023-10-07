@@ -23,13 +23,13 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.storage.AlphaInventoryTracker;
 import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.ClientboundPacketsb1_8;
@@ -51,7 +51,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 
 import java.util.concurrent.ThreadLocalRandom;
 
-public class Protocolb1_8_0_1tob1_7_0_3 extends AbstractProtocol<ClientboundPacketsb1_7, ClientboundPacketsb1_8, ServerboundPacketsb1_7, ServerboundPacketsb1_8> {
+public class Protocolb1_8_0_1tob1_7_0_3 extends StatelessProtocol<ClientboundPacketsb1_7, ClientboundPacketsb1_8, ServerboundPacketsb1_7, ServerboundPacketsb1_8> {
 
     public Protocolb1_8_0_1tob1_7_0_3() {
         super(ClientboundPacketsb1_7.class, ClientboundPacketsb1_8.class, ServerboundPacketsb1_7.class, ServerboundPacketsb1_8.class);
@@ -228,7 +228,7 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends AbstractProtocol<ClientboundPack
             }
         });
 
-        this.registerServerbound(State.STATUS, ServerboundPacketsb1_8.SERVER_PING.getId(), -2, new PacketHandlers() {
+        this.registerServerbound(State.PLAY, ServerboundPacketsb1_8.SERVER_PING.getId(), -2, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
@@ -247,8 +247,7 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends AbstractProtocol<ClientboundPack
                 });
             }
         });
-        this.cancelServerbound(ServerboundPacketsb1_8.SERVER_PING);
-        this.registerServerbound(State.LOGIN, ServerboundPacketsb1_8.LOGIN.getId(), ServerboundPacketsb1_7.LOGIN.getId(), new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsb1_8.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // protocol id

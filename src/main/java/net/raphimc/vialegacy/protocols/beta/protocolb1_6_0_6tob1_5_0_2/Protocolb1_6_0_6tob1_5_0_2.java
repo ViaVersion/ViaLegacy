@@ -22,13 +22,13 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
 import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_6_0_6tob1_5_0_2.storage.WorldTimeStorage;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_6_0_6tob1_5_0_2.task.TimeTrackTask;
@@ -40,7 +40,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.Pl
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Types1_6_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
-public class Protocolb1_6_0_6tob1_5_0_2 extends AbstractProtocol<ClientboundPacketsb1_5, ClientboundPacketsb1_7, ServerboundPacketsb1_5, ServerboundPacketsb1_7> {
+public class Protocolb1_6_0_6tob1_5_0_2 extends StatelessProtocol<ClientboundPacketsb1_5, ClientboundPacketsb1_7, ServerboundPacketsb1_5, ServerboundPacketsb1_7> {
 
     public Protocolb1_6_0_6tob1_5_0_2() {
         super(ClientboundPacketsb1_5.class, ClientboundPacketsb1_7.class, ServerboundPacketsb1_5.class, ServerboundPacketsb1_7.class);

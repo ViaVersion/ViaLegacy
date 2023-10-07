@@ -20,9 +20,9 @@ package net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.rewriter.ItemRewriter;
@@ -35,7 +35,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.types.Ty
 import net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2.types.Types1_4_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
-public class Protocol1_0_0_1tob1_8_0_1 extends AbstractProtocol<ClientboundPacketsb1_8, ClientboundPackets1_0, ServerboundPacketsb1_8, ServerboundPackets1_0> {
+public class Protocol1_0_0_1tob1_8_0_1 extends StatelessProtocol<ClientboundPacketsb1_8, ClientboundPackets1_0, ServerboundPacketsb1_8, ServerboundPackets1_0> {
 
     private final LegacyItemRewriter<Protocol1_0_0_1tob1_8_0_1> itemRewriter = new ItemRewriter(this);
 

@@ -24,15 +24,14 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.rewriter.ItemRewriter;
@@ -50,7 +49,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 import java.util.List;
 import java.util.logging.Level;
 
-public class Protocol1_4_2to1_3_1_2 extends AbstractProtocol<ClientboundPackets1_3_1, ClientboundPackets1_4_2, ServerboundPackets1_3_1, ServerboundPackets1_5_2> {
+public class Protocol1_4_2to1_3_1_2 extends StatelessProtocol<ClientboundPackets1_3_1, ClientboundPackets1_4_2, ServerboundPackets1_3_1, ServerboundPackets1_5_2> {
 
     private final LegacyItemRewriter<Protocol1_4_2to1_3_1_2> itemRewriter = new ItemRewriter(this);
 
@@ -62,7 +61,7 @@ public class Protocol1_4_2to1_3_1_2 extends AbstractProtocol<ClientboundPackets1
     protected void registerPackets() {
         this.itemRewriter.register();
 
-        this.registerClientbound(State.STATUS, ClientboundPackets1_3_1.DISCONNECT.getId(), ClientboundPackets1_4_2.DISCONNECT.getId(), new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_3_1.DISCONNECT, ClientboundPackets1_4_2.DISCONNECT, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
@@ -296,7 +295,7 @@ public class Protocol1_4_2to1_3_1_2 extends AbstractProtocol<ClientboundPackets1
             }
         });
 
-        this.registerServerbound(State.STATUS, ServerboundPackets1_5_2.SERVER_PING.getId(), ServerboundPackets1_3_1.SERVER_PING.getId(), new PacketHandlers() {
+        this.registerServerbound(ServerboundPackets1_5_2.SERVER_PING, new PacketHandlers() {
             @Override
             public void register() {
                 handler(PacketWrapper::clearPacket);

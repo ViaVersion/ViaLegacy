@@ -20,10 +20,10 @@ package net.raphimc.vialegacy.protocols.release.protocol1_5_0_1to1_4_6_7;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_5_0_1to1_4_6_7.rewriter.ItemRewriter;
@@ -32,7 +32,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.ServerboundP
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Types1_6_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
-public class Protocol1_5_0_1to1_4_6_7 extends AbstractProtocol<ClientboundPackets1_4_6, ClientboundPackets1_5_2, ServerboundPackets1_5_2, ServerboundPackets1_5_2> {
+public class Protocol1_5_0_1to1_4_6_7 extends StatelessProtocol<ClientboundPackets1_4_6, ClientboundPackets1_5_2, ServerboundPackets1_5_2, ServerboundPackets1_5_2> {
 
     private final LegacyItemRewriter<Protocol1_5_0_1to1_4_6_7> itemRewriter = new ItemRewriter(this);
 

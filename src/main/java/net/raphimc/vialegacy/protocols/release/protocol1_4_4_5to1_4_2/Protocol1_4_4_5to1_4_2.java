@@ -19,9 +19,9 @@ package net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2.rewriter.ItemRewriter;
@@ -33,7 +33,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Type
 
 import java.util.List;
 
-public class Protocol1_4_4_5to1_4_2 extends AbstractProtocol<ClientboundPackets1_4_2, ClientboundPackets1_4_4, ServerboundPackets1_5_2, ServerboundPackets1_5_2> {
+public class Protocol1_4_4_5to1_4_2 extends StatelessProtocol<ClientboundPackets1_4_2, ClientboundPackets1_4_4, ServerboundPackets1_5_2, ServerboundPackets1_5_2> {
 
     private final LegacyItemRewriter<Protocol1_4_4_5to1_4_2> itemRewriter = new ItemRewriter(this);
 

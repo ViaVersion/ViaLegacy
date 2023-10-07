@@ -18,10 +18,9 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_1to1_0_0_1;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
-import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_1to1_0_0_1.rewriter.ChatFilter;
@@ -31,7 +30,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.ServerboundP
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Types1_6_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
-public class Protocol1_1to1_0_0_1 extends AbstractProtocol<ClientboundPackets1_0, ClientboundPackets1_1, ServerboundPackets1_0, ServerboundPackets1_1> {
+public class Protocol1_1to1_0_0_1 extends StatelessProtocol<ClientboundPackets1_0, ClientboundPackets1_1, ServerboundPackets1_0, ServerboundPackets1_1> {
 
     private final LegacyItemRewriter<Protocol1_1to1_0_0_1> itemRewriter = new ItemRewriter(this);
 
@@ -43,7 +42,7 @@ public class Protocol1_1to1_0_0_1 extends AbstractProtocol<ClientboundPackets1_0
     protected void registerPackets() {
         this.itemRewriter.register();
 
-        this.registerServerbound(State.LOGIN, ServerboundPackets1_1.LOGIN.getId(), ServerboundPackets1_0.LOGIN.getId(), new PacketHandlers() {
+        this.registerServerbound(ServerboundPackets1_1.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // protocol id

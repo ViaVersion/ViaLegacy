@@ -18,17 +18,16 @@
 package net.raphimc.vialegacy.protocols.classic.protocolc0_0_16a_02to0_0_15a_1;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.types.Typesc0_30;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_0_20a_27toc0_0_19a_06.ClientboundPacketsc0_19a;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_0_20a_27toc0_0_19a_06.ServerboundPacketsc0_19a;
 
-public class Protocolc0_0_16a_02to0_0_15a_1 extends AbstractProtocol<ClientboundPacketsc0_15a, ClientboundPacketsc0_19a, ServerboundPacketsc0_15a, ServerboundPacketsc0_19a> {
+public class Protocolc0_0_16a_02to0_0_15a_1 extends StatelessProtocol<ClientboundPacketsc0_15a, ClientboundPacketsc0_19a, ServerboundPacketsc0_15a, ServerboundPacketsc0_19a> {
 
     public Protocolc0_0_16a_02to0_0_15a_1() {
         super(ClientboundPacketsc0_15a.class, ClientboundPacketsc0_19a.class, ServerboundPacketsc0_15a.class, ServerboundPacketsc0_19a.class);
@@ -74,7 +73,7 @@ public class Protocolc0_0_16a_02to0_0_15a_1 extends AbstractProtocol<Clientbound
             }
         });
 
-        this.registerServerbound(State.LOGIN, ServerboundPacketsc0_19a.LOGIN.getId(), ServerboundPacketsc0_15a.LOGIN.getId(), new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsc0_19a.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {

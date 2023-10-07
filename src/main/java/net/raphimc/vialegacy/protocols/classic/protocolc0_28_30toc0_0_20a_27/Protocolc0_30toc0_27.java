@@ -18,7 +18,7 @@
 package net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_0_20a_27;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.ClientboundPacketsc0_28;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.ServerboundPacketsc0_28;
@@ -26,7 +26,7 @@ import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.data.Cl
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.storage.ClassicBlockRemapper;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_0_20a_27toc0_0_19a_06.Protocolc0_27toc0_0_19a_06;
 
-public class Protocolc0_30toc0_27 extends AbstractProtocol<ClientboundPacketsc0_20a, ClientboundPacketsc0_28, ServerboundPacketsc0_28, ServerboundPacketsc0_28> {
+public class Protocolc0_30toc0_27 extends StatelessProtocol<ClientboundPacketsc0_20a, ClientboundPacketsc0_28, ServerboundPacketsc0_28, ServerboundPacketsc0_28> {
 
     public Protocolc0_30toc0_27() {
         super(ClientboundPacketsc0_20a.class, ClientboundPacketsc0_28.class, ServerboundPacketsc0_28.class, ServerboundPacketsc0_28.class);

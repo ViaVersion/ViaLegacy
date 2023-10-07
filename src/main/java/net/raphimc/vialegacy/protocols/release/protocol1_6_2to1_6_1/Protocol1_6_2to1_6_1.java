@@ -20,11 +20,12 @@ package net.raphimc.vialegacy.protocols.release.protocol1_6_2to1_6_1;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import io.netty.buffer.Unpooled;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.api.util.BlockFaceUtil;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.ClientboundPackets1_6_4;
@@ -34,7 +35,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 
 import java.nio.charset.StandardCharsets;
 
-public class Protocol1_6_2to1_6_1 extends AbstractProtocol<ClientboundPackets1_6_1, ClientboundPackets1_6_4, ServerboundPackets1_6_4, ServerboundPackets1_6_4> {
+public class Protocol1_6_2to1_6_1 extends StatelessProtocol<ClientboundPackets1_6_1, ClientboundPackets1_6_4, ServerboundPackets1_6_4, ServerboundPackets1_6_4> {
 
     public Protocol1_6_2to1_6_1() {
         super(ClientboundPackets1_6_1.class, ClientboundPackets1_6_4.class, ServerboundPackets1_6_4.class, ServerboundPackets1_6_4.class);
@@ -46,7 +47,7 @@ public class Protocol1_6_2to1_6_1 extends AbstractProtocol<ClientboundPackets1_6
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final PacketWrapper brand = PacketWrapper.create(ClientboundPackets1_6_4.PLUGIN_MESSAGE, wrapper.user());
+                    final PacketWrapper brand = PacketWrapper.create(ClientboundPackets1_6_4.PLUGIN_MESSAGE, Unpooled.buffer(), wrapper.user());
                     brand.write(Types1_6_4.STRING, "MC|Brand");
                     final byte[] brandBytes = "legacy".getBytes(StandardCharsets.UTF_8);
                     brand.write(Type.SHORT, (short) brandBytes.length); // data length

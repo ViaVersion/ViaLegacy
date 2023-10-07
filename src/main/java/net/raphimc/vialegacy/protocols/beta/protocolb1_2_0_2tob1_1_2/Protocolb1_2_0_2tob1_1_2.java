@@ -21,12 +21,12 @@ import com.google.common.collect.Lists;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_2_0_2tob1_1_2.rewriter.BlockDataRewriter;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_2_0_2tob1_1_2.storage.EntityFlagStorage;
@@ -40,7 +40,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.types.Type
 import net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2.types.Types1_4_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
-public class Protocolb1_2_0_2tob1_1_2 extends AbstractProtocol<ClientboundPacketsb1_1, ClientboundPacketsb1_2, ServerboundPacketsb1_1, ServerboundPacketsb1_2> {
+public class Protocolb1_2_0_2tob1_1_2 extends StatelessProtocol<ClientboundPacketsb1_1, ClientboundPacketsb1_2, ServerboundPacketsb1_1, ServerboundPacketsb1_2> {
 
     private final BlockDataRewriter BLOCK_DATA_REWRITER = new BlockDataRewriter();
 

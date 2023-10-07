@@ -23,16 +23,16 @@ import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord1_8;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.CustomByteType;
+import io.netty.buffer.Unpooled;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.model.ChunkCoord;
 import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_16_2toa1_0_15.ClientboundPacketsa1_0_15;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_16_2toa1_0_15.Protocola1_0_16_2toa1_0_15;
@@ -61,7 +61,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPacketsc0_30cpe, ClientboundPacketsc0_28, ServerboundPacketsc0_30cpe, ServerboundPacketsc0_28> {
+public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacketsc0_30cpe, ClientboundPacketsc0_28, ServerboundPacketsc0_30cpe, ServerboundPacketsc0_28> {
 
     public Protocolc0_30toc0_30cpe() {
         super(ClientboundPacketsc0_30cpe.class, ClientboundPacketsc0_28.class, ServerboundPacketsc0_30cpe.class, ServerboundPacketsc0_28.class);
@@ -75,7 +75,7 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
                 handler(wrapper -> {
                     if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_6_2to1_6_1.class)) {
                         final ExtensionProtocolMetadataStorage protocolMetadataStorage = wrapper.user().get(ExtensionProtocolMetadataStorage.class);
-                        final PacketWrapper brand = PacketWrapper.create(ClientboundPackets1_6_4.PLUGIN_MESSAGE, wrapper.user());
+                        final PacketWrapper brand = PacketWrapper.create(ClientboundPackets1_6_4.PLUGIN_MESSAGE, Unpooled.buffer(), wrapper.user());
                         brand.write(Types1_6_4.STRING, "MC|Brand");
                         final byte[] brandBytes = protocolMetadataStorage.getServerSoftwareName().getBytes(StandardCharsets.UTF_8);
                         brand.write(Type.SHORT, (short) brandBytes.length); // data length
@@ -264,7 +264,7 @@ public class Protocolc0_30toc0_30cpe extends AbstractProtocol<ClientboundPackets
             }
         });
 
-        this.registerServerbound(State.LOGIN, ServerboundPacketsc0_28.LOGIN.getId(), ServerboundPacketsc0_30cpe.LOGIN.getId(), new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsc0_28.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.BYTE); // protocol id

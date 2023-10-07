@@ -18,14 +18,14 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_2_4_5to1_2_1_3;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_4_5to1_2_1_3.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.ClientboundPackets1_2_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.ServerboundPackets1_2_4;
 
-public class Protocol1_2_4_5to1_2_1_3 extends AbstractProtocol<ClientboundPackets1_2_1, ClientboundPackets1_2_4, ServerboundPackets1_2_1, ServerboundPackets1_2_4> {
+public class Protocol1_2_4_5to1_2_1_3 extends StatelessProtocol<ClientboundPackets1_2_1, ClientboundPackets1_2_4, ServerboundPackets1_2_1, ServerboundPackets1_2_4> {
 
     private final LegacyItemRewriter<Protocol1_2_4_5to1_2_1_3> itemRewriter = new ItemRewriter(this);
 

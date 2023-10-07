@@ -22,9 +22,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
@@ -32,6 +30,7 @@ import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.model.ChunkCoord;
 import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.api.util.BlockFaceUtil;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_16_2toa1_0_15.ClientboundPacketsa1_0_15;
@@ -60,7 +59,7 @@ import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.sto
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
-public class Protocola1_0_15toc0_30 extends AbstractProtocol<ClientboundPacketsc0_28, ClientboundPacketsa1_0_15, ServerboundPacketsc0_28, ServerboundPacketsa1_0_15> {
+public class Protocola1_0_15toc0_30 extends StatelessProtocol<ClientboundPacketsc0_28, ClientboundPacketsa1_0_15, ServerboundPacketsc0_28, ServerboundPacketsa1_0_15> {
 
     public Protocola1_0_15toc0_30() {
         super(ClientboundPacketsc0_28.class, ClientboundPacketsa1_0_15.class, ServerboundPacketsc0_28.class, ServerboundPacketsa1_0_15.class);
@@ -68,13 +67,6 @@ public class Protocola1_0_15toc0_30 extends AbstractProtocol<ClientboundPacketsc
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(State.LOGIN, ClientboundPacketsc0_28.DISCONNECT.getId(), ClientboundPacketsa1_0_15.DISCONNECT.getId(), new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Typesc0_30.STRING, Typesb1_7_0_3.STRING, s -> s.replace("&", "§")); // reason
-            }
-        });
-
         this.registerClientbound(ClientboundPacketsc0_28.JOIN_GAME, new PacketHandlers() {
             @Override
             public void register() {
@@ -365,7 +357,7 @@ public class Protocola1_0_15toc0_30 extends AbstractProtocol<ClientboundPacketsc
             }
         });
 
-        this.registerServerbound(State.LOGIN, ServerboundPacketsa1_0_15.LOGIN.getId(), ServerboundPacketsc0_28.LOGIN.getId(), new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsa1_0_15.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT, Type.BYTE); // protocol id

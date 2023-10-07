@@ -25,13 +25,12 @@ import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.model.IdAndData;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_8_0_1tob1_7_0_3.Protocolb1_8_0_1tob1_7_0_3;
@@ -59,7 +58,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 
 import java.util.Arrays;
 
-public class Protocol1_2_1_3to1_1 extends AbstractProtocol<ClientboundPackets1_1, ClientboundPackets1_2_1, ServerboundPackets1_1, ServerboundPackets1_2_1> {
+public class Protocol1_2_1_3to1_1 extends StatelessProtocol<ClientboundPackets1_1, ClientboundPackets1_2_1, ServerboundPackets1_1, ServerboundPackets1_2_1> {
 
     private final LegacyItemRewriter<Protocol1_2_1_3to1_1> itemRewriter = new ItemRewriter(this);
 
@@ -287,13 +286,13 @@ public class Protocol1_2_1_3to1_1 extends AbstractProtocol<ClientboundPackets1_1
             }
         });
 
-        this.registerServerbound(State.LOGIN, ServerboundPackets1_2_1.HANDSHAKE.getId(), ServerboundPackets1_1.HANDSHAKE.getId(), new PacketHandlers() {
+        this.registerServerbound(ServerboundPackets1_2_1.HANDSHAKE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types1_6_4.STRING, Types1_6_4.STRING, s -> s.split(";")[0]); // info
             }
         });
-        this.registerServerbound(State.LOGIN, ServerboundPackets1_2_1.LOGIN.getId(), ServerboundPackets1_1.LOGIN.getId(), new PacketHandlers() {
+        this.registerServerbound(ServerboundPackets1_2_1.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT); // protocol id

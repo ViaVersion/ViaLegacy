@@ -28,7 +28,6 @@ import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
-import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -43,6 +42,7 @@ import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.model.Location;
+import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.data.EntityList;
@@ -76,7 +76,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
 
-public class Protocol1_3_1_2to1_2_4_5 extends AbstractProtocol<ClientboundPackets1_2_4, ClientboundPackets1_3_1, ServerboundPackets1_2_4, ServerboundPackets1_3_1> {
+public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPackets1_2_4, ClientboundPackets1_3_1, ServerboundPackets1_2_4, ServerboundPackets1_3_1> {
 
     private final LegacyItemRewriter<Protocol1_3_1_2to1_2_4_5> itemRewriter = new ItemRewriter(this);
 
@@ -88,23 +88,44 @@ public class Protocol1_3_1_2to1_2_4_5 extends AbstractProtocol<ClientboundPacket
     protected void registerPackets() {
         this.itemRewriter.register();
 
-        this.registerClientbound(State.LOGIN, ClientboundPackets1_2_4.HANDSHAKE.getId(), ClientboundPackets1_3_1.SHARED_KEY.getId(), new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_2_4.HANDSHAKE, ClientboundPackets1_3_1.SHARED_KEY, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
-                    handleHandshake(wrapper);
-                    wrapper.write(Type.SHORT_BYTE_ARRAY, new byte[0]);
-                    wrapper.write(Type.SHORT_BYTE_ARRAY, new byte[0]);
-                    wrapper.user().get(ProtocolMetadataStorage.class).skipEncryption = true;
-                });
-            }
-        });
-        this.registerClientbound(ClientboundPackets1_2_4.HANDSHAKE, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    handleHandshake(wrapper); // Very hacky but some servers expect the client to send back a Packet1Login
-                    wrapper.cancel();
+                    final String serverHash = wrapper.read(Types1_6_4.STRING); // server hash
+                    if (!serverHash.trim().isEmpty() && !serverHash.equalsIgnoreCase("-")) {
+                        try {
+                            Via.getManager().getProviders().get(OldAuthProvider.class).sendAuthRequest(wrapper.user(), serverHash);
+                        } catch (Throwable e) {
+                            ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Could not authenticate with mojang for joinserver request!", e);
+                            wrapper.cancel();
+                            final PacketWrapper kick = PacketWrapper.create(ClientboundPackets1_3_1.DISCONNECT, wrapper.user());
+                            kick.write(Types1_6_4.STRING, "Failed to log in: Invalid session (Try restarting your game and the launcher)"); // reason
+                            kick.send(Protocol1_3_1_2to1_2_4_5.class);
+                            return;
+                        }
+                    }
+
+                    final ProtocolInfo info = wrapper.user().getProtocolInfo();
+                    final PacketWrapper login = PacketWrapper.create(ServerboundPackets1_2_4.LOGIN, wrapper.user());
+                    login.write(Type.INT, LegacyProtocolVersion.getRealProtocolVersion(info.getServerProtocolVersion())); // protocol id
+                    login.write(Types1_6_4.STRING, info.getUsername()); // username
+                    login.write(Types1_6_4.STRING, ""); // level type
+                    login.write(Type.INT, 0); // game mode
+                    login.write(Type.INT, 0); // dimension id
+                    login.write(Type.BYTE, (byte) 0); // difficulty
+                    login.write(Type.BYTE, (byte) 0); // world height
+                    login.write(Type.BYTE, (byte) 0); // max players
+                    login.sendToServer(Protocol1_3_1_2to1_2_4_5.class);
+
+                    final State currentState = wrapper.user().getProtocolInfo().getServerState();
+                    if (currentState != State.LOGIN) { // Very hacky but some servers expect the client to send back a Packet1Login
+                        wrapper.cancel();
+                    } else {
+                        wrapper.write(Type.SHORT_BYTE_ARRAY, new byte[0]);
+                        wrapper.write(Type.SHORT_BYTE_ARRAY, new byte[0]);
+                        wrapper.user().get(ProtocolMetadataStorage.class).skipEncryption = true;
+                    }
                 });
             }
         });
@@ -645,7 +666,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends AbstractProtocol<ClientboundPacket
             }
         });
 
-        this.registerServerbound(State.LOGIN, ServerboundPackets1_3_1.CLIENT_PROTOCOL.getId(), ServerboundPackets1_2_4.HANDSHAKE.getId(), new PacketHandlers() {
+        this.registerServerbound(ServerboundPackets1_3_1.CLIENT_PROTOCOL, ServerboundPackets1_2_4.HANDSHAKE, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
@@ -657,7 +678,6 @@ public class Protocol1_3_1_2to1_2_4_5 extends AbstractProtocol<ClientboundPacket
                 });
             }
         });
-        this.cancelServerbound(ServerboundPackets1_3_1.CLIENT_PROTOCOL);
         this.cancelServerbound(ServerboundPackets1_3_1.SHARED_KEY);
         this.registerServerbound(ServerboundPackets1_3_1.PLAYER_POSITION, new PacketHandlers() {
             @Override
@@ -820,38 +840,6 @@ public class Protocol1_3_1_2to1_2_4_5 extends AbstractProtocol<ClientboundPacket
                 }
             }
         }
-    }
-
-    private void handleHandshake(final PacketWrapper wrapper) throws Exception {
-        final ProtocolInfo info = wrapper.user().getProtocolInfo();
-        final String serverHash = wrapper.read(Types1_6_4.STRING); // server hash
-        if (!serverHash.trim().isEmpty() && !serverHash.equalsIgnoreCase("-")) {
-            try {
-                Via.getManager().getProviders().get(OldAuthProvider.class).sendAuthRequest(wrapper.user(), serverHash);
-            } catch (Throwable e) {
-                ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Could not authenticate with mojang for joinserver request!", e);
-                wrapper.cancel();
-                final PacketWrapper kick = PacketWrapper.create(ClientboundPackets1_3_1.DISCONNECT, wrapper.user());
-                kick.write(Types1_6_4.STRING, "Failed to log in: Invalid session (Try restarting your game and the launcher)"); // reason
-                kick.send(Protocol1_3_1_2to1_2_4_5.class);
-                return;
-            }
-        }
-
-        final PacketWrapper login = PacketWrapper.create(ServerboundPackets1_2_4.LOGIN, wrapper.user());
-        login.write(Type.INT, LegacyProtocolVersion.getRealProtocolVersion(info.getServerProtocolVersion())); // protocol id
-        login.write(Types1_6_4.STRING, info.getUsername()); // username
-        login.write(Types1_6_4.STRING, ""); // level type
-        login.write(Type.INT, 0); // game mode
-        login.write(Type.INT, 0); // dimension id
-        login.write(Type.BYTE, (byte) 0); // difficulty
-        login.write(Type.BYTE, (byte) 0); // world height
-        login.write(Type.BYTE, (byte) 0); // max players
-
-        final State oldState = info.getClientState();
-        info.setState(State.LOGIN);
-        login.sendToServer(Protocol1_3_1_2to1_2_4_5.class);
-        info.setClientState(oldState);
     }
 
     @Override

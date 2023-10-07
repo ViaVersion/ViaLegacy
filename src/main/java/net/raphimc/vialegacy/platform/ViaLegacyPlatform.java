@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.ViaLegacyConfig;
 import net.raphimc.vialegacy.api.LegacyProtocolVersion;
+import net.raphimc.vialegacy.api.protocol.EmptyBaseProtocol;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_16_2toa1_0_15.Protocola1_0_16_2toa1_0_15;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_17_1_0_17_4toa1_0_16_2.Protocola1_0_17_1_0_17_4toa1_0_16_2;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_1_0_1_1_2_1toa1_0_17_1_0_17_4.Protocola1_1_0_1_1_2_1toa1_0_17_1_0_17_4;
@@ -61,7 +62,6 @@ import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.Protocol1_6_
 import net.raphimc.vialegacy.protocols.release.protocol1_6_2to1_6_1.Protocol1_6_2to1_6_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_4to1_6_2.Protocol1_6_4to1_6_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.Protocol1_7_2_5to1_6_4;
-import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.baseprotocols.EmptyBaseProtocol;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.Protocol1_7_6_10to1_7_2_5;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 
