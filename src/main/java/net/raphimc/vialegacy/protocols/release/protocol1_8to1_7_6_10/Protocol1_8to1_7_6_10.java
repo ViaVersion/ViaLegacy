@@ -1054,7 +1054,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             public void register() {
                 map(Types1_7_6.POSITION_SHORT, Type.POSITION); // position
                 map(Type.UNSIGNED_BYTE); // type
-                map(Types1_7_6.COMPRESSED_NBT, Type.NBT); // data
+                map(Types1_7_6.COMPRESSED_NBT, Type.NAMED_COMPOUND_TAG); // data
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.OPEN_SIGN_EDITOR, new PacketHandlers() {

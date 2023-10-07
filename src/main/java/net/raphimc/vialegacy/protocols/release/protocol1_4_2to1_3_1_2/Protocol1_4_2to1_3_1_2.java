@@ -25,6 +25,7 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.type.Type;
@@ -61,19 +62,22 @@ public class Protocol1_4_2to1_3_1_2 extends StatelessProtocol<ClientboundPackets
     protected void registerPackets() {
         this.itemRewriter.register();
 
-        this.registerClientbound(ClientboundPackets1_3_1.DISCONNECT, ClientboundPackets1_4_2.DISCONNECT, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_3_1.DISCONNECT, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final String reason = wrapper.read(Types1_6_4.STRING); // reason
-                    try {
-                        final ProtocolInfo info = wrapper.user().getProtocolInfo();
-                        final String[] pingParts = reason.split("§");
-                        final String out = "§1\0" + LegacyProtocolVersion.getRealProtocolVersion(info.getServerProtocolVersion()) + "\0" + ProtocolVersion.getProtocol(info.getServerProtocolVersion()).getName() + "\0" + pingParts[0] + "\0" + pingParts[1] + "\0" + pingParts[2];
-                        wrapper.write(Types1_6_4.STRING, out);
-                    } catch (Throwable e) {
-                        ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Could not parse 1.3.1 ping: " + reason, e);
-                        wrapper.cancel();
+                    final State currentState = wrapper.user().getProtocolInfo().getServerState();
+                    if (currentState == State.STATUS) {
+                        final String reason = wrapper.read(Types1_6_4.STRING); // reason
+                        try {
+                            final ProtocolInfo info = wrapper.user().getProtocolInfo();
+                            final String[] pingParts = reason.split("§");
+                            final String out = "§1\0" + LegacyProtocolVersion.getRealProtocolVersion(info.getServerProtocolVersion()) + "\0" + ProtocolVersion.getProtocol(info.getServerProtocolVersion()).getName() + "\0" + pingParts[0] + "\0" + pingParts[1] + "\0" + pingParts[2];
+                            wrapper.write(Types1_6_4.STRING, out);
+                        } catch (Throwable e) {
+                            ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Could not parse 1.3.1 ping: " + reason, e);
+                            wrapper.cancel();
+                        }
                     }
                 });
             }
