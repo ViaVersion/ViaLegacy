@@ -45,6 +45,8 @@ public class AlphaInventoryUpdateTask implements Runnable {
             if (inventoryStorage == null) continue;
 
             info.getChannel().eventLoop().submit(() -> {
+                if (!info.getChannel().isActive()) return;
+
                 try {
                     final Item[] mainInventory = fixItems(Via.getManager().getProviders().get(AlphaInventoryProvider.class).getMainInventoryItems(info));
                     final Item[] craftingInventory = fixItems(Via.getManager().getProviders().get(AlphaInventoryProvider.class).getCraftingInventoryItems(info));

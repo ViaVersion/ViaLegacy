@@ -46,6 +46,8 @@ public class PlayerAirTimeUpdateTask implements Runnable {
                 final PlayerInfoStorage playerInfoStorage = info.get(PlayerInfoStorage.class);
                 if (playerInfoStorage == null) continue;
                 info.getChannel().eventLoop().submit(() -> {
+                    if (!info.getChannel().isActive()) return;
+
                     try {
                         final IdAndData headBlock = info.get(ChunkTracker.class).getBlockNotNull(floor(playerInfoStorage.posX), floor(playerInfoStorage.posY + 1.62F), floor(playerInfoStorage.posZ));
                         if (headBlock.id == BlockList1_6.waterMoving.blockID || headBlock.id == BlockList1_6.waterStill.blockID) {

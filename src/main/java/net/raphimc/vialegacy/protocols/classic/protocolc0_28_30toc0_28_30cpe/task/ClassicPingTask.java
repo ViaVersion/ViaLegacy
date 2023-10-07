@@ -39,6 +39,8 @@ public class ClassicPingTask implements Runnable {
             if (protocolMetadata == null) continue;
             if (!protocolMetadata.hasServerExtension(ClassicProtocolExtension.TWO_WAY_PING, 1)) continue;
             info.getChannel().eventLoop().submit(() -> {
+                if (!info.getChannel().isActive()) return;
+
                 try {
                     final PacketWrapper pingRequest = PacketWrapper.create(ServerboundPacketsc0_30cpe.EXT_TWO_WAY_PING, info);
                     pingRequest.write(Type.BYTE, (byte) 0); // direction

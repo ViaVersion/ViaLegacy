@@ -40,6 +40,8 @@ public class TimeLockTask implements Runnable {
             final PlayerInfoStorage playerInfoStorage = info.get(PlayerInfoStorage.class);
             if (timeLockStorage != null && playerInfoStorage != null && playerInfoStorage.entityId != -1) {
                 info.getChannel().eventLoop().submit(() -> {
+                    if (!info.getChannel().isActive()) return;
+
                     try {
                         if (info.getProtocolInfo().getPipeline().contains(Protocol1_6_1to1_5_2.class)) {
                             if (timeLockStorage.getTime() == 0) { // 0 always does the daylight cycle

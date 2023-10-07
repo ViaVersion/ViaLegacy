@@ -32,6 +32,8 @@ public class ClassicLevelStorageTickTask implements Runnable {
             final ClassicLevelStorage classicLevelStorage = info.get(ClassicLevelStorage.class);
             if (classicLevelStorage != null) {
                 info.getChannel().eventLoop().submit(() -> {
+                    if (!info.getChannel().isActive()) return;
+
                     try {
                         classicLevelStorage.tick();
                     } catch (Throwable e) {
