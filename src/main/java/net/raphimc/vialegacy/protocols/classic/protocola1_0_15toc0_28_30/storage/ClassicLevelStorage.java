@@ -99,7 +99,7 @@ public class ClassicLevelStorage extends StoredObject {
 
     public void tick() throws Exception {
         final ClassicPositionTracker positionTracker = this.getUser().get(ClassicPositionTracker.class);
-        if (!positionTracker.spawned) return;
+        if (positionTracker == null || !positionTracker.spawned) return;
 
         final long start = System.currentTimeMillis();
         this.getUser().getChannel().eventLoop().submit(() -> {
