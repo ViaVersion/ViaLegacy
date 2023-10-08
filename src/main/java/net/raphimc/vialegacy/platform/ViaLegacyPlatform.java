@@ -74,8 +74,8 @@ public interface ViaLegacyPlatform {
         final ViaLegacyConfig config = new ViaLegacyConfig(new File(dataFolder, "vialegacy.yml"));
         config.reload();
         ViaLegacy.init(this, config);
-        Via.getManager().getSubPlatforms().add(ViaLegacy.IMPL_VERSION);
         Via.getManager().getConfigurationProvider().register(config);
+        Via.getManager().getSubPlatforms().add(ViaLegacy.IMPL_VERSION);
 
         final ProtocolManager protocolManager = Via.getManager().getProtocolManager();
         protocolManager.registerProtocol(new Protocol1_8to1_7_6_10(), ProtocolVersion.v1_8, ProtocolVersion.v1_7_6);
