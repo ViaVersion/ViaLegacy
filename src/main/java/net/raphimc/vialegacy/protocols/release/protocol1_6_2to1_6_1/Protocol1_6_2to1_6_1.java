@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import io.netty.buffer.Unpooled;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
@@ -47,7 +46,7 @@ public class Protocol1_6_2to1_6_1 extends StatelessProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final PacketWrapper brand = PacketWrapper.create(ClientboundPackets1_6_4.PLUGIN_MESSAGE, Unpooled.buffer(), wrapper.user());
+                    final PacketWrapper brand = PacketWrapper.create(ClientboundPackets1_6_4.PLUGIN_MESSAGE, wrapper.user());
                     brand.write(Types1_6_4.STRING, "MC|Brand");
                     final byte[] brandBytes = "legacy".getBytes(StandardCharsets.UTF_8);
                     brand.write(Type.SHORT, (short) brandBytes.length); // data length
