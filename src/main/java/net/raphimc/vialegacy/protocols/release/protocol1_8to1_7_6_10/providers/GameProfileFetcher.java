@@ -36,7 +36,7 @@ public abstract class GameProfileFetcher implements Provider {
 
     protected static final Pattern PATTERN_CONTROL_CODE = Pattern.compile("(?i)\\u00A7[0-9A-FK-OR]");
 
-    private static final ThreadPoolExecutor LOADING_POOL = (ThreadPoolExecutor) Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setNameFormat("ProtocolHack GameProfile Loader #%d").setDaemon(true).build());
+    private static final ThreadPoolExecutor LOADING_POOL = (ThreadPoolExecutor) Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setNameFormat("ViaLegacy GameProfile Loader #%d").setDaemon(true).build());
 
     private final LoadingCache<String, UUID> UUID_CACHE = CacheBuilder.newBuilder().expireAfterWrite(6, TimeUnit.HOURS).build(new CacheLoader<String, UUID>() {
         @Override
