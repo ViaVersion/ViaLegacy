@@ -19,7 +19,6 @@ package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter;
 
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.nbt.BinaryTagIO;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
 import com.viaversion.viaversion.libs.gson.JsonArray;
 import com.viaversion.viaversion.libs.gson.JsonElement;
@@ -30,11 +29,12 @@ import com.viaversion.viaversion.libs.opennbt.tag.builtin.ShortTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import net.lenni0451.mcstructs.snbt.SNbtSerializer;
+import net.lenni0451.mcstructs.snbt.exceptions.SNbtSerializeException;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 import net.raphimc.vialegacy.util.NbtConverter;
 
-import java.io.IOException;
+import java.util.logging.Level;
 
 public class ChatItemRewriter {
 
@@ -376,7 +376,7 @@ public class ChatItemRewriter {
 
                 final CompoundTag tag;
                 try {
-                    tag = (CompoundTag) NbtConverter.mcStructToVia(SNbtSerializer.V1_7.deserialize(text));
+                    tag = (CompoundTag) NbtConverter.mcStructsToVia(SNbtSerializer.V1_7.deserialize(text));
                 } catch (Throwable e) {
                     ViaLegacy.getPlatform().getLogger().warning("Error reading NBT in show_item:" + text);
                     throw new RuntimeException(e);
@@ -409,12 +409,11 @@ public class ChatItemRewriter {
                 array.add(object);
                 final String serializedNBT;
                 try {
-                    serializedNBT = BinaryTagIO.writeString(tag);
+                    serializedNBT = SNbtSerializer.V1_8.serialize(NbtConverter.viaToMcStructs(tag));
                     object.addProperty("text", serializedNBT);
                     hoverEvent.add("value", array);
-                } catch (IOException e) {
-                    ViaLegacy.getPlatform().getLogger().warning("Error writing NBT in show_item:" + text);
-                    e.printStackTrace();
+                } catch (SNbtSerializeException e) {
+                    ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error writing NBT in show_item:" + text, e);
                 }
             }
 
