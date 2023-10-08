@@ -17,7 +17,9 @@
  */
 package net.raphimc.vialegacy.platform;
 
-public interface ViaLegacyConfig {
+import com.viaversion.viaversion.api.configuration.Config;
+
+public interface ViaLegacyConfig extends Config {
 
     boolean isDynamicOnground();
 
