@@ -40,7 +40,7 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
 
     public LegacyItemRewriter(final P protocol, final String protocolName) {
         super(protocol);
-        this.tagName = protocolName.replace(".", "_") + "_ProtocolHack_" + System.currentTimeMillis();
+        this.tagName = protocolName.replace(".", "_") + "_ViaLegacy_" + System.currentTimeMillis();
         this.protocolName = protocolName;
     }
 
@@ -134,11 +134,11 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
     }
 
     private void setRemappedNameRead(final Item item, final String name) {
-        //Set protocol hack tag for later remapping
-        final CompoundTag protocolHackTag = (item.tag() != null && item.tag().contains(tagName) ? item.tag().get(tagName) : new CompoundTag());
+        //Set ViaLegacy tag for later remapping
+        final CompoundTag viaLegacyTag = (item.tag() != null && item.tag().contains(tagName) ? item.tag().get(tagName) : new CompoundTag());
         if (item.tag() == null || !item.tag().contains(tagName)) {
-            protocolHackTag.put("Id", new IntTag(item.identifier()));
-            protocolHackTag.put("Meta", new ShortTag(item.data()));
+            viaLegacyTag.put("Id", new IntTag(item.identifier()));
+            viaLegacyTag.put("Meta", new ShortTag(item.data()));
         }
 
         //Get Item tag
@@ -146,29 +146,29 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
         if (tag == null) {
             tag = new CompoundTag();
             item.setTag(tag);
-            protocolHackTag.put("RemoveTag", new IntTag(0));
+            viaLegacyTag.put("RemoveTag", new IntTag(0));
         }
-        tag.put(tagName, protocolHackTag);
+        tag.put(tagName, viaLegacyTag);
 
         //Set name/lore of item
         CompoundTag display = tag.get("display");
         if (display == null) {
             display = new CompoundTag();
             tag.put("display", display);
-            protocolHackTag.put("RemoveDisplayTag", new IntTag(0));
+            viaLegacyTag.put("RemoveDisplayTag", new IntTag(0));
         }
         if (display.contains("Name")) {
             ListTag lore = display.get("Lore");
             if (lore == null) {
                 lore = new ListTag();
                 display.put("Lore", lore);
-                protocolHackTag.put("RemoveLore", new IntTag(0));
+                viaLegacyTag.put("RemoveLore", new IntTag(0));
             }
             lore.add(new StringTag("§r " + this.protocolName + " Item ID: " + item.identifier() + " (" + name + ")"));
-            protocolHackTag.put("RemoveLastLore", new IntTag(0));
+            viaLegacyTag.put("RemoveLastLore", new IntTag(0));
         } else {
             display.put("Name", new StringTag("§r" + this.protocolName + " " + name));
-            protocolHackTag.put("RemoveDisplayName", new IntTag(0));
+            viaLegacyTag.put("RemoveDisplayName", new IntTag(0));
         }
     }
 
@@ -177,27 +177,27 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
         if (!item.tag().contains(tagName)) return;
 
         final CompoundTag tag = item.tag();
-        final CompoundTag protocolHackTag = tag.get(tagName);
+        final CompoundTag viaLegacyTag = tag.get(tagName);
         tag.remove(tagName);
 
-        item.setIdentifier(((IntTag) protocolHackTag.get("Id")).asInt());
-        item.setData(((ShortTag) protocolHackTag.get("Meta")).asShort());
-        if (protocolHackTag.contains("RemoveLastLore")) {
+        item.setIdentifier(((IntTag) viaLegacyTag.get("Id")).asInt());
+        item.setData(((ShortTag) viaLegacyTag.get("Meta")).asShort());
+        if (viaLegacyTag.contains("RemoveLastLore")) {
             ListTag lore = ((CompoundTag) tag.get("display")).get("Lore");
             List<Tag> tags = lore.getValue();
             tags.remove(lore.size() - 1);
             lore.setValue(tags);
         }
-        if (protocolHackTag.contains("RemoveLore")) {
+        if (viaLegacyTag.contains("RemoveLore")) {
             ((CompoundTag) tag.get("display")).remove("Lore");
         }
-        if (protocolHackTag.contains("RemoveDisplayName")) {
+        if (viaLegacyTag.contains("RemoveDisplayName")) {
             ((CompoundTag) tag.get("display")).remove("Name");
         }
-        if (protocolHackTag.contains("RemoveDisplayTag")) {
+        if (viaLegacyTag.contains("RemoveDisplayTag")) {
             tag.remove("display");
         }
-        if (protocolHackTag.contains("RemoveTag")) {
+        if (viaLegacyTag.contains("RemoveTag")) {
             item.setTag(null);
         }
     }
