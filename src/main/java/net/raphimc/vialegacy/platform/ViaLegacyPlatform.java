@@ -72,7 +72,7 @@ public interface ViaLegacyPlatform {
 
     default void init(final File dataFolder) {
         final ViaLegacyConfig config = new ViaLegacyConfig(new File(dataFolder, "vialegacy.yml"));
-        config.reloadConfig();
+        config.reload();
         ViaLegacy.init(this, config);
         Via.getManager().getSubPlatforms().add(ViaLegacy.IMPL_VERSION);
 

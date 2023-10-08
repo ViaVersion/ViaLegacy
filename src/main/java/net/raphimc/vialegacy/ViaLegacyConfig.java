@@ -17,6 +17,7 @@
  */
 package net.raphimc.vialegacy;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.util.Config;
 
 import java.io.File;
@@ -39,11 +40,12 @@ public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.pla
 
     public ViaLegacyConfig(final File configFile) {
         super(configFile);
+        Via.getManager().getConfigurationProvider().register(this);
     }
 
     @Override
-    public void reloadConfig() {
-        super.reloadConfig();
+    public void reload() {
+        super.reload();
         this.loadFields();
     }
 
