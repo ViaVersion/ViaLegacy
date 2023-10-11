@@ -70,8 +70,8 @@ import java.util.logging.Logger;
 
 public interface ViaLegacyPlatform {
 
-    default void init(final File dataFolder) {
-        final ViaLegacyConfig config = new ViaLegacyConfig(new File(dataFolder, "vialegacy.yml"));
+    default void init(final File configFile) {
+        final ViaLegacyConfig config = new ViaLegacyConfig(configFile);
         config.reload();
         ViaLegacy.init(this, config);
         Via.getManager().getConfigurationProvider().register(config);
