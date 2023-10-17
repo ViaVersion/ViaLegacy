@@ -28,7 +28,7 @@ repositories {
 }
 
 dependencies {
-    implementation("net.raphimc:ViaLegacy:2.2.20") // Get latest version from releases
+    implementation("net.raphimc:ViaLegacy:x.x.x") // Get latest version from releases
 }
 ```
 
@@ -44,13 +44,13 @@ dependencies {
     <dependency>
         <groupId>net.raphimc</groupId>
         <artifactId>ViaLegacy</artifactId>
-        <version>2.2.20</version> <!-- Get latest version from releases -->
+        <version>x.x.x</version> <!-- Get latest version from releases -->
     </dependency>
 </dependencies>
 ```
 
 ### Jar File
-If you just want the latest jar file you can download it from this [Jenkins](https://ci.viaversion.com/view/All/job/ViaLegacy/).
+If you just want the latest jar file you can download it from [GitHub Actions](https://github.com/RaphiMC/ViaLegacy/actions/workflows/build.yml) or [Lenni0451's Jenkins](https://build.lenni0451.net/job/ViaLegacy/).
 
 ## Usage
 ViaLegacy requires you to have an already functional ViaVersion implementation for your platform.
