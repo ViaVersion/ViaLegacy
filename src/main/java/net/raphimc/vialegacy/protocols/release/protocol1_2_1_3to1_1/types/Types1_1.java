@@ -24,6 +24,6 @@ import com.viaversion.viaversion.api.type.Type;
 public class Types1_1 {
 
     public static Type<BlockChangeRecord[]> BLOCK_CHANGE_RECORD_ARRAY = new BlockChangeRecordArrayType();
-    public static Type<Chunk> CHUNK = new Chunk1_1Type();
+    public static Type<Chunk> CHUNK = new ChunkType1_1();
 
 }

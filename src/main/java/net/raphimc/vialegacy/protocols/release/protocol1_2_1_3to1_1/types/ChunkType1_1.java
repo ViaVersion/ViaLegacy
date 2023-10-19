@@ -32,9 +32,9 @@ import java.util.ArrayList;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
-public class Chunk1_1Type extends Type<Chunk> {
+public class ChunkType1_1 extends Type<Chunk> {
 
-    public Chunk1_1Type() {
+    public ChunkType1_1() {
         super(Chunk.class);
     }
 

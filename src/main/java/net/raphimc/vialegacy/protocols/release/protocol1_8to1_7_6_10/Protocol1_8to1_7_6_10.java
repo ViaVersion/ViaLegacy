@@ -63,8 +63,8 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.Ch
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.TranslationRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage.*;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Chunk1_7_6Type;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkBulk1_7_6Type;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkType1_7_6;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkBulkType1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
 import java.nio.charset.StandardCharsets;
@@ -633,7 +633,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final Chunk chunk = wrapper.read(new Chunk1_7_6Type(wrapper.user().get(ClientWorld.class)));
+                    final Chunk chunk = wrapper.read(new ChunkType1_7_6(wrapper.user().get(ClientWorld.class)));
                     wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
                     wrapper.write(new Chunk1_8Type(wrapper.user().get(ClientWorld.class)), chunk);
                 });
@@ -696,7 +696,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final Chunk[] chunks = wrapper.read(new ChunkBulk1_7_6Type(wrapper.user().get(ClientWorld.class)));
+                    final Chunk[] chunks = wrapper.read(new ChunkBulkType1_7_6(wrapper.user().get(ClientWorld.class)));
                     for (Chunk chunk : chunks) {
                         wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
                     }

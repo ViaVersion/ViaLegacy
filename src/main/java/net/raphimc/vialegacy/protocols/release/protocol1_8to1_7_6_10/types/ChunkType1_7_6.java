@@ -36,9 +36,9 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-public class Chunk1_7_6Type extends PartialType<Chunk, ClientWorld> {
+public class ChunkType1_7_6 extends PartialType<Chunk, ClientWorld> {
 
-    public Chunk1_7_6Type(final ClientWorld clientWorld) {
+    public ChunkType1_7_6(final ClientWorld clientWorld) {
         super(clientWorld, Chunk.class);
     }
 

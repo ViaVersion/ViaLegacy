@@ -67,7 +67,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.Ch
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.ProtocolMetadataStorage;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Types1_6_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata.MetaIndex1_8to1_7_6;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Chunk1_7_6Type;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkType1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
 import java.util.ArrayList;
@@ -459,7 +459,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
 
                     if (!load) {
                         final Chunk chunk = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>());
-                        wrapper.write(new Chunk1_7_6Type(wrapper.user().get(ClientWorld.class)), chunk);
+                        wrapper.write(new ChunkType1_7_6(wrapper.user().get(ClientWorld.class)), chunk);
                     } else {
                         wrapper.cancel();
                     }
@@ -496,7 +496,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                             }
                         }
                     }
-                    wrapper.write(new Chunk1_7_6Type(clientWorld), chunk);
+                    wrapper.write(new ChunkType1_7_6(clientWorld), chunk);
                 });
             }
         });
