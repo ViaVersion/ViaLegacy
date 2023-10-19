@@ -30,6 +30,6 @@ public class Types1_2_4 {
     public static final Type<Item[]> ITEM_ARRAY = new ItemArrayType<>(ITEM);
     public static final Type<Item[]> COMPRESSED_NBT_ITEM_ARRAY = new ItemArrayType<>(COMPRESSED_NBT_ITEM);
 
-    public static final Type<Chunk> CHUNK = new Chunk1_2_4Type();
+    public static final Type<Chunk> CHUNK = new ChunkType1_2_4();
 
 }

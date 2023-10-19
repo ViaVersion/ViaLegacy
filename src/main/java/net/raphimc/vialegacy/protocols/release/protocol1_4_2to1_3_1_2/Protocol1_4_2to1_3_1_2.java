@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2;
 import com.google.common.collect.Lists;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -184,9 +184,9 @@ public class Protocol1_4_2to1_3_1_2 extends StatelessProtocol<ClientboundPackets
                 handler(wrapper -> {
                     final int entityId = wrapper.get(Type.INT, 0);
                     final short typeId = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                    if (typeId == Entity1_10Types.EntityType.SKELETON.getId()) {
+                    if (typeId == EntityTypes1_10.EntityType.SKELETON.getId()) {
                         setMobHandItem(entityId, new DataItem(ItemList1_6.bow.itemID, (byte) 1, (short) 0, null), wrapper);
-                    } else if (typeId == Entity1_10Types.EntityType.PIG_ZOMBIE.getId()) {
+                    } else if (typeId == EntityTypes1_10.EntityType.PIG_ZOMBIE.getId()) {
                         setMobHandItem(entityId, new DataItem(ItemList1_6.swordGold.itemID, (byte) 1, (short) 0, null), wrapper);
                     }
                 });

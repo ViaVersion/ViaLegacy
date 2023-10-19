@@ -22,9 +22,10 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -34,6 +35,9 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.chunk.BulkChunkType1_8;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkSectionType1_8;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.gson.JsonObject;
@@ -41,9 +45,6 @@ import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.Chunk1_8Type;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.ChunkBulk1_8Type;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
@@ -63,8 +64,8 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.Ch
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.TranslationRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage.*;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Chunk1_7_6Type;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkBulk1_7_6Type;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkType1_7_6;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkBulkType1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
 import java.nio.charset.StandardCharsets;
@@ -135,7 +136,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     final int entityId = wrapper.get(Type.INT, 0);
                     final byte dimensionId = wrapper.get(Type.BYTE, 0);
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                    tracker.trackEntity(entityId, Entity1_10Types.EntityType.PLAYER);
+                    tracker.trackEntity(entityId, EntityTypes1_10.EntityType.PLAYER);
                     tracker.setPlayerID(entityId);
                     wrapper.user().get(DimensionTracker.class).setDimension(dimensionId);
                     wrapper.user().get(ClientWorld.class).setEnvironment(dimensionId);
@@ -154,14 +155,14 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             public void register() {
                 map(Type.INT, Type.VAR_INT); // entity id
                 map(Type.SHORT); // slot
-                map(Types1_7_6.COMPRESSED_ITEM, Type.ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Type.ITEM, 0)));
+                map(Types1_7_6.COMPRESSED_ITEM, Type.ITEM1_8); // item
+                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Type.ITEM1_8, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.SPAWN_POSITION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_INT, Type.POSITION); // position
+                map(Types1_7_6.POSITION_INT, Type.POSITION1_8); // position
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.UPDATE_HEALTH, new PacketHandlers() {
@@ -212,7 +213,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 map(Type.INT, Type.VAR_INT); // entity id
-                map(Types1_7_6.POSITION_BYTE, Type.POSITION); // position
+                map(Types1_7_6.POSITION_BYTE, Type.POSITION1_8); // position
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.SPAWN_PLAYER, new PacketHandlers() {
@@ -247,14 +248,14 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     wrapper.write(Type.SHORT, (short) currentItem.identifier());
 
                     final List<Metadata> metadata = wrapper.read(Types1_7_6.METADATA_LIST); // metadata
-                    metadataRewriter.transform(Entity1_10Types.EntityType.PLAYER, metadata);
+                    metadataRewriter.transform(EntityTypes1_10.EntityType.PLAYER, metadata);
                     wrapper.write(Types1_8.METADATA_LIST, metadata);
 
                     tablistStorage.sendTempEntry(tempTabEntry);
                 });
                 handler(wrapper -> {
                     final int entityID = wrapper.get(Type.VAR_INT, 0);
-                    wrapper.user().get(EntityTracker.class).trackEntity(entityID, Entity1_10Types.EntityType.PLAYER);
+                    wrapper.user().get(EntityTracker.class).trackEntity(entityID, EntityTypes1_10.EntityType.PLAYER);
                 });
             }
         });
@@ -286,18 +287,18 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     final int x = wrapper.get(Type.INT, 0);
                     final int y = wrapper.get(Type.INT, 1);
                     final int z = wrapper.get(Type.INT, 2);
-                    tracker.trackEntity(entityID, Entity1_10Types.getTypeFromId(typeID, true));
+                    tracker.trackEntity(entityID, EntityTypes1_10.getTypeFromId(typeID, true));
                     tracker.updateEntityLocation(entityID, x, y, z, false);
                 });
                 handler(wrapper -> {
-                    final Entity1_10Types.EntityType type = Entity1_10Types.getTypeFromId(wrapper.get(Type.BYTE, 0), true);
+                    final EntityTypes1_10.EntityType type = EntityTypes1_10.getTypeFromId(wrapper.get(Type.BYTE, 0), true);
                     int x = wrapper.get(Type.INT, 0);
                     int y = wrapper.get(Type.INT, 1);
                     int z = wrapper.get(Type.INT, 2);
                     byte yaw = wrapper.get(Type.BYTE, 2);
                     int data = wrapper.get(Type.INT, 3);
 
-                    if (type == Entity1_10Types.ObjectType.ITEM_FRAME.getType()) {
+                    if (type == EntityTypes1_10.ObjectType.ITEM_FRAME.getType()) {
                         switch (data) {
                             case 0:
                                 z += 32;
@@ -316,7 +317,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                                 yaw = -64;
                                 break;
                         }
-                    } else if (type == Entity1_10Types.ObjectType.FALLING_BLOCK.getType()) {
+                    } else if (type == EntityTypes1_10.ObjectType.FALLING_BLOCK.getType()) {
                         final int id = data & 0xffff;
                         final int metadata = data >> 16;
                         final IdAndData block = new IdAndData(id, metadata);
@@ -357,7 +358,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     final int y = wrapper.get(Type.INT, 1);
                     final int z = wrapper.get(Type.INT, 2);
                     final List<Metadata> metadataList = wrapper.get(Types1_8.METADATA_LIST, 0);
-                    final Entity1_10Types.EntityType entityType = Entity1_10Types.getTypeFromId(typeID, false);
+                    final EntityTypes1_10.EntityType entityType = EntityTypes1_10.getTypeFromId(typeID, false);
                     tracker.trackEntity(entityID, entityType);
                     tracker.updateEntityLocation(entityID, x, y, z, false);
                     tracker.updateEntityMetadata(entityID, metadataList);
@@ -371,11 +372,11 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             public void register() {
                 map(Type.VAR_INT); // entity id
                 map(Type.STRING); // motive
-                map(Types1_7_6.POSITION_INT, Type.POSITION); // position
+                map(Types1_7_6.POSITION_INT, Type.POSITION1_8); // position
                 map(Type.INT, Type.BYTE); // rotation
                 handler(wrapper -> {
                     final short rotation = wrapper.get(Type.BYTE, 0);
-                    final Position pos = wrapper.get(Type.POSITION, 0);
+                    final Position pos = wrapper.get(Type.POSITION1_8, 0);
                     int modX = 0;
                     int modZ = 0;
                     switch (rotation) {
@@ -392,11 +393,11 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                             modX = 1;
                             break;
                     }
-                    wrapper.set(Type.POSITION, 0, new Position(pos.x() + modX, pos.y(), pos.z() + modZ));
+                    wrapper.set(Type.POSITION1_8, 0, new Position(pos.x() + modX, pos.y(), pos.z() + modZ));
                 });
                 handler(wrapper -> {
                     final int entityID = wrapper.get(Type.VAR_INT, 0);
-                    wrapper.user().get(EntityTracker.class).trackEntity(entityID, Entity1_10Types.EntityType.PAINTING);
+                    wrapper.user().get(EntityTracker.class).trackEntity(entityID, EntityTypes1_10.EntityType.PAINTING);
                 });
             }
         });
@@ -410,9 +411,9 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.SHORT); // count
                 handler(wrapper -> {
                     final int entityID = wrapper.get(Type.VAR_INT, 0);
-                    wrapper.user().get(EntityTracker.class).trackEntity(entityID, Entity1_10Types.EntityType.EXPERIENCE_ORB);
+                    wrapper.user().get(EntityTracker.class).trackEntity(entityID, EntityTypes1_10.EntityType.EXPERIENCE_ORB);
 
-                    wrapper.set(Type.INT, 1, realignEntityY(Entity1_10Types.EntityType.EXPERIENCE_ORB, wrapper.get(Type.INT, 1)));
+                    wrapper.set(Type.INT, 1, realignEntityY(EntityTypes1_10.EntityType.EXPERIENCE_ORB, wrapper.get(Type.INT, 1)));
                 });
             }
         });
@@ -535,7 +536,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 });
                 handler(wrapper -> {
                     final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
-                    final Entity1_10Types.EntityType type = entityTracker.getTrackedEntities().get(wrapper.get(Type.VAR_INT, 0));
+                    final EntityTypes1_10.EntityType type = entityTracker.getTrackedEntities().get(wrapper.get(Type.VAR_INT, 0));
 
                     wrapper.set(Type.INT, 1, realignEntityY(type, wrapper.get(Type.INT, 1)));
                 });
@@ -633,9 +634,9 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final Chunk chunk = wrapper.read(new Chunk1_7_6Type(wrapper.user().get(ClientWorld.class)));
+                    final Chunk chunk = wrapper.read(new ChunkType1_7_6(wrapper.user().get(ClientWorld.class)));
                     wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
-                    wrapper.write(new Chunk1_8Type(wrapper.user().get(ClientWorld.class)), chunk);
+                    wrapper.write(new ChunkType1_8(wrapper.user().get(ClientWorld.class)), chunk);
                 });
             }
         });
@@ -664,11 +665,11 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         this.registerClientbound(ClientboundPackets1_7_2.BLOCK_CHANGE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_UBYTE, Type.POSITION); // position
+                map(Types1_7_6.POSITION_UBYTE, Type.POSITION1_8); // position
                 handler(wrapper -> {
                     final int blockId = wrapper.read(Type.VAR_INT); // block id
                     final int data = wrapper.read(Type.UNSIGNED_BYTE); // block data
-                    final Position pos = wrapper.get(Type.POSITION, 0); // position
+                    final Position pos = wrapper.get(Type.POSITION1_8, 0); // position
                     final IdAndData block = new IdAndData(blockId, data);
                     wrapper.user().get(ChunkTracker.class).trackAndRemap(pos, block);
                     wrapper.write(Type.VAR_INT, block.toCompressedData());
@@ -678,7 +679,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         this.registerClientbound(ClientboundPackets1_7_2.BLOCK_ACTION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT, Type.POSITION); // position
+                map(Types1_7_6.POSITION_SHORT, Type.POSITION1_8); // position
                 map(Type.UNSIGNED_BYTE); // type
                 map(Type.UNSIGNED_BYTE); // data
                 map(Type.VAR_INT); // block id
@@ -688,7 +689,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 map(Type.VAR_INT); // entity id
-                map(Types1_7_6.POSITION_INT, Type.POSITION); // position
+                map(Types1_7_6.POSITION_INT, Type.POSITION1_8); // position
                 map(Type.BYTE); // progress
             }
         });
@@ -696,11 +697,11 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final Chunk[] chunks = wrapper.read(new ChunkBulk1_7_6Type(wrapper.user().get(ClientWorld.class)));
+                    final Chunk[] chunks = wrapper.read(new ChunkBulkType1_7_6(wrapper.user().get(ClientWorld.class)));
                     for (Chunk chunk : chunks) {
                         wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
                     }
-                    wrapper.write(new ChunkBulk1_8Type(wrapper.user().get(ClientWorld.class)), chunks);
+                    wrapper.write(new BulkChunkType1_8(wrapper.user().get(ClientWorld.class)), chunks);
                 });
             }
         });
@@ -782,7 +783,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                         }
 
                         wrapper.write(Type.INT, effectId);
-                        wrapper.write(Type.POSITION, pos);
+                        wrapper.write(Type.POSITION1_8, pos);
                         wrapper.write(Type.INT, data);
                         wrapper.write(Type.BOOLEAN, disableRelativeVolume);
                     }
@@ -931,8 +932,8 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     if (windowType == 4/*enchanting_table*/ && slot >= 1) slot += 1;
                     wrapper.write(Type.SHORT, slot);
                 });
-                map(Types1_7_6.COMPRESSED_ITEM, Type.ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Type.ITEM, 0)));
+                map(Types1_7_6.COMPRESSED_ITEM, Type.ITEM1_8); // item
+                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Type.ITEM1_8, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.WINDOW_ITEMS, new PacketHandlers() {
@@ -952,7 +953,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     for (Item item : items) {
                         itemRewriter.handleItemToClient(item);
                     }
-                    wrapper.write(Type.ITEM_ARRAY, items);
+                    wrapper.write(Type.ITEM1_8_ARRAY, items);
                 });
             }
         });
@@ -994,7 +995,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         this.registerClientbound(ClientboundPackets1_7_2.UPDATE_SIGN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT, Type.POSITION); // position
+                map(Types1_7_6.POSITION_SHORT, Type.POSITION1_8); // position
                 map(LEGACY_TO_JSON); // line 1
                 map(LEGACY_TO_JSON); // line 2
                 map(LEGACY_TO_JSON); // line 3
@@ -1052,7 +1053,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         this.registerClientbound(ClientboundPackets1_7_2.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT, Type.POSITION); // position
+                map(Types1_7_6.POSITION_SHORT, Type.POSITION1_8); // position
                 map(Type.UNSIGNED_BYTE); // type
                 map(Types1_7_6.COMPRESSED_NBT, Type.NAMED_COMPOUND_TAG); // data
             }
@@ -1060,7 +1061,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         this.registerClientbound(ClientboundPackets1_7_2.OPEN_SIGN_EDITOR, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_INT, Type.POSITION); // position
+                map(Types1_7_6.POSITION_INT, Type.POSITION1_8); // position
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.PLAYER_INFO, new PacketHandlers() {
@@ -1177,17 +1178,17 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                             for (int i = 0; i < count; i++) {
                                 Item item = wrapper.read(Types1_7_6.COMPRESSED_ITEM);
                                 itemRewriter.handleItemToClient(item);
-                                wrapper.write(Type.ITEM, item); // item 1
+                                wrapper.write(Type.ITEM1_8, item); // item 1
 
                                 item = wrapper.read(Types1_7_6.COMPRESSED_ITEM);
                                 itemRewriter.handleItemToClient(item);
-                                wrapper.write(Type.ITEM, item); // item 3
+                                wrapper.write(Type.ITEM1_8, item); // item 3
 
                                 final boolean has3Items = wrapper.passthrough(Type.BOOLEAN); // has 3 items
                                 if (has3Items) {
                                     item = wrapper.read(Types1_7_6.COMPRESSED_ITEM);
                                     itemRewriter.handleItemToClient(item);
-                                    wrapper.write(Type.ITEM, item); // item 2
+                                    wrapper.write(Type.ITEM1_8, item); // item 2
                                 }
 
                                 wrapper.passthrough(Type.BOOLEAN); // unavailable
@@ -1234,8 +1235,8 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                         wrapper.read(Type.FLOAT); // offsetY
                         wrapper.read(Type.FLOAT); // offsetZ
                         final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
-                        final Entity1_10Types.EntityType entityType = entityTracker.getTrackedEntities().get(wrapper.get(Type.INT, 0));
-                        if (entityType == null || !entityType.isOrHasParent(Entity1_10Types.EntityType.ARMOR_STAND)) {
+                        final EntityTypes1_10.EntityType entityType = entityTracker.getTrackedEntities().get(wrapper.get(Type.INT, 0));
+                        if (entityType == null || !entityType.isOrHasParent(EntityTypes1_10.EntityType.ARMOR_STAND)) {
                             wrapper.cancel();
                         }
                     } else {
@@ -1270,16 +1271,16 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 map(Type.VAR_INT, Type.UNSIGNED_BYTE); // status
-                map(Type.POSITION, Types1_7_6.POSITION_UBYTE); // position
+                map(Type.POSITION1_8, Types1_7_6.POSITION_UBYTE); // position
                 map(Type.UNSIGNED_BYTE); // direction
             }
         });
         this.registerServerbound(ServerboundPackets1_8.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION, Types1_7_6.POSITION_UBYTE); // position
+                map(Type.POSITION1_8, Types1_7_6.POSITION_UBYTE); // position
                 map(Type.UNSIGNED_BYTE); // direction
-                map(Type.ITEM, Types1_7_6.COMPRESSED_ITEM); // item
+                map(Type.ITEM1_8, Types1_7_6.COMPRESSED_ITEM); // item
                 map(Type.UNSIGNED_BYTE); // offset x
                 map(Type.UNSIGNED_BYTE); // offset y
                 map(Type.UNSIGNED_BYTE); // offset z
@@ -1342,12 +1343,12 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                             final PacketWrapper resetHandItem = PacketWrapper.create(ClientboundPackets1_8.SET_SLOT, wrapper.user());
                             resetHandItem.write(Type.UNSIGNED_BYTE, (short) -1); // window id
                             resetHandItem.write(Type.SHORT, (short) 0); // slot
-                            resetHandItem.write(Type.ITEM, new DataItem(-1, (byte) 0, (short) 0, null));
+                            resetHandItem.write(Type.ITEM1_8, new DataItem(-1, (byte) 0, (short) 0, null));
                             resetHandItem.send(Protocol1_8to1_7_6_10.class);
                             final PacketWrapper setLapisSlot = PacketWrapper.create(ClientboundPackets1_8.SET_SLOT, wrapper.user());
                             setLapisSlot.write(Type.UNSIGNED_BYTE, windowId);
                             setLapisSlot.write(Type.SHORT, slot);
-                            setLapisSlot.write(Type.ITEM, new DataItem(351/*lapis_lazuli*/, (byte) 3, (short) 4, null));
+                            setLapisSlot.write(Type.ITEM1_8, new DataItem(351/*lapis_lazuli*/, (byte) 3, (short) 4, null));
                             setLapisSlot.send(Protocol1_8to1_7_6_10.class);
                             wrapper.cancel();
                         } else if (slot > 1) {
@@ -1358,7 +1359,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.BYTE); // button
                 map(Type.SHORT); // transaction id
                 map(Type.BYTE); // action
-                map(Type.ITEM, Types1_7_6.COMPRESSED_ITEM); // item
+                map(Type.ITEM1_8, Types1_7_6.COMPRESSED_ITEM); // item
                 handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
             }
         });
@@ -1366,14 +1367,14 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 map(Type.SHORT); // slot
-                map(Type.ITEM, Types1_7_6.COMPRESSED_ITEM); // item
+                map(Type.ITEM1_8, Types1_7_6.COMPRESSED_ITEM); // item
                 handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
             }
         });
         this.registerServerbound(ServerboundPackets1_8.UPDATE_SIGN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION, Types1_7_6.POSITION_SHORT); // position
+                map(Type.POSITION1_8, Types1_7_6.POSITION_SHORT); // position
                 handler(wrapper -> {
                     for (int i = 0; i < 4; i++) {
                         final JsonElement component = wrapper.read(Type.COMPONENT); // line
@@ -1426,7 +1427,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     switch (channel) {
                         case "MC|BEdit":
                         case "MC|BSign":
-                            final Item item = wrapper.read(Type.ITEM); // book
+                            final Item item = wrapper.read(Type.ITEM1_8); // book
                             itemRewriter.handleItemToServer(item);
 
                             lengthPacketWrapper.write(Types1_7_6.COMPRESSED_ITEM, item);
@@ -1555,24 +1556,24 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         return min >= max ? min : rnd.nextFloat() * (max - min) + min;
     }
 
-    private int realignEntityY(final Entity1_10Types.EntityType type, final int y) {
+    private int realignEntityY(final EntityTypes1_10.EntityType type, final int y) {
         float yPos = y / 32F;
         float yOffset = 0F;
-        if (type == Entity1_10Types.ObjectType.FALLING_BLOCK.getType())
+        if (type == EntityTypes1_10.ObjectType.FALLING_BLOCK.getType())
             yOffset = 0.98F / 2F;
-        if (type == Entity1_10Types.ObjectType.TNT_PRIMED.getType())
+        if (type == EntityTypes1_10.ObjectType.TNT_PRIMED.getType())
             yOffset = 0.98F / 2F;
-        if (type == Entity1_10Types.ObjectType.ENDER_CRYSTAL.getType())
+        if (type == EntityTypes1_10.ObjectType.ENDER_CRYSTAL.getType())
             yOffset = 1F;
-        else if (type == Entity1_10Types.ObjectType.MINECART.getType())
+        else if (type == EntityTypes1_10.ObjectType.MINECART.getType())
             yOffset = 0.7F / 2F;
-        else if (type == Entity1_10Types.ObjectType.BOAT.getType())
+        else if (type == EntityTypes1_10.ObjectType.BOAT.getType())
             yOffset = 0.6F / 2F;
-        else if (type == Entity1_10Types.ObjectType.ITEM.getType())
+        else if (type == EntityTypes1_10.ObjectType.ITEM.getType())
             yOffset = 0.25F / 2F;
-        else if (type == Entity1_10Types.ObjectType.LEASH.getType())
+        else if (type == EntityTypes1_10.ObjectType.LEASH.getType())
             yOffset = 0.5F;
-        else if (type == Entity1_10Types.EntityType.EXPERIENCE_ORB)
+        else if (type == EntityTypes1_10.EntityType.EXPERIENCE_ORB)
             yOffset = 0.5F / 2F;
         return (int) Math.floor((yPos - yOffset) * 32F);
     }

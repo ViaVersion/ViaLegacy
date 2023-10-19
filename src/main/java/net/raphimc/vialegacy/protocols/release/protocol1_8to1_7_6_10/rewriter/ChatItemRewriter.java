@@ -31,6 +31,7 @@ import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import net.lenni0451.mcstructs.snbt.SNbtSerializer;
 import net.lenni0451.mcstructs.snbt.exceptions.SNbtSerializeException;
 import net.raphimc.vialegacy.ViaLegacy;
+import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ClientboundPackets1_7_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 import net.raphimc.vialegacy.util.NbtConverter;
 
@@ -358,10 +359,10 @@ public class ChatItemRewriter {
         ID_TO_NAME.put(2267, "record_wait");
     }
 
-    private final ComponentRewriter SHOW_ITEM;
+    private final ComponentRewriter<ClientboundPackets1_7_2> SHOW_ITEM;
 
     public ChatItemRewriter(final Protocol1_8to1_7_6_10 protocol) {
-        this.SHOW_ITEM = new ComponentRewriter(protocol) {
+        this.SHOW_ITEM = new ComponentRewriter<ClientboundPackets1_7_2>(protocol) {
             @Override
             protected void handleHoverEvent(JsonObject hoverEvent) {
                 super.handleHoverEvent(hoverEvent);

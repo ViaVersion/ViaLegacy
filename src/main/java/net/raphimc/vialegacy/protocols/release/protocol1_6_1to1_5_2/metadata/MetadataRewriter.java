@@ -17,7 +17,7 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.metadata;
 
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import net.raphimc.vialegacy.ViaLegacy;
 
@@ -27,7 +27,7 @@ import java.util.logging.Level;
 
 public class MetadataRewriter {
 
-    public static void transform(Entity1_10Types.EntityType type, List<Metadata> list) {
+    public static void transform(EntityTypes1_10.EntityType type, List<Metadata> list) {
         for (Metadata entry : new ArrayList<>(list)) {
             final MetaIndex1_6_1to1_5_2 metaIndex = MetaIndex1_6_1to1_5_2.searchIndex(type, entry.id());
             try {

@@ -17,7 +17,7 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.model;
 
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import net.raphimc.vialegacy.api.model.Location;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.sound.SoundEmulation;
@@ -42,7 +42,7 @@ public class TrackedLivingEntity extends AbstractTrackedEntity {
     public int wolfHealth;
     public boolean wolfIsAngry;
 
-    public TrackedLivingEntity(int entityId, Location location, Entity1_10Types.EntityType entityType) {
+    public TrackedLivingEntity(int entityId, Location location, EntityTypes1_10.EntityType entityType) {
         super(entityId, location, entityType);
     }
 
@@ -53,7 +53,7 @@ public class TrackedLivingEntity extends AbstractTrackedEntity {
             tracker.playSound(this.getEntityId(), SoundType.IDLE);
         }
 
-        if (this.getEntityType().isOrHasParent(Entity1_10Types.EntityType.ENTITY_AGEABLE)) {
+        if (this.getEntityType().isOrHasParent(EntityTypes1_10.EntityType.ENTITY_AGEABLE)) {
             if (this.growingAge < 0) {
                 this.growingAge++;
             } else if (this.growingAge > 0) {
@@ -84,7 +84,7 @@ public class TrackedLivingEntity extends AbstractTrackedEntity {
     public void applyPitch(EntityTracker tracker, ConfiguredSound sound) {
         float pitch;
 
-        if (this.getEntityType().isOrHasParent(Entity1_10Types.EntityType.ENTITY_AGEABLE) && this.growingAge < 0) {
+        if (this.getEntityType().isOrHasParent(EntityTypes1_10.EntityType.ENTITY_AGEABLE) && this.growingAge < 0) {
             pitch = (tracker.RND.nextFloat() - tracker.RND.nextFloat()) * 0.2F + 1.5F;
         } else {
             pitch = (tracker.RND.nextFloat() - tracker.RND.nextFloat()) * 0.2F + 1.0F;

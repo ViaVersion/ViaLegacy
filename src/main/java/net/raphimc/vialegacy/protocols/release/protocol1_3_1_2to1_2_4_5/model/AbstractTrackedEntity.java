@@ -17,18 +17,18 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.model;
 
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import net.raphimc.vialegacy.api.model.Location;
 
 public abstract class AbstractTrackedEntity {
 
     private int entityId;
     private Location location;
-    private Entity1_10Types.EntityType entityType;
+    private EntityTypes1_10.EntityType entityType;
 
     private boolean isRiding;
 
-    public AbstractTrackedEntity(final int entityId, final Location location, final Entity1_10Types.EntityType entityType) {
+    public AbstractTrackedEntity(final int entityId, final Location location, final EntityTypes1_10.EntityType entityType) {
         this.entityId = entityId;
         this.location = location;
         this.entityType = entityType;
@@ -50,11 +50,11 @@ public abstract class AbstractTrackedEntity {
         this.location = location;
     }
 
-    public Entity1_10Types.EntityType getEntityType() {
+    public EntityTypes1_10.EntityType getEntityType() {
         return this.entityType;
     }
 
-    public void setEntityType(Entity1_10Types.EntityType entityType) {
+    public void setEntityType(EntityTypes1_10.EntityType entityType) {
         this.entityType = entityType;
     }
 

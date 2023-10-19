@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.CustomByteType;
-import com.viaversion.viaversion.api.type.types.minecraft.BaseChunkType;
+import com.viaversion.viaversion.api.type.types.chunk.BaseChunkType;
 import io.netty.buffer.ByteBuf;
 import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.chunks.NibbleArray1_1;
@@ -32,9 +32,9 @@ import java.util.ArrayList;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
 
-public class Chunk1_1Type extends Type<Chunk> {
+public class ChunkType1_1 extends Type<Chunk> {
 
-    public Chunk1_1Type() {
+    public ChunkType1_1() {
         super(Chunk.class);
     }
 

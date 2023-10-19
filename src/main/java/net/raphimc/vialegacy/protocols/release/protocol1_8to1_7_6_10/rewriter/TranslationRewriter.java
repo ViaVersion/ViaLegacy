@@ -21,6 +21,7 @@ import com.viaversion.viaversion.libs.fastutil.objects.Object2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2ObjectOpenHashMap;
 import com.viaversion.viaversion.libs.gson.JsonObject;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ClientboundPackets1_7_2;
 
 public class TranslationRewriter {
 
@@ -88,7 +89,7 @@ public class TranslationRewriter {
         TRANSLATIONS.put("commands.achievement.usage", "/achievement give <stat_name> [player]");
     }
 
-    private static final ComponentRewriter REWRITER = new ComponentRewriter() {
+    private static final ComponentRewriter<ClientboundPackets1_7_2> REWRITER = new ComponentRewriter<ClientboundPackets1_7_2>(null, ComponentRewriter.ReadType.JSON) {
         @Override
         protected void handleTranslate(JsonObject object, String translate) {
             final String text = TRANSLATIONS.get(translate);

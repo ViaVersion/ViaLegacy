@@ -17,12 +17,12 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types;
 
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.type.PartialType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.CustomByteType;
-import com.viaversion.viaversion.api.type.types.minecraft.BaseChunkBulkType;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.type.types.chunk.BaseChunkBulkType;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
 
@@ -32,9 +32,9 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-public class ChunkBulk1_7_6Type extends PartialType<Chunk[], ClientWorld> {
+public class ChunkBulkType1_7_6 extends PartialType<Chunk[], ClientWorld> {
 
-    public ChunkBulk1_7_6Type(final ClientWorld clientWorld) {
+    public ChunkBulkType1_7_6(final ClientWorld clientWorld) {
         super(clientWorld, Chunk[].class);
     }
 
@@ -82,7 +82,7 @@ public class ChunkBulk1_7_6Type extends PartialType<Chunk[], ClientWorld> {
             additionalBitMask[i] = byteBuf.readShort();
         }
 
-        final byte[] uncompressedData = new byte[Chunk1_7_6Type.getSize((short) 0xFFFF, (short) 0xFFFF, true, hasSkyLight) * chunkCount];
+        final byte[] uncompressedData = new byte[ChunkType1_7_6.getSize((short) 0xFFFF, (short) 0xFFFF, true, hasSkyLight) * chunkCount];
         final Inflater inflater = new Inflater();
         try {
             inflater.setInput(data, 0, compressedSize);
@@ -96,9 +96,9 @@ public class ChunkBulk1_7_6Type extends PartialType<Chunk[], ClientWorld> {
         final Chunk[] chunks = new Chunk[chunkCount];
         int dataPosition = 0;
         for (int i = 0; i < chunkCount; i++) {
-            final byte[] chunkData = new byte[Chunk1_7_6Type.getSize(primaryBitMask[i], additionalBitMask[i], true, hasSkyLight)];
+            final byte[] chunkData = new byte[ChunkType1_7_6.getSize(primaryBitMask[i], additionalBitMask[i], true, hasSkyLight)];
             System.arraycopy(uncompressedData, dataPosition, chunkData, 0, chunkData.length);
-            chunks[i] = Chunk1_7_6Type.deserialize(chunkX[i], chunkZ[i], true, hasSkyLight, primaryBitMask[i], additionalBitMask[i], chunkData);
+            chunks[i] = ChunkType1_7_6.deserialize(chunkX[i], chunkZ[i], true, hasSkyLight, primaryBitMask[i], additionalBitMask[i], chunkData);
             dataPosition += chunkData.length;
         }
 
@@ -116,7 +116,7 @@ public class ChunkBulk1_7_6Type extends PartialType<Chunk[], ClientWorld> {
 
         for (int i = 0; i < chunkCount; i++) {
             final Chunk chunk = chunks[i];
-            final Pair<byte[], Short> chunkData = Chunk1_7_6Type.serialize(chunk);
+            final Pair<byte[], Short> chunkData = ChunkType1_7_6.serialize(chunk);
             output.write(chunkData.key());
             chunkX[i] = chunk.getX();
             chunkZ[i] = chunk.getZ();

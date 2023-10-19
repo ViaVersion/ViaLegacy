@@ -22,9 +22,10 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -44,7 +45,6 @@ import com.viaversion.viaversion.protocols.base.ClientboundStatusPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundStatusPackets;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
@@ -66,8 +66,8 @@ import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.Serverb
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.GameProfile;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.providers.GameProfileFetcher;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Chunk1_7_6Type;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkBulk1_7_6Type;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkType1_7_6;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkBulkType1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.MetaType1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
@@ -342,7 +342,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 map(Type.INT); // data
                 handler(wrapper -> {
                     int data = wrapper.get(Type.INT, 3);
-                    if (Entity1_10Types.getTypeFromId(wrapper.get(Type.BYTE, 0), true) == Entity1_10Types.ObjectType.FALLING_BLOCK.getType()) {
+                    if (EntityTypes1_10.getTypeFromId(wrapper.get(Type.BYTE, 0), true) == EntityTypes1_10.ObjectType.FALLING_BLOCK.getType()) {
                         final int id = data & 0xFFFF;
                         final int metadata = data >> 16;
                         final IdAndData block = new IdAndData(id, metadata);
@@ -421,7 +421,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final Chunk chunk = wrapper.passthrough(new Chunk1_7_6Type(wrapper.user().get(ClientWorld.class)));
+                    final Chunk chunk = wrapper.passthrough(new ChunkType1_7_6(wrapper.user().get(ClientWorld.class)));
                     wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
                 });
             }
@@ -486,7 +486,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final Chunk[] chunks = wrapper.passthrough(new ChunkBulk1_7_6Type(wrapper.user().get(ClientWorld.class)));
+                    final Chunk[] chunks = wrapper.passthrough(new ChunkBulkType1_7_6(wrapper.user().get(ClientWorld.class)));
                     for (Chunk chunk : chunks) {
                         wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
                     }

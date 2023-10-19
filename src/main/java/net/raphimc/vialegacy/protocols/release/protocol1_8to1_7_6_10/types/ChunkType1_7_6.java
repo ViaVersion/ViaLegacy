@@ -17,13 +17,13 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types;
 
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.api.type.PartialType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.CustomByteType;
-import com.viaversion.viaversion.api.type.types.minecraft.BaseChunkType;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
+import com.viaversion.viaversion.api.type.types.chunk.BaseChunkType;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
 import net.raphimc.vialegacy.api.model.IdAndData;
@@ -36,9 +36,9 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-public class Chunk1_7_6Type extends PartialType<Chunk, ClientWorld> {
+public class ChunkType1_7_6 extends PartialType<Chunk, ClientWorld> {
 
-    public Chunk1_7_6Type(final ClientWorld clientWorld) {
+    public ChunkType1_7_6(final ClientWorld clientWorld) {
         super(clientWorld, Chunk.class);
     }
 
