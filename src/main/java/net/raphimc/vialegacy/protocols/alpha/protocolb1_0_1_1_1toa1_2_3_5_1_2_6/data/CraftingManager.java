@@ -114,7 +114,7 @@ public class CraftingManager {
     }
 
     private static void addRecipe(final Item resultItem, final Object... objects) {
-        String var3 = "";
+        StringBuilder var3 = new StringBuilder();
         int pos = 0;
         int width = 0;
         int height = 0;
@@ -125,14 +125,14 @@ public class CraftingManager {
             for (String var9 : var11) {
                 height++;
                 width = var9.length();
-                var3 = var3 + var9;
+                var3.append(var9);
             }
         } else {
             while (objects[pos] instanceof String) {
                 String var7 = (String) objects[pos++];
                 height++;
                 width = var7.length();
-                var3 = var3 + var7;
+                var3.append(var7);
             }
         }
 

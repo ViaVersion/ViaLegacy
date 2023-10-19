@@ -362,7 +362,7 @@ public class ChatItemRewriter {
     private final ComponentRewriter<ClientboundPackets1_7_2> SHOW_ITEM;
 
     public ChatItemRewriter(final Protocol1_8to1_7_6_10 protocol) {
-        this.SHOW_ITEM = new ComponentRewriter<ClientboundPackets1_7_2>(protocol) {
+        this.SHOW_ITEM = new ComponentRewriter<ClientboundPackets1_7_2>(protocol, ComponentRewriter.ReadType.JSON) {
             @Override
             protected void handleHoverEvent(JsonObject hoverEvent) {
                 super.handleHoverEvent(hoverEvent);

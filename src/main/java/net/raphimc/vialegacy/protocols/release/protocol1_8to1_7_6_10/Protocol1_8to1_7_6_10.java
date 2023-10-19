@@ -36,7 +36,6 @@ import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.chunk.BulkChunkType1_8;
-import com.viaversion.viaversion.api.type.types.chunk.ChunkSectionType1_8;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.libs.gson.JsonElement;
@@ -64,8 +63,8 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.Ch
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.TranslationRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage.*;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkType1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkBulkType1_7_6;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkType1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
 import java.nio.charset.StandardCharsets;
