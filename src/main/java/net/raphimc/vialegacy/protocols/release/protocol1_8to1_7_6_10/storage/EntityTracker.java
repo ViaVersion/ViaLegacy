@@ -19,7 +19,7 @@ package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage;
 
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
@@ -34,7 +34,7 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class EntityTracker extends StoredObject {
 
-    private final Map<Integer, Entity1_10Types.EntityType> entityMap = new ConcurrentHashMap<>();
+    private final Map<Integer, EntityTypes1_10.EntityType> entityMap = new ConcurrentHashMap<>();
     private final Map<Integer, Boolean> groundMap = new ConcurrentHashMap<>();
     private final Int2ObjectMap<HologramPartEntity> hologramParts = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectMap<HologramPartEntity> virtualHolograms = new Int2ObjectOpenHashMap<>();
@@ -53,7 +53,7 @@ public class EntityTracker extends StoredObject {
         this.playerID = playerID;
     }
 
-    public Map<Integer, Entity1_10Types.EntityType> getTrackedEntities() {
+    public Map<Integer, EntityTypes1_10.EntityType> getTrackedEntities() {
         return this.entityMap;
     }
 
@@ -65,7 +65,7 @@ public class EntityTracker extends StoredObject {
         return this.virtualHolograms;
     }
 
-    public void trackEntity(final int entityId, final Entity1_10Types.EntityType entityType) throws Exception {
+    public void trackEntity(final int entityId, final EntityTypes1_10.EntityType entityType) throws Exception {
         if (this.virtualHolograms.containsKey(entityId)) {
             final int newMappedEntityId = this.getNextMappedEntityId();
             final HologramPartEntity hologramPartEntity = this.virtualHolograms.remove(entityId);
@@ -78,7 +78,7 @@ public class EntityTracker extends StoredObject {
 
         this.entityMap.put(entityId, entityType);
 
-        if (entityType == Entity1_10Types.EntityType.HORSE || entityType == Entity1_10Types.EntityType.WITHER_SKULL) {
+        if (entityType == EntityTypes1_10.EntityType.HORSE || entityType == EntityTypes1_10.EntityType.WITHER_SKULL) {
             this.hologramParts.put(entityId, new HologramPartEntity(this.getUser(), entityId, entityType));
         }
     }

@@ -18,7 +18,7 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_5_0_1to1_4_6_7;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -58,7 +58,7 @@ public class Protocol1_5_0_1to1_4_6_7 extends StatelessProtocol<ClientboundPacke
                 handler(wrapper -> {
                     final byte typeId = wrapper.get(Type.BYTE, 0);
                     if (typeId == 10 || typeId == 11 || typeId == 12) {
-                        wrapper.set(Type.BYTE, 0, (byte) Entity1_10Types.ObjectType.MINECART.getId());
+                        wrapper.set(Type.BYTE, 0, (byte) EntityTypes1_10.ObjectType.MINECART.getId());
                     }
                     int throwerEntityId = wrapper.get(Type.INT, 4);
                     short speedX = 0;

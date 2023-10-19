@@ -18,7 +18,7 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -67,7 +67,7 @@ public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_
                 handler(wrapper -> {
                     final int entityId = wrapper.get(Type.INT, 0);
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                    tracker.getTrackedEntities().put(entityId, Entity1_10Types.EntityType.PLAYER);
+                    tracker.getTrackedEntities().put(entityId, EntityTypes1_10.EntityType.PLAYER);
                     tracker.setPlayerID(entityId);
                 });
             }
@@ -98,10 +98,10 @@ public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_
                 map(Type.BYTE); // pitch
                 map(Type.UNSIGNED_SHORT); // item
                 map(Types1_6_4.METADATA_LIST); // metadata
-                handler(wrapper -> MetadataRewriter.transform(Entity1_10Types.EntityType.PLAYER, wrapper.get(Types1_6_4.METADATA_LIST, 0)));
+                handler(wrapper -> MetadataRewriter.transform(EntityTypes1_10.EntityType.PLAYER, wrapper.get(Types1_6_4.METADATA_LIST, 0)));
                 handler(wrapper -> {
                     final int entityId = wrapper.get(Type.INT, 0);
-                    wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityId, Entity1_10Types.EntityType.PLAYER);
+                    wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityId, EntityTypes1_10.EntityType.PLAYER);
                 });
             }
         });
@@ -130,7 +130,7 @@ public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_
                 handler(wrapper -> {
                     final int entityID = wrapper.get(Type.INT, 0);
                     final int typeID = wrapper.get(Type.BYTE, 0);
-                    wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityID, Entity1_10Types.getTypeFromId(typeID, true));
+                    wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityID, EntityTypes1_10.getTypeFromId(typeID, true));
                 });
             }
         });
@@ -152,12 +152,12 @@ public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_
                 handler(wrapper -> {
                     final int entityID = wrapper.get(Type.INT, 0);
                     final int typeID = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                    final Entity1_10Types.EntityType entityType = Entity1_10Types.getTypeFromId(typeID, false);
+                    final EntityTypes1_10.EntityType entityType = EntityTypes1_10.getTypeFromId(typeID, false);
                     final List<Metadata> metadataList = wrapper.get(Types1_6_4.METADATA_LIST, 0);
                     wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityID, entityType);
                     MetadataRewriter.transform(entityType, metadataList);
 
-                    if (entityType.isOrHasParent(Entity1_10Types.EntityType.WOLF)) {
+                    if (entityType.isOrHasParent(EntityTypes1_10.EntityType.WOLF)) {
                         handleWolfMetadata(entityID, metadataList, wrapper);
                     }
                 });
@@ -172,7 +172,7 @@ public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_
                 map(Type.INT); // rotation
                 handler(wrapper -> {
                     final int entityID = wrapper.get(Type.INT, 0);
-                    wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityID, Entity1_10Types.EntityType.PAINTING);
+                    wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityID, EntityTypes1_10.EntityType.PAINTING);
                 });
             }
         });
@@ -186,7 +186,7 @@ public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_
                 map(Type.SHORT); // count
                 handler(wrapper -> {
                     final int entityID = wrapper.get(Type.INT, 0);
-                    wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityID, Entity1_10Types.EntityType.EXPERIENCE_ORB);
+                    wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityID, EntityTypes1_10.EntityType.EXPERIENCE_ORB);
                 });
             }
         });
@@ -228,12 +228,12 @@ public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                     final List<Metadata> metadataList = wrapper.get(Types1_6_4.METADATA_LIST, 0);
                     final int entityID = wrapper.get(Type.INT, 0);
-                    final Entity1_10Types.EntityType entityType = tracker.getTrackedEntities().get(entityID);
+                    final EntityTypes1_10.EntityType entityType = tracker.getTrackedEntities().get(entityID);
                     if (tracker.getTrackedEntities().containsKey(entityID)) {
                         MetadataRewriter.transform(entityType, metadataList);
                         if (metadataList.isEmpty()) wrapper.cancel();
 
-                        if (entityType.isOrHasParent(Entity1_10Types.EntityType.WOLF)) {
+                        if (entityType.isOrHasParent(EntityTypes1_10.EntityType.WOLF)) {
                             handleWolfMetadata(entityID, metadataList, wrapper);
                         }
                     } else {
@@ -352,7 +352,7 @@ public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_
 
     private void handleWolfMetadata(final int entityId, final List<Metadata> metadataList, final PacketWrapper wrapper) throws Exception {
         for (Metadata metadata : metadataList) {
-            final MetaIndex1_8to1_7_6 index = MetaIndex1_8to1_7_6.searchIndex(Entity1_10Types.EntityType.WOLF, metadata.id());
+            final MetaIndex1_8to1_7_6 index = MetaIndex1_8to1_7_6.searchIndex(EntityTypes1_10.EntityType.WOLF, metadata.id());
 
             if (index == MetaIndex1_8to1_7_6.TAMEABLE_FLAGS) {
                 if ((metadata.<Byte>value() & 4) != 0) { // is tamed

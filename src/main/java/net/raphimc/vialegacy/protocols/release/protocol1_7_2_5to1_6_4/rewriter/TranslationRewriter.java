@@ -21,6 +21,7 @@ import com.viaversion.viaversion.libs.fastutil.objects.Object2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2ObjectOpenHashMap;
 import com.viaversion.viaversion.libs.gson.JsonObject;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
+import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.ClientboundPackets1_6_4;
 
 public class TranslationRewriter {
 
@@ -66,7 +67,7 @@ public class TranslationRewriter {
         TRANSLATIONS.put("mco.configure.world.restore.question.line1", "Your realm will be restored to a previous version");
     }
 
-    private static final ComponentRewriter REWRITER = new ComponentRewriter() {
+    private static final ComponentRewriter<ClientboundPackets1_6_4> REWRITER = new ComponentRewriter<ClientboundPackets1_6_4>(null, ComponentRewriter.ReadType.JSON) {
         @Override
         protected void handleTranslate(JsonObject object, String translate) {
             final String text = TRANSLATIONS.get(translate);

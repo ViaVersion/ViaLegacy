@@ -19,7 +19,7 @@ package net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.storage
 
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
@@ -121,13 +121,13 @@ public class EntityTracker extends StoredObject {
                 final TrackedLivingEntity livingEntity = (TrackedLivingEntity) entity;
                 livingEntity.applyPitch(this, sound);
 
-                if (entity.getEntityType().isOrHasParent(Entity1_10Types.EntityType.WOLF)) {
+                if (entity.getEntityType().isOrHasParent(EntityTypes1_10.EntityType.WOLF)) {
                     if (livingEntity.wolfIsAngry) {
                         sound.setSound(Sound.MOB_WOLF_GROWL);
                     } else if (RND.nextInt(3) == 0) {
                         sound.setSound(livingEntity.isTamed && livingEntity.wolfHealth < 10 ? Sound.MOB_WOLF_WHINE : Sound.MOB_WOLF_PANTING);
                     }
-                } else if (entity.getEntityType().isOrHasParent(Entity1_10Types.EntityType.OCELOT)) {
+                } else if (entity.getEntityType().isOrHasParent(EntityTypes1_10.EntityType.OCELOT)) {
                     if (livingEntity.isTamed) {
                         sound.setSound(RND.nextInt(4) == 0 ? Sound.MOB_CAT_PURREOW : Sound.MOB_CAT_MEOW);
                     }

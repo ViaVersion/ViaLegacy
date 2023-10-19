@@ -18,7 +18,7 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.types;
 
 import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
-import com.viaversion.viaversion.api.type.types.minecraft.OldMetaType;
+import com.viaversion.viaversion.api.type.types.metadata.OldMetaType;
 
 public class MetadataType extends OldMetaType {
 

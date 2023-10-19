@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -135,7 +135,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     final int entityId = wrapper.get(Type.INT, 0);
                     final byte dimensionId = wrapper.get(Type.BYTE, 0);
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                    tracker.trackEntity(entityId, Entity1_10Types.EntityType.PLAYER);
+                    tracker.trackEntity(entityId, EntityTypes1_10.EntityType.PLAYER);
                     tracker.setPlayerID(entityId);
                     wrapper.user().get(DimensionTracker.class).setDimension(dimensionId);
                     wrapper.user().get(ClientWorld.class).setEnvironment(dimensionId);
@@ -247,14 +247,14 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     wrapper.write(Type.SHORT, (short) currentItem.identifier());
 
                     final List<Metadata> metadata = wrapper.read(Types1_7_6.METADATA_LIST); // metadata
-                    metadataRewriter.transform(Entity1_10Types.EntityType.PLAYER, metadata);
+                    metadataRewriter.transform(EntityTypes1_10.EntityType.PLAYER, metadata);
                     wrapper.write(Types1_8.METADATA_LIST, metadata);
 
                     tablistStorage.sendTempEntry(tempTabEntry);
                 });
                 handler(wrapper -> {
                     final int entityID = wrapper.get(Type.VAR_INT, 0);
-                    wrapper.user().get(EntityTracker.class).trackEntity(entityID, Entity1_10Types.EntityType.PLAYER);
+                    wrapper.user().get(EntityTracker.class).trackEntity(entityID, EntityTypes1_10.EntityType.PLAYER);
                 });
             }
         });
@@ -286,18 +286,18 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     final int x = wrapper.get(Type.INT, 0);
                     final int y = wrapper.get(Type.INT, 1);
                     final int z = wrapper.get(Type.INT, 2);
-                    tracker.trackEntity(entityID, Entity1_10Types.getTypeFromId(typeID, true));
+                    tracker.trackEntity(entityID, EntityTypes1_10.getTypeFromId(typeID, true));
                     tracker.updateEntityLocation(entityID, x, y, z, false);
                 });
                 handler(wrapper -> {
-                    final Entity1_10Types.EntityType type = Entity1_10Types.getTypeFromId(wrapper.get(Type.BYTE, 0), true);
+                    final EntityTypes1_10.EntityType type = EntityTypes1_10.getTypeFromId(wrapper.get(Type.BYTE, 0), true);
                     int x = wrapper.get(Type.INT, 0);
                     int y = wrapper.get(Type.INT, 1);
                     int z = wrapper.get(Type.INT, 2);
                     byte yaw = wrapper.get(Type.BYTE, 2);
                     int data = wrapper.get(Type.INT, 3);
 
-                    if (type == Entity1_10Types.ObjectType.ITEM_FRAME.getType()) {
+                    if (type == EntityTypes1_10.ObjectType.ITEM_FRAME.getType()) {
                         switch (data) {
                             case 0:
                                 z += 32;
@@ -316,7 +316,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                                 yaw = -64;
                                 break;
                         }
-                    } else if (type == Entity1_10Types.ObjectType.FALLING_BLOCK.getType()) {
+                    } else if (type == EntityTypes1_10.ObjectType.FALLING_BLOCK.getType()) {
                         final int id = data & 0xffff;
                         final int metadata = data >> 16;
                         final IdAndData block = new IdAndData(id, metadata);
@@ -357,7 +357,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     final int y = wrapper.get(Type.INT, 1);
                     final int z = wrapper.get(Type.INT, 2);
                     final List<Metadata> metadataList = wrapper.get(Types1_8.METADATA_LIST, 0);
-                    final Entity1_10Types.EntityType entityType = Entity1_10Types.getTypeFromId(typeID, false);
+                    final EntityTypes1_10.EntityType entityType = EntityTypes1_10.getTypeFromId(typeID, false);
                     tracker.trackEntity(entityID, entityType);
                     tracker.updateEntityLocation(entityID, x, y, z, false);
                     tracker.updateEntityMetadata(entityID, metadataList);
@@ -396,7 +396,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 });
                 handler(wrapper -> {
                     final int entityID = wrapper.get(Type.VAR_INT, 0);
-                    wrapper.user().get(EntityTracker.class).trackEntity(entityID, Entity1_10Types.EntityType.PAINTING);
+                    wrapper.user().get(EntityTracker.class).trackEntity(entityID, EntityTypes1_10.EntityType.PAINTING);
                 });
             }
         });
@@ -410,9 +410,9 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.SHORT); // count
                 handler(wrapper -> {
                     final int entityID = wrapper.get(Type.VAR_INT, 0);
-                    wrapper.user().get(EntityTracker.class).trackEntity(entityID, Entity1_10Types.EntityType.EXPERIENCE_ORB);
+                    wrapper.user().get(EntityTracker.class).trackEntity(entityID, EntityTypes1_10.EntityType.EXPERIENCE_ORB);
 
-                    wrapper.set(Type.INT, 1, realignEntityY(Entity1_10Types.EntityType.EXPERIENCE_ORB, wrapper.get(Type.INT, 1)));
+                    wrapper.set(Type.INT, 1, realignEntityY(EntityTypes1_10.EntityType.EXPERIENCE_ORB, wrapper.get(Type.INT, 1)));
                 });
             }
         });
@@ -535,7 +535,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 });
                 handler(wrapper -> {
                     final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
-                    final Entity1_10Types.EntityType type = entityTracker.getTrackedEntities().get(wrapper.get(Type.VAR_INT, 0));
+                    final EntityTypes1_10.EntityType type = entityTracker.getTrackedEntities().get(wrapper.get(Type.VAR_INT, 0));
 
                     wrapper.set(Type.INT, 1, realignEntityY(type, wrapper.get(Type.INT, 1)));
                 });
@@ -952,7 +952,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     for (Item item : items) {
                         itemRewriter.handleItemToClient(item);
                     }
-                    wrapper.write(Type.ITEM_ARRAY, items);
+                    wrapper.write(Type.ITEM1_8_ARRAY, items);
                 });
             }
         });
@@ -1234,8 +1234,8 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                         wrapper.read(Type.FLOAT); // offsetY
                         wrapper.read(Type.FLOAT); // offsetZ
                         final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
-                        final Entity1_10Types.EntityType entityType = entityTracker.getTrackedEntities().get(wrapper.get(Type.INT, 0));
-                        if (entityType == null || !entityType.isOrHasParent(Entity1_10Types.EntityType.ARMOR_STAND)) {
+                        final EntityTypes1_10.EntityType entityType = entityTracker.getTrackedEntities().get(wrapper.get(Type.INT, 0));
+                        if (entityType == null || !entityType.isOrHasParent(EntityTypes1_10.EntityType.ARMOR_STAND)) {
                             wrapper.cancel();
                         }
                     } else {
@@ -1555,24 +1555,24 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         return min >= max ? min : rnd.nextFloat() * (max - min) + min;
     }
 
-    private int realignEntityY(final Entity1_10Types.EntityType type, final int y) {
+    private int realignEntityY(final EntityTypes1_10.EntityType type, final int y) {
         float yPos = y / 32F;
         float yOffset = 0F;
-        if (type == Entity1_10Types.ObjectType.FALLING_BLOCK.getType())
+        if (type == EntityTypes1_10.ObjectType.FALLING_BLOCK.getType())
             yOffset = 0.98F / 2F;
-        if (type == Entity1_10Types.ObjectType.TNT_PRIMED.getType())
+        if (type == EntityTypes1_10.ObjectType.TNT_PRIMED.getType())
             yOffset = 0.98F / 2F;
-        if (type == Entity1_10Types.ObjectType.ENDER_CRYSTAL.getType())
+        if (type == EntityTypes1_10.ObjectType.ENDER_CRYSTAL.getType())
             yOffset = 1F;
-        else if (type == Entity1_10Types.ObjectType.MINECART.getType())
+        else if (type == EntityTypes1_10.ObjectType.MINECART.getType())
             yOffset = 0.7F / 2F;
-        else if (type == Entity1_10Types.ObjectType.BOAT.getType())
+        else if (type == EntityTypes1_10.ObjectType.BOAT.getType())
             yOffset = 0.6F / 2F;
-        else if (type == Entity1_10Types.ObjectType.ITEM.getType())
+        else if (type == EntityTypes1_10.ObjectType.ITEM.getType())
             yOffset = 0.25F / 2F;
-        else if (type == Entity1_10Types.ObjectType.LEASH.getType())
+        else if (type == EntityTypes1_10.ObjectType.LEASH.getType())
             yOffset = 0.5F;
-        else if (type == Entity1_10Types.EntityType.EXPERIENCE_ORB)
+        else if (type == EntityTypes1_10.EntityType.EXPERIENCE_ORB)
             yOffset = 0.5F / 2F;
         return (int) Math.floor((yPos - yOffset) * 32F);
     }

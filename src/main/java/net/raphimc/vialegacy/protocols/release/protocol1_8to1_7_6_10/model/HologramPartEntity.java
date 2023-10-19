@@ -18,7 +18,7 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
@@ -40,7 +40,7 @@ public class HologramPartEntity {
     private final EntityTracker entityTracker;
 
     private final int entityId;
-    private final Entity1_10Types.EntityType entityType;
+    private final EntityTypes1_10.EntityType entityType;
     private HologramPartEntity riderEntity;
     private HologramPartEntity vehicleEntity;
     private Location location;
@@ -48,7 +48,7 @@ public class HologramPartEntity {
 
     private Integer mappedEntityId;
 
-    public HologramPartEntity(final UserConnection user, final int entityId, final Entity1_10Types.EntityType entityType) {
+    public HologramPartEntity(final UserConnection user, final int entityId, final EntityTypes1_10.EntityType entityType) {
         this.user = user;
         this.entityTracker = this.user.get(EntityTracker.class);
 
@@ -56,7 +56,7 @@ public class HologramPartEntity {
         this.entityType = entityType;
         this.location = new Location(Float.NaN, Float.NaN, Float.NaN);
 
-        if (entityType == Entity1_10Types.EntityType.HORSE) {
+        if (entityType == EntityTypes1_10.EntityType.HORSE) {
             this.metadata.put(MetaIndex1_8to1_7_6.ENTITY_FLAGS, (byte) 0);
             this.metadata.put(MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG_VISIBILITY, (byte) 0);
             this.metadata.put(MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG, "");
@@ -123,7 +123,7 @@ public class HologramPartEntity {
             spawnMob.send(Protocol1_8to1_7_6_10.class);
         }
         if (this.vehicleEntity != null) {
-            final int objectId = Arrays.stream(Entity1_10Types.ObjectType.values()).filter(o -> o.getType() == this.vehicleEntity.entityType).map(Entity1_10Types.ObjectType::getId).findFirst().orElse(-1);
+            final int objectId = Arrays.stream(EntityTypes1_10.ObjectType.values()).filter(o -> o.getType() == this.vehicleEntity.entityType).map(EntityTypes1_10.ObjectType::getId).findFirst().orElse(-1);
             if (objectId == -1) {
                 throw new IllegalStateException("Could not find object id for entity type " + this.vehicleEntity.entityType);
             }
@@ -161,7 +161,7 @@ public class HologramPartEntity {
     private void spawnArmorStand() throws Exception {
         final PacketWrapper spawnMob = PacketWrapper.create(ClientboundPackets1_8.SPAWN_MOB, this.user);
         spawnMob.write(Type.VAR_INT, this.mappedEntityId); // entity id
-        spawnMob.write(Type.UNSIGNED_BYTE, (short) Entity1_10Types.EntityType.ARMOR_STAND.getId()); // type id
+        spawnMob.write(Type.UNSIGNED_BYTE, (short) EntityTypes1_10.EntityType.ARMOR_STAND.getId()); // type id
         spawnMob.write(Type.INT, (int) (this.location.getX() * 32F)); // x
         spawnMob.write(Type.INT, (int) ((this.location.getY() + this.getHeight()) * 32F)); // y
         spawnMob.write(Type.INT, (int) (this.location.getZ() * 32F)); // z
@@ -203,7 +203,7 @@ public class HologramPartEntity {
     }
 
     private boolean isHologram() {
-        if (this.entityType != Entity1_10Types.EntityType.HORSE) return false;
+        if (this.entityType != EntityTypes1_10.EntityType.HORSE) return false;
         if (this.vehicleEntity == null) return false;
         if (this.riderEntity != null) return false;
         if (this.vehicleEntity.riderEntity != this) return false;
@@ -213,14 +213,14 @@ public class HologramPartEntity {
     }
 
     private boolean wouldBeInvisible() {
-        if (this.entityType != Entity1_10Types.EntityType.HORSE) return false;
+        if (this.entityType != EntityTypes1_10.EntityType.HORSE) return false;
 
         final int age = (int) this.getMetadata(MetaIndex1_8to1_7_6.ENTITY_AGEABLE_AGE);
         return age >= -50_000;
     }
 
     private float getHeight() {
-        if (this.entityType == Entity1_10Types.EntityType.HORSE) {
+        if (this.entityType == EntityTypes1_10.EntityType.HORSE) {
             final int age = (int) this.getMetadata(MetaIndex1_8to1_7_6.ENTITY_AGEABLE_AGE);
             final float size = age >= 0 ? 1F : (0.5F + (-24_000F - age) / -24_000F * 0.5F);
             return HORSE_HEIGHT * size;
@@ -242,7 +242,7 @@ public class HologramPartEntity {
         return this.entityId;
     }
 
-    public Entity1_10Types.EntityType getEntityType() {
+    public EntityTypes1_10.EntityType getEntityType() {
         return this.entityType;
     }
 
@@ -250,7 +250,7 @@ public class HologramPartEntity {
         if (vehicleEntity == null) {
             if (this.vehicleEntity != null) {
                 this.location = this.vehicleEntity.location;
-                this.location = new Location(this.location.getX(), this.location.getY() + (this.vehicleEntity.entityType == Entity1_10Types.EntityType.HORSE ? HORSE_HEIGHT : WITHER_SKULL_HEIGHT), this.location.getZ());
+                this.location = new Location(this.location.getX(), this.location.getY() + (this.vehicleEntity.entityType == EntityTypes1_10.EntityType.HORSE ? HORSE_HEIGHT : WITHER_SKULL_HEIGHT), this.location.getZ());
                 this.vehicleEntity.riderEntity = null;
                 this.vehicleEntity.onChange();
             }
@@ -311,7 +311,7 @@ public class HologramPartEntity {
 
     private List<Metadata> getArmorStandMetadata() {
         final List<Metadata> metadataList = new ArrayList<>();
-        if (this.entityType == Entity1_10Types.EntityType.HORSE) {
+        if (this.entityType == EntityTypes1_10.EntityType.HORSE) {
             metadataList.add(new Metadata(MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG_VISIBILITY.getNewIndex(), MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG_VISIBILITY.getNewType(), this.getMetadata(MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG_VISIBILITY)));
             metadataList.add(new Metadata(MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG.getNewIndex(), MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG.getNewType(), this.getMetadata(MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG)));
             metadataList.add(new Metadata(MetaIndex1_8to1_7_6.ENTITY_FLAGS.getNewIndex(), MetaIndex1_8to1_7_6.ENTITY_FLAGS.getNewType(), (byte) (1 << 5)));

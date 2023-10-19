@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -342,7 +342,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 map(Type.INT); // data
                 handler(wrapper -> {
                     int data = wrapper.get(Type.INT, 3);
-                    if (Entity1_10Types.getTypeFromId(wrapper.get(Type.BYTE, 0), true) == Entity1_10Types.ObjectType.FALLING_BLOCK.getType()) {
+                    if (EntityTypes1_10.getTypeFromId(wrapper.get(Type.BYTE, 0), true) == EntityTypes1_10.ObjectType.FALLING_BLOCK.getType()) {
                         final int id = data & 0xFFFF;
                         final int metadata = data >> 16;
                         final IdAndData block = new IdAndData(id, metadata);

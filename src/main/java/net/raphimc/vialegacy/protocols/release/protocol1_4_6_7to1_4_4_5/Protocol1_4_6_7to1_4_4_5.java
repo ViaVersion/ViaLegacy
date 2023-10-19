@@ -19,7 +19,7 @@ package net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5;
 
 import com.google.common.collect.Lists;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -89,7 +89,7 @@ public class Protocol1_4_6_7to1_4_4_5 extends StatelessProtocol<ClientboundPacke
                     final int motionZ = wrapper.read(Type.BYTE); // velocity z
 
                     wrapper.write(Type.INT, entityId); // entity id
-                    wrapper.write(Type.BYTE, (byte) Entity1_10Types.ObjectType.ITEM.getId()); // type id
+                    wrapper.write(Type.BYTE, (byte) EntityTypes1_10.ObjectType.ITEM.getId()); // type id
                     wrapper.write(Type.INT, x); // x
                     wrapper.write(Type.INT, y); // y
                     wrapper.write(Type.INT, z); // z

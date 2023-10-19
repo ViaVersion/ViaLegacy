@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
-import com.viaversion.viaversion.api.minecraft.entities.Entity1_10Types;
+import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
@@ -145,7 +145,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                     wrapper.user().get(DimensionTracker.class).setDimension(wrapper.get(Type.BYTE, 1));
                     final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                     entityTracker.setPlayerID(wrapper.get(Type.INT, 0));
-                    entityTracker.getTrackedEntities().put(entityTracker.getPlayerID(), new TrackedLivingEntity(entityTracker.getPlayerID(), new Location(8, 64, 8), Entity1_10Types.EntityType.PLAYER));
+                    entityTracker.getTrackedEntities().put(entityTracker.getPlayerID(), new TrackedLivingEntity(entityTracker.getPlayerID(), new Location(8, 64, 8), EntityTypes1_10.EntityType.PLAYER));
                 });
             }
         });
@@ -178,7 +178,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                         wrapper.user().get(ChestStateTracker.class).clear();
                         final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                         entityTracker.getTrackedEntities().clear();
-                        entityTracker.getTrackedEntities().put(entityTracker.getPlayerID(), new TrackedLivingEntity(entityTracker.getPlayerID(), new Location(8, 64, 8), Entity1_10Types.EntityType.PLAYER));
+                        entityTracker.getTrackedEntities().put(entityTracker.getPlayerID(), new TrackedLivingEntity(entityTracker.getPlayerID(), new Location(8, 64, 8), EntityTypes1_10.EntityType.PLAYER));
                     }
                 });
             }
@@ -201,7 +201,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                     final double y = wrapper.get(Type.INT, 2) / 32.0D;
                     final double z = wrapper.get(Type.INT, 3) / 32.0D;
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                    tracker.getTrackedEntities().put(entityId, new TrackedLivingEntity(entityId, new Location(x, y, z), Entity1_10Types.EntityType.PLAYER));
+                    tracker.getTrackedEntities().put(entityId, new TrackedLivingEntity(entityId, new Location(x, y, z), EntityTypes1_10.EntityType.PLAYER));
                 });
             }
         });
@@ -222,7 +222,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                     final double x = wrapper.get(Type.INT, 1) / 32.0D;
                     final double y = wrapper.get(Type.INT, 2) / 32.0D;
                     final double z = wrapper.get(Type.INT, 3) / 32.0D;
-                    tracker.getTrackedEntities().put(entityId, new TrackedEntity(entityId, new Location(x, y, z), Entity1_10Types.ObjectType.ITEM.getType()));
+                    tracker.getTrackedEntities().put(entityId, new TrackedEntity(entityId, new Location(x, y, z), EntityTypes1_10.ObjectType.ITEM.getType()));
                 });
             }
         });
@@ -249,14 +249,14 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                     final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                     final int entityId = wrapper.get(Type.INT, 0);
                     final byte typeId = wrapper.get(Type.BYTE, 0);
-                    final Entity1_10Types.EntityType type;
+                    final EntityTypes1_10.EntityType type;
                     if (typeId == 70 || typeId == 71 || typeId == 74) {
-                        type = Entity1_10Types.ObjectType.FALLING_BLOCK.getType();
-                        wrapper.set(Type.BYTE, 0, (byte) Entity1_10Types.ObjectType.FALLING_BLOCK.getId());
+                        type = EntityTypes1_10.ObjectType.FALLING_BLOCK.getType();
+                        wrapper.set(Type.BYTE, 0, (byte) EntityTypes1_10.ObjectType.FALLING_BLOCK.getId());
                     } else if (typeId == 10 || typeId == 11 || typeId == 12) {
-                        type = Entity1_10Types.ObjectType.MINECART.getType();
+                        type = EntityTypes1_10.ObjectType.MINECART.getType();
                     } else {
-                        type = Entity1_10Types.getTypeFromId(typeId, true);
+                        type = EntityTypes1_10.getTypeFromId(typeId, true);
                     }
                     final double x = wrapper.get(Type.INT, 1) / 32.0D;
                     final double y = wrapper.get(Type.INT, 2) / 32.0D;
@@ -274,8 +274,8 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                     if (typeId == 70) throwerEntityId = 12; // sand
                     if (typeId == 71) throwerEntityId = 13; // gravel
                     if (typeId == 74) throwerEntityId = 122; // dragon egg
-                    if (typeId == Entity1_10Types.ObjectType.FISHIHNG_HOOK.getId()) {
-                        final Optional<AbstractTrackedEntity> nearestEntity = entityTracker.getNearestEntity(location, 2.0D, e -> e.getEntityType().isOrHasParent(Entity1_10Types.EntityType.PLAYER));
+                    if (typeId == EntityTypes1_10.ObjectType.FISHIHNG_HOOK.getId()) {
+                        final Optional<AbstractTrackedEntity> nearestEntity = entityTracker.getNearestEntity(location, 2.0D, e -> e.getEntityType().isOrHasParent(EntityTypes1_10.EntityType.PLAYER));
                         throwerEntityId = nearestEntity.map(AbstractTrackedEntity::getEntityId).orElseGet(entityTracker::getPlayerID);
                     }
                     wrapper.set(Type.INT, 4, throwerEntityId);
@@ -286,7 +286,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                     }
 
                     entityTracker.getTrackedEntities().put(entityId, new TrackedEntity(entityId, location, type));
-                    final Entity1_10Types.ObjectType objectType = Entity1_10Types.ObjectType.findById(typeId).orElse(null);
+                    final EntityTypes1_10.ObjectType objectType = EntityTypes1_10.ObjectType.findById(typeId).orElse(null);
                     if (objectType == null) return;
 
                     float pitch;
@@ -334,7 +334,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                     final double y = wrapper.get(Type.INT, 2) / 32.0D;
                     final double z = wrapper.get(Type.INT, 3) / 32.0D;
                     final List<Metadata> metadataList = wrapper.get(Types1_3_1.METADATA_LIST, 0);
-                    final Entity1_10Types.EntityType entityType = Entity1_10Types.getTypeFromId(type, false);
+                    final EntityTypes1_10.EntityType entityType = EntityTypes1_10.getTypeFromId(type, false);
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                     tracker.getTrackedEntities().put(entityId, new TrackedLivingEntity(entityId, new Location(x, y, z), entityType));
                     tracker.updateEntityMetadata(entityId, metadataList);
@@ -807,7 +807,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
             if (index == MetaIndex1_8to1_7_6.ENTITY_FLAGS) {
                 if ((metadata.<Byte>value() & 4) != 0) { // entity mount
                     final Optional<AbstractTrackedEntity> oNearbyEntity = tracker.getNearestEntity(entity.getLocation(), 1.0D, e -> {
-                        return e.getEntityType().isOrHasParent(Entity1_10Types.EntityType.MINECART_RIDEABLE) || e.getEntityType().isOrHasParent(Entity1_10Types.EntityType.PIG) || e.getEntityType().isOrHasParent(Entity1_10Types.EntityType.BOAT);
+                        return e.getEntityType().isOrHasParent(EntityTypes1_10.EntityType.MINECART_RIDEABLE) || e.getEntityType().isOrHasParent(EntityTypes1_10.EntityType.PIG) || e.getEntityType().isOrHasParent(EntityTypes1_10.EntityType.BOAT);
                     });
 
                     if (oNearbyEntity.isPresent()) {
