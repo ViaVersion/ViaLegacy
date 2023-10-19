@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
@@ -34,6 +35,9 @@ import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.types.chunk.BulkChunkType1_8;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkSectionType1_8;
+import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.gson.JsonObject;
@@ -41,9 +45,6 @@ import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.Chunk1_8Type;
-import com.viaversion.viaversion.protocols.protocol1_9to1_8.types.ChunkBulk1_8Type;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
@@ -154,14 +155,14 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             public void register() {
                 map(Type.INT, Type.VAR_INT); // entity id
                 map(Type.SHORT); // slot
-                map(Types1_7_6.COMPRESSED_ITEM, Type.ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Type.ITEM, 0)));
+                map(Types1_7_6.COMPRESSED_ITEM, Type.ITEM1_8); // item
+                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Type.ITEM1_8, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.SPAWN_POSITION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_INT, Type.POSITION); // position
+                map(Types1_7_6.POSITION_INT, Type.POSITION1_8); // position
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.UPDATE_HEALTH, new PacketHandlers() {
@@ -212,7 +213,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 map(Type.INT, Type.VAR_INT); // entity id
-                map(Types1_7_6.POSITION_BYTE, Type.POSITION); // position
+                map(Types1_7_6.POSITION_BYTE, Type.POSITION1_8); // position
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.SPAWN_PLAYER, new PacketHandlers() {
@@ -371,11 +372,11 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             public void register() {
                 map(Type.VAR_INT); // entity id
                 map(Type.STRING); // motive
-                map(Types1_7_6.POSITION_INT, Type.POSITION); // position
+                map(Types1_7_6.POSITION_INT, Type.POSITION1_8); // position
                 map(Type.INT, Type.BYTE); // rotation
                 handler(wrapper -> {
                     final short rotation = wrapper.get(Type.BYTE, 0);
-                    final Position pos = wrapper.get(Type.POSITION, 0);
+                    final Position pos = wrapper.get(Type.POSITION1_8, 0);
                     int modX = 0;
                     int modZ = 0;
                     switch (rotation) {
@@ -392,7 +393,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                             modX = 1;
                             break;
                     }
-                    wrapper.set(Type.POSITION, 0, new Position(pos.x() + modX, pos.y(), pos.z() + modZ));
+                    wrapper.set(Type.POSITION1_8, 0, new Position(pos.x() + modX, pos.y(), pos.z() + modZ));
                 });
                 handler(wrapper -> {
                     final int entityID = wrapper.get(Type.VAR_INT, 0);
@@ -635,7 +636,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 handler(wrapper -> {
                     final Chunk chunk = wrapper.read(new ChunkType1_7_6(wrapper.user().get(ClientWorld.class)));
                     wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
-                    wrapper.write(new Chunk1_8Type(wrapper.user().get(ClientWorld.class)), chunk);
+                    wrapper.write(new ChunkType1_8(wrapper.user().get(ClientWorld.class)), chunk);
                 });
             }
         });
@@ -664,11 +665,11 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         this.registerClientbound(ClientboundPackets1_7_2.BLOCK_CHANGE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_UBYTE, Type.POSITION); // position
+                map(Types1_7_6.POSITION_UBYTE, Type.POSITION1_8); // position
                 handler(wrapper -> {
                     final int blockId = wrapper.read(Type.VAR_INT); // block id
                     final int data = wrapper.read(Type.UNSIGNED_BYTE); // block data
-                    final Position pos = wrapper.get(Type.POSITION, 0); // position
+                    final Position pos = wrapper.get(Type.POSITION1_8, 0); // position
                     final IdAndData block = new IdAndData(blockId, data);
                     wrapper.user().get(ChunkTracker.class).trackAndRemap(pos, block);
                     wrapper.write(Type.VAR_INT, block.toCompressedData());
@@ -678,7 +679,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         this.registerClientbound(ClientboundPackets1_7_2.BLOCK_ACTION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT, Type.POSITION); // position
+                map(Types1_7_6.POSITION_SHORT, Type.POSITION1_8); // position
                 map(Type.UNSIGNED_BYTE); // type
                 map(Type.UNSIGNED_BYTE); // data
                 map(Type.VAR_INT); // block id
@@ -688,7 +689,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 map(Type.VAR_INT); // entity id
-                map(Types1_7_6.POSITION_INT, Type.POSITION); // position
+                map(Types1_7_6.POSITION_INT, Type.POSITION1_8); // position
                 map(Type.BYTE); // progress
             }
         });
@@ -700,7 +701,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     for (Chunk chunk : chunks) {
                         wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
                     }
-                    wrapper.write(new ChunkBulk1_8Type(wrapper.user().get(ClientWorld.class)), chunks);
+                    wrapper.write(new BulkChunkType1_8(wrapper.user().get(ClientWorld.class)), chunks);
                 });
             }
         });
@@ -782,7 +783,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                         }
 
                         wrapper.write(Type.INT, effectId);
-                        wrapper.write(Type.POSITION, pos);
+                        wrapper.write(Type.POSITION1_8, pos);
                         wrapper.write(Type.INT, data);
                         wrapper.write(Type.BOOLEAN, disableRelativeVolume);
                     }
@@ -931,8 +932,8 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     if (windowType == 4/*enchanting_table*/ && slot >= 1) slot += 1;
                     wrapper.write(Type.SHORT, slot);
                 });
-                map(Types1_7_6.COMPRESSED_ITEM, Type.ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Type.ITEM, 0)));
+                map(Types1_7_6.COMPRESSED_ITEM, Type.ITEM1_8); // item
+                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Type.ITEM1_8, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.WINDOW_ITEMS, new PacketHandlers() {
@@ -994,7 +995,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         this.registerClientbound(ClientboundPackets1_7_2.UPDATE_SIGN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT, Type.POSITION); // position
+                map(Types1_7_6.POSITION_SHORT, Type.POSITION1_8); // position
                 map(LEGACY_TO_JSON); // line 1
                 map(LEGACY_TO_JSON); // line 2
                 map(LEGACY_TO_JSON); // line 3
@@ -1052,7 +1053,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         this.registerClientbound(ClientboundPackets1_7_2.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT, Type.POSITION); // position
+                map(Types1_7_6.POSITION_SHORT, Type.POSITION1_8); // position
                 map(Type.UNSIGNED_BYTE); // type
                 map(Types1_7_6.COMPRESSED_NBT, Type.NAMED_COMPOUND_TAG); // data
             }
@@ -1060,7 +1061,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         this.registerClientbound(ClientboundPackets1_7_2.OPEN_SIGN_EDITOR, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_INT, Type.POSITION); // position
+                map(Types1_7_6.POSITION_INT, Type.POSITION1_8); // position
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.PLAYER_INFO, new PacketHandlers() {
@@ -1177,17 +1178,17 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                             for (int i = 0; i < count; i++) {
                                 Item item = wrapper.read(Types1_7_6.COMPRESSED_ITEM);
                                 itemRewriter.handleItemToClient(item);
-                                wrapper.write(Type.ITEM, item); // item 1
+                                wrapper.write(Type.ITEM1_8, item); // item 1
 
                                 item = wrapper.read(Types1_7_6.COMPRESSED_ITEM);
                                 itemRewriter.handleItemToClient(item);
-                                wrapper.write(Type.ITEM, item); // item 3
+                                wrapper.write(Type.ITEM1_8, item); // item 3
 
                                 final boolean has3Items = wrapper.passthrough(Type.BOOLEAN); // has 3 items
                                 if (has3Items) {
                                     item = wrapper.read(Types1_7_6.COMPRESSED_ITEM);
                                     itemRewriter.handleItemToClient(item);
-                                    wrapper.write(Type.ITEM, item); // item 2
+                                    wrapper.write(Type.ITEM1_8, item); // item 2
                                 }
 
                                 wrapper.passthrough(Type.BOOLEAN); // unavailable
@@ -1270,16 +1271,16 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 map(Type.VAR_INT, Type.UNSIGNED_BYTE); // status
-                map(Type.POSITION, Types1_7_6.POSITION_UBYTE); // position
+                map(Type.POSITION1_8, Types1_7_6.POSITION_UBYTE); // position
                 map(Type.UNSIGNED_BYTE); // direction
             }
         });
         this.registerServerbound(ServerboundPackets1_8.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION, Types1_7_6.POSITION_UBYTE); // position
+                map(Type.POSITION1_8, Types1_7_6.POSITION_UBYTE); // position
                 map(Type.UNSIGNED_BYTE); // direction
-                map(Type.ITEM, Types1_7_6.COMPRESSED_ITEM); // item
+                map(Type.ITEM1_8, Types1_7_6.COMPRESSED_ITEM); // item
                 map(Type.UNSIGNED_BYTE); // offset x
                 map(Type.UNSIGNED_BYTE); // offset y
                 map(Type.UNSIGNED_BYTE); // offset z
@@ -1342,12 +1343,12 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                             final PacketWrapper resetHandItem = PacketWrapper.create(ClientboundPackets1_8.SET_SLOT, wrapper.user());
                             resetHandItem.write(Type.UNSIGNED_BYTE, (short) -1); // window id
                             resetHandItem.write(Type.SHORT, (short) 0); // slot
-                            resetHandItem.write(Type.ITEM, new DataItem(-1, (byte) 0, (short) 0, null));
+                            resetHandItem.write(Type.ITEM1_8, new DataItem(-1, (byte) 0, (short) 0, null));
                             resetHandItem.send(Protocol1_8to1_7_6_10.class);
                             final PacketWrapper setLapisSlot = PacketWrapper.create(ClientboundPackets1_8.SET_SLOT, wrapper.user());
                             setLapisSlot.write(Type.UNSIGNED_BYTE, windowId);
                             setLapisSlot.write(Type.SHORT, slot);
-                            setLapisSlot.write(Type.ITEM, new DataItem(351/*lapis_lazuli*/, (byte) 3, (short) 4, null));
+                            setLapisSlot.write(Type.ITEM1_8, new DataItem(351/*lapis_lazuli*/, (byte) 3, (short) 4, null));
                             setLapisSlot.send(Protocol1_8to1_7_6_10.class);
                             wrapper.cancel();
                         } else if (slot > 1) {
@@ -1358,7 +1359,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.BYTE); // button
                 map(Type.SHORT); // transaction id
                 map(Type.BYTE); // action
-                map(Type.ITEM, Types1_7_6.COMPRESSED_ITEM); // item
+                map(Type.ITEM1_8, Types1_7_6.COMPRESSED_ITEM); // item
                 handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
             }
         });
@@ -1366,14 +1367,14 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 map(Type.SHORT); // slot
-                map(Type.ITEM, Types1_7_6.COMPRESSED_ITEM); // item
+                map(Type.ITEM1_8, Types1_7_6.COMPRESSED_ITEM); // item
                 handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
             }
         });
         this.registerServerbound(ServerboundPackets1_8.UPDATE_SIGN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.POSITION, Types1_7_6.POSITION_SHORT); // position
+                map(Type.POSITION1_8, Types1_7_6.POSITION_SHORT); // position
                 handler(wrapper -> {
                     for (int i = 0; i < 4; i++) {
                         final JsonElement component = wrapper.read(Type.COMPONENT); // line
@@ -1426,7 +1427,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     switch (channel) {
                         case "MC|BEdit":
                         case "MC|BSign":
-                            final Item item = wrapper.read(Type.ITEM); // book
+                            final Item item = wrapper.read(Type.ITEM1_8); // book
                             itemRewriter.handleItemToServer(item);
 
                             lengthPacketWrapper.write(Types1_7_6.COMPRESSED_ITEM, item);

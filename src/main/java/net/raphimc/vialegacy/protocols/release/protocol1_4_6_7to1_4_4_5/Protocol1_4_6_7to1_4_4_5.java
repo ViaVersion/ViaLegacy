@@ -19,13 +19,13 @@ package net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5;
 
 import com.google.common.collect.Lists;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_9_3to1_9_1_2.storage.ClientWorld;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
