@@ -459,7 +459,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
 
                     if (!load) {
                         final Chunk chunk = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>());
-                        wrapper.write(new ChunkType1_7_6(wrapper.user().get(ClientWorld.class)), chunk);
+                        wrapper.write(ChunkType1_7_6.forEnvironment(wrapper.user().get(ClientWorld.class).getEnvironment()), chunk);
                     } else {
                         wrapper.cancel();
                     }
@@ -470,7 +470,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
+                    final Environment environment = wrapper.user().get(ClientWorld.class).getEnvironment();
                     Chunk chunk = wrapper.read(Types1_2_4.CHUNK);
 
                     wrapper.user().get(ChestStateTracker.class).unload(chunk.getX(), chunk.getZ());
@@ -481,7 +481,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                         for (int i = 0; i < chunk.getSections().length; i++) {
                             final ChunkSection section = chunk.getSections()[i] = new ChunkSectionImpl(true);
                             section.palette(PaletteType.BLOCKS).addId(0);
-                            if (clientWorld.getEnvironment() == Environment.NORMAL) {
+                            if (environment == Environment.NORMAL) {
                                 final byte[] skyLight = new byte[2048];
                                 Arrays.fill(skyLight, (byte) 255);
                                 section.getLight().setSkyLight(skyLight);
@@ -489,14 +489,14 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                         }
                     }
 
-                    if (clientWorld.getEnvironment() != Environment.NORMAL) {
+                    if (environment != Environment.NORMAL) {
                         for (ChunkSection section : chunk.getSections()) {
                             if (section != null) {
                                 section.getLight().setSkyLight(null);
                             }
                         }
                     }
-                    wrapper.write(new ChunkType1_7_6(clientWorld), chunk);
+                    wrapper.write(ChunkType1_7_6.forEnvironment(environment), chunk);
                 });
             }
         });

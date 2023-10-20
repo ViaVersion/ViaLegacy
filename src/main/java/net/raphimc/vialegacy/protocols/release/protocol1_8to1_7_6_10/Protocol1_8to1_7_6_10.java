@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
@@ -63,7 +64,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.Ch
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.TranslationRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage.*;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkBulkType1_7_6;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.BulkChunkType1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkType1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
@@ -633,9 +634,11 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final Chunk chunk = wrapper.read(new ChunkType1_7_6(wrapper.user().get(ClientWorld.class)));
+                    final Environment environment = wrapper.user().get(ClientWorld.class).getEnvironment();
+
+                    final Chunk chunk = wrapper.read(ChunkType1_7_6.forEnvironment(environment));
                     wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
-                    wrapper.write(new ChunkType1_8(wrapper.user().get(ClientWorld.class)), chunk);
+                    wrapper.write(ChunkType1_8.forEnvironment(environment), chunk);
                 });
             }
         });
@@ -696,11 +699,11 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final Chunk[] chunks = wrapper.read(new ChunkBulkType1_7_6(wrapper.user().get(ClientWorld.class)));
+                    final Chunk[] chunks = wrapper.read(BulkChunkType1_7_6.TYPE);
                     for (Chunk chunk : chunks) {
                         wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
                     }
-                    wrapper.write(new BulkChunkType1_8(wrapper.user().get(ClientWorld.class)), chunks);
+                    wrapper.write(BulkChunkType1_8.TYPE, chunks);
                 });
             }
         });

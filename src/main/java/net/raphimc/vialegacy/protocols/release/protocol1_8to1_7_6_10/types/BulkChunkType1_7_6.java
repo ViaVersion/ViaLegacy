@@ -17,12 +17,9 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types;
 
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
-import com.viaversion.viaversion.api.type.PartialType;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.CustomByteType;
-import com.viaversion.viaversion.api.type.types.chunk.BaseChunkBulkType;
+import com.viaversion.viaversion.api.type.types.FixedByteArrayType;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
 
@@ -32,25 +29,21 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-public class ChunkBulkType1_7_6 extends PartialType<Chunk[], ClientWorld> {
+public class BulkChunkType1_7_6 extends Type<Chunk[]> {
 
-    public ChunkBulkType1_7_6(final ClientWorld clientWorld) {
-        super(clientWorld, Chunk[].class);
-    }
+    public static final BulkChunkType1_7_6 TYPE = new BulkChunkType1_7_6();
 
-    @Override
-    public Class<? extends Type> getBaseClass() {
-        return BaseChunkBulkType.class;
+    public BulkChunkType1_7_6() {
+        super(Chunk[].class);
     }
 
     /**
      * This method is here to allow overriding the code for 1.4.5 -{@literal >} 1.4.7
      *
-     * @param byteBuf     The buffer
-     * @param clientWorld The ClientWorld
+     * @param byteBuf The buffer
      * @return Read skylight array or not
      */
-    protected boolean readHasSkyLight(final ByteBuf byteBuf, final ClientWorld clientWorld) {
+    protected boolean readHasSkyLight(final ByteBuf byteBuf) {
         return byteBuf.readBoolean();
     }
 
@@ -58,19 +51,18 @@ public class ChunkBulkType1_7_6 extends PartialType<Chunk[], ClientWorld> {
      * This method is here to allow overriding the code for 1.4.5 -{@literal >} 1.4.7
      *
      * @param byteBuf     The buffer
-     * @param clientWorld The ClientWorld
      * @param hasSkyLight Has skylight
      */
-    protected void writeHasSkyLight(final ByteBuf byteBuf, final ClientWorld clientWorld, final boolean hasSkyLight) {
+    protected void writeHasSkyLight(final ByteBuf byteBuf, final boolean hasSkyLight) {
         byteBuf.writeBoolean(hasSkyLight);
     }
 
     @Override
-    public Chunk[] read(ByteBuf byteBuf, ClientWorld clientWorld) throws Exception {
+    public Chunk[] read(ByteBuf byteBuf) throws Exception {
         final short chunkCount = byteBuf.readShort();
         final int compressedSize = byteBuf.readInt();
-        final boolean hasSkyLight = this.readHasSkyLight(byteBuf, clientWorld);
-        final byte[] data = new CustomByteType(compressedSize).read(byteBuf);
+        final boolean hasSkyLight = this.readHasSkyLight(byteBuf);
+        final byte[] data = new FixedByteArrayType(compressedSize).read(byteBuf);
         final int[] chunkX = new int[chunkCount];
         final int[] chunkZ = new int[chunkCount];
         final short[] primaryBitMask = new short[chunkCount];
@@ -106,7 +98,7 @@ public class ChunkBulkType1_7_6 extends PartialType<Chunk[], ClientWorld> {
     }
 
     @Override
-    public void write(ByteBuf byteBuf, ClientWorld clientWorld, Chunk[] chunks) throws Exception {
+    public void write(ByteBuf byteBuf, Chunk[] chunks) throws Exception {
         final int chunkCount = chunks.length;
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         final int[] chunkX = new int[chunkCount];
@@ -139,7 +131,7 @@ public class ChunkBulkType1_7_6 extends PartialType<Chunk[], ClientWorld> {
 
         byteBuf.writeShort(chunkCount);
         byteBuf.writeInt(compressedSize);
-        this.writeHasSkyLight(byteBuf, clientWorld, true);
+        this.writeHasSkyLight(byteBuf, true);
         byteBuf.writeBytes(compressedData, 0, compressedSize);
 
         for (int i = 0; i < chunkCount; i++) {

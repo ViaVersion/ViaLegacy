@@ -20,6 +20,7 @@ package net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5;
 import com.google.common.collect.Lists;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -30,13 +31,13 @@ import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5.rewriter.ItemRewriter;
-import net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5.types.ChunkBulkType1_4_4;
+import net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5.types.BulkChunkType1_4_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_5_0_1to1_4_6_7.ClientboundPackets1_4_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.ServerboundPackets1_5_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.MetaType1_6_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Types1_6_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata.MetaIndex1_8to1_7_6;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkBulkType1_7_6;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.BulkChunkType1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
 public class Protocol1_4_6_7to1_4_4_5 extends StatelessProtocol<ClientboundPackets1_4_4, ClientboundPackets1_4_6, ServerboundPackets1_5_2, ServerboundPackets1_5_2> {
@@ -127,10 +128,7 @@ public class Protocol1_4_6_7to1_4_4_5 extends StatelessProtocol<ClientboundPacke
         this.registerClientbound(ClientboundPackets1_4_4.MAP_BULK_CHUNK, new PacketHandlers() {
             @Override
             public void register() {
-                handler(wrapper -> {
-                    final ClientWorld clientWorld = wrapper.user().get(ClientWorld.class);
-                    wrapper.write(new ChunkBulkType1_7_6(clientWorld), wrapper.read(new ChunkBulkType1_4_4(clientWorld)));
-                });
+                map(BulkChunkType1_7_6.TYPE, BulkChunkType1_4_4.TYPE);
             }
         });
 

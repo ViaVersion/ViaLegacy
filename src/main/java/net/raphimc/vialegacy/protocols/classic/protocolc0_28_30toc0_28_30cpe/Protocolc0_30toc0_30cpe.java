@@ -26,7 +26,7 @@ import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.CustomByteType;
+import com.viaversion.viaversion.api.type.types.FixedByteArrayType;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.model.ChunkCoord;
@@ -220,8 +220,8 @@ public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacket
                     final ClassicLevel level = levelStorage.getClassicLevel();
 
                     final int count = wrapper.read(Type.UNSIGNED_BYTE) + 1; // count
-                    final byte[] indices = wrapper.read(new CustomByteType(1024)); // indices
-                    final byte[] blocks = wrapper.read(new CustomByteType(256)); // blocks
+                    final byte[] indices = wrapper.read(new FixedByteArrayType(1024)); // indices
+                    final byte[] blocks = wrapper.read(new FixedByteArrayType(256)); // blocks
 
                     if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocola1_0_16_2toa1_0_15.class)) {
                         final Map<ChunkCoord, List<BlockChangeRecord>> records = new HashMap<>();
