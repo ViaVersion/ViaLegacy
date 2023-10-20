@@ -17,7 +17,6 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types;
 
-import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.FixedByteArrayType;
@@ -35,17 +34,11 @@ import java.util.zip.Inflater;
 
 public class ChunkType1_7_6 extends Type<Chunk> {
 
-    private static final ChunkType1_7_6 WITH_SKYLIGHT = new ChunkType1_7_6(true);
-    private static final ChunkType1_7_6 WITHOUT_SKYLIGHT = new ChunkType1_7_6(false);
     private final boolean hasSkyLight;
 
     public ChunkType1_7_6(boolean hasSkyLight) {
         super(Chunk.class);
         this.hasSkyLight = hasSkyLight;
-    }
-
-    public static ChunkType1_7_6 forEnvironment(Environment environment) {
-        return environment == Environment.NORMAL ? WITH_SKYLIGHT : WITHOUT_SKYLIGHT;
     }
 
     /**

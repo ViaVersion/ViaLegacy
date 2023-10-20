@@ -18,6 +18,7 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types;
 
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -50,4 +51,12 @@ public class Types1_7_6 {
     public static final Type<Position> POSITION_SHORT = new PositionVarYType<>(Type.SHORT, i -> (short) i);
     public static final Type<Position> POSITION_INT = new PositionVarYType<>(Type.INT, i -> i);
 
+    public static final BulkChunkType1_7_6 CHUNK_BULK = new BulkChunkType1_7_6();
+
+    private static final ChunkType1_7_6 CHUNK_WITH_SKYLIGHT = new ChunkType1_7_6(true);
+    private static final ChunkType1_7_6 CHUNK_WITHOUT_SKYLIGHT = new ChunkType1_7_6(false);
+
+    public static ChunkType1_7_6 getChunk(Environment environment) {
+        return environment == Environment.NORMAL ? CHUNK_WITH_SKYLIGHT : CHUNK_WITHOUT_SKYLIGHT;
+    }
 }

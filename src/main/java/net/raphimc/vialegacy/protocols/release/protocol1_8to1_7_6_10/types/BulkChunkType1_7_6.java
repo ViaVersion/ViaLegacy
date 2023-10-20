@@ -31,8 +31,6 @@ import java.util.zip.Inflater;
 
 public class BulkChunkType1_7_6 extends Type<Chunk[]> {
 
-    public static final BulkChunkType1_7_6 TYPE = new BulkChunkType1_7_6();
-
     public BulkChunkType1_7_6() {
         super(Chunk[].class);
     }

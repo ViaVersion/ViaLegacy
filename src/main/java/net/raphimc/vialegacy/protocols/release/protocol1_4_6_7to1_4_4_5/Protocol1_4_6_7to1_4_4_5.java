@@ -32,6 +32,7 @@ import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5.types.BulkChunkType1_4_4;
+import net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5.types.Types1_4_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_5_0_1to1_4_6_7.ClientboundPackets1_4_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.ServerboundPackets1_5_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.MetaType1_6_4;
@@ -128,7 +129,7 @@ public class Protocol1_4_6_7to1_4_4_5 extends StatelessProtocol<ClientboundPacke
         this.registerClientbound(ClientboundPackets1_4_4.MAP_BULK_CHUNK, new PacketHandlers() {
             @Override
             public void register() {
-                map(BulkChunkType1_7_6.TYPE, BulkChunkType1_4_4.TYPE);
+                map(Types1_7_6.CHUNK_BULK, Types1_4_4.CHUNK_BULK);
             }
         });
 

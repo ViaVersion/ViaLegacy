@@ -636,7 +636,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 handler(wrapper -> {
                     final Environment environment = wrapper.user().get(ClientWorld.class).getEnvironment();
 
-                    final Chunk chunk = wrapper.read(ChunkType1_7_6.forEnvironment(environment));
+                    final Chunk chunk = wrapper.read(Types1_7_6.getChunk(environment));
                     wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
                     wrapper.write(ChunkType1_8.forEnvironment(environment), chunk);
                 });
@@ -699,7 +699,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final Chunk[] chunks = wrapper.read(BulkChunkType1_7_6.TYPE);
+                    final Chunk[] chunks = wrapper.read(Types1_7_6.CHUNK_BULK);
                     for (Chunk chunk : chunks) {
                         wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
                     }
