@@ -129,7 +129,7 @@ public class Protocol1_4_6_7to1_4_4_5 extends StatelessProtocol<ClientboundPacke
         this.registerClientbound(ClientboundPackets1_4_4.MAP_BULK_CHUNK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.CHUNK_BULK, Types1_4_4.CHUNK_BULK);
+                map(Types1_4_4.CHUNK_BULK, Types1_7_6.CHUNK_BULK);
             }
         });
 
