@@ -78,14 +78,14 @@ public class Protocol1_6_2to1_6_1 extends StatelessProtocol<ClientboundPackets1_
             public void register() {
                 map(Types1_7_6.POSITION_UBYTE); // position
                 map(Type.UNSIGNED_BYTE); // direction
-                map(Types1_7_6.COMPRESSED_ITEM); // item
+                map(Types1_7_6.ITEM); // item
                 map(Type.UNSIGNED_BYTE); // offset x
                 map(Type.UNSIGNED_BYTE); // offset y
                 map(Type.UNSIGNED_BYTE); // offset z
                 handler(wrapper -> {
                     final Position pos = wrapper.get(Types1_7_6.POSITION_UBYTE, 0);
                     final short direction = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                    final Item item = wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0);
+                    final Item item = wrapper.get(Types1_7_6.ITEM, 0);
 
                     if (item != null && item.identifier() == ItemList1_6.sign.itemID && direction != 255 && direction != 0) { // If placed item is a sign then cancel and send a OPEN_SIGN_EDITOR packet
                         final PacketWrapper openSignEditor = PacketWrapper.create(ClientboundPackets1_6_4.OPEN_SIGN_EDITOR, wrapper.user());
@@ -100,7 +100,7 @@ public class Protocol1_6_2to1_6_1 extends StatelessProtocol<ClientboundPackets1_
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocol1_6_2to1_6_1.class, ClientboundPackets1_6_1::getPacket));
+        userConnection.put(new PreNettySplitter(Protocol1_6_2to1_6_1.class, ClientboundPackets1_6_1::getPacket));
     }
 
 }

@@ -17,23 +17,18 @@
  */
 package net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.data.ClassicProtocolExtension;
 
 import java.util.EnumMap;
 
-public class ExtensionProtocolMetadataStorage extends StoredObject {
+public class ExtensionProtocolMetadataStorage implements StorableObject {
 
     private String serverSoftwareName = "classic";
     private short extensionCount = -1;
     private short receivedExtensions = 0;
 
     private final EnumMap<ClassicProtocolExtension, Integer> serverExtensions = new EnumMap<>(ClassicProtocolExtension.class);
-
-    public ExtensionProtocolMetadataStorage(final UserConnection user) {
-        super(user);
-    }
 
     public void setServerSoftwareName(final String serverSoftwareName) {
         if (serverSoftwareName.isEmpty()) return;

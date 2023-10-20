@@ -17,19 +17,17 @@
  */
 package net.raphimc.vialegacy.api.splitter;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.protocol.Protocol;
 
 import java.util.function.IntFunction;
 
-public class PreNettySplitter extends StoredObject {
+public class PreNettySplitter implements StorableObject {
 
     private final IntFunction<PreNettyPacketType> packetTypeSupplier;
     private final Class<? extends Protocol<?, ?, ?, ?>> protocolClass;
 
-    public PreNettySplitter(UserConnection user, Class<? extends Protocol<?, ?, ?, ?>> protocolClass, IntFunction<PreNettyPacketType> packetTypeSupplier) {
-        super(user);
+    public PreNettySplitter(Class<? extends Protocol<?, ?, ?, ?>> protocolClass, IntFunction<PreNettyPacketType> packetTypeSupplier) {
         this.protocolClass = protocolClass;
         this.packetTypeSupplier = packetTypeSupplier;
     }

@@ -66,14 +66,14 @@ public class Protocol1_0_0_1tob1_8_0_1 extends StatelessProtocol<ClientboundPack
             public void register() {
                 map(Type.BYTE); // window id
                 map(Type.SHORT); // slot
-                map(Types1_4_2.NBTLESS_ITEM, Types1_2_4.COMPRESSED_NBT_ITEM); // item
+                map(Types1_4_2.NBTLESS_ITEM, Types1_2_4.NBT_ITEM); // item
             }
         });
         this.registerClientbound(ClientboundPacketsb1_8.WINDOW_ITEMS, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.BYTE); // window id
-                map(Types1_4_2.NBTLESS_ITEM_ARRAY, Types1_2_4.COMPRESSED_NBT_ITEM_ARRAY); // item
+                map(Types1_4_2.NBTLESS_ITEM_ARRAY, Types1_2_4.NBT_ITEM_ARRAY); // item
             }
         });
 
@@ -82,7 +82,7 @@ public class Protocol1_0_0_1tob1_8_0_1 extends StatelessProtocol<ClientboundPack
             public void register() {
                 map(Types1_7_6.POSITION_UBYTE); // position
                 map(Type.UNSIGNED_BYTE); // direction
-                map(Types1_2_4.COMPRESSED_NBT_ITEM, Types1_4_2.NBTLESS_ITEM);
+                map(Types1_2_4.NBT_ITEM, Types1_4_2.NBTLESS_ITEM);
             }
         });
         this.registerServerbound(ServerboundPackets1_0.CLICK_WINDOW, new PacketHandlers() {
@@ -93,14 +93,14 @@ public class Protocol1_0_0_1tob1_8_0_1 extends StatelessProtocol<ClientboundPack
                 map(Type.BYTE); // button
                 map(Type.SHORT); // action
                 map(Type.BYTE); // mode
-                map(Types1_2_4.COMPRESSED_NBT_ITEM, Types1_4_2.NBTLESS_ITEM); // item
+                map(Types1_2_4.NBT_ITEM, Types1_4_2.NBTLESS_ITEM); // item
             }
         });
         this.registerServerbound(ServerboundPackets1_0.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.SHORT); // slot
-                map(Types1_2_4.COMPRESSED_NBT_ITEM, Typesb1_8_0_1.CREATIVE_ITEM); // item
+                map(Types1_2_4.NBT_ITEM, Typesb1_8_0_1.CREATIVE_ITEM); // item
                 handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Typesb1_8_0_1.CREATIVE_ITEM, 0)));
             }
         });
@@ -114,9 +114,9 @@ public class Protocol1_0_0_1tob1_8_0_1 extends StatelessProtocol<ClientboundPack
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocol1_0_0_1tob1_8_0_1.class, ClientboundPacketsb1_8::getPacket));
+        userConnection.put(new PreNettySplitter(Protocol1_0_0_1tob1_8_0_1.class, ClientboundPacketsb1_8::getPacket));
 
-        userConnection.put(new PlayerAirTimeStorage(userConnection));
+        userConnection.put(new PlayerAirTimeStorage());
     }
 
     @Override

@@ -21,7 +21,6 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.metadata.MetaListType;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ItemArrayType;
 
 import java.util.List;
 

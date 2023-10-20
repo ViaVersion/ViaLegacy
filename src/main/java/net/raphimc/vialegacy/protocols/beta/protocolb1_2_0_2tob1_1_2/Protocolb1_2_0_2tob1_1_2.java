@@ -19,7 +19,6 @@ package net.raphimc.vialegacy.protocols.beta.protocolb1_2_0_2tob1_1_2;
 
 import com.google.common.collect.Lists;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -135,11 +134,7 @@ public class Protocolb1_2_0_2tob1_1_2 extends StatelessProtocol<ClientboundPacke
         this.registerClientbound(ClientboundPacketsb1_1.CHUNK_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                handler(wrapper -> {
-                    final ClientWorld clientWorld = new ClientWorld(wrapper.user());
-                    clientWorld.setEnvironment(0);
-                    BLOCK_DATA_REWRITER.remapChunk(wrapper.passthrough(Types1_1.CHUNK));
-                });
+                handler(wrapper -> BLOCK_DATA_REWRITER.remapChunk(wrapper.passthrough(Types1_1.CHUNK))); // chunk
             }
         });
         this.registerClientbound(ClientboundPacketsb1_1.MULTI_BLOCK_CHANGE, new PacketHandlers() {
@@ -203,9 +198,9 @@ public class Protocolb1_2_0_2tob1_1_2 extends StatelessProtocol<ClientboundPacke
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocolb1_2_0_2tob1_1_2.class, ClientboundPacketsb1_1::getPacket));
+        userConnection.put(new PreNettySplitter(Protocolb1_2_0_2tob1_1_2.class, ClientboundPacketsb1_1::getPacket));
 
-        userConnection.put(new EntityFlagStorage(userConnection));
+        userConnection.put(new EntityFlagStorage());
     }
 
 }

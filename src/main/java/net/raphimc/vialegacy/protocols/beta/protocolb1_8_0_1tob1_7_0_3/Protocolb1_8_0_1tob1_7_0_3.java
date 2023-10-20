@@ -352,10 +352,10 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends StatelessProtocol<ClientboundPac
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocolb1_8_0_1tob1_7_0_3.class, ClientboundPacketsb1_7::getPacket));
+        userConnection.put(new PreNettySplitter(Protocolb1_8_0_1tob1_7_0_3.class, ClientboundPacketsb1_7::getPacket));
 
-        userConnection.put(new PlayerNameTracker(userConnection));
-        userConnection.put(new PlayerHealthTracker(userConnection));
+        userConnection.put(new PlayerNameTracker());
+        userConnection.put(new PlayerHealthTracker());
     }
 
     private boolean isSword(final Item item) {

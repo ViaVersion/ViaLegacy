@@ -17,16 +17,11 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 
-public class AttachTracker extends StoredObject {
+public class AttachTracker implements StorableObject {
 
     public int vehicleEntityId = -1;
     public boolean lastSneakState = false;
-
-    public AttachTracker(UserConnection user) {
-        super(user);
-    }
 
 }

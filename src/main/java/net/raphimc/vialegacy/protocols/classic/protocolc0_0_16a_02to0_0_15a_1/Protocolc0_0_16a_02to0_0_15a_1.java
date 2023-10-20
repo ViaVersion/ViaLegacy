@@ -87,7 +87,7 @@ public class Protocolc0_0_16a_02to0_0_15a_1 extends StatelessProtocol<Clientboun
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocolc0_0_16a_02to0_0_15a_1.class, ClientboundPacketsc0_15a::getPacket));
+        userConnection.put(new PreNettySplitter(Protocolc0_0_16a_02to0_0_15a_1.class, ClientboundPacketsc0_15a::getPacket));
     }
 
 }

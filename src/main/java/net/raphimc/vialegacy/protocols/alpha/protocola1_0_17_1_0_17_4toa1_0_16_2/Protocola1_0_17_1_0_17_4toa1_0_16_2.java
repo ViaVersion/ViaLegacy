@@ -60,9 +60,9 @@ public class Protocola1_0_17_1_0_17_4toa1_0_16_2 extends StatelessProtocol<Clien
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocola1_0_17_1_0_17_4toa1_0_16_2.class, ClientboundPacketsa1_0_16::getPacket));
+        userConnection.put(new PreNettySplitter(Protocola1_0_17_1_0_17_4toa1_0_16_2.class, ClientboundPacketsa1_0_16::getPacket));
 
-        userConnection.put(new TimeLockStorage(userConnection, 0));
+        userConnection.put(new TimeLockStorage(0));
     }
 
 }

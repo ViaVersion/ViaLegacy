@@ -31,7 +31,7 @@ public class Protocolb1_4_0_1tob1_3_0_1 extends StatelessProtocol<ClientboundPac
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocolb1_4_0_1tob1_3_0_1.class, ClientboundPacketsb1_3::getPacket));
+        userConnection.put(new PreNettySplitter(Protocolb1_4_0_1tob1_3_0_1.class, ClientboundPacketsb1_3::getPacket));
     }
 
 }

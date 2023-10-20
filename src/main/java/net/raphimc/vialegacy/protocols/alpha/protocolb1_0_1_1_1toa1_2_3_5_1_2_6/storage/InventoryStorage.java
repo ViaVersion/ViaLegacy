@@ -17,8 +17,7 @@
  */
 package net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 
@@ -26,7 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-public class InventoryStorage extends StoredObject {
+public class InventoryStorage implements StorableObject {
 
     public static final byte WORKBENCH_WID = 33;
     public static final byte FURNACE_WID = 44;
@@ -42,8 +41,7 @@ public class InventoryStorage extends StoredObject {
     public Position openContainerPos = null;
     public short selectedHotbarSlot = 0;
 
-    public InventoryStorage(UserConnection user) {
-        super(user);
+    public InventoryStorage() {
         this.resetPlayerInventory();
     }
 

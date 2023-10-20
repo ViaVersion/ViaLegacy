@@ -17,8 +17,11 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5.types;
 
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.type.Type;
+
 public class Types1_4_4 {
 
-    public static final BulkChunkType1_4_4 CHUNK_BULK = new BulkChunkType1_4_4();
+    public static final Type<Chunk[]> CHUNK_BULK = new BulkChunkType1_4_4();
 
 }

@@ -17,23 +17,22 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
+import com.viaversion.viaversion.api.minecraft.Environment;
 
-public class DimensionTracker extends StoredObject {
+public class DimensionTracker implements StorableObject {
 
-    private int dimensionId = 0;
+    private Environment dimension = Environment.NORMAL;
 
-    public DimensionTracker(UserConnection user) {
-        super(user);
+    public boolean changeDimension(final int dimensionId) {
+        final Environment newDimension = Environment.getEnvironmentById(dimensionId);
+        final boolean dimensionChanged = newDimension != this.dimension;
+        this.dimension = Environment.getEnvironmentById(dimensionId);
+        return dimensionChanged;
     }
 
-    public void setDimension(final int dimensionId) {
-        this.dimensionId = dimensionId;
-    }
-
-    public int getDimensionId() {
-        return this.dimensionId;
+    public Environment getDimension() {
+        return this.dimension;
     }
 
 }

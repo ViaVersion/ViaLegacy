@@ -545,12 +545,12 @@ public class Protocola1_0_15toc0_30 extends StatelessProtocol<ClientboundPackets
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocola1_0_15toc0_30.class, ClientboundPacketsc0_28::getPacket));
+        userConnection.put(new PreNettySplitter(Protocola1_0_15toc0_30.class, ClientboundPacketsc0_28::getPacket));
 
-        userConnection.put(new ClassicPositionTracker(userConnection));
+        userConnection.put(new ClassicPositionTracker());
         userConnection.put(new ClassicOpLevelStorage(userConnection, ViaLegacy.getConfig().enableClassicFly()));
-        userConnection.put(new ClassicProgressStorage(userConnection));
-        userConnection.put(new ClassicBlockRemapper(userConnection, i -> ClassicBlocks.MAPPING.get(i), o -> {
+        userConnection.put(new ClassicProgressStorage());
+        userConnection.put(new ClassicBlockRemapper(i -> ClassicBlocks.MAPPING.get(i), o -> {
             int block = ClassicBlocks.REVERSE_MAPPING.getInt(o);
 
             if (!userConnection.getProtocolInfo().getPipeline().contains(Protocolc0_30toc0_30cpe.class)) {

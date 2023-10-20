@@ -160,7 +160,7 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
                     wrapper.cancel();
                     final InventoryStorage tracker = wrapper.user().get(InventoryStorage.class);
                     final Position pos = wrapper.read(Types1_7_6.POSITION_SHORT); // position
-                    final CompoundTag tag = wrapper.read(Types1_7_6.COMPRESSED_NBT); // data
+                    final CompoundTag tag = wrapper.read(Types1_7_6.NBT); // data
 
                     if (tag.<IntTag>get("x").asInt() != pos.x() || tag.<IntTag>get("y").asInt() != pos.y() || tag.<IntTag>get("z").asInt() != pos.z()) {
                         return;
@@ -365,7 +365,7 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
                     wrapper.write(Type.INT, tracker.openContainerPos.x());
                     wrapper.write(Type.SHORT, (short) tracker.openContainerPos.y());
                     wrapper.write(Type.INT, tracker.openContainerPos.z());
-                    wrapper.write(Types1_7_6.COMPRESSED_NBT, tag);
+                    wrapper.write(Types1_7_6.NBT, tag);
                 });
             }
         });
@@ -384,7 +384,7 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
                     tag.put("Text2", new StringTag(wrapper.read(Typesb1_7_0_3.STRING))); // line 2
                     tag.put("Text3", new StringTag(wrapper.read(Typesb1_7_0_3.STRING))); // line 3
                     tag.put("Text4", new StringTag(wrapper.read(Typesb1_7_0_3.STRING))); // line 4
-                    wrapper.write(Types1_7_6.COMPRESSED_NBT, tag); // data
+                    wrapper.write(Types1_7_6.NBT, tag); // data
                 });
             }
         });
@@ -528,9 +528,9 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class, ClientboundPacketsa1_2_6::getPacket));
+        userConnection.put(new PreNettySplitter(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class, ClientboundPacketsa1_2_6::getPacket));
 
-        userConnection.put(new InventoryStorage(userConnection));
+        userConnection.put(new InventoryStorage());
         if (Via.getManager().getProviders().get(AlphaInventoryProvider.class).usesInventoryTracker()) {
             userConnection.put(new AlphaInventoryTracker(userConnection));
         }

@@ -17,19 +17,14 @@
  */
 package net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.libs.fastutil.ints.IntOpenHashSet;
 import com.viaversion.viaversion.libs.fastutil.ints.IntSet;
 
-public class ExtBlockPermissionsStorage extends StoredObject {
+public class ExtBlockPermissionsStorage implements StorableObject {
 
     private final IntSet placingDenied = new IntOpenHashSet();
     private final IntSet breakingDenied = new IntOpenHashSet();
-
-    public ExtBlockPermissionsStorage(final UserConnection user) {
-        super(user);
-    }
 
     public void addPlaceable(final int block) {
         this.placingDenied.remove(block);

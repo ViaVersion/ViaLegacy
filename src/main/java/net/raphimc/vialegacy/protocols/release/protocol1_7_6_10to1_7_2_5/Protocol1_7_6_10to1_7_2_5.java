@@ -82,11 +82,11 @@ public class Protocol1_7_6_10to1_7_2_5 extends AbstractProtocol<ClientboundPacke
             public void register() {
                 map(Types1_7_6.POSITION_SHORT); // position
                 map(Type.UNSIGNED_BYTE); // type
-                map(Types1_7_6.COMPRESSED_NBT); // data
+                map(Types1_7_6.NBT); // data
                 handler(wrapper -> {
                     final Position pos = wrapper.get(Types1_7_6.POSITION_SHORT, 0);
                     final short type = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                    final CompoundTag tag = wrapper.get(Types1_7_6.COMPRESSED_NBT, 0);
+                    final CompoundTag tag = wrapper.get(Types1_7_6.NBT, 0);
                     if (type != 4/*skull*/) return;
                     final ByteTag skullType = tag.get("SkullType");
                     if (skullType == null || skullType.asByte() != 3/*player_skull*/) return;
@@ -106,7 +106,7 @@ public class Protocol1_7_6_10to1_7_2_5 extends AbstractProtocol<ClientboundPacke
                                 if (skullProfile == null || skullProfile.isOffline()) return;
 
                                 newTag.put("Owner", writeGameProfileToTag(skullProfile));
-                                wrapper.set(Types1_7_6.COMPRESSED_NBT, 0, newTag);
+                                wrapper.set(Types1_7_6.NBT, 0, newTag);
                                 return;
                             }
                         }
@@ -120,7 +120,7 @@ public class Protocol1_7_6_10to1_7_2_5 extends AbstractProtocol<ClientboundPacke
                                 final PacketWrapper updateSkull = PacketWrapper.create(ClientboundPackets1_7_2.BLOCK_ENTITY_DATA, wrapper.user());
                                 updateSkull.write(Types1_7_6.POSITION_SHORT, pos);
                                 updateSkull.write(Type.UNSIGNED_BYTE, type);
-                                updateSkull.write(Types1_7_6.COMPRESSED_NBT, newTag);
+                                updateSkull.write(Types1_7_6.NBT, newTag);
                                 updateSkull.send(Protocol1_7_6_10to1_7_2_5.class);
                             } catch (Throwable e) {
                                 e.printStackTrace();

@@ -17,21 +17,16 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.Position;
 
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
-public class ChestStateTracker extends StoredObject {
+public class ChestStateTracker implements StorableObject {
 
     private final Set<Position> openChests = new HashSet<>();
-
-    public ChestStateTracker(final UserConnection userConnection) {
-        super(userConnection);
-    }
 
     public void openChest(final Position position) {
         this.openChests.add(position);

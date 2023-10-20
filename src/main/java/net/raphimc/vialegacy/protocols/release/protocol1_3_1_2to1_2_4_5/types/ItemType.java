@@ -40,7 +40,7 @@ public class ItemType extends Type<Item> {
             item.setAmount(buffer.readByte());
             item.setData(buffer.readShort());
             if (NbtItemList.hasNbt(id)) {
-                item.setTag(Types1_7_6.COMPRESSED_NBT.read(buffer));
+                item.setTag(Types1_7_6.NBT.read(buffer));
             }
             return item;
         }
@@ -54,7 +54,7 @@ public class ItemType extends Type<Item> {
             buffer.writeByte(item.amount());
             buffer.writeShort(item.data());
             if (NbtItemList.hasNbt(item.identifier())) {
-                Types1_7_6.COMPRESSED_NBT.write(buffer, item.tag());
+                Types1_7_6.NBT.write(buffer, item.tag());
             }
         }
     }

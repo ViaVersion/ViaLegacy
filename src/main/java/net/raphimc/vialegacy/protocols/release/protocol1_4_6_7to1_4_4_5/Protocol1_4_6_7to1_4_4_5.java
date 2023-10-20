@@ -19,8 +19,6 @@ package net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5;
 
 import com.google.common.collect.Lists;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
-import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -31,14 +29,12 @@ import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5.rewriter.ItemRewriter;
-import net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5.types.BulkChunkType1_4_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5.types.Types1_4_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_5_0_1to1_4_6_7.ClientboundPackets1_4_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.ServerboundPackets1_5_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.MetaType1_6_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Types1_6_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata.MetaIndex1_8to1_7_6;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.BulkChunkType1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
 public class Protocol1_4_6_7to1_4_4_5 extends StatelessProtocol<ClientboundPackets1_4_4, ClientboundPackets1_4_6, ServerboundPackets1_5_2, ServerboundPackets1_5_2> {
@@ -53,36 +49,12 @@ public class Protocol1_4_6_7to1_4_4_5 extends StatelessProtocol<ClientboundPacke
     protected void registerPackets() {
         this.itemRewriter.register();
 
-        this.registerClientbound(ClientboundPackets1_4_4.JOIN_GAME, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Type.INT); // entity id
-                map(Types1_6_4.STRING); // level type
-                map(Type.BYTE); // game mode
-                map(Type.BYTE); // dimension id
-                map(Type.BYTE); // difficulty
-                map(Type.BYTE); // world height
-                map(Type.BYTE); // max players
-                handler(wrapper -> wrapper.user().get(ClientWorld.class).setEnvironment(wrapper.get(Type.BYTE, 1)));
-            }
-        });
-        this.registerClientbound(ClientboundPackets1_4_4.RESPAWN, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Type.INT); // dimension id
-                map(Type.BYTE); // difficulty
-                map(Type.BYTE); // game mode
-                map(Type.SHORT); // world height
-                map(Types1_6_4.STRING); // worldType
-                handler(wrapper -> wrapper.user().get(ClientWorld.class).setEnvironment(wrapper.get(Type.INT, 0)));
-            }
-        });
         this.registerClientbound(ClientboundPackets1_4_4.SPAWN_ITEM, ClientboundPackets1_4_6.SPAWN_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> {
                     final int entityId = wrapper.read(Type.INT); // entity id
-                    final Item item = wrapper.read(Types1_7_6.COMPRESSED_ITEM); // item
+                    final Item item = wrapper.read(Types1_7_6.ITEM); // item
                     final int x = wrapper.read(Type.INT); // x
                     final int y = wrapper.read(Type.INT); // y
                     final int z = wrapper.read(Type.INT); // z
@@ -151,11 +123,7 @@ public class Protocol1_4_6_7to1_4_4_5 extends StatelessProtocol<ClientboundPacke
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocol1_4_6_7to1_4_4_5.class, ClientboundPackets1_4_4::getPacket));
-
-        if (!userConnection.has(ClientWorld.class)) {
-            userConnection.put(new ClientWorld(userConnection));
-        }
+        userConnection.put(new PreNettySplitter(Protocol1_4_6_7to1_4_4_5.class, ClientboundPackets1_4_4::getPacket));
     }
 
     @Override

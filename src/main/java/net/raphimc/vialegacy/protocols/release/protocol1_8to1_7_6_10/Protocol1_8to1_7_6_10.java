@@ -22,7 +22,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
@@ -64,8 +63,6 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.Ch
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.TranslationRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage.*;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.BulkChunkType1_7_6;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkType1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
 import java.nio.charset.StandardCharsets;
@@ -138,8 +135,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                     tracker.trackEntity(entityId, EntityTypes1_10.EntityType.PLAYER);
                     tracker.setPlayerID(entityId);
-                    wrapper.user().get(DimensionTracker.class).setDimension(dimensionId);
-                    wrapper.user().get(ClientWorld.class).setEnvironment(dimensionId);
+                    wrapper.user().get(DimensionTracker.class).changeDimension(dimensionId);
                 });
             }
         });
@@ -155,7 +151,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             public void register() {
                 map(Type.INT, Type.VAR_INT); // entity id
                 map(Type.SHORT); // slot
-                map(Types1_7_6.COMPRESSED_ITEM, Type.ITEM1_8); // item
+                map(Types1_7_6.ITEM, Type.ITEM1_8); // item
                 handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Type.ITEM1_8, 0)));
             }
         });
@@ -181,11 +177,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.UNSIGNED_BYTE); // gamemode
                 map(Type.STRING); // worldType
                 handler(wrapper -> {
-                    final int oldDim = wrapper.user().get(DimensionTracker.class).getDimensionId();
-                    final int newDim = wrapper.get(Type.INT, 0);
-                    wrapper.user().get(DimensionTracker.class).setDimension(newDim);
-                    wrapper.user().get(ClientWorld.class).setEnvironment(newDim);
-                    if (oldDim != newDim) {
+                    if (wrapper.user().get(DimensionTracker.class).changeDimension(wrapper.get(Type.INT, 0))) {
                         wrapper.user().get(ChunkTracker.class).clear();
                         wrapper.user().get(EntityTracker.class).clear();
                     }
@@ -634,11 +626,11 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final Environment environment = wrapper.user().get(ClientWorld.class).getEnvironment();
+                    final Environment dimension = wrapper.user().get(DimensionTracker.class).getDimension();
 
-                    final Chunk chunk = wrapper.read(Types1_7_6.getChunk(environment));
+                    final Chunk chunk = wrapper.read(Types1_7_6.getChunk(dimension));
                     wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
-                    wrapper.write(ChunkType1_8.forEnvironment(environment), chunk);
+                    wrapper.write(ChunkType1_8.forEnvironment(dimension), chunk);
                 });
             }
         });
@@ -934,7 +926,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     if (windowType == 4/*enchanting_table*/ && slot >= 1) slot += 1;
                     wrapper.write(Type.SHORT, slot);
                 });
-                map(Types1_7_6.COMPRESSED_ITEM, Type.ITEM1_8); // item
+                map(Types1_7_6.ITEM, Type.ITEM1_8); // item
                 handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Type.ITEM1_8, 0)));
             }
         });
@@ -944,7 +936,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 handler(wrapper -> {
                     final short windowId = wrapper.passthrough(Type.UNSIGNED_BYTE); // window id
                     final short windowType = wrapper.user().get(WindowTracker.class).get(windowId);
-                    Item[] items = wrapper.read(Types1_7_6.COMPRESSED_ITEM_ARRAY); // items
+                    Item[] items = wrapper.read(Types1_7_6.ITEM_ARRAY); // items
                     if (windowType == 4/*enchanting_table*/) {
                         final Item[] old = items;
                         items = new Item[old.length + 1];
@@ -1057,7 +1049,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             public void register() {
                 map(Types1_7_6.POSITION_SHORT, Type.POSITION1_8); // position
                 map(Type.UNSIGNED_BYTE); // type
-                map(Types1_7_6.COMPRESSED_NBT, Type.NAMED_COMPOUND_TAG); // data
+                map(Types1_7_6.NBT, Type.NAMED_COMPOUND_TAG); // data
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.OPEN_SIGN_EDITOR, new PacketHandlers() {
@@ -1178,17 +1170,17 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                             wrapper.passthrough(Type.INT); // window id
                             final int count = wrapper.passthrough(Type.UNSIGNED_BYTE); // count
                             for (int i = 0; i < count; i++) {
-                                Item item = wrapper.read(Types1_7_6.COMPRESSED_ITEM);
+                                Item item = wrapper.read(Types1_7_6.ITEM);
                                 itemRewriter.handleItemToClient(item);
                                 wrapper.write(Type.ITEM1_8, item); // item 1
 
-                                item = wrapper.read(Types1_7_6.COMPRESSED_ITEM);
+                                item = wrapper.read(Types1_7_6.ITEM);
                                 itemRewriter.handleItemToClient(item);
                                 wrapper.write(Type.ITEM1_8, item); // item 3
 
                                 final boolean has3Items = wrapper.passthrough(Type.BOOLEAN); // has 3 items
                                 if (has3Items) {
-                                    item = wrapper.read(Types1_7_6.COMPRESSED_ITEM);
+                                    item = wrapper.read(Types1_7_6.ITEM);
                                     itemRewriter.handleItemToClient(item);
                                     wrapper.write(Type.ITEM1_8, item); // item 2
                                 }
@@ -1282,13 +1274,13 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             public void register() {
                 map(Type.POSITION1_8, Types1_7_6.POSITION_UBYTE); // position
                 map(Type.UNSIGNED_BYTE); // direction
-                map(Type.ITEM1_8, Types1_7_6.COMPRESSED_ITEM); // item
+                map(Type.ITEM1_8, Types1_7_6.ITEM); // item
                 map(Type.UNSIGNED_BYTE); // offset x
                 map(Type.UNSIGNED_BYTE); // offset y
                 map(Type.UNSIGNED_BYTE); // offset z
                 handler(wrapper -> {
                     final short direction = wrapper.get(Type.UNSIGNED_BYTE, 0);
-                    final Item item = wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0);
+                    final Item item = wrapper.get(Types1_7_6.ITEM, 0);
                     itemRewriter.handleItemToServer(item);
 
                     if (item != null && item.identifier() == ItemList1_6.writtenBook.itemID && direction == 255) { // If placed item is a book then cancel it and send a MC|BOpen to the client
@@ -1361,16 +1353,16 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.BYTE); // button
                 map(Type.SHORT); // transaction id
                 map(Type.BYTE); // action
-                map(Type.ITEM1_8, Types1_7_6.COMPRESSED_ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
+                map(Type.ITEM1_8, Types1_7_6.ITEM); // item
+                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.ITEM, 0)));
             }
         });
         this.registerServerbound(ServerboundPackets1_8.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.SHORT); // slot
-                map(Type.ITEM1_8, Types1_7_6.COMPRESSED_ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
+                map(Type.ITEM1_8, Types1_7_6.ITEM); // item
+                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.ITEM, 0)));
             }
         });
         this.registerServerbound(ServerboundPackets1_8.UPDATE_SIGN, new PacketHandlers() {
@@ -1432,11 +1424,11 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                             final Item item = wrapper.read(Type.ITEM1_8); // book
                             itemRewriter.handleItemToServer(item);
 
-                            lengthPacketWrapper.write(Types1_7_6.COMPRESSED_ITEM, item);
+                            lengthPacketWrapper.write(Types1_7_6.ITEM, item);
                             lengthPacketWrapper.writeToBuffer(lengthBuffer);
 
                             wrapper.write(Type.SHORT, (short) lengthBuffer.readableBytes()); // length
-                            wrapper.write(Types1_7_6.COMPRESSED_ITEM, item); // book
+                            wrapper.write(Types1_7_6.ITEM, item); // book
                             break;
                         case "MC|TrSel":
                             final int selectedTrade = wrapper.read(Type.INT); // selected trade
@@ -1583,13 +1575,10 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
     @Override
     public void init(UserConnection userConnection) {
         userConnection.put(new TablistStorage(userConnection));
-        userConnection.put(new WindowTracker(userConnection));
+        userConnection.put(new WindowTracker());
         userConnection.put(new EntityTracker(userConnection));
-        userConnection.put(new MapStorage(userConnection));
-        userConnection.put(new DimensionTracker(userConnection));
-        if (!userConnection.has(ClientWorld.class)) {
-            userConnection.put(new ClientWorld(userConnection));
-        }
+        userConnection.put(new MapStorage());
+        userConnection.put(new DimensionTracker());
         userConnection.put(new ChunkTracker(userConnection));
     }
 

@@ -22,7 +22,6 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
@@ -66,8 +65,6 @@ import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.Serverb
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.GameProfile;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.providers.GameProfileFetcher;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkType1_7_6;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.BulkChunkType1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.MetaType1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
@@ -108,8 +105,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                         });
                         handler(wrapper -> {
                             final byte dimensionId = wrapper.get(Type.BYTE, 0);
-                            wrapper.user().get(DimensionTracker.class).setDimension(dimensionId);
-                            wrapper.user().get(ClientWorld.class).setEnvironment(dimensionId);
+                            wrapper.user().get(DimensionTracker.class).changeDimension(dimensionId);
 
                             wrapper.user().put(new ChunkTracker(wrapper.user()));
                         });
@@ -143,8 +139,8 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
             public void register() {
                 map(Type.INT); // entity id
                 map(Type.SHORT); // slot
-                map(Types1_7_6.COMPRESSED_ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
+                map(Types1_7_6.ITEM); // item
+                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Types1_7_6.ITEM, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.RESPAWN, new PacketHandlers() {
@@ -156,11 +152,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 read(Type.SHORT); // world height
                 map(Types1_6_4.STRING, Type.STRING); // worldType
                 handler(wrapper -> {
-                    final int oldDim = wrapper.user().get(DimensionTracker.class).getDimensionId();
-                    final int newDim = wrapper.get(Type.INT, 0);
-                    wrapper.user().get(DimensionTracker.class).setDimension(newDim);
-                    wrapper.user().get(ClientWorld.class).setEnvironment(newDim);
-                    if (oldDim != newDim) {
+                    if (wrapper.user().get(DimensionTracker.class).changeDimension(wrapper.get(Type.INT, 0))) {
                         wrapper.user().get(ChunkTracker.class).clear();
                     }
                 });
@@ -421,7 +413,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final Chunk chunk = wrapper.passthrough(Types1_7_6.getChunk(wrapper.user().get(ClientWorld.class).getEnvironment()));
+                    final Chunk chunk = wrapper.passthrough(Types1_7_6.getChunk(wrapper.user().get(DimensionTracker.class).getDimension()));
                     wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
                 });
             }
@@ -655,8 +647,8 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
             public void register() {
                 map(Type.BYTE); // window id
                 map(Type.SHORT); // slot
-                map(Types1_7_6.COMPRESSED_ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
+                map(Types1_7_6.ITEM); // item
+                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Types1_7_6.ITEM, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.WINDOW_ITEMS, new PacketHandlers() {
@@ -664,7 +656,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
             public void register() {
                 map(Type.BYTE, Type.UNSIGNED_BYTE); // window id
                 handler(wrapper -> {
-                    final Item[] items = wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM_ARRAY); // items
+                    final Item[] items = wrapper.passthrough(Types1_7_6.ITEM_ARRAY); // items
                     for (Item item : items) {
                         itemRewriter.handleItemToClient(item);
                     }
@@ -694,7 +686,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
             public void register() {
                 map(Types1_7_6.POSITION_SHORT); // position
                 map(Type.BYTE, Type.UNSIGNED_BYTE); // type
-                map(Types1_7_6.COMPRESSED_NBT); // data
+                map(Types1_7_6.NBT); // data
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.OPEN_SIGN_EDITOR, new PacketHandlers() {
@@ -798,10 +790,10 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                                 wrapper.passthrough(Type.INT); // window id
                                 final int count = wrapper.passthrough(Type.UNSIGNED_BYTE); // count
                                 for (int i = 0; i < count; i++) {
-                                    itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM)); // item 1
-                                    itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM)); // item 3
+                                    itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.ITEM)); // item 1
+                                    itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.ITEM)); // item 3
                                     if (wrapper.passthrough(Type.BOOLEAN)) { // has 3 items
-                                        itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM)); // item 2
+                                        itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.ITEM)); // item 2
                                     }
                                     wrapper.passthrough(Type.BOOLEAN); // unavailable
                                 }
@@ -1023,8 +1015,8 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
             public void register() {
                 map(Types1_7_6.POSITION_UBYTE); // position
                 map(Type.UNSIGNED_BYTE); // direction
-                map(Types1_7_6.COMPRESSED_ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
+                map(Types1_7_6.ITEM); // item
+                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.ITEM, 0)));
                 map(Type.UNSIGNED_BYTE); // offset x
                 map(Type.UNSIGNED_BYTE); // offset y
                 map(Type.UNSIGNED_BYTE); // offset z
@@ -1038,8 +1030,8 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 map(Type.BYTE); // button
                 map(Type.SHORT); // action
                 map(Type.BYTE); // mode
-                map(Types1_7_6.COMPRESSED_ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.COMPRESSED_ITEM, 0)));
+                map(Types1_7_6.ITEM); // item
+                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.ITEM, 0)));
             }
         });
         this.registerServerbound(ServerboundPackets1_7_2.UPDATE_SIGN, new PacketHandlers() {
@@ -1130,14 +1122,14 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                     switch (channel) {
                         case "MC|BEdit":
                         case "MC|BSign":
-                            final Item item = wrapper.read(Types1_7_6.COMPRESSED_ITEM); // book
+                            final Item item = wrapper.read(Types1_7_6.ITEM); // book
                             itemRewriter.handleItemToServer(item);
 
-                            lengthPacketWrapper.write(Types1_7_6.COMPRESSED_ITEM, item);
+                            lengthPacketWrapper.write(Types1_7_6.ITEM, item);
                             lengthPacketWrapper.writeToBuffer(lengthBuffer);
 
                             wrapper.set(Type.SHORT, 0, (short) lengthBuffer.readableBytes()); // length
-                            wrapper.write(Types1_7_6.COMPRESSED_ITEM, item); // book
+                            wrapper.write(Types1_7_6.ITEM, item); // book
                             break;
                         case "MC|AdvCdm":
                             final byte type = wrapper.read(Type.BYTE); // command block type
@@ -1185,14 +1177,11 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocol1_7_2_5to1_6_4.class, ClientboundPackets1_6_4::getPacket));
+        userConnection.put(new PreNettySplitter(Protocol1_7_2_5to1_6_4.class, ClientboundPackets1_6_4::getPacket));
 
-        userConnection.put(new PlayerInfoStorage(userConnection));
-        userConnection.put(new StatisticsStorage(userConnection));
-        userConnection.put(new DimensionTracker(userConnection));
-        if (!userConnection.has(ClientWorld.class)) {
-            userConnection.put(new ClientWorld(userConnection));
-        }
+        userConnection.put(new PlayerInfoStorage());
+        userConnection.put(new StatisticsStorage());
+        userConnection.put(new DimensionTracker());
         userConnection.put(new ChunkTracker(userConnection)); // Set again in JOIN_GAME handler for version comparisons to work
 
         if (userConnection.getChannel() != null) {

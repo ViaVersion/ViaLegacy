@@ -24,8 +24,8 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ItemA
 
 public class Types1_2_4 {
 
-    public static final Type<Item> COMPRESSED_NBT_ITEM = new ItemType();
-    public static final Type<Item[]> COMPRESSED_NBT_ITEM_ARRAY = new ItemArrayType<>(COMPRESSED_NBT_ITEM);
+    public static final Type<Item> NBT_ITEM = new ItemType();
+    public static final Type<Item[]> NBT_ITEM_ARRAY = new ItemArrayType<>(NBT_ITEM);
 
     public static final Type<Chunk> CHUNK = new ChunkType1_2_4();
 

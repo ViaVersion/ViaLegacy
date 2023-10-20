@@ -39,7 +39,7 @@ public class ItemType extends Type<Item> {
         item.setIdentifier(id);
         item.setAmount(buffer.readByte());
         item.setData(buffer.readShort());
-        item.setTag(Types1_7_6.COMPRESSED_NBT.read(buffer));
+        item.setTag(Types1_7_6.NBT.read(buffer));
         return item;
     }
 
@@ -51,7 +51,7 @@ public class ItemType extends Type<Item> {
             buffer.writeShort(item.identifier());
             buffer.writeByte(item.amount());
             buffer.writeShort(item.data());
-            Types1_7_6.COMPRESSED_NBT.write(buffer, item.tag());
+            Types1_7_6.NBT.write(buffer, item.tag());
         }
     }
 

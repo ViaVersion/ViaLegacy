@@ -36,7 +36,7 @@ public class ItemRewriter extends LegacyItemRewriter<Protocol1_5_0_1to1_4_6_7> {
 
     @Override
     protected void registerPackets() {
-        this.registerCreativeInventoryAction(ServerboundPackets1_5_2.CREATIVE_INVENTORY_ACTION, Types1_7_6.COMPRESSED_ITEM);
+        this.registerCreativeInventoryAction(ServerboundPackets1_5_2.CREATIVE_INVENTORY_ACTION, Types1_7_6.ITEM);
     }
 
 }

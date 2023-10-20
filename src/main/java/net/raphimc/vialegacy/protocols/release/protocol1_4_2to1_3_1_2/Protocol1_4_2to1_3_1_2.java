@@ -156,7 +156,7 @@ public class Protocol1_4_2to1_3_1_2 extends StatelessProtocol<ClientboundPackets
             @Override
             public void register() {
                 map(Type.INT); // entity id
-                map(Types1_3_1.NBTLESS_ITEM, Types1_7_6.COMPRESSED_ITEM);
+                map(Types1_3_1.NBTLESS_ITEM, Types1_7_6.ITEM);
                 map(Type.INT); // x
                 map(Type.INT); // y
                 map(Type.INT); // z
@@ -287,10 +287,10 @@ public class Protocol1_4_2to1_3_1_2 extends StatelessProtocol<ClientboundPackets
                         wrapper.passthrough(Type.INT); // window Id
                         final int count = wrapper.passthrough(Type.UNSIGNED_BYTE); // count
                         for (int i = 0; i < count; i++) {
-                            wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM); // item 1
-                            wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM); // item 3
+                            wrapper.passthrough(Types1_7_6.ITEM); // item 1
+                            wrapper.passthrough(Types1_7_6.ITEM); // item 3
                             if (wrapper.passthrough(Type.BOOLEAN)) { // has 3 items
-                                wrapper.passthrough(Types1_7_6.COMPRESSED_ITEM); // item 2
+                                wrapper.passthrough(Types1_7_6.ITEM); // item 2
                             }
                             wrapper.write(Type.BOOLEAN, false); // unavailable
                         }
@@ -327,7 +327,7 @@ public class Protocol1_4_2to1_3_1_2 extends StatelessProtocol<ClientboundPackets
         final PacketWrapper handItem = PacketWrapper.create(ClientboundPackets1_4_2.ENTITY_EQUIPMENT, wrapper.user());
         handItem.write(Type.INT, entityId); // entity id
         handItem.write(Type.SHORT, (short) 0); // slot
-        handItem.write(Types1_7_6.COMPRESSED_ITEM, item); // item
+        handItem.write(Types1_7_6.ITEM, item); // item
 
         wrapper.send(Protocol1_4_2to1_3_1_2.class);
         handItem.send(Protocol1_4_2to1_3_1_2.class);
@@ -336,7 +336,7 @@ public class Protocol1_4_2to1_3_1_2 extends StatelessProtocol<ClientboundPackets
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocol1_4_2to1_3_1_2.class, ClientboundPackets1_3_1::getPacket));
+        userConnection.put(new PreNettySplitter(Protocol1_4_2to1_3_1_2.class, ClientboundPackets1_3_1::getPacket));
     }
 
     @Override

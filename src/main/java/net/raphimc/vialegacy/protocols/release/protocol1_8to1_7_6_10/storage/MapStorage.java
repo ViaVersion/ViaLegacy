@@ -17,19 +17,14 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.MapData;
 
-public class MapStorage extends StoredObject {
+public class MapStorage implements StorableObject {
 
     private final Int2ObjectMap<MapData> maps = new Int2ObjectOpenHashMap<>();
-
-    public MapStorage(UserConnection user) {
-        super(user);
-    }
 
     public MapData getMapData(final int id) {
         return this.maps.get(id);

@@ -17,14 +17,13 @@
  */
 package net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.api.model.ChunkCoord;
 
-public class ClassicPositionTracker extends StoredObject {
+public class ClassicPositionTracker implements StorableObject {
 
     public double posX;
     public double stance;
@@ -33,10 +32,6 @@ public class ClassicPositionTracker extends StoredObject {
     public float pitch;
 
     public boolean spawned;
-
-    public ClassicPositionTracker(final UserConnection user) {
-        super(user);
-    }
 
     public void writeToPacket(final PacketWrapper wrapper) {
         final int x = (int) (this.posX * 32.0F);

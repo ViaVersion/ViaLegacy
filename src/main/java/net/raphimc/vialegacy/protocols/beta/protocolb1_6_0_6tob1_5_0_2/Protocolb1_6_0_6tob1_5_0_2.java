@@ -165,9 +165,9 @@ public class Protocolb1_6_0_6tob1_5_0_2 extends StatelessProtocol<ClientboundPac
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocolb1_6_0_6tob1_5_0_2.class, ClientboundPacketsb1_5::getPacket));
+        userConnection.put(new PreNettySplitter(Protocolb1_6_0_6tob1_5_0_2.class, ClientboundPacketsb1_5::getPacket));
 
-        userConnection.put(new WorldTimeStorage(userConnection));
+        userConnection.put(new WorldTimeStorage());
     }
 
 }

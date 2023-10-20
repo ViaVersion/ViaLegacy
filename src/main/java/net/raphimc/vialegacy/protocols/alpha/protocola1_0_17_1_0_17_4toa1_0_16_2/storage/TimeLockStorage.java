@@ -17,15 +17,13 @@
  */
 package net.raphimc.vialegacy.protocols.alpha.protocola1_0_17_1_0_17_4toa1_0_16_2.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 
-public class TimeLockStorage extends StoredObject {
+public class TimeLockStorage implements StorableObject {
 
     private long time;
 
-    public TimeLockStorage(UserConnection user, final long time) {
-        super(user);
+    public TimeLockStorage(final long time) {
         this.time = time;
     }
 

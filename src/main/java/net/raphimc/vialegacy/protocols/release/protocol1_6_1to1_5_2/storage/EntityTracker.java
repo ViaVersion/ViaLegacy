@@ -17,22 +17,17 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class EntityTracker extends StoredObject {
+public class EntityTracker implements StorableObject {
 
     private final Map<Integer, EntityTypes1_10.EntityType> entityMap = new ConcurrentHashMap<>();
 
     private int playerID;
-
-    public EntityTracker(UserConnection user) {
-        super(user);
-    }
 
     public int getPlayerID() {
         return this.playerID;

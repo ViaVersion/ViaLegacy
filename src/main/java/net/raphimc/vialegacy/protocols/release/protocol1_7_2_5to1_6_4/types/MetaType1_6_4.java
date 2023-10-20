@@ -28,7 +28,7 @@ public enum MetaType1_6_4 implements MetaType {
     Int(2, Type.INT),
     Float(3, Type.FLOAT),
     String(4, Types1_6_4.STRING),
-    Slot(5, Types1_7_6.COMPRESSED_ITEM),
+    Slot(5, Types1_7_6.ITEM),
     Position(6, Type.VECTOR);
 
     private final int typeID;

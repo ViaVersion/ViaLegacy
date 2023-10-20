@@ -128,7 +128,7 @@ public class Protocol1_1to1_0_0_1 extends StatelessProtocol<ClientboundPackets1_
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocol1_1to1_0_0_1.class, ClientboundPackets1_0::getPacket));
+        userConnection.put(new PreNettySplitter(Protocol1_1to1_0_0_1.class, ClientboundPackets1_0::getPacket));
     }
 
     @Override

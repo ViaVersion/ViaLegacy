@@ -19,7 +19,6 @@ package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types;
 
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.FixedByteArrayType;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
 
@@ -60,7 +59,8 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
         final short chunkCount = byteBuf.readShort();
         final int compressedSize = byteBuf.readInt();
         final boolean hasSkyLight = this.readHasSkyLight(byteBuf);
-        final byte[] data = new FixedByteArrayType(compressedSize).read(byteBuf);
+        final byte[] data = new byte[compressedSize];
+        byteBuf.readBytes(data);
         final int[] chunkX = new int[chunkCount];
         final int[] chunkZ = new int[chunkCount];
         final short[] primaryBitMask = new short[chunkCount];

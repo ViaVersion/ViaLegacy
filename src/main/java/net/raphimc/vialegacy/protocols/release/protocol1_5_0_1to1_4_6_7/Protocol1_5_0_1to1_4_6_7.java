@@ -100,7 +100,7 @@ public class Protocol1_5_0_1to1_4_6_7 extends StatelessProtocol<ClientboundPacke
                 map(Type.BYTE); // button
                 map(Type.SHORT); // action
                 map(Type.BYTE); // mode
-                map(Types1_7_6.COMPRESSED_ITEM); // item
+                map(Types1_7_6.ITEM); // item
                 handler(wrapper -> {
                     final short slot = wrapper.get(Type.SHORT, 0);
                     final byte button = wrapper.get(Type.BYTE, 1);
@@ -141,7 +141,7 @@ public class Protocol1_5_0_1to1_4_6_7 extends StatelessProtocol<ClientboundPacke
 
                         wrapper.set(Type.BYTE, 1, (byte) mouseClick);
                         wrapper.set(Type.BYTE, 2, (byte) 0);
-                        wrapper.set(Types1_7_6.COMPRESSED_ITEM, 0, new DataItem(34, (byte) 0, (short) 0, null));
+                        wrapper.set(Types1_7_6.ITEM, 0, new DataItem(34, (byte) 0, (short) 0, null));
                     }
                 });
             }
@@ -150,7 +150,7 @@ public class Protocol1_5_0_1to1_4_6_7 extends StatelessProtocol<ClientboundPacke
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocol1_5_0_1to1_4_6_7.class, ClientboundPackets1_4_6::getPacket));
+        userConnection.put(new PreNettySplitter(Protocol1_5_0_1to1_4_6_7.class, ClientboundPackets1_4_6::getPacket));
     }
 
     @Override

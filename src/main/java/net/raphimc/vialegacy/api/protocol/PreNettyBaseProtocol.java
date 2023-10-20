@@ -46,7 +46,7 @@ public class PreNettyBaseProtocol extends AbstractSimpleProtocol {
                     wrapper.read(Type.VAR_INT); // protocolVersion
                     final String hostname = wrapper.read(Type.STRING); // hostName
                     final int port = wrapper.read(Type.UNSIGNED_SHORT); // port
-                    wrapper.user().put(new HandshakeStorage(wrapper.user(), hostname, port));
+                    wrapper.user().put(new HandshakeStorage(hostname, port));
                 });
             }
         });
@@ -60,7 +60,7 @@ public class PreNettyBaseProtocol extends AbstractSimpleProtocol {
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new ProtocolMetadataStorage(userConnection));
+        userConnection.put(new ProtocolMetadataStorage());
     }
 
     @Override

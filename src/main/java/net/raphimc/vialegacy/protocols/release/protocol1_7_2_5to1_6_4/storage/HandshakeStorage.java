@@ -17,16 +17,14 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 
-public class HandshakeStorage extends StoredObject {
+public class HandshakeStorage implements StorableObject {
 
     private final String hostname;
     private final int port;
 
-    public HandshakeStorage(final UserConnection user, final String hostName, final int port) {
-        super(user);
+    public HandshakeStorage(final String hostName, final int port) {
         this.hostname = hostName;
         this.port = port;
     }

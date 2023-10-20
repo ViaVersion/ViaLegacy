@@ -60,10 +60,10 @@ public class Protocolc0_27toc0_0_19a_06 extends StatelessProtocol<ClientboundPac
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocolc0_27toc0_0_19a_06.class, ClientboundPacketsc0_19a::getPacket));
+        userConnection.put(new PreNettySplitter(Protocolc0_27toc0_0_19a_06.class, ClientboundPacketsc0_19a::getPacket));
 
         final ClassicBlockRemapper previousRemapper = userConnection.get(ClassicBlockRemapper.class);
-        userConnection.put(new ClassicBlockRemapper(userConnection, previousRemapper.getMapper(), o -> {
+        userConnection.put(new ClassicBlockRemapper(previousRemapper.getMapper(), o -> {
             int block = previousRemapper.getReverseMapper().getInt(o);
 
             if (!userConnection.getProtocolInfo().getPipeline().contains(Protocolc0_0_19a_06toc0_0_18a_02.class)) {

@@ -373,10 +373,10 @@ public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocol1_6_1to1_5_2.class, ClientboundPackets1_5_2::getPacket));
+        userConnection.put(new PreNettySplitter(Protocol1_6_1to1_5_2.class, ClientboundPackets1_5_2::getPacket));
 
-        userConnection.put(new EntityTracker(userConnection));
-        userConnection.put(new AttachTracker(userConnection));
+        userConnection.put(new EntityTracker());
+        userConnection.put(new AttachTracker());
     }
 
     @Override

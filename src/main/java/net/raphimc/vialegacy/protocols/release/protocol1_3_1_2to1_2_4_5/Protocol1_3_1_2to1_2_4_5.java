@@ -21,7 +21,6 @@ import com.google.common.collect.Lists;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
@@ -67,7 +66,6 @@ import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.Ch
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.ProtocolMetadataStorage;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Types1_6_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata.MetaIndex1_8to1_7_6;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkType1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
 import java.util.ArrayList;
@@ -141,8 +139,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                 map(Type.BYTE); // world height
                 map(Type.BYTE); // max players
                 handler(wrapper -> {
-                    wrapper.user().get(ClientWorld.class).setEnvironment(wrapper.get(Type.BYTE, 1));
-                    wrapper.user().get(DimensionTracker.class).setDimension(wrapper.get(Type.BYTE, 1));
+                    wrapper.user().get(DimensionTracker.class).changeDimension(wrapper.get(Type.BYTE, 1));
                     final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                     entityTracker.setPlayerID(wrapper.get(Type.INT, 0));
                     entityTracker.getTrackedEntities().put(entityTracker.getPlayerID(), new TrackedLivingEntity(entityTracker.getPlayerID(), new Location(8, 64, 8), EntityTypes1_10.EntityType.PLAYER));
@@ -157,7 +154,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                 handler(wrapper -> {
                     final int itemId = wrapper.read(Type.SHORT); // item id
                     final short itemDamage = wrapper.read(Type.SHORT); // item damage
-                    wrapper.write(Types1_7_6.COMPRESSED_ITEM, itemId < 0 ? null : new DataItem(itemId, (byte) 1, itemDamage, null));
+                    wrapper.write(Types1_7_6.ITEM, itemId < 0 ? null : new DataItem(itemId, (byte) 1, itemDamage, null));
                 });
             }
         });
@@ -170,11 +167,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                 map(Type.SHORT); // world height
                 map(Types1_6_4.STRING); // level type
                 handler(wrapper -> {
-                    final int oldDim = wrapper.user().get(DimensionTracker.class).getDimensionId();
-                    final int newDim = wrapper.get(Type.INT, 0);
-                    wrapper.user().get(ClientWorld.class).setEnvironment(newDim);
-                    wrapper.user().get(DimensionTracker.class).setDimension(newDim);
-                    if (oldDim != newDim) {
+                    if (wrapper.user().get(DimensionTracker.class).changeDimension(wrapper.get(Type.INT, 0))) {
                         wrapper.user().get(ChestStateTracker.class).clear();
                         final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                         entityTracker.getTrackedEntities().clear();
@@ -459,7 +452,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
 
                     if (!load) {
                         final Chunk chunk = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>());
-                        wrapper.write(Types1_7_6.getChunk(wrapper.user().get(ClientWorld.class).getEnvironment()), chunk);
+                        wrapper.write(Types1_7_6.getChunk(wrapper.user().get(DimensionTracker.class).getDimension()), chunk);
                     } else {
                         wrapper.cancel();
                     }
@@ -470,7 +463,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final Environment environment = wrapper.user().get(ClientWorld.class).getEnvironment();
+                    final Environment dimension = wrapper.user().get(DimensionTracker.class).getDimension();
                     Chunk chunk = wrapper.read(Types1_2_4.CHUNK);
 
                     wrapper.user().get(ChestStateTracker.class).unload(chunk.getX(), chunk.getZ());
@@ -481,7 +474,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                         for (int i = 0; i < chunk.getSections().length; i++) {
                             final ChunkSection section = chunk.getSections()[i] = new ChunkSectionImpl(true);
                             section.palette(PaletteType.BLOCKS).addId(0);
-                            if (environment == Environment.NORMAL) {
+                            if (dimension == Environment.NORMAL) {
                                 final byte[] skyLight = new byte[2048];
                                 Arrays.fill(skyLight, (byte) 255);
                                 section.getLight().setSkyLight(skyLight);
@@ -489,14 +482,14 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                         }
                     }
 
-                    if (environment != Environment.NORMAL) {
+                    if (dimension != Environment.NORMAL) {
                         for (ChunkSection section : chunk.getSections()) {
                             if (section != null) {
                                 section.getLight().setSkyLight(null);
                             }
                         }
                     }
-                    wrapper.write(Types1_7_6.getChunk(environment), chunk);
+                    wrapper.write(Types1_7_6.getChunk(dimension), chunk);
                 });
             }
         });
@@ -609,14 +602,14 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
             public void register() {
                 map(Type.BYTE); // window id
                 map(Type.SHORT); // slot
-                map(Types1_2_4.COMPRESSED_NBT_ITEM, Types1_7_6.COMPRESSED_ITEM); // item
+                map(Types1_2_4.NBT_ITEM, Types1_7_6.ITEM); // item
             }
         });
         this.registerClientbound(ClientboundPackets1_2_4.WINDOW_ITEMS, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.BYTE); // window id
-                map(Types1_2_4.COMPRESSED_NBT_ITEM_ARRAY, Types1_7_6.COMPRESSED_ITEM_ARRAY); // items
+                map(Types1_2_4.NBT_ITEM_ARRAY, Types1_7_6.ITEM_ARRAY); // items
             }
         });
         this.registerClientbound(ClientboundPackets1_2_4.BLOCK_ENTITY_DATA, new PacketHandlers() {
@@ -640,7 +633,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                     tag.put("x", new IntTag(pos.x()));
                     tag.put("y", new IntTag(pos.y()));
                     tag.put("z", new IntTag(pos.z()));
-                    wrapper.write(Types1_7_6.COMPRESSED_NBT, tag);
+                    wrapper.write(Types1_7_6.NBT, tag);
                 });
             }
         });
@@ -730,7 +723,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
             public void register() {
                 map(Types1_7_6.POSITION_UBYTE); // position
                 map(Type.UNSIGNED_BYTE); // direction
-                map(Types1_7_6.COMPRESSED_ITEM, Types1_2_4.COMPRESSED_NBT_ITEM); // item
+                map(Types1_7_6.ITEM, Types1_2_4.NBT_ITEM); // item
                 read(Type.UNSIGNED_BYTE); // offset x
                 read(Type.UNSIGNED_BYTE); // offset y
                 read(Type.UNSIGNED_BYTE); // offset z
@@ -744,15 +737,15 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                 map(Type.BYTE); // button
                 map(Type.SHORT); // action
                 map(Type.BYTE); // mode
-                map(Types1_7_6.COMPRESSED_ITEM, Types1_2_4.COMPRESSED_NBT_ITEM); // item
+                map(Types1_7_6.ITEM, Types1_2_4.NBT_ITEM); // item
             }
         });
         this.registerServerbound(ServerboundPackets1_3_1.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.SHORT); // slot
-                map(Types1_7_6.COMPRESSED_ITEM, Types1_2_4.COMPRESSED_NBT_ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_2_4.COMPRESSED_NBT_ITEM, 0)));
+                map(Types1_7_6.ITEM, Types1_2_4.NBT_ITEM); // item
+                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_2_4.NBT_ITEM, 0)));
             }
         });
         this.registerServerbound(ServerboundPackets1_3_1.PLAYER_ABILITIES, new PacketHandlers() {
@@ -851,14 +844,11 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocol1_3_1_2to1_2_4_5.class, ClientboundPackets1_2_4::getPacket));
+        userConnection.put(new PreNettySplitter(Protocol1_3_1_2to1_2_4_5.class, ClientboundPackets1_2_4::getPacket));
 
-        userConnection.put(new ChestStateTracker(userConnection));
+        userConnection.put(new ChestStateTracker());
         userConnection.put(new EntityTracker(userConnection));
-        userConnection.put(new DimensionTracker(userConnection));
-        if (!userConnection.has(ClientWorld.class)) {
-            userConnection.put(new ClientWorld(userConnection));
-        }
+        userConnection.put(new DimensionTracker());
     }
 
     @Override

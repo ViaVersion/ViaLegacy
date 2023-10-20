@@ -19,7 +19,6 @@ package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types;
 
 import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.FixedByteArrayType;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
 import net.raphimc.vialegacy.api.model.IdAndData;
@@ -36,7 +35,7 @@ public class ChunkType1_7_6 extends Type<Chunk> {
 
     private final boolean hasSkyLight;
 
-    public ChunkType1_7_6(boolean hasSkyLight) {
+    public ChunkType1_7_6(final boolean hasSkyLight) {
         super(Chunk.class);
         this.hasSkyLight = hasSkyLight;
     }
@@ -44,7 +43,7 @@ public class ChunkType1_7_6 extends Type<Chunk> {
     /**
      * This method is here to allow overriding the code for 1.2.5 -{@literal >} 1.3.2 because it introduced an unused int
      *
-     * @param byteBuf     The buffer
+     * @param byteBuf The buffer
      */
     protected void readUnusedInt(final ByteBuf byteBuf) {
     }
@@ -52,8 +51,8 @@ public class ChunkType1_7_6 extends Type<Chunk> {
     /**
      * This method is here to allow overriding the code for 1.2.5 -{@literal >} 1.3.2 because it introduced an unused int
      *
-     * @param byteBuf     The buffer
-     * @param chunk       The Chunk
+     * @param byteBuf The buffer
+     * @param chunk   The Chunk
      */
     protected void writeUnusedInt(final ByteBuf byteBuf, final Chunk chunk) {
     }
@@ -67,7 +66,8 @@ public class ChunkType1_7_6 extends Type<Chunk> {
         final short additionalBitMask = byteBuf.readShort();
         final int compressedSize = byteBuf.readInt();
         this.readUnusedInt(byteBuf);
-        final byte[] data = new FixedByteArrayType(compressedSize).read(byteBuf);
+        final byte[] data = new byte[compressedSize];
+        byteBuf.readBytes(data);
 
         final byte[] uncompressedData = new byte[getSize(primaryBitMask, additionalBitMask, fullChunk, this.hasSkyLight)];
         final Inflater inflater = new Inflater();

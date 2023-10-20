@@ -134,7 +134,7 @@ public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacket
                         }
 
                         if (supportedExtensions.contains(ClassicProtocolExtension.BLOCK_PERMISSIONS)) {
-                            wrapper.user().put(new ExtBlockPermissionsStorage(wrapper.user()));
+                            wrapper.user().put(new ExtBlockPermissionsStorage());
                         }
 
                         final PacketWrapper extensionProtocolInfo = PacketWrapper.create(ServerboundPacketsc0_30cpe.EXTENSION_PROTOCOL_INFO, wrapper.user());
@@ -344,13 +344,13 @@ public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacket
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocolc0_30toc0_30cpe.class, ClientboundPacketsc0_30cpe::getPacket));
+        userConnection.put(new PreNettySplitter(Protocolc0_30toc0_30cpe.class, ClientboundPacketsc0_30cpe::getPacket));
 
-        userConnection.put(new ExtensionProtocolMetadataStorage(userConnection));
+        userConnection.put(new ExtensionProtocolMetadataStorage());
         userConnection.put(new ClassicOpLevelStorage(userConnection, true));
 
         final ClassicBlockRemapper previousRemapper = userConnection.get(ClassicBlockRemapper.class);
-        userConnection.put(new ClassicBlockRemapper(userConnection, i -> {
+        userConnection.put(new ClassicBlockRemapper(i -> {
             if (ClassicBlocks.MAPPING.containsKey(i)) return previousRemapper.getMapper().get(i);
             final ExtensionProtocolMetadataStorage extensionProtocol = userConnection.get(ExtensionProtocolMetadataStorage.class);
             if (extensionProtocol.hasServerExtension(ClassicProtocolExtension.CUSTOM_BLOCKS, 1)) {

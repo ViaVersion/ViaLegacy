@@ -32,11 +32,8 @@ import java.util.zip.GZIPOutputStream;
 
 public class NBTType extends Type<CompoundTag> {
 
-    private final boolean compressed;
-
-    public NBTType(final boolean compressed) {
+    public NBTType() {
         super(CompoundTag.class);
-        this.compressed = compressed;
     }
 
     @Override
@@ -47,7 +44,7 @@ public class NBTType extends Type<CompoundTag> {
         }
 
         final ByteBuf data = buffer.readSlice(length);
-        try (InputStream in = this.compressed ? new GZIPInputStream(new ByteBufInputStream(data)) : new ByteBufInputStream(data)) {
+        try (InputStream in = new GZIPInputStream(new ByteBufInputStream(data))) {
             return NBTIO.readTag(in);
         }
     }
@@ -61,7 +58,7 @@ public class NBTType extends Type<CompoundTag> {
 
         final ByteBuf data = buffer.alloc().buffer();
         try {
-            try (OutputStream out = this.compressed ? new GZIPOutputStream(new ByteBufOutputStream(data)) : new ByteBufOutputStream(data)) {
+            try (OutputStream out = new GZIPOutputStream(new ByteBufOutputStream(data))) {
                 NBTIO.writeTag(out, nbt);
             }
 

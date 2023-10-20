@@ -20,7 +20,6 @@ package net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.FixedByteArrayType;
 import io.netty.buffer.ByteBuf;
 import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.chunks.NibbleArray1_1;
@@ -46,7 +45,8 @@ public class ChunkType1_1 extends Type<Chunk> {
         final int ySize = byteBuf.readUnsignedByte() + 1;
         final int zSize = byteBuf.readUnsignedByte() + 1;
         final int chunkSize = byteBuf.readInt();
-        final byte[] compressedData = new FixedByteArrayType(chunkSize).read(byteBuf);
+        final byte[] compressedData = new byte[chunkSize];
+        byteBuf.readBytes(compressedData);
         final byte[] uncompressedData = new byte[(xSize * ySize * zSize * 5) / 2];
         final Inflater inflater = new Inflater();
         inflater.setInput(compressedData);

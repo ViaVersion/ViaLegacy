@@ -320,8 +320,7 @@ public class Protocol1_2_1_3to1_1 extends StatelessProtocol<ClientboundPackets1_
     }
 
     private void handleRespawn(final int dimensionId, final UserConnection user) {
-        if (user.get(DimensionTracker.class).getDimensionId() != dimensionId) {
-            user.get(DimensionTracker.class).setDimension(dimensionId);
+        if (user.get(DimensionTracker.class).changeDimension(dimensionId)) {
             user.get(PendingBlocksTracker.class).clear();
         }
 
@@ -363,11 +362,11 @@ public class Protocol1_2_1_3to1_1 extends StatelessProtocol<ClientboundPackets1_
 
     @Override
     public void init(UserConnection userConnection) {
-        userConnection.put(new PreNettySplitter(userConnection, Protocol1_2_1_3to1_1.class, ClientboundPackets1_1::getPacket));
+        userConnection.put(new PreNettySplitter(Protocol1_2_1_3to1_1.class, ClientboundPackets1_1::getPacket));
 
-        userConnection.put(new SeedStorage(userConnection));
+        userConnection.put(new SeedStorage());
         userConnection.put(new PendingBlocksTracker(userConnection));
-        userConnection.put(new DimensionTracker(userConnection));
+        userConnection.put(new DimensionTracker());
     }
 
     @Override

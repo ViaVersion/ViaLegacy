@@ -17,19 +17,17 @@
  */
 package net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectFunction;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2IntFunction;
 import net.raphimc.vialegacy.api.model.IdAndData;
 
-public class ClassicBlockRemapper extends StoredObject {
+public class ClassicBlockRemapper implements StorableObject {
 
     private final Int2ObjectFunction<IdAndData> mapper;
     private final Object2IntFunction<IdAndData> reverseMapper;
 
-    public ClassicBlockRemapper(UserConnection user, Int2ObjectFunction<IdAndData> mapper, Object2IntFunction<IdAndData> reverseMapper) {
-        super(user);
+    public ClassicBlockRemapper(Int2ObjectFunction<IdAndData> mapper, Object2IntFunction<IdAndData> reverseMapper) {
         this.mapper = mapper;
         this.reverseMapper = reverseMapper;
     }

@@ -17,18 +17,13 @@
  */
 package net.raphimc.vialegacy.protocols.beta.protocolb1_2_0_2tob1_1_2.storage;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2IntMap;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2IntOpenHashMap;
 
-public class EntityFlagStorage extends StoredObject {
+public class EntityFlagStorage implements StorableObject {
 
     private final Int2IntMap animationFlags = new Int2IntOpenHashMap();
-
-    public EntityFlagStorage(UserConnection user) {
-        super(user);
-    }
 
     public boolean getFlag(final int entityId, final int index) {
         return (this.getFlagMask(entityId) & 1 << index) != 0;
