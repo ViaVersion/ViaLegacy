@@ -17,23 +17,8 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5.types;
 
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
-import io.netty.buffer.ByteBuf;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ChunkBulkType1_7_6;
+public class Types1_4_4 {
 
-public class ChunkBulkType1_4_4 extends ChunkBulkType1_7_6 {
-
-    public ChunkBulkType1_4_4(ClientWorld clientWorld) {
-        super(clientWorld);
-    }
-
-    @Override
-    protected boolean readHasSkyLight(ByteBuf byteBuf, ClientWorld clientWorld) {
-        return true;
-    }
-
-    @Override
-    protected void writeHasSkyLight(ByteBuf byteBuf, ClientWorld clientWorld, boolean hasSkyLight) {
-    }
+    public static final BulkChunkType1_4_4 CHUNK_BULK = new BulkChunkType1_4_4();
 
 }

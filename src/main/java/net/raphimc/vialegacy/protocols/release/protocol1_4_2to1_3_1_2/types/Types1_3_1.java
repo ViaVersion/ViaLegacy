@@ -28,7 +28,6 @@ import java.util.List;
 public class Types1_3_1 {
 
     public static final Type<Item> NBTLESS_ITEM = new NbtLessItemType();
-    public static final Type<Item[]> NBTLESS_ITEM_ARRAY = new ItemArrayType<>(NBTLESS_ITEM);
 
     public static final Type<Metadata> METADATA = new MetadataType();
     public static final Type<List<Metadata>> METADATA_LIST = new MetaListType(METADATA);

@@ -15,18 +15,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.types;
+package net.raphimc.vialegacy.protocols.release.protocol1_4_6_7to1_4_4_5.types;
 
-import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
-import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.type.Type;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.ItemArrayType;
+import io.netty.buffer.ByteBuf;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.BulkChunkType1_7_6;
 
-public class Types1_2_4 {
+public class BulkChunkType1_4_4 extends BulkChunkType1_7_6 {
 
-    public static final Type<Item> COMPRESSED_NBT_ITEM = new ItemType();
-    public static final Type<Item[]> COMPRESSED_NBT_ITEM_ARRAY = new ItemArrayType<>(COMPRESSED_NBT_ITEM);
+    @Override
+    protected boolean readHasSkyLight(ByteBuf byteBuf) {
+        return true;
+    }
 
-    public static final Type<Chunk> CHUNK = new ChunkType1_2_4();
+    @Override
+    protected void writeHasSkyLight(ByteBuf byteBuf, boolean hasSkyLight) {
+    }
 
 }

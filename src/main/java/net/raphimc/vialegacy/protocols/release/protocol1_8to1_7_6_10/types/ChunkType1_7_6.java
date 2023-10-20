@@ -17,13 +17,9 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types;
 
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
-import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
-import com.viaversion.viaversion.api.type.PartialType;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.CustomByteType;
-import com.viaversion.viaversion.api.type.types.chunk.BaseChunkType;
+import com.viaversion.viaversion.api.type.types.FixedByteArrayType;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
 import net.raphimc.vialegacy.api.model.IdAndData;
@@ -36,48 +32,44 @@ import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
 
-public class ChunkType1_7_6 extends PartialType<Chunk, ClientWorld> {
+public class ChunkType1_7_6 extends Type<Chunk> {
 
-    public ChunkType1_7_6(final ClientWorld clientWorld) {
-        super(clientWorld, Chunk.class);
-    }
+    private final boolean hasSkyLight;
 
-    @Override
-    public Class<? extends Type> getBaseClass() {
-        return BaseChunkType.class;
+    public ChunkType1_7_6(boolean hasSkyLight) {
+        super(Chunk.class);
+        this.hasSkyLight = hasSkyLight;
     }
 
     /**
      * This method is here to allow overriding the code for 1.2.5 -{@literal >} 1.3.2 because it introduced an unused int
      *
      * @param byteBuf     The buffer
-     * @param clientWorld The ClientWorld
      */
-    protected void readUnusedInt(final ByteBuf byteBuf, final ClientWorld clientWorld) {
+    protected void readUnusedInt(final ByteBuf byteBuf) {
     }
 
     /**
      * This method is here to allow overriding the code for 1.2.5 -{@literal >} 1.3.2 because it introduced an unused int
      *
      * @param byteBuf     The buffer
-     * @param clientWorld The ClientWorld
      * @param chunk       The Chunk
      */
-    protected void writeUnusedInt(final ByteBuf byteBuf, final ClientWorld clientWorld, final Chunk chunk) {
+    protected void writeUnusedInt(final ByteBuf byteBuf, final Chunk chunk) {
     }
 
     @Override
-    public Chunk read(ByteBuf byteBuf, ClientWorld clientWorld) throws Exception {
+    public Chunk read(ByteBuf byteBuf) throws Exception {
         final int chunkX = byteBuf.readInt();
         final int chunkZ = byteBuf.readInt();
         final boolean fullChunk = byteBuf.readBoolean();
         final short primaryBitMask = byteBuf.readShort();
         final short additionalBitMask = byteBuf.readShort();
         final int compressedSize = byteBuf.readInt();
-        this.readUnusedInt(byteBuf, clientWorld);
-        final byte[] data = new CustomByteType(compressedSize).read(byteBuf);
+        this.readUnusedInt(byteBuf);
+        final byte[] data = new FixedByteArrayType(compressedSize).read(byteBuf);
 
-        final byte[] uncompressedData = new byte[getSize(primaryBitMask, additionalBitMask, fullChunk, clientWorld.getEnvironment() == Environment.NORMAL)];
+        final byte[] uncompressedData = new byte[getSize(primaryBitMask, additionalBitMask, fullChunk, this.hasSkyLight)];
         final Inflater inflater = new Inflater();
         try {
             inflater.setInput(data, 0, compressedSize);
@@ -93,11 +85,11 @@ public class ChunkType1_7_6 extends PartialType<Chunk, ClientWorld> {
             return new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>());
         }
 
-        return deserialize(chunkX, chunkZ, fullChunk, clientWorld.getEnvironment() == Environment.NORMAL, primaryBitMask, additionalBitMask, uncompressedData);
+        return deserialize(chunkX, chunkZ, fullChunk, this.hasSkyLight, primaryBitMask, additionalBitMask, uncompressedData);
     }
 
     @Override
-    public void write(ByteBuf byteBuf, ClientWorld clientWorld, Chunk chunk) throws Exception {
+    public void write(ByteBuf byteBuf, Chunk chunk) throws Exception {
         final Pair<byte[], Short> chunkData = serialize(chunk);
         final byte[] data = chunkData.key();
         final short additionalBitMask = chunkData.value();
@@ -120,7 +112,7 @@ public class ChunkType1_7_6 extends PartialType<Chunk, ClientWorld> {
         byteBuf.writeShort(chunk.getBitmask());
         byteBuf.writeShort(additionalBitMask);
         byteBuf.writeInt(compressedSize);
-        this.writeUnusedInt(byteBuf, clientWorld, chunk);
+        this.writeUnusedInt(byteBuf, chunk);
         byteBuf.writeBytes(compressedData, 0, compressedSize);
     }
 
