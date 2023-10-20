@@ -421,7 +421,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final Chunk chunk = wrapper.passthrough(ChunkType1_7_6.forEnvironment(wrapper.user().get(ClientWorld.class).getEnvironment()));
+                    final Chunk chunk = wrapper.passthrough(Types1_7_6.getChunk(wrapper.user().get(ClientWorld.class).getEnvironment()));
                     wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
                 });
             }
@@ -486,7 +486,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final Chunk[] chunks = wrapper.passthrough(BulkChunkType1_7_6.TYPE);
+                    final Chunk[] chunks = wrapper.passthrough(Types1_7_6.CHUNK_BULK);
                     for (Chunk chunk : chunks) {
                         wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
                     }

@@ -459,7 +459,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
 
                     if (!load) {
                         final Chunk chunk = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>());
-                        wrapper.write(ChunkType1_7_6.forEnvironment(wrapper.user().get(ClientWorld.class).getEnvironment()), chunk);
+                        wrapper.write(Types1_7_6.getChunk(wrapper.user().get(ClientWorld.class).getEnvironment()), chunk);
                     } else {
                         wrapper.cancel();
                     }
@@ -496,7 +496,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                             }
                         }
                     }
-                    wrapper.write(ChunkType1_7_6.forEnvironment(environment), chunk);
+                    wrapper.write(Types1_7_6.getChunk(environment), chunk);
                 });
             }
         });

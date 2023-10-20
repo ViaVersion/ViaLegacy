@@ -26,11 +26,8 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 
 public class ItemType extends Type<Item> {
 
-    private final boolean compressed;
-
-    public ItemType(boolean compressed) {
+    public ItemType() {
         super(Item.class);
-        this.compressed = compressed;
     }
 
     public Item read(ByteBuf buffer) throws Exception {
@@ -43,7 +40,7 @@ public class ItemType extends Type<Item> {
             item.setAmount(buffer.readByte());
             item.setData(buffer.readShort());
             if (NbtItemList.hasNbt(id)) {
-                item.setTag((this.compressed ? Types1_7_6.COMPRESSED_NBT : Types1_7_6.NBT).read(buffer));
+                item.setTag(Types1_7_6.COMPRESSED_NBT.read(buffer));
             }
             return item;
         }
@@ -57,7 +54,7 @@ public class ItemType extends Type<Item> {
             buffer.writeByte(item.amount());
             buffer.writeShort(item.data());
             if (NbtItemList.hasNbt(item.identifier())) {
-                (this.compressed ? Types1_7_6.COMPRESSED_NBT : Types1_7_6.NBT).write(buffer, item.tag());
+                Types1_7_6.COMPRESSED_NBT.write(buffer, item.tag());
             }
         }
     }
