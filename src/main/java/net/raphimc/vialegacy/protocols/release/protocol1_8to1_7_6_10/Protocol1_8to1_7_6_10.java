@@ -947,7 +947,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     for (Item item : items) {
                         itemRewriter.handleItemToClient(item);
                     }
-                    wrapper.write(Type.ITEM1_8_ARRAY, items);
+                    wrapper.write(Type.ITEM1_8_SHORT_ARRAY, items);
                 });
             }
         });
