@@ -18,6 +18,7 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types;
 
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
@@ -127,9 +128,20 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
             deflater.end();
         }
 
+        boolean skyLight = false;
+        loop1:
+        for (Chunk chunk : chunks) {
+            for (ChunkSection section : chunk.getSections()) {
+                if (section != null && section.getLight().hasSkyLight()) {
+                    skyLight = true;
+                    break loop1;
+                }
+            }
+        }
+
         byteBuf.writeShort(chunkCount);
         byteBuf.writeInt(compressedSize);
-        this.writeHasSkyLight(byteBuf, true);
+        this.writeHasSkyLight(byteBuf, skyLight);
         byteBuf.writeBytes(compressedData, 0, compressedSize);
 
         for (int i = 0; i < chunkCount; i++) {
