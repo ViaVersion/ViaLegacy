@@ -115,7 +115,7 @@ if (serverTargetVersion.isOlderThanOrEqualTo(VersionEnum.r1_6_4)) { // Only add 
     // channel.pipeline().addBefore("length-encoder", "vialegacy-pre-netty-length-remover", new PreNettyLengthRemover(user));
 }
 ```
-In case you use [ViaLoader](https://github.com/ViaVersion/ViaLoader) and the [VLPipeline](https://github.com/ViaVersion/ViaLoader/blob/main/src/main/java/net/raphimc/vialoader/netty/VLPipeline.java) (or the [VLLegacyPipeline](https://github.com/ViaVersion/ViaLoader/blob/main/src/main/java/net/raphimc/vialoader/netty/VLLegacyPipeline.java)), you don't need to make these modifications anymore, as the VPHpipeline already does it automatically.
+In case you use [ViaLoader](https://github.com/ViaVersion/ViaLoader) and the [VLPipeline](https://github.com/ViaVersion/ViaLoader/blob/main/src/main/java/net/raphimc/vialoader/netty/VLPipeline.java) (or the [VLLegacyPipeline](https://github.com/ViaVersion/ViaLoader/blob/main/src/main/java/net/raphimc/vialoader/netty/VLLegacyPipeline.java)), you don't need to make these modifications anymore, as the VLPipeline/VLLegacyPipeline already does it automatically.
 ### Implementing the platform specific providers
 The platform specific providers are all optional (except for ``EncryptionProvider`` and ``GameProfileFetcher``) and only required if you want to use the features which require them.  
 To implement a provider you can simply call ``Via.getManager().getProviders().use(TheNameOfTheProvider.class, new YouImplementationOfThatProvider());`` after the Via manager is initialized.
