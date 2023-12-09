@@ -24,44 +24,45 @@ import java.util.Map;
 
 public class NbtConverter {
 
-    public static Tag mcStructsToVia(final INbtTag tag) {
-        if (tag == null) return null;
+    public static Tag mcStructsToVia(final INbtTag nbtTag) {
+        if (nbtTag == null) return null;
 
-        if (tag instanceof net.lenni0451.mcstructs.nbt.tags.ByteTag) {
-            return new ByteTag(tag.asByteTag().getValue());
-        } else if (tag instanceof net.lenni0451.mcstructs.nbt.tags.ShortTag) {
-            return new ShortTag(tag.asShortTag().getValue());
-        } else if (tag instanceof net.lenni0451.mcstructs.nbt.tags.IntTag) {
-            return new IntTag(tag.asIntTag().getValue());
-        } else if (tag instanceof net.lenni0451.mcstructs.nbt.tags.LongTag) {
-            return new LongTag(tag.asLongTag().getValue());
-        } else if (tag instanceof net.lenni0451.mcstructs.nbt.tags.FloatTag) {
-            return new FloatTag(tag.asFloatTag().getValue());
-        } else if (tag instanceof net.lenni0451.mcstructs.nbt.tags.DoubleTag) {
-            return new DoubleTag(tag.asDoubleTag().getValue());
-        } else if (tag instanceof net.lenni0451.mcstructs.nbt.tags.ByteArrayTag) {
-            return new ByteArrayTag(tag.asByteArrayTag().getValue());
-        } else if (tag instanceof net.lenni0451.mcstructs.nbt.tags.StringTag) {
-            return new StringTag(tag.asStringTag().getValue());
-        } else if (tag instanceof net.lenni0451.mcstructs.nbt.tags.ListTag) {
+        if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.ByteTag) {
+            return new ByteTag(((net.lenni0451.mcstructs.nbt.tags.ByteTag) nbtTag).getValue());
+        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.ShortTag) {
+            return new ShortTag(((net.lenni0451.mcstructs.nbt.tags.ShortTag) nbtTag).getValue());
+        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.IntTag) {
+            return new IntTag(((net.lenni0451.mcstructs.nbt.tags.IntTag) nbtTag).getValue());
+        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.LongTag) {
+            return new LongTag(((net.lenni0451.mcstructs.nbt.tags.LongTag) nbtTag).getValue());
+        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.FloatTag) {
+            return new FloatTag(((net.lenni0451.mcstructs.nbt.tags.FloatTag) nbtTag).getValue());
+        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.DoubleTag) {
+            return new DoubleTag(((net.lenni0451.mcstructs.nbt.tags.DoubleTag) nbtTag).getValue());
+        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.ByteArrayTag) {
+            return new ByteArrayTag(((net.lenni0451.mcstructs.nbt.tags.ByteArrayTag) nbtTag).getValue());
+        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.StringTag) {
+            return new StringTag(((net.lenni0451.mcstructs.nbt.tags.StringTag) nbtTag).getValue());
+        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.ListTag<?>) {
             final ListTag list = new ListTag();
-            for (INbtTag e : tag.asListTag()) {
-                list.add(mcStructsToVia(e));
+            for (INbtTag t : ((net.lenni0451.mcstructs.nbt.tags.ListTag<?>) nbtTag).getValue()) {
+                list.add(mcStructsToVia(t));
             }
             return list;
-        } else if (tag instanceof net.lenni0451.mcstructs.nbt.tags.CompoundTag) {
+        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.CompoundTag) {
+            final Map<String, INbtTag> values = ((net.lenni0451.mcstructs.nbt.tags.CompoundTag) nbtTag).getValue();
             final CompoundTag compound = new CompoundTag();
-            for (Map.Entry<String, INbtTag> e : tag.asCompoundTag().getValue().entrySet()) {
-                compound.put(e.getKey(), mcStructsToVia(e.getValue()));
+            for (Map.Entry<String, INbtTag> entry : values.entrySet()) {
+                compound.put(entry.getKey(), mcStructsToVia(entry.getValue()));
             }
             return compound;
-        } else if (tag instanceof net.lenni0451.mcstructs.nbt.tags.IntArrayTag) {
-            return new IntArrayTag(tag.asIntArrayTag().getValue());
-        } else if (tag instanceof net.lenni0451.mcstructs.nbt.tags.LongArrayTag) {
-            return new LongArrayTag(tag.asLongArrayTag().getValue());
+        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.IntArrayTag) {
+            return new IntArrayTag(((net.lenni0451.mcstructs.nbt.tags.IntArrayTag) nbtTag).getValue());
+        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.LongArrayTag) {
+            return new LongArrayTag(((net.lenni0451.mcstructs.nbt.tags.LongArrayTag) nbtTag).getValue());
+        } else {
+            throw new IllegalArgumentException("Unsupported tag type: " + nbtTag.getClass().getName());
         }
-
-        throw new IllegalArgumentException("Unsupported tag type: " + tag.getClass().getName());
     }
 
     public static INbtTag viaToMcStructs(final Tag tag) {
@@ -85,22 +86,24 @@ public class NbtConverter {
             return new net.lenni0451.mcstructs.nbt.tags.StringTag(((StringTag) tag).getValue());
         } else if (tag instanceof ListTag) {
             final net.lenni0451.mcstructs.nbt.tags.ListTag<INbtTag> list = new net.lenni0451.mcstructs.nbt.tags.ListTag<>();
-            for (Tag e : ((ListTag) tag)) {
-                list.add(viaToMcStructs(e));
+            for (Tag t : ((ListTag) tag).getValue()) {
+                list.add(viaToMcStructs(t));
             }
             return list;
         } else if (tag instanceof CompoundTag) {
+            final Map<String, Tag> values = ((CompoundTag) tag).getValue();
             final net.lenni0451.mcstructs.nbt.tags.CompoundTag compound = new net.lenni0451.mcstructs.nbt.tags.CompoundTag();
-            for (Map.Entry<String, Tag> e : ((CompoundTag) tag).entrySet()) {
-                compound.add(e.getKey(), viaToMcStructs(e.getValue()));
+            for (Map.Entry<String, Tag> entry : values.entrySet()) {
+                compound.add(entry.getKey(), viaToMcStructs(entry.getValue()));
             }
             return compound;
         } else if (tag instanceof IntArrayTag) {
             return new net.lenni0451.mcstructs.nbt.tags.IntArrayTag(((IntArrayTag) tag).getValue());
         } else if (tag instanceof LongArrayTag) {
             return new net.lenni0451.mcstructs.nbt.tags.LongArrayTag(((LongArrayTag) tag).getValue());
+        } else {
+            throw new IllegalArgumentException("Unsupported tag type: " + tag.getClass().getName());
         }
-
-        throw new IllegalArgumentException("Unsupported tag type: " + tag.getClass().getName());
     }
+
 }
