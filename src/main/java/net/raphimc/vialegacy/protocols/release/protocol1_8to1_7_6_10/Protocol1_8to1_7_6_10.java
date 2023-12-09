@@ -51,6 +51,7 @@ import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
 import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
+import net.raphimc.vialegacy.api.util.converter.JsonConverter;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ClientboundPackets1_7_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ServerboundPackets1_7_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.data.Particle;
@@ -1372,7 +1373,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 handler(wrapper -> {
                     for (int i = 0; i < 4; i++) {
                         final JsonElement component = wrapper.read(Type.COMPONENT); // line
-                        String text = TextComponentSerializer.V1_8.deserialize(component.toString()).asLegacyFormatString();
+                        String text = TextComponentSerializer.V1_8.deserialize(JsonConverter.viaToGson(component)).asLegacyFormatString();
                         if (text.length() > 15) text = text.substring(0, 15);
                         wrapper.write(Type.STRING, text);
                     }

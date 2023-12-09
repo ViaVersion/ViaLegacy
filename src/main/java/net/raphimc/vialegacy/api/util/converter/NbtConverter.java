@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.vialegacy.util;
+package net.raphimc.vialegacy.api.util.converter;
 
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.*;
 import net.lenni0451.mcstructs.nbt.INbtTag;
@@ -25,50 +25,50 @@ import java.util.Map;
 public class NbtConverter {
 
     public static Tag mcStructsToVia(final INbtTag nbtTag) {
-        if (nbtTag == null) return null;
-
-        if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.ByteTag) {
-            return new ByteTag(((net.lenni0451.mcstructs.nbt.tags.ByteTag) nbtTag).getValue());
-        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.ShortTag) {
-            return new ShortTag(((net.lenni0451.mcstructs.nbt.tags.ShortTag) nbtTag).getValue());
-        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.IntTag) {
-            return new IntTag(((net.lenni0451.mcstructs.nbt.tags.IntTag) nbtTag).getValue());
-        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.LongTag) {
-            return new LongTag(((net.lenni0451.mcstructs.nbt.tags.LongTag) nbtTag).getValue());
-        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.FloatTag) {
-            return new FloatTag(((net.lenni0451.mcstructs.nbt.tags.FloatTag) nbtTag).getValue());
-        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.DoubleTag) {
-            return new DoubleTag(((net.lenni0451.mcstructs.nbt.tags.DoubleTag) nbtTag).getValue());
-        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.ByteArrayTag) {
-            return new ByteArrayTag(((net.lenni0451.mcstructs.nbt.tags.ByteArrayTag) nbtTag).getValue());
-        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.StringTag) {
-            return new StringTag(((net.lenni0451.mcstructs.nbt.tags.StringTag) nbtTag).getValue());
-        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.ListTag<?>) {
+        if (nbtTag == null) {
+            return null;
+        } else if (nbtTag.isByteTag()) {
+            return new ByteTag(nbtTag.asByteTag().getValue());
+        } else if (nbtTag.isShortTag()) {
+            return new ShortTag(nbtTag.asShortTag().getValue());
+        } else if (nbtTag.isIntTag()) {
+            return new IntTag(nbtTag.asIntTag().getValue());
+        } else if (nbtTag.isLongTag()) {
+            return new LongTag(nbtTag.asLongTag().getValue());
+        } else if (nbtTag.isFloatTag()) {
+            return new FloatTag(nbtTag.asFloatTag().getValue());
+        } else if (nbtTag.isDoubleTag()) {
+            return new DoubleTag(nbtTag.asDoubleTag().getValue());
+        } else if (nbtTag.isByteArrayTag()) {
+            return new ByteArrayTag(nbtTag.asByteArrayTag().getValue());
+        } else if (nbtTag.isStringTag()) {
+            return new StringTag(nbtTag.asStringTag().getValue());
+        } else if (nbtTag.isListTag()) {
             final ListTag list = new ListTag();
-            for (INbtTag t : ((net.lenni0451.mcstructs.nbt.tags.ListTag<?>) nbtTag).getValue()) {
+            for (INbtTag t : nbtTag.asListTag().getValue()) {
                 list.add(mcStructsToVia(t));
             }
             return list;
-        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.CompoundTag) {
-            final Map<String, INbtTag> values = ((net.lenni0451.mcstructs.nbt.tags.CompoundTag) nbtTag).getValue();
+        } else if (nbtTag.isCompoundTag()) {
+            final Map<String, INbtTag> values = nbtTag.asCompoundTag().getValue();
             final CompoundTag compound = new CompoundTag();
             for (Map.Entry<String, INbtTag> entry : values.entrySet()) {
                 compound.put(entry.getKey(), mcStructsToVia(entry.getValue()));
             }
             return compound;
-        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.IntArrayTag) {
-            return new IntArrayTag(((net.lenni0451.mcstructs.nbt.tags.IntArrayTag) nbtTag).getValue());
-        } else if (nbtTag instanceof net.lenni0451.mcstructs.nbt.tags.LongArrayTag) {
-            return new LongArrayTag(((net.lenni0451.mcstructs.nbt.tags.LongArrayTag) nbtTag).getValue());
+        } else if (nbtTag.isIntArrayTag()) {
+            return new IntArrayTag(nbtTag.asIntArrayTag().getValue());
+        } else if (nbtTag.isLongArrayTag()) {
+            return new LongArrayTag(nbtTag.asLongArrayTag().getValue());
         } else {
             throw new IllegalArgumentException("Unsupported tag type: " + nbtTag.getClass().getName());
         }
     }
 
     public static INbtTag viaToMcStructs(final Tag tag) {
-        if (tag == null) return null;
-
-        if (tag instanceof ByteTag) {
+        if (tag == null) {
+            return null;
+        } else if (tag instanceof ByteTag) {
             return new net.lenni0451.mcstructs.nbt.tags.ByteTag(((ByteTag) tag).asByte());
         } else if (tag instanceof ShortTag) {
             return new net.lenni0451.mcstructs.nbt.tags.ShortTag(((ShortTag) tag).asShort());

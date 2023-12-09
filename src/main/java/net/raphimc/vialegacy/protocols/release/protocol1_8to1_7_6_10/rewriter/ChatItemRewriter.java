@@ -31,9 +31,9 @@ import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import net.lenni0451.mcstructs.snbt.SNbtSerializer;
 import net.lenni0451.mcstructs.snbt.exceptions.SNbtSerializeException;
 import net.raphimc.vialegacy.ViaLegacy;
+import net.raphimc.vialegacy.api.util.converter.NbtConverter;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ClientboundPackets1_7_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
-import net.raphimc.vialegacy.util.NbtConverter;
 
 import java.util.logging.Level;
 
