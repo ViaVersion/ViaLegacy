@@ -94,9 +94,7 @@ public enum ClientboundPackets1_2_4 implements ClientboundPacketType, PreNettyPa
     SET_EXPERIENCE(43, (user, buf) -> buf.skipBytes(8)),
     PRE_CHUNK(50, (user, buf) -> buf.skipBytes(9)),
     CHUNK_DATA(51, (user, buf) -> {
-        buf.skipBytes(8);
-        buf.readBoolean();
-        buf.skipBytes(4);
+        buf.skipBytes(13);
         int x = buf.readInt();
         buf.skipBytes(4);
         for (int i = 0; i < x; i++) buf.readByte();
@@ -157,12 +155,7 @@ public enum ClientboundPackets1_2_4 implements ClientboundPacketType, PreNettyPa
         readString(buf);
         buf.skipBytes(3);
     }),
-    PLAYER_ABILITIES(202, (user, buf) -> {
-        buf.readBoolean();
-        buf.readBoolean();
-        buf.readBoolean();
-        buf.readBoolean();
-    }),
+    PLAYER_ABILITIES(202, (user, buf) -> buf.skipBytes(4)),
     PLUGIN_MESSAGE(250, (user, buf) -> {
         readString(buf);
         short s = buf.readShort();

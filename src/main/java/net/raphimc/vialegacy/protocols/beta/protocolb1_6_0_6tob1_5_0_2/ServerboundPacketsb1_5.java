@@ -53,15 +53,10 @@ public enum ServerboundPacketsb1_5 implements ServerboundPacketType, PreNettyPac
     HELD_ITEM_CHANGE(16, (user, buf) -> buf.skipBytes(2)),
     ANIMATION(18, (user, buf) -> buf.skipBytes(5)),
     ENTITY_ACTION(19, (user, buf) -> buf.skipBytes(5)),
-    POSITION(27, (user, buf) -> {
-        buf.skipBytes(16);
-        buf.readBoolean();
-        buf.readBoolean();
-    }),
+    POSITION(27, (user, buf) -> buf.skipBytes(18)),
     CLOSE_WINDOW(101, (user, buf) -> buf.skipBytes(1)),
     CLICK_WINDOW(102, (user, buf) -> {
-        buf.skipBytes(6);
-        buf.readBoolean();
+        buf.skipBytes(7);
         readItemStackb1_2(buf);
     }),
     WINDOW_CONFIRMATION(106, (user, buf) -> buf.skipBytes(4)),

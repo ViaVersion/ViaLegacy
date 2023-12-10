@@ -106,9 +106,7 @@ public enum ClientboundPackets1_6_1 implements ClientboundPacketType, PreNettyPa
         }
     }),
     CHUNK_DATA(51, (user, buf) -> {
-        buf.skipBytes(8);
-        buf.readBoolean();
-        buf.skipBytes(4);
+        buf.skipBytes(13);
         int x = buf.readInt();
         for (int i = 0; i < x; i++) buf.readByte();
     }),
@@ -137,10 +135,7 @@ public enum ClientboundPackets1_6_1 implements ClientboundPacketType, PreNettyPa
         }
         buf.skipBytes(12);
     }),
-    EFFECT(61, (user, buf) -> {
-        buf.skipBytes(17);
-        buf.readBoolean();
-    }),
+    EFFECT(61, (user, buf) -> buf.skipBytes(18)),
     NAMED_SOUND(62, (user, buf) -> {
         readString(buf);
         buf.skipBytes(17);
@@ -155,8 +150,7 @@ public enum ClientboundPackets1_6_1 implements ClientboundPacketType, PreNettyPa
         buf.skipBytes(1);
         int x = buf.readByte();
         readString(buf);
-        buf.skipBytes(1);
-        buf.readBoolean();
+        buf.skipBytes(2);
         if (x == 11) buf.readInt();
     }),
     CLOSE_WINDOW(101, (user, buf) -> buf.skipBytes(1)),

@@ -59,11 +59,7 @@ public enum ServerboundPackets1_6_4 implements ServerboundPacketType, PreNettyPa
     HELD_ITEM_CHANGE(16, (user, buf) -> buf.skipBytes(2)),
     ANIMATION(18, (user, buf) -> buf.skipBytes(5)),
     ENTITY_ACTION(19, (user, buf) -> buf.skipBytes(9)),
-    STEER_VEHICLE(27, (user, buf) -> {
-        buf.skipBytes(8);
-        buf.readBoolean();
-        buf.readBoolean();
-    }),
+    STEER_VEHICLE(27, (user, buf) -> buf.skipBytes(10)),
     CLOSE_WINDOW(101, (user, buf) -> buf.skipBytes(1)),
     CLICK_WINDOW(102, (user, buf) -> {
         buf.skipBytes(7);
@@ -86,8 +82,7 @@ public enum ServerboundPackets1_6_4 implements ServerboundPacketType, PreNettyPa
     TAB_COMPLETE(203, (user, buf) -> readString(buf)),
     CLIENT_SETTINGS(204, (user, buf) -> {
         readString(buf);
-        buf.skipBytes(3);
-        buf.readBoolean();
+        buf.skipBytes(4);
     }),
     CLIENT_STATUS(205, (user, buf) -> buf.skipBytes(1)),
     PLUGIN_MESSAGE(250, (user, buf) -> {

@@ -81,8 +81,7 @@ public enum ServerboundPackets1_5_2 implements ServerboundPacketType, PreNettyPa
     TAB_COMPLETE(203, (user, buf) -> readString(buf)),
     CLIENT_SETTINGS(204, (user, buf) -> {
         readString(buf);
-        buf.skipBytes(3);
-        buf.readBoolean();
+        buf.skipBytes(4);
     }),
     CLIENT_STATUS(205, (user, buf) -> buf.skipBytes(1)),
     PLUGIN_MESSAGE(250, (user, buf) -> {

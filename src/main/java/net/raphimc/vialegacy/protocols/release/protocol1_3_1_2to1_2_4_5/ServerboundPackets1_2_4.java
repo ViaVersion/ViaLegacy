@@ -57,8 +57,7 @@ public enum ServerboundPackets1_2_4 implements ServerboundPacketType, PreNettyPa
     ENTITY_ACTION(19, (user, buf) -> buf.skipBytes(5)),
     CLOSE_WINDOW(101, (user, buf) -> buf.skipBytes(1)),
     CLICK_WINDOW(102, (user, buf) -> {
-        buf.skipBytes(6);
-        buf.readBoolean();
+        buf.skipBytes(7);
         readItemStack1_0(buf);
     }),
     WINDOW_CONFIRMATION(106, (user, buf) -> buf.skipBytes(4)),
@@ -74,12 +73,7 @@ public enum ServerboundPackets1_2_4 implements ServerboundPacketType, PreNettyPa
         readString(buf);
         readString(buf);
     }),
-    PLAYER_ABILITIES(202, (user, buf) -> {
-        buf.readBoolean();
-        buf.readBoolean();
-        buf.readBoolean();
-        buf.readBoolean();
-    }),
+    PLAYER_ABILITIES(202, (user, buf) -> buf.skipBytes(4)),
     PLUGIN_MESSAGE(250, (user, buf) -> {
         readString(buf);
         short s = buf.readShort();
