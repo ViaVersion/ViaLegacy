@@ -122,6 +122,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                             sharedKey.send(Protocol1_7_2_5to1_6_4.class, false); // switch to play state
                             wrapper.user().get(ProtocolMetadataStorage.class).skipEncryption = false;
 
+                            wrapper.setPacketType(ClientboundPackets1_6_4.JOIN_GAME);
                             wrapper.send(Protocol1_7_2_5to1_6_4.class, false);
                             wrapper.cancel();
                         });
