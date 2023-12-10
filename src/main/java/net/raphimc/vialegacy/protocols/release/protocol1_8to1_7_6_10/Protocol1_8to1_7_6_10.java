@@ -129,8 +129,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     final ProtocolInfo protocolInfo = wrapper.user().getProtocolInfo();
                     final TablistStorage tablistStorage = wrapper.user().get(TablistStorage.class);
                     tablistStorage.sendTempEntry(new TabListEntry(protocolInfo.getUsername(), protocolInfo.getUuid())); // load own skin
-                });
-                handler(wrapper -> {
+
                     final int entityId = wrapper.get(Type.INT, 0);
                     final byte dimensionId = wrapper.get(Type.BYTE, 0);
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
@@ -182,8 +181,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                         wrapper.user().get(ChunkTracker.class).clear();
                         wrapper.user().get(EntityTracker.class).clear();
                     }
-                });
-                handler(wrapper -> {
+
                     final ProtocolInfo protocolInfo = wrapper.user().getProtocolInfo();
                     final TablistStorage tablistStorage = wrapper.user().get(TablistStorage.class);
                     tablistStorage.sendTempEntry(new TabListEntry(protocolInfo.getUsername(), protocolInfo.getUuid())); // load own skin
@@ -209,57 +207,48 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Types1_7_6.POSITION_BYTE, Type.POSITION1_8); // position
             }
         });
-        this.registerClientbound(ClientboundPackets1_7_2.SPAWN_PLAYER, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.passthrough(Type.VAR_INT); // entity id
-                    final UUID uuid = UUID.fromString(wrapper.read(Type.STRING)); // uuid
-                    wrapper.write(Type.UUID, uuid);
-                    final String name = wrapper.read(Type.STRING); // name
+        this.registerClientbound(ClientboundPackets1_7_2.SPAWN_PLAYER, wrapper -> {
+            final int entityID = wrapper.passthrough(Type.VAR_INT); // entity id
+            final UUID uuid = UUID.fromString(wrapper.read(Type.STRING)); // uuid
+            wrapper.write(Type.UUID, uuid);
+            final String name = wrapper.read(Type.STRING); // name
 
-                    final TablistStorage tablistStorage = wrapper.user().get(TablistStorage.class);
-                    final TabListEntry tempTabEntry = new TabListEntry(name, uuid);
+            final TablistStorage tablistStorage = wrapper.user().get(TablistStorage.class);
+            final TabListEntry tempTabEntry = new TabListEntry(name, uuid);
 
-                    final int dataCount = wrapper.read(Type.VAR_INT); // properties count
-                    for (int i = 0; i < dataCount; i++) {
-                        final String key = wrapper.read(Type.STRING); // name
-                        final String value = wrapper.read(Type.STRING); // value
-                        final String signature = wrapper.read(Type.STRING); // signature
-                        tempTabEntry.gameProfile.addProperty(new GameProfile.Property(key, value, signature));
-                    }
-
-                    wrapper.passthrough(Type.INT); // x
-                    wrapper.passthrough(Type.INT); // y
-                    wrapper.passthrough(Type.INT); // z
-                    wrapper.passthrough(Type.BYTE); // yaw
-                    wrapper.passthrough(Type.BYTE); // pitch
-
-                    final short itemId = wrapper.read(Type.SHORT); // item in hand
-                    final Item currentItem = new DataItem(itemId, (byte) 1, (short) 0, null);
-                    itemRewriter.handleItemToClient(currentItem);
-                    wrapper.write(Type.SHORT, (short) currentItem.identifier());
-
-                    final List<Metadata> metadata = wrapper.read(Types1_7_6.METADATA_LIST); // metadata
-                    metadataRewriter.transform(EntityTypes1_10.EntityType.PLAYER, metadata);
-                    wrapper.write(Types1_8.METADATA_LIST, metadata);
-
-                    tablistStorage.sendTempEntry(tempTabEntry);
-                });
-                handler(wrapper -> {
-                    final int entityID = wrapper.get(Type.VAR_INT, 0);
-                    wrapper.user().get(EntityTracker.class).trackEntity(entityID, EntityTypes1_10.EntityType.PLAYER);
-                });
+            final int dataCount = wrapper.read(Type.VAR_INT); // properties count
+            for (int i = 0; i < dataCount; i++) {
+                final String key = wrapper.read(Type.STRING); // name
+                final String value = wrapper.read(Type.STRING); // value
+                final String signature = wrapper.read(Type.STRING); // signature
+                tempTabEntry.gameProfile.addProperty(new GameProfile.Property(key, value, signature));
             }
+
+            wrapper.passthrough(Type.INT); // x
+            wrapper.passthrough(Type.INT); // y
+            wrapper.passthrough(Type.INT); // z
+            wrapper.passthrough(Type.BYTE); // yaw
+            wrapper.passthrough(Type.BYTE); // pitch
+
+            final short itemId = wrapper.read(Type.SHORT); // item in hand
+            final Item currentItem = new DataItem(itemId, (byte) 1, (short) 0, null);
+            itemRewriter.handleItemToClient(currentItem);
+            wrapper.write(Type.SHORT, (short) currentItem.identifier());
+
+            final List<Metadata> metadata = wrapper.read(Types1_7_6.METADATA_LIST); // metadata
+            metadataRewriter.transform(EntityTypes1_10.EntityType.PLAYER, metadata);
+            wrapper.write(Types1_8.METADATA_LIST, metadata);
+
+            tablistStorage.sendTempEntry(tempTabEntry);
+
+            wrapper.user().get(EntityTracker.class).trackEntity(entityID, EntityTypes1_10.EntityType.PLAYER);
         });
         this.registerClientbound(ClientboundPackets1_7_2.COLLECT_ITEM, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.INT, Type.VAR_INT); // collected entity id
                 map(Type.INT, Type.VAR_INT); // collector entity id
-                handler(wrapper -> {
-                    wrapper.user().get(EntityTracker.class).removeEntity(wrapper.get(Type.VAR_INT, 0));
-                });
+                handler(wrapper -> wrapper.user().get(EntityTracker.class).removeEntity(wrapper.get(Type.VAR_INT, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.SPAWN_ENTITY, new PacketHandlers() {
@@ -277,19 +266,14 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                     final int entityID = wrapper.get(Type.VAR_INT, 0);
                     final int typeID = wrapper.get(Type.BYTE, 0);
-                    final int x = wrapper.get(Type.INT, 0);
-                    final int y = wrapper.get(Type.INT, 1);
-                    final int z = wrapper.get(Type.INT, 2);
-                    tracker.trackEntity(entityID, EntityTypes1_10.getTypeFromId(typeID, true));
-                    tracker.updateEntityLocation(entityID, x, y, z, false);
-                });
-                handler(wrapper -> {
-                    final EntityTypes1_10.EntityType type = EntityTypes1_10.getTypeFromId(wrapper.get(Type.BYTE, 0), true);
                     int x = wrapper.get(Type.INT, 0);
                     int y = wrapper.get(Type.INT, 1);
                     int z = wrapper.get(Type.INT, 2);
                     byte yaw = wrapper.get(Type.BYTE, 2);
                     int data = wrapper.get(Type.INT, 3);
+                    final EntityTypes1_10.EntityType type = EntityTypes1_10.getTypeFromId(typeID, true);
+                    tracker.trackEntity(entityID, type);
+                    tracker.updateEntityLocation(entityID, x, y, z, false);
 
                     if (type == EntityTypes1_10.ObjectType.ITEM_FRAME.getType()) {
                         switch (data) {
@@ -387,8 +371,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                             break;
                     }
                     wrapper.set(Type.POSITION1_8, 0, new Position(pos.x() + modX, pos.y(), pos.z() + modZ));
-                });
-                handler(wrapper -> {
+
                     final int entityID = wrapper.get(Type.VAR_INT, 0);
                     wrapper.user().get(EntityTracker.class).trackEntity(entityID, EntityTypes1_10.EntityType.PAINTING);
                 });
@@ -445,16 +428,14 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.BYTE); // y
                 map(Type.BYTE); // z
                 handler(wrapper -> {
-                    final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                    final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                     final int entityId = wrapper.get(Type.VAR_INT, 0);
                     final byte x = wrapper.get(Type.BYTE, 0);
                     final byte y = wrapper.get(Type.BYTE, 1);
                     final byte z = wrapper.get(Type.BYTE, 2);
-                    tracker.updateEntityLocation(entityId, x, y, z, true);
-                });
-                handler(wrapper -> {
+                    entityTracker.updateEntityLocation(entityId, x, y, z, true);
+
                     if (ViaLegacy.getConfig().isDynamicOnground()) {
-                        final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                         final boolean onGround = wrapper.get(Type.BYTE, 1) > -8/*0.25D*/;
                         entityTracker.getGroundMap().put(wrapper.get(Type.VAR_INT, 0), onGround);
                         wrapper.write(Type.BOOLEAN, onGround); // onGround
@@ -490,16 +471,14 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.BYTE); // yaw
                 map(Type.BYTE); // pitch
                 handler(wrapper -> {
-                    final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                    final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                     final int entityId = wrapper.get(Type.VAR_INT, 0);
                     final byte x = wrapper.get(Type.BYTE, 0);
                     final byte y = wrapper.get(Type.BYTE, 1);
                     final byte z = wrapper.get(Type.BYTE, 2);
-                    tracker.updateEntityLocation(entityId, x, y, z, true);
-                });
-                handler(wrapper -> {
+                    entityTracker.updateEntityLocation(entityId, x, y, z, true);
+
                     if (ViaLegacy.getConfig().isDynamicOnground()) {
-                        final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                         final boolean onGround = wrapper.get(Type.BYTE, 1) > -8/*0.25D*/;
                         entityTracker.getGroundMap().put(wrapper.get(Type.VAR_INT, 0), onGround);
                         wrapper.write(Type.BOOLEAN, onGround); // onGround
@@ -520,18 +499,15 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.BYTE); // pitch
                 create(Type.BOOLEAN, true); // onGround
                 handler(wrapper -> {
-                    final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
+                    final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                     final int entityId = wrapper.get(Type.VAR_INT, 0);
                     final int x = wrapper.get(Type.INT, 0);
                     final int y = wrapper.get(Type.INT, 1);
                     final int z = wrapper.get(Type.INT, 2);
-                    tracker.updateEntityLocation(entityId, x, y, z, false);
-                });
-                handler(wrapper -> {
-                    final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
-                    final EntityTypes1_10.EntityType type = entityTracker.getTrackedEntities().get(wrapper.get(Type.VAR_INT, 0));
+                    entityTracker.updateEntityLocation(entityId, x, y, z, false);
 
-                    wrapper.set(Type.INT, 1, realignEntityY(type, wrapper.get(Type.INT, 1)));
+                    final EntityTypes1_10.EntityType type = entityTracker.getTrackedEntities().get(entityId);
+                    wrapper.set(Type.INT, 1, realignEntityY(type, y));
                 });
             }
         });
@@ -623,17 +599,12 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 });
             }
         });
-        this.registerClientbound(ClientboundPackets1_7_2.CHUNK_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final Environment dimension = wrapper.user().get(DimensionTracker.class).getDimension();
+        this.registerClientbound(ClientboundPackets1_7_2.CHUNK_DATA, wrapper -> {
+            final Environment dimension = wrapper.user().get(DimensionTracker.class).getDimension();
 
-                    final Chunk chunk = wrapper.read(Types1_7_6.getChunk(dimension));
-                    wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
-                    wrapper.write(ChunkType1_8.forEnvironment(dimension), chunk);
-                });
-            }
+            final Chunk chunk = wrapper.read(Types1_7_6.getChunk(dimension));
+            wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
+            wrapper.write(ChunkType1_8.forEnvironment(dimension), chunk);
         });
         this.registerClientbound(ClientboundPackets1_7_2.MULTI_BLOCK_CHANGE, new PacketHandlers() {
             @Override
@@ -688,17 +659,12 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.BYTE); // progress
             }
         });
-        this.registerClientbound(ClientboundPackets1_7_2.MAP_BULK_CHUNK, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final Chunk[] chunks = wrapper.read(Types1_7_6.CHUNK_BULK);
-                    for (Chunk chunk : chunks) {
-                        wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
-                    }
-                    wrapper.write(BulkChunkType1_8.TYPE, chunks);
-                });
+        this.registerClientbound(ClientboundPackets1_7_2.MAP_BULK_CHUNK, wrapper -> {
+            final Chunk[] chunks = wrapper.read(Types1_7_6.CHUNK_BULK);
+            for (Chunk chunk : chunks) {
+                wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
             }
+            wrapper.write(BulkChunkType1_8.TYPE, chunks);
         });
         this.registerClientbound(ClientboundPackets1_7_2.EXPLOSION, new PacketHandlers() {
             @Override
@@ -724,107 +690,97 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.FLOAT); // velocity z
             }
         });
-        this.registerClientbound(ClientboundPackets1_7_2.EFFECT, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    int effectId = wrapper.read(Type.INT); // effect id
-                    final Position pos = wrapper.read(Types1_7_6.POSITION_UBYTE); // position
-                    int data = wrapper.read(Type.INT); // data
-                    final boolean disableRelativeVolume = wrapper.read(Type.BOOLEAN); // server wide
+        this.registerClientbound(ClientboundPackets1_7_2.EFFECT, wrapper -> {
+            int effectId = wrapper.read(Type.INT); // effect id
+            final Position pos = wrapper.read(Types1_7_6.POSITION_UBYTE); // position
+            int data = wrapper.read(Type.INT); // data
+            final boolean disableRelativeVolume = wrapper.read(Type.BOOLEAN); // server wide
 
-                    if (!disableRelativeVolume && effectId == 2006) { // block dust effect
-                        wrapper.setPacketType(ClientboundPackets1_8.SPAWN_PARTICLE);
-                        final Random rnd = new Random();
-                        final ChunkTracker chunkTracker = wrapper.user().get(ChunkTracker.class);
-                        final IdAndData block = chunkTracker.getBlockNotNull(pos);
-                        if (block.id != 0) {
-                            double var21 = Math.min(0.2F + (float) data / 15.0F, 10.0F);
-                            if (var21 > 2.5D) var21 = 2.5D;
-                            final float var25 = randomFloatClamp(rnd, 0.0F, ((float) Math.PI * 2F));
-                            final double var26 = randomFloatClamp(rnd, 0.75F, 1.0F);
+            if (!disableRelativeVolume && effectId == 2006) { // block dust effect
+                wrapper.setPacketType(ClientboundPackets1_8.SPAWN_PARTICLE);
+                final Random rnd = new Random();
+                final ChunkTracker chunkTracker = wrapper.user().get(ChunkTracker.class);
+                final IdAndData block = chunkTracker.getBlockNotNull(pos);
+                if (block.id != 0) {
+                    double var21 = Math.min(0.2F + (float) data / 15.0F, 10.0F);
+                    if (var21 > 2.5D) var21 = 2.5D;
+                    final float var25 = randomFloatClamp(rnd, 0.0F, ((float) Math.PI * 2F));
+                    final double var26 = randomFloatClamp(rnd, 0.75F, 1.0F);
 
-                            final float offsetY = (float) (0.20000000298023224D + var21 / 100.0D);
-                            final float offsetX = (float) (Math.cos(var25) * 0.2F * var26 * var26 * (var21 + 0.2D));
-                            final float offsetZ = (float) (Math.sin(var25) * 0.2F * var26 * var26 * (var21 + 0.2D));
-                            final int amount = (int) (150.0D * var21);
+                    final float offsetY = (float) (0.20000000298023224D + var21 / 100.0D);
+                    final float offsetX = (float) (Math.cos(var25) * 0.2F * var26 * var26 * (var21 + 0.2D));
+                    final float offsetZ = (float) (Math.sin(var25) * 0.2F * var26 * var26 * (var21 + 0.2D));
+                    final int amount = (int) (150.0D * var21);
 
-                            wrapper.write(Type.INT, Particle.BLOCK_DUST.ordinal());
-                            wrapper.write(Type.BOOLEAN, false); // longDistance
-                            wrapper.write(Type.FLOAT, pos.x() + 0.5F);
-                            wrapper.write(Type.FLOAT, pos.y() + 1.0F);
-                            wrapper.write(Type.FLOAT, pos.z() + 0.5F);
-                            wrapper.write(Type.FLOAT, offsetX);
-                            wrapper.write(Type.FLOAT, offsetY);
-                            wrapper.write(Type.FLOAT, offsetZ);
-                            wrapper.write(Type.FLOAT, 0.15000000596046448F); // particleSpeed
-                            wrapper.write(Type.INT, amount);
-                            wrapper.write(Type.VAR_INT, block.id | (block.data << 12));
-                        } else {
-                            wrapper.cancel();
-                        }
-                    } else {
-                        if (!disableRelativeVolume && effectId == 1003) { // door_open
-                            if (Math.random() > 0.5) {
-                                effectId = 1006; // door_close
-                            }
-                        } else if (!disableRelativeVolume && effectId == 2001) { // block break effect
-                            final ChunkTracker chunkTracker = wrapper.user().get(ChunkTracker.class);
-                            final int blockID = data & 4095;
-                            final int blockData = data >> 12 & 255;
-                            final IdAndData block = new IdAndData(blockID, blockData);
-                            chunkTracker.remapBlockParticle(block);
-                            data = block.id | (block.data << 12);
-                        }
-
-                        wrapper.write(Type.INT, effectId);
-                        wrapper.write(Type.POSITION1_8, pos);
-                        wrapper.write(Type.INT, data);
-                        wrapper.write(Type.BOOLEAN, disableRelativeVolume);
+                    wrapper.write(Type.INT, Particle.BLOCK_DUST.ordinal());
+                    wrapper.write(Type.BOOLEAN, false); // longDistance
+                    wrapper.write(Type.FLOAT, pos.x() + 0.5F);
+                    wrapper.write(Type.FLOAT, pos.y() + 1.0F);
+                    wrapper.write(Type.FLOAT, pos.z() + 0.5F);
+                    wrapper.write(Type.FLOAT, offsetX);
+                    wrapper.write(Type.FLOAT, offsetY);
+                    wrapper.write(Type.FLOAT, offsetZ);
+                    wrapper.write(Type.FLOAT, 0.15000000596046448F); // particleSpeed
+                    wrapper.write(Type.INT, amount);
+                    wrapper.write(Type.VAR_INT, block.id | (block.data << 12));
+                } else {
+                    wrapper.cancel();
+                }
+            } else {
+                if (!disableRelativeVolume && effectId == 1003) { // door_open
+                    if (Math.random() > 0.5) {
+                        effectId = 1006; // door_close
                     }
-                });
+                } else if (!disableRelativeVolume && effectId == 2001) { // block break effect
+                    final ChunkTracker chunkTracker = wrapper.user().get(ChunkTracker.class);
+                    final int blockID = data & 4095;
+                    final int blockData = data >> 12 & 255;
+                    final IdAndData block = new IdAndData(blockID, blockData);
+                    chunkTracker.remapBlockParticle(block);
+                    data = block.id | (block.data << 12);
+                }
+
+                wrapper.write(Type.INT, effectId);
+                wrapper.write(Type.POSITION1_8, pos);
+                wrapper.write(Type.INT, data);
+                wrapper.write(Type.BOOLEAN, disableRelativeVolume);
             }
         });
-        this.registerClientbound(ClientboundPackets1_7_2.SPAWN_PARTICLE, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final String[] parts = wrapper.read(Type.STRING).split("_", 3);
-                    Particle particle = Particle.find(parts[0]);
-                    if (particle == null) {
-                        particle = Particle.BARRIER;
-                        ViaLegacy.getPlatform().getLogger().warning("Could not find 1.8 particle for " + Arrays.toString(parts));
-                    }
-                    wrapper.write(Type.INT, particle.ordinal()); // particle id
-                    wrapper.write(Type.BOOLEAN, false); // long distance
-                    wrapper.passthrough(Type.FLOAT); // x
-                    wrapper.passthrough(Type.FLOAT); // y
-                    wrapper.passthrough(Type.FLOAT); // z
-                    wrapper.passthrough(Type.FLOAT); // offset x
-                    wrapper.passthrough(Type.FLOAT); // offset y
-                    wrapper.passthrough(Type.FLOAT); // offset z
-                    wrapper.passthrough(Type.FLOAT); // speed
-                    wrapper.passthrough(Type.INT); // amount
-
-                    if (particle == Particle.ICON_CRACK) {
-                        final int id = Integer.parseInt(parts[1]);
-                        int damage = 0;
-                        if (parts.length > 2) damage = Integer.parseInt(parts[2]);
-                        final DataItem item = new DataItem(id, (byte) 1, (short) damage, null);
-                        itemRewriter.handleItemToClient(item);
-                        wrapper.write(Type.VAR_INT, item.identifier()); // particle data
-                        if (item.data() != 0)
-                            wrapper.write(Type.VAR_INT, (int) item.data()); // particle data
-                    } else if (particle == Particle.BLOCK_CRACK || particle == Particle.BLOCK_DUST) {
-                        final int id = Integer.parseInt(parts[1]);
-                        final int metadata = Integer.parseInt(parts[2]);
-                        final IdAndData block = new IdAndData(id, metadata);
-                        wrapper.user().get(ChunkTracker.class).remapBlockParticle(block);
-                        wrapper.write(Type.VAR_INT, block.id | block.data << 12); // particle data
-                    } else if (particle.extra > 0)
-                        throw new IllegalStateException("Tried to write particle which requires extra data, but no handler was found");
-                });
+        this.registerClientbound(ClientboundPackets1_7_2.SPAWN_PARTICLE, wrapper -> {
+            final String[] parts = wrapper.read(Type.STRING).split("_", 3);
+            Particle particle = Particle.find(parts[0]);
+            if (particle == null) {
+                particle = Particle.BARRIER;
+                ViaLegacy.getPlatform().getLogger().warning("Could not find 1.8 particle for " + Arrays.toString(parts));
             }
+            wrapper.write(Type.INT, particle.ordinal()); // particle id
+            wrapper.write(Type.BOOLEAN, false); // long distance
+            wrapper.passthrough(Type.FLOAT); // x
+            wrapper.passthrough(Type.FLOAT); // y
+            wrapper.passthrough(Type.FLOAT); // z
+            wrapper.passthrough(Type.FLOAT); // offset x
+            wrapper.passthrough(Type.FLOAT); // offset y
+            wrapper.passthrough(Type.FLOAT); // offset z
+            wrapper.passthrough(Type.FLOAT); // speed
+            wrapper.passthrough(Type.INT); // amount
+
+            if (particle == Particle.ICON_CRACK) {
+                final int id = Integer.parseInt(parts[1]);
+                int damage = 0;
+                if (parts.length > 2) damage = Integer.parseInt(parts[2]);
+                final DataItem item = new DataItem(id, (byte) 1, (short) damage, null);
+                itemRewriter.handleItemToClient(item);
+                wrapper.write(Type.VAR_INT, item.identifier()); // particle data
+                if (item.data() != 0)
+                    wrapper.write(Type.VAR_INT, (int) item.data()); // particle data
+            } else if (particle == Particle.BLOCK_CRACK || particle == Particle.BLOCK_DUST) {
+                final int id = Integer.parseInt(parts[1]);
+                final int metadata = Integer.parseInt(parts[2]);
+                final IdAndData block = new IdAndData(id, metadata);
+                wrapper.user().get(ChunkTracker.class).remapBlockParticle(block);
+                wrapper.write(Type.VAR_INT, block.id | block.data << 12); // particle data
+            } else if (particle.extra > 0)
+                throw new IllegalStateException("Tried to write particle which requires extra data, but no handler was found");
         });
         this.registerClientbound(ClientboundPackets1_7_2.GAME_EVENT, new PacketHandlers() {
             @Override
@@ -841,80 +797,75 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 });
             }
         });
-        this.registerClientbound(ClientboundPackets1_7_2.OPEN_WINDOW, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final short windowId = wrapper.passthrough(Type.UNSIGNED_BYTE); // window id
-                    final short windowType = wrapper.read(Type.UNSIGNED_BYTE); // window type
-                    String title = wrapper.read(Type.STRING); // title
-                    short slots = wrapper.read(Type.UNSIGNED_BYTE); // slots
-                    boolean useProvidedWindowTitle = wrapper.read(Type.BOOLEAN); // use provided title
+        this.registerClientbound(ClientboundPackets1_7_2.OPEN_WINDOW, wrapper -> {
+            final short windowId = wrapper.passthrough(Type.UNSIGNED_BYTE); // window id
+            final short windowType = wrapper.read(Type.UNSIGNED_BYTE); // window type
+            String title = wrapper.read(Type.STRING); // title
+            short slots = wrapper.read(Type.UNSIGNED_BYTE); // slots
+            boolean useProvidedWindowTitle = wrapper.read(Type.BOOLEAN); // use provided title
 
-                    wrapper.user().get(WindowTracker.class).types.put(windowId, windowType);
+            wrapper.user().get(WindowTracker.class).types.put(windowId, windowType);
 
-                    final String inventoryName;
-                    switch (windowType) {
-                        case 0:
-                            inventoryName = "minecraft:chest";
-                            break;
-                        case 1:
-                            inventoryName = "minecraft:crafting_table";
-                            break;
-                        case 2:
-                            inventoryName = "minecraft:furnace";
-                            break;
-                        case 3:
-                            inventoryName = "minecraft:dispenser";
-                            break;
-                        case 4:
-                            inventoryName = "minecraft:enchanting_table";
-                            break;
-                        case 5:
-                            inventoryName = "minecraft:brewing_stand";
-                            break;
-                        case 6:
-                            inventoryName = "minecraft:villager";
-                            if (!useProvidedWindowTitle || title.isEmpty()) {
-                                title = "entity.Villager.name";
-                                useProvidedWindowTitle = false;
-                            }
-                            break;
-                        case 7:
-                            inventoryName = "minecraft:beacon";
-                            break;
-                        case 8:
-                            inventoryName = "minecraft:anvil";
-                            break;
-                        case 9:
-                            inventoryName = "minecraft:hopper";
-                            break;
-                        case 10:
-                            inventoryName = "minecraft:dropper";
-                            break;
-                        case 11:
-                            inventoryName = "EntityHorse";
-                            break;
-                        default:
-                            throw new IllegalArgumentException("Unknown window type: " + windowType);
+            final String inventoryName;
+            switch (windowType) {
+                case 0:
+                    inventoryName = "minecraft:chest";
+                    break;
+                case 1:
+                    inventoryName = "minecraft:crafting_table";
+                    break;
+                case 2:
+                    inventoryName = "minecraft:furnace";
+                    break;
+                case 3:
+                    inventoryName = "minecraft:dispenser";
+                    break;
+                case 4:
+                    inventoryName = "minecraft:enchanting_table";
+                    break;
+                case 5:
+                    inventoryName = "minecraft:brewing_stand";
+                    break;
+                case 6:
+                    inventoryName = "minecraft:villager";
+                    if (!useProvidedWindowTitle || title.isEmpty()) {
+                        title = "entity.Villager.name";
+                        useProvidedWindowTitle = false;
                     }
-
-                    if (windowType == 1/*crafting_table*/ || windowType == 4/*enchanting_table*/ || windowType == 8/*anvil*/) {
-                        slots = 0;
-                    }
-
-                    if (useProvidedWindowTitle) {
-                        title = LEGACY_TO_JSON.transform(wrapper, title);
-                    } else {
-                        title = LEGACY_TO_JSON_TRANSLATE.transform(wrapper, title);
-                    }
-
-                    wrapper.write(Type.STRING, inventoryName);
-                    wrapper.write(Type.STRING, title);
-                    wrapper.write(Type.UNSIGNED_BYTE, slots);
-                    if (windowType == 11) wrapper.passthrough(Type.INT); // entity id
-                });
+                    break;
+                case 7:
+                    inventoryName = "minecraft:beacon";
+                    break;
+                case 8:
+                    inventoryName = "minecraft:anvil";
+                    break;
+                case 9:
+                    inventoryName = "minecraft:hopper";
+                    break;
+                case 10:
+                    inventoryName = "minecraft:dropper";
+                    break;
+                case 11:
+                    inventoryName = "EntityHorse";
+                    break;
+                default:
+                    throw new IllegalArgumentException("Unknown window type: " + windowType);
             }
+
+            if (windowType == 1/*crafting_table*/ || windowType == 4/*enchanting_table*/ || windowType == 8/*anvil*/) {
+                slots = 0;
+            }
+
+            if (useProvidedWindowTitle) {
+                title = LEGACY_TO_JSON.transform(wrapper, title);
+            } else {
+                title = LEGACY_TO_JSON_TRANSLATE.transform(wrapper, title);
+            }
+
+            wrapper.write(Type.STRING, inventoryName);
+            wrapper.write(Type.STRING, title);
+            wrapper.write(Type.UNSIGNED_BYTE, slots);
+            if (windowType == 11) wrapper.passthrough(Type.INT); // entity id
         });
         this.registerClientbound(ClientboundPackets1_7_2.SET_SLOT, new PacketHandlers() {
             @Override
@@ -997,52 +948,47 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(LEGACY_TO_JSON); // line 4
             }
         });
-        this.registerClientbound(ClientboundPackets1_7_2.MAP_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final int id = wrapper.passthrough(Type.VAR_INT); // map id
-                    final byte[] data = wrapper.read(Type.SHORT_BYTE_ARRAY); // data
+        this.registerClientbound(ClientboundPackets1_7_2.MAP_DATA, wrapper -> {
+            final int id = wrapper.passthrough(Type.VAR_INT); // map id
+            final byte[] data = wrapper.read(Type.SHORT_BYTE_ARRAY); // data
 
-                    final MapStorage mapStorage = wrapper.user().get(MapStorage.class);
-                    MapData mapData = mapStorage.getMapData(id);
-                    if (mapData == null) mapStorage.putMapData(id, mapData = new MapData());
+            final MapStorage mapStorage = wrapper.user().get(MapStorage.class);
+            MapData mapData = mapStorage.getMapData(id);
+            if (mapData == null) mapStorage.putMapData(id, mapData = new MapData());
 
-                    if (data[0] == 1) {
-                        final int count = (data.length - 1) / 3;
-                        mapData.mapIcons = new MapIcon[count];
+            if (data[0] == 1) {
+                final int count = (data.length - 1) / 3;
+                mapData.mapIcons = new MapIcon[count];
 
-                        for (int i = 0; i < count; i++) {
-                            mapData.mapIcons[i] = new MapIcon((byte) (data[i * 3 + 1] >> 4), (byte) (data[i * 3 + 1] & 0xF), data[i * 3 + 2], data[i * 3 + 3]);
-                        }
-                    } else if (data[0] == 2) {
-                        mapData.scale = data[1];
-                    }
+                for (int i = 0; i < count; i++) {
+                    mapData.mapIcons[i] = new MapIcon((byte) (data[i * 3 + 1] >> 4), (byte) (data[i * 3 + 1] & 0xF), data[i * 3 + 2], data[i * 3 + 3]);
+                }
+            } else if (data[0] == 2) {
+                mapData.scale = data[1];
+            }
 
-                    wrapper.write(Type.BYTE, mapData.scale);
-                    wrapper.write(Type.VAR_INT, mapData.mapIcons.length);
-                    for (MapIcon mapIcon : mapData.mapIcons) {
-                        wrapper.write(Type.BYTE, (byte) (mapIcon.direction << 4 | mapIcon.type & 0xF));
-                        wrapper.write(Type.BYTE, mapIcon.x);
-                        wrapper.write(Type.BYTE, mapIcon.z);
-                    }
+            wrapper.write(Type.BYTE, mapData.scale);
+            wrapper.write(Type.VAR_INT, mapData.mapIcons.length);
+            for (MapIcon mapIcon : mapData.mapIcons) {
+                wrapper.write(Type.BYTE, (byte) (mapIcon.direction << 4 | mapIcon.type & 0xF));
+                wrapper.write(Type.BYTE, mapIcon.x);
+                wrapper.write(Type.BYTE, mapIcon.z);
+            }
 
-                    if (data[0] == 0) {
-                        final byte x = data[1];
-                        final byte z = data[2];
-                        final int rows = data.length - 3;
-                        final byte[] newData = new byte[rows];
-                        System.arraycopy(data, 3, newData, 0, rows);
+            if (data[0] == 0) {
+                final byte x = data[1];
+                final byte z = data[2];
+                final int rows = data.length - 3;
+                final byte[] newData = new byte[rows];
+                System.arraycopy(data, 3, newData, 0, rows);
 
-                        wrapper.write(Type.BYTE, (byte) 1);
-                        wrapper.write(Type.BYTE, (byte) rows);
-                        wrapper.write(Type.BYTE, x);
-                        wrapper.write(Type.BYTE, z);
-                        wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, newData);
-                    } else {
-                        wrapper.write(Type.BYTE, (byte) 0);
-                    }
-                });
+                wrapper.write(Type.BYTE, (byte) 1);
+                wrapper.write(Type.BYTE, (byte) rows);
+                wrapper.write(Type.BYTE, x);
+                wrapper.write(Type.BYTE, z);
+                wrapper.write(Type.BYTE_ARRAY_PRIMITIVE, newData);
+            } else {
+                wrapper.write(Type.BYTE, (byte) 0);
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.BLOCK_ENTITY_DATA, new PacketHandlers() {
@@ -1059,42 +1005,37 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Types1_7_6.POSITION_INT, Type.POSITION1_8); // position
             }
         });
-        this.registerClientbound(ClientboundPackets1_7_2.PLAYER_INFO, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final String name = wrapper.read(Type.STRING); // name
-                    final boolean online = wrapper.read(Type.BOOLEAN); // online
-                    final short ping = wrapper.read(Type.SHORT); // ping
+        this.registerClientbound(ClientboundPackets1_7_2.PLAYER_INFO, wrapper -> {
+            final String name = wrapper.read(Type.STRING); // name
+            final boolean online = wrapper.read(Type.BOOLEAN); // online
+            final short ping = wrapper.read(Type.SHORT); // ping
 
-                    final TablistStorage tablistStorage = wrapper.user().get(TablistStorage.class);
-                    TabListEntry entry = tablistStorage.tablist.get(name);
+            final TablistStorage tablistStorage = wrapper.user().get(TablistStorage.class);
+            TabListEntry entry = tablistStorage.tablist.get(name);
 
-                    if (entry == null && online) { // add entry
-                        tablistStorage.tablist.put(name, entry = new TabListEntry(name, ping));
-                        wrapper.write(Type.VAR_INT, 0); // action
-                        wrapper.write(Type.VAR_INT, 1); // count
-                        wrapper.write(Type.UUID, entry.gameProfile.uuid); // uuid
-                        wrapper.write(Type.STRING, entry.gameProfile.userName); // name
-                        wrapper.write(Type.VAR_INT, 0); // properties count
-                        wrapper.write(Type.VAR_INT, 0); // gamemode
-                        wrapper.write(Type.VAR_INT, entry.ping); // ping
-                        wrapper.write(Type.OPTIONAL_STRING, null); // display name
-                    } else if (entry != null && !online) { // remove entry
-                        tablistStorage.tablist.remove(name);
-                        wrapper.write(Type.VAR_INT, 4); // action
-                        wrapper.write(Type.VAR_INT, 1); // count
-                        wrapper.write(Type.UUID, entry.gameProfile.uuid); // uuid
-                    } else if (entry != null) { // update ping
-                        entry.ping = ping;
-                        wrapper.write(Type.VAR_INT, 2); // action
-                        wrapper.write(Type.VAR_INT, 1); // count
-                        wrapper.write(Type.UUID, entry.gameProfile.uuid); // uuid
-                        wrapper.write(Type.VAR_INT, entry.ping); // ping
-                    } else {
-                        wrapper.cancel();
-                    }
-                });
+            if (entry == null && online) { // add entry
+                tablistStorage.tablist.put(name, entry = new TabListEntry(name, ping));
+                wrapper.write(Type.VAR_INT, 0); // action
+                wrapper.write(Type.VAR_INT, 1); // count
+                wrapper.write(Type.UUID, entry.gameProfile.uuid); // uuid
+                wrapper.write(Type.STRING, entry.gameProfile.userName); // name
+                wrapper.write(Type.VAR_INT, 0); // properties count
+                wrapper.write(Type.VAR_INT, 0); // gamemode
+                wrapper.write(Type.VAR_INT, entry.ping); // ping
+                wrapper.write(Type.OPTIONAL_STRING, null); // display name
+            } else if (entry != null && !online) { // remove entry
+                tablistStorage.tablist.remove(name);
+                wrapper.write(Type.VAR_INT, 4); // action
+                wrapper.write(Type.VAR_INT, 1); // count
+                wrapper.write(Type.UUID, entry.gameProfile.uuid); // uuid
+            } else if (entry != null) { // update ping
+                entry.ping = ping;
+                wrapper.write(Type.VAR_INT, 2); // action
+                wrapper.write(Type.VAR_INT, 1); // count
+                wrapper.write(Type.UUID, entry.gameProfile.uuid); // uuid
+                wrapper.write(Type.VAR_INT, entry.ping); // ping
+            } else {
+                wrapper.cancel();
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.SCOREBOARD_OBJECTIVE, new PacketHandlers() {
@@ -1294,15 +1235,10 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 });
             }
         });
-        this.registerServerbound(ServerboundPackets1_8.ANIMATION, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
-                    wrapper.write(Type.INT, entityTracker.getPlayerID()); // entity id
-                    wrapper.write(Type.BYTE, (byte) 1); // animation
-                });
-            }
+        this.registerServerbound(ServerboundPackets1_8.ANIMATION, wrapper -> {
+            final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
+            wrapper.write(Type.INT, entityTracker.getPlayerID()); // entity id
+            wrapper.write(Type.BYTE, (byte) 1); // animation
         });
         this.registerServerbound(ServerboundPackets1_8.ENTITY_ACTION, new PacketHandlers() {
             @Override
@@ -1380,15 +1316,10 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 });
             }
         });
-        this.registerServerbound(ServerboundPackets1_8.TAB_COMPLETE, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final String text = wrapper.read(Type.STRING); // text
-                    wrapper.clearPacket(); // remove optional blockpos
-                    wrapper.write(Type.STRING, text);
-                });
-            }
+        this.registerServerbound(ServerboundPackets1_8.TAB_COMPLETE, wrapper -> {
+            final String text = wrapper.read(Type.STRING); // text
+            wrapper.clearPacket(); // remove optional blockpos
+            wrapper.write(Type.STRING, text);
         });
         this.registerServerbound(ServerboundPackets1_8.CLIENT_SETTINGS, new PacketHandlers() {
             @Override

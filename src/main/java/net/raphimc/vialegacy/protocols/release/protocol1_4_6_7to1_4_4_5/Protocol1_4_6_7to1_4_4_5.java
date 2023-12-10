@@ -49,40 +49,35 @@ public class Protocol1_4_6_7to1_4_4_5 extends StatelessProtocol<ClientboundPacke
     protected void registerPackets() {
         this.itemRewriter.register();
 
-        this.registerClientbound(ClientboundPackets1_4_4.SPAWN_ITEM, ClientboundPackets1_4_6.SPAWN_ENTITY, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final int entityId = wrapper.read(Type.INT); // entity id
-                    final Item item = wrapper.read(Types1_7_6.ITEM); // item
-                    final int x = wrapper.read(Type.INT); // x
-                    final int y = wrapper.read(Type.INT); // y
-                    final int z = wrapper.read(Type.INT); // z
-                    final int motionX = wrapper.read(Type.BYTE); // velocity x
-                    final int motionY = wrapper.read(Type.BYTE); // velocity y
-                    final int motionZ = wrapper.read(Type.BYTE); // velocity z
+        this.registerClientbound(ClientboundPackets1_4_4.SPAWN_ITEM, ClientboundPackets1_4_6.SPAWN_ENTITY, wrapper -> {
+            final int entityId = wrapper.read(Type.INT); // entity id
+            final Item item = wrapper.read(Types1_7_6.ITEM); // item
+            final int x = wrapper.read(Type.INT); // x
+            final int y = wrapper.read(Type.INT); // y
+            final int z = wrapper.read(Type.INT); // z
+            final int motionX = wrapper.read(Type.BYTE); // velocity x
+            final int motionY = wrapper.read(Type.BYTE); // velocity y
+            final int motionZ = wrapper.read(Type.BYTE); // velocity z
 
-                    wrapper.write(Type.INT, entityId); // entity id
-                    wrapper.write(Type.BYTE, (byte) EntityTypes1_10.ObjectType.ITEM.getId()); // type id
-                    wrapper.write(Type.INT, x); // x
-                    wrapper.write(Type.INT, y); // y
-                    wrapper.write(Type.INT, z); // z
-                    wrapper.write(Type.BYTE, (byte) 0); // yaw
-                    wrapper.write(Type.BYTE, (byte) 0); // pitch
-                    wrapper.write(Type.INT, 1); // data (any value above 0)
-                    wrapper.write(Type.SHORT, (short) (motionX / 128F * 8000F)); // velocity x
-                    wrapper.write(Type.SHORT, (short) (motionY / 128F * 8000F)); // velocity y
-                    wrapper.write(Type.SHORT, (short) (motionZ / 128F * 8000F)); // velocity z
+            wrapper.write(Type.INT, entityId); // entity id
+            wrapper.write(Type.BYTE, (byte) EntityTypes1_10.ObjectType.ITEM.getId()); // type id
+            wrapper.write(Type.INT, x); // x
+            wrapper.write(Type.INT, y); // y
+            wrapper.write(Type.INT, z); // z
+            wrapper.write(Type.BYTE, (byte) 0); // yaw
+            wrapper.write(Type.BYTE, (byte) 0); // pitch
+            wrapper.write(Type.INT, 1); // data (any value above 0)
+            wrapper.write(Type.SHORT, (short) (motionX / 128F * 8000F)); // velocity x
+            wrapper.write(Type.SHORT, (short) (motionY / 128F * 8000F)); // velocity y
+            wrapper.write(Type.SHORT, (short) (motionZ / 128F * 8000F)); // velocity z
 
-                    final PacketWrapper metadata = PacketWrapper.create(ClientboundPackets1_4_6.ENTITY_METADATA, wrapper.user());
-                    metadata.write(Type.INT, entityId); // entity id
-                    metadata.write(Types1_6_4.METADATA_LIST, Lists.newArrayList(new Metadata(MetaIndex1_8to1_7_6.ITEM_ITEM.getOldIndex(), MetaType1_6_4.Slot, item))); // metadata
+            final PacketWrapper metadata = PacketWrapper.create(ClientboundPackets1_4_6.ENTITY_METADATA, wrapper.user());
+            metadata.write(Type.INT, entityId); // entity id
+            metadata.write(Types1_6_4.METADATA_LIST, Lists.newArrayList(new Metadata(MetaIndex1_8to1_7_6.ITEM_ITEM.getOldIndex(), MetaType1_6_4.Slot, item))); // metadata
 
-                    wrapper.send(Protocol1_4_6_7to1_4_4_5.class);
-                    metadata.send(Protocol1_4_6_7to1_4_4_5.class);
-                    wrapper.cancel();
-                });
-            }
+            wrapper.send(Protocol1_4_6_7to1_4_4_5.class);
+            metadata.send(Protocol1_4_6_7to1_4_4_5.class);
+            wrapper.cancel();
         });
         this.registerClientbound(ClientboundPackets1_4_4.SPAWN_ENTITY, new PacketHandlers() {
             @Override

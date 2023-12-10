@@ -62,24 +62,19 @@ public class Protocol1_4_2to1_3_1_2 extends StatelessProtocol<ClientboundPackets
     protected void registerPackets() {
         this.itemRewriter.register();
 
-        this.registerClientbound(ClientboundPackets1_3_1.DISCONNECT, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final State currentState = wrapper.user().getProtocolInfo().getServerState();
-                    if (currentState == State.STATUS) {
-                        final String reason = wrapper.read(Types1_6_4.STRING); // reason
-                        try {
-                            final ProtocolInfo info = wrapper.user().getProtocolInfo();
-                            final String[] pingParts = reason.split("§");
-                            final String out = "§1\0" + LegacyProtocolVersion.getRealProtocolVersion(info.getServerProtocolVersion()) + "\0" + ProtocolVersion.getProtocol(info.getServerProtocolVersion()).getName() + "\0" + pingParts[0] + "\0" + pingParts[1] + "\0" + pingParts[2];
-                            wrapper.write(Types1_6_4.STRING, out);
-                        } catch (Throwable e) {
-                            ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Could not parse 1.3.1 ping: " + reason, e);
-                            wrapper.cancel();
-                        }
-                    }
-                });
+        this.registerClientbound(ClientboundPackets1_3_1.DISCONNECT, wrapper -> {
+            final State currentState = wrapper.user().getProtocolInfo().getServerState();
+            if (currentState == State.STATUS) {
+                final String reason = wrapper.read(Types1_6_4.STRING); // reason
+                try {
+                    final ProtocolInfo info = wrapper.user().getProtocolInfo();
+                    final String[] pingParts = reason.split("§");
+                    final String out = "§1\0" + LegacyProtocolVersion.getRealProtocolVersion(info.getServerProtocolVersion()) + "\0" + ProtocolVersion.getProtocol(info.getServerProtocolVersion()).getName() + "\0" + pingParts[0] + "\0" + pingParts[1] + "\0" + pingParts[2];
+                    wrapper.write(Types1_6_4.STRING, out);
+                } catch (Throwable e) {
+                    ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Could not parse 1.3.1 ping: " + reason, e);
+                    wrapper.cancel();
+                }
             }
         });
         this.registerClientbound(ClientboundPackets1_3_1.JOIN_GAME, new PacketHandlers() {
@@ -103,14 +98,9 @@ public class Protocol1_4_2to1_3_1_2 extends StatelessProtocol<ClientboundPackets
                 });
             }
         });
-        this.registerClientbound(ClientboundPackets1_3_1.TIME_UPDATE, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final long time = wrapper.passthrough(Type.LONG); // time
-                    wrapper.write(Type.LONG, time % 24_000); // time of day
-                });
-            }
+        this.registerClientbound(ClientboundPackets1_3_1.TIME_UPDATE, wrapper -> {
+            final long time = wrapper.passthrough(Type.LONG); // time
+            wrapper.write(Type.LONG, time % 24_000); // time of day
         });
         this.registerClientbound(ClientboundPackets1_3_1.RESPAWN, new PacketHandlers() {
             @Override
@@ -144,9 +134,9 @@ public class Protocol1_4_2to1_3_1_2 extends StatelessProtocol<ClientboundPackets
                 map(Type.BYTE); // pitch
                 map(Type.UNSIGNED_SHORT); // item
                 map(Types1_3_1.METADATA_LIST, Types1_4_2.METADATA_LIST); // metadata
-                handler(wrapper -> rewriteMetadata(wrapper.get(Types1_4_2.METADATA_LIST, 0)));
                 handler(wrapper -> {
                     final List<Metadata> metadataList = wrapper.get(Types1_4_2.METADATA_LIST, 0);
+                    rewriteMetadata(metadataList);
                     metadataList.removeIf(metadata -> metadata.metaType() == MetaType1_4_2.Byte && metadata.id() == MetaIndex1_8to1_7_6.HUMAN_SKIN_FLAGS.getOldIndex());
                     metadataList.add(new Metadata(MetaIndex1_8to1_7_6.HUMAN_SKIN_FLAGS.getOldIndex(), MetaType1_4_2.Byte, (byte) 0));
                 });
@@ -180,8 +170,9 @@ public class Protocol1_4_2to1_3_1_2 extends StatelessProtocol<ClientboundPackets
                 map(Type.SHORT); // velocity y
                 map(Type.SHORT); // velocity z
                 map(Types1_3_1.METADATA_LIST, Types1_4_2.METADATA_LIST); // metadata
-                handler(wrapper -> rewriteMetadata(wrapper.get(Types1_4_2.METADATA_LIST, 0)));
                 handler(wrapper -> {
+                    rewriteMetadata(wrapper.get(Types1_4_2.METADATA_LIST, 0));
+
                     final int entityId = wrapper.get(Type.INT, 0);
                     final short typeId = wrapper.get(Type.UNSIGNED_BYTE, 0);
                     if (typeId == EntityTypes1_10.EntityType.SKELETON.getId()) {

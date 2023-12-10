@@ -144,73 +144,68 @@ public class Protocol1_2_1_3to1_1 extends StatelessProtocol<ClientboundPackets1_
                 handler(wrapper -> sendEntityHeadLook(wrapper.get(Type.INT, 0), wrapper.get(Type.BYTE, 0), wrapper));
             }
         });
-        this.registerClientbound(ClientboundPackets1_1.CHUNK_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final ChunkTracker chunkTracker = wrapper.user().get(ChunkTracker.class);
-                    final SeedStorage seedStorage = wrapper.user().get(SeedStorage.class);
-                    final PendingBlocksTracker pendingBlocksTracker = wrapper.user().get(PendingBlocksTracker.class);
-                    final Chunk chunk = wrapper.read(Types1_1.CHUNK);
+        this.registerClientbound(ClientboundPackets1_1.CHUNK_DATA, wrapper -> {
+            final ChunkTracker chunkTracker = wrapper.user().get(ChunkTracker.class);
+            final SeedStorage seedStorage = wrapper.user().get(SeedStorage.class);
+            final PendingBlocksTracker pendingBlocksTracker = wrapper.user().get(PendingBlocksTracker.class);
+            final Chunk chunk = wrapper.read(Types1_1.CHUNK);
 
-                    if (chunk instanceof NonFullChunk1_1) {
-                        if (!chunkTracker.isChunkLoaded(chunk.getX(), chunk.getZ())) { // Cancel because update in unloaded area is ignored by mc
-                            wrapper.cancel();
-                            return;
-                        }
+            if (chunk instanceof NonFullChunk1_1) {
+                if (!chunkTracker.isChunkLoaded(chunk.getX(), chunk.getZ())) { // Cancel because update in unloaded area is ignored by mc
+                    wrapper.cancel();
+                    return;
+                }
 
-                        final NonFullChunk1_1 nfc = (NonFullChunk1_1) chunk;
-                        wrapper.setPacketType(ClientboundPackets1_2_1.MULTI_BLOCK_CHANGE);
-                        wrapper.write(Type.INT, nfc.getX());
-                        wrapper.write(Type.INT, nfc.getZ());
-                        wrapper.write(Types1_7_6.BLOCK_CHANGE_RECORD_ARRAY, nfc.asBlockChangeRecords().toArray(new BlockChangeRecord[0]));
+                final NonFullChunk1_1 nfc = (NonFullChunk1_1) chunk;
+                wrapper.setPacketType(ClientboundPackets1_2_1.MULTI_BLOCK_CHANGE);
+                wrapper.write(Type.INT, nfc.getX());
+                wrapper.write(Type.INT, nfc.getZ());
+                wrapper.write(Types1_7_6.BLOCK_CHANGE_RECORD_ARRAY, nfc.asBlockChangeRecords().toArray(new BlockChangeRecord[0]));
 
-                        pendingBlocksTracker.markReceived(new Position((nfc.getX() << 4) + nfc.getStartPos().x(), nfc.getStartPos().y(), (nfc.getZ() << 4) + nfc.getStartPos().z()), new Position((nfc.getX() << 4) + nfc.getEndPos().x() - 1, nfc.getEndPos().y() - 1, (nfc.getZ() << 4) + nfc.getEndPos().z() - 1));
-                        return;
-                    }
-                    pendingBlocksTracker.markReceived(new Position(chunk.getX() << 4, 0, chunk.getZ() << 4), new Position((chunk.getX() << 4) + 15, chunk.getSections().length * 16, (chunk.getZ() << 4) + 15));
-
-                    int[] newBiomeData;
-                    if (seedStorage.worldChunkManager != null) {
-                        final byte[] oldBiomeData = seedStorage.worldChunkManager.getBiomeDataAt(chunk.getX(), chunk.getZ());
-                        newBiomeData = new int[oldBiomeData.length];
-                        for (int i = 0; i < oldBiomeData.length; i++) {
-                            newBiomeData[i] = oldBiomeData[i] & 255;
-                        }
-                    } else {
-                        newBiomeData = new int[256];
-                        Arrays.fill(newBiomeData, 1); // plains
-                    }
-                    chunk.setBiomeData(newBiomeData);
-
-                    for (ChunkSection section : chunk.getSections()) {
-                        if (section == null) continue;
-                        final NibbleArray1_1 oldBlockLight = new NibbleArray1_1(section.getLight().getBlockLight(), 4);
-                        final NibbleArray newBlockLight = new NibbleArray(oldBlockLight.size());
-                        final NibbleArray1_1 oldSkyLight = new NibbleArray1_1(section.getLight().getSkyLight(), 4);
-                        final NibbleArray newSkyLight = new NibbleArray(oldSkyLight.size());
-
-                        for (int x = 0; x < 16; x++) {
-                            for (int y = 0; y < 16; y++) {
-                                for (int z = 0; z < 16; z++) {
-                                    newBlockLight.set(x, y, z, oldBlockLight.get(x, y, z));
-                                    newSkyLight.set(x, y, z, oldSkyLight.get(x, y, z));
-                                }
-                            }
-                        }
-                        section.getLight().setBlockLight(newBlockLight.getHandle());
-                        section.getLight().setSkyLight(newSkyLight.getHandle());
-                    }
-
-                    if (chunk.getSections().length < 16) { // Increase available sections to match new world height
-                        final ChunkSection[] newArray = new ChunkSection[16];
-                        System.arraycopy(chunk.getSections(), 0, newArray, 0, chunk.getSections().length);
-                        chunk.setSections(newArray);
-                    }
-
-                    wrapper.write(Types1_2_4.CHUNK, chunk);
-                });
+                pendingBlocksTracker.markReceived(new Position((nfc.getX() << 4) + nfc.getStartPos().x(), nfc.getStartPos().y(), (nfc.getZ() << 4) + nfc.getStartPos().z()), new Position((nfc.getX() << 4) + nfc.getEndPos().x() - 1, nfc.getEndPos().y() - 1, (nfc.getZ() << 4) + nfc.getEndPos().z() - 1));
+                return;
             }
+            pendingBlocksTracker.markReceived(new Position(chunk.getX() << 4, 0, chunk.getZ() << 4), new Position((chunk.getX() << 4) + 15, chunk.getSections().length * 16, (chunk.getZ() << 4) + 15));
+
+            int[] newBiomeData;
+            if (seedStorage.worldChunkManager != null) {
+                final byte[] oldBiomeData = seedStorage.worldChunkManager.getBiomeDataAt(chunk.getX(), chunk.getZ());
+                newBiomeData = new int[oldBiomeData.length];
+                for (int i = 0; i < oldBiomeData.length; i++) {
+                    newBiomeData[i] = oldBiomeData[i] & 255;
+                }
+            } else {
+                newBiomeData = new int[256];
+                Arrays.fill(newBiomeData, 1); // plains
+            }
+            chunk.setBiomeData(newBiomeData);
+
+            for (ChunkSection section : chunk.getSections()) {
+                if (section == null) continue;
+                final NibbleArray1_1 oldBlockLight = new NibbleArray1_1(section.getLight().getBlockLight(), 4);
+                final NibbleArray newBlockLight = new NibbleArray(oldBlockLight.size());
+                final NibbleArray1_1 oldSkyLight = new NibbleArray1_1(section.getLight().getSkyLight(), 4);
+                final NibbleArray newSkyLight = new NibbleArray(oldSkyLight.size());
+
+                for (int x = 0; x < 16; x++) {
+                    for (int y = 0; y < 16; y++) {
+                        for (int z = 0; z < 16; z++) {
+                            newBlockLight.set(x, y, z, oldBlockLight.get(x, y, z));
+                            newSkyLight.set(x, y, z, oldSkyLight.get(x, y, z));
+                        }
+                    }
+                }
+                section.getLight().setBlockLight(newBlockLight.getHandle());
+                section.getLight().setSkyLight(newSkyLight.getHandle());
+            }
+
+            if (chunk.getSections().length < 16) { // Increase available sections to match new world height
+                final ChunkSection[] newArray = new ChunkSection[16];
+                System.arraycopy(chunk.getSections(), 0, newArray, 0, chunk.getSections().length);
+                chunk.setSections(newArray);
+            }
+
+            wrapper.write(Types1_2_4.CHUNK, chunk);
         });
         this.registerClientbound(ClientboundPackets1_1.MULTI_BLOCK_CHANGE, new PacketHandlers() {
             @Override

@@ -34,39 +34,17 @@ public enum ServerboundPacketsa1_0_15 implements ServerboundPacketType, PreNetty
         PreNettyTypes.readUTF(buf);
         PreNettyTypes.readUTF(buf);
     }),
-    CHAT_MESSAGE(3, (user, buf) -> {
-        PreNettyTypes.readUTF(buf);
-    }),
-    PLAYER_MOVEMENT(10, (user, buf) -> {
-        buf.skipBytes(1);
-    }),
-    PLAYER_POSITION(11, (user, buf) -> {
-        buf.skipBytes(33);
-    }),
-    PLAYER_ROTATION(12, (user, buf) -> {
-        buf.skipBytes(9);
-    }),
-    PLAYER_POSITION_AND_ROTATION(13, (user, buf) -> {
-        buf.skipBytes(41);
-    }),
-    PLAYER_DIGGING(14, (user, buf) -> {
-        buf.skipBytes(11);
-    }),
-    PLAYER_BLOCK_PLACEMENT(15, (user, buf) -> {
-        buf.skipBytes(12);
-    }),
-    HELD_ITEM_CHANGE(16, (user, buf) -> {
-        buf.skipBytes(6);
-    }),
-    ANIMATION(18, (user, buf) -> {
-        buf.skipBytes(5);
-    }),
-    SPAWN_ITEM(21, (user, buf) -> {
-        buf.skipBytes(22);
-    }),
-    DISCONNECT(255, (user, buf) -> {
-        PreNettyTypes.readUTF(buf);
-    });
+    CHAT_MESSAGE(3, (user, buf) -> PreNettyTypes.readUTF(buf)),
+    PLAYER_MOVEMENT(10, (user, buf) -> buf.skipBytes(1)),
+    PLAYER_POSITION(11, (user, buf) -> buf.skipBytes(33)),
+    PLAYER_ROTATION(12, (user, buf) -> buf.skipBytes(9)),
+    PLAYER_POSITION_AND_ROTATION(13, (user, buf) -> buf.skipBytes(41)),
+    PLAYER_DIGGING(14, (user, buf) -> buf.skipBytes(11)),
+    PLAYER_BLOCK_PLACEMENT(15, (user, buf) -> buf.skipBytes(12)),
+    HELD_ITEM_CHANGE(16, (user, buf) -> buf.skipBytes(6)),
+    ANIMATION(18, (user, buf) -> buf.skipBytes(5)),
+    SPAWN_ITEM(21, (user, buf) -> buf.skipBytes(22)),
+    DISCONNECT(255, (user, buf) -> PreNettyTypes.readUTF(buf));
 
     private static final ServerboundPacketsa1_0_15[] REGISTRY = new ServerboundPacketsa1_0_15[256];
 

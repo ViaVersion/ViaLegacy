@@ -28,52 +28,30 @@ import static net.raphimc.vialegacy.api.splitter.PreNettyTypes.*;
 
 public enum ClientboundPackets1_4_2 implements ClientboundPacketType, PreNettyPacketType {
 
-    KEEP_ALIVE(0, (user, buf) -> {
-        buf.skipBytes(4);
-    }),
+    KEEP_ALIVE(0, (user, buf) -> buf.skipBytes(4)),
     JOIN_GAME(1, (user, buf) -> {
         buf.skipBytes(4);
         readString(buf);
         buf.skipBytes(5);
     }),
-    CHAT_MESSAGE(3, (user, buf) -> {
-        readString(buf);
-    }),
-    TIME_UPDATE(4, (user, buf) -> {
-        buf.skipBytes(16);
-    }),
+    CHAT_MESSAGE(3, (user, buf) -> readString(buf)),
+    TIME_UPDATE(4, (user, buf) -> buf.skipBytes(16)),
     ENTITY_EQUIPMENT(5, (user, buf) -> {
         buf.skipBytes(6);
         readItemStack1_3_1(buf);
     }),
-    SPAWN_POSITION(6, (user, buf) -> {
-        buf.skipBytes(12);
-    }),
-    UPDATE_HEALTH(8, (user, buf) -> {
-        buf.skipBytes(8);
-    }),
+    SPAWN_POSITION(6, (user, buf) -> buf.skipBytes(12)),
+    UPDATE_HEALTH(8, (user, buf) -> buf.skipBytes(8)),
     RESPAWN(9, (user, buf) -> {
         buf.skipBytes(8);
         readString(buf);
     }),
-    PLAYER_POSITION_ONLY_ONGROUND(10, (user, buf) -> {
-        buf.skipBytes(1);
-    }),
-    PLAYER_POSITION_ONLY_POSITION(11, (user, buf) -> {
-        buf.skipBytes(33);
-    }),
-    PLAYER_POSITION_ONLY_LOOK(12, (user, buf) -> {
-        buf.skipBytes(9);
-    }),
-    PLAYER_POSITION(13, (user, buf) -> {
-        buf.skipBytes(41);
-    }),
-    USE_BED(17, (user, buf) -> {
-        buf.skipBytes(14);
-    }),
-    ENTITY_ANIMATION(18, (user, buf) -> {
-        buf.skipBytes(5);
-    }),
+    PLAYER_POSITION_ONLY_ONGROUND(10, (user, buf) -> buf.skipBytes(1)),
+    PLAYER_POSITION_ONLY_POSITION(11, (user, buf) -> buf.skipBytes(33)),
+    PLAYER_POSITION_ONLY_LOOK(12, (user, buf) -> buf.skipBytes(9)),
+    PLAYER_POSITION(13, (user, buf) -> buf.skipBytes(41)),
+    USE_BED(17, (user, buf) -> buf.skipBytes(14)),
+    ENTITY_ANIMATION(18, (user, buf) -> buf.skipBytes(5)),
     SPAWN_PLAYER(20, (user, buf) -> {
         buf.skipBytes(4);
         readString(buf);
@@ -85,9 +63,7 @@ public enum ClientboundPackets1_4_2 implements ClientboundPacketType, PreNettyPa
         readItemStack1_3_1(buf);
         buf.skipBytes(15);
     }),
-    COLLECT_ITEM(22, (user, buf) -> {
-        buf.skipBytes(8);
-    }),
+    COLLECT_ITEM(22, (user, buf) -> buf.skipBytes(8)),
     SPAWN_ENTITY(23, (user, buf) -> {
         buf.skipBytes(17);
         int i = buf.readInt();
@@ -104,53 +80,27 @@ public enum ClientboundPackets1_4_2 implements ClientboundPacketType, PreNettyPa
         readString(buf);
         buf.skipBytes(16);
     }),
-    SPAWN_EXPERIENCE_ORB(26, (user, buf) -> {
-        buf.skipBytes(18);
-    }),
-    ENTITY_VELOCITY(28, (user, buf) -> {
-        buf.skipBytes(10);
-    }),
+    SPAWN_EXPERIENCE_ORB(26, (user, buf) -> buf.skipBytes(18)),
+    ENTITY_VELOCITY(28, (user, buf) -> buf.skipBytes(10)),
     DESTROY_ENTITIES(29, (user, buf) -> {
         int x = buf.readUnsignedByte();
         for (int i = 0; i < x; i++) buf.readInt();
     }),
-    ENTITY_MOVEMENT(30, (user, buf) -> {
-        buf.skipBytes(4);
-    }),
-    ENTITY_POSITION(31, (user, buf) -> {
-        buf.skipBytes(7);
-    }),
-    ENTITY_ROTATION(32, (user, buf) -> {
-        buf.skipBytes(6);
-    }),
-    ENTITY_POSITION_AND_ROTATION(33, (user, buf) -> {
-        buf.skipBytes(9);
-    }),
-    ENTITY_TELEPORT(34, (user, buf) -> {
-        buf.skipBytes(18);
-    }),
-    ENTITY_HEAD_LOOK(35, (user, buf) -> {
-        buf.skipBytes(5);
-    }),
-    ENTITY_STATUS(38, (user, buf) -> {
-        buf.skipBytes(5);
-    }),
-    ATTACH_ENTITY(39, (user, buf) -> {
-        buf.skipBytes(8);
-    }),
+    ENTITY_MOVEMENT(30, (user, buf) -> buf.skipBytes(4)),
+    ENTITY_POSITION(31, (user, buf) -> buf.skipBytes(7)),
+    ENTITY_ROTATION(32, (user, buf) -> buf.skipBytes(6)),
+    ENTITY_POSITION_AND_ROTATION(33, (user, buf) -> buf.skipBytes(9)),
+    ENTITY_TELEPORT(34, (user, buf) -> buf.skipBytes(18)),
+    ENTITY_HEAD_LOOK(35, (user, buf) -> buf.skipBytes(5)),
+    ENTITY_STATUS(38, (user, buf) -> buf.skipBytes(5)),
+    ATTACH_ENTITY(39, (user, buf) -> buf.skipBytes(8)),
     ENTITY_METADATA(40, (user, buf) -> {
         buf.skipBytes(4);
         readEntityMetadata1_4_2(buf);
     }),
-    ENTITY_EFFECT(41, (user, buf) -> {
-        buf.skipBytes(8);
-    }),
-    REMOVE_ENTITY_EFFECT(42, (user, buf) -> {
-        buf.skipBytes(5);
-    }),
-    SET_EXPERIENCE(43, (user, buf) -> {
-        buf.skipBytes(8);
-    }),
+    ENTITY_EFFECT(41, (user, buf) -> buf.skipBytes(8)),
+    REMOVE_ENTITY_EFFECT(42, (user, buf) -> buf.skipBytes(5)),
+    SET_EXPERIENCE(43, (user, buf) -> buf.skipBytes(8)),
     CHUNK_DATA(51, (user, buf) -> {
         buf.skipBytes(8);
         buf.readBoolean();
@@ -163,15 +113,9 @@ public enum ClientboundPackets1_4_2 implements ClientboundPacketType, PreNettyPa
         int x = buf.readInt();
         for (int i = 0; i < x; i++) buf.readByte();
     }),
-    BLOCK_CHANGE(53, (user, buf) -> {
-        buf.skipBytes(12);
-    }),
-    BLOCK_ACTION(54, (user, buf) -> {
-        buf.skipBytes(14);
-    }),
-    BLOCK_BREAK_ANIMATION(55, (user, buf) -> {
-        buf.skipBytes(17);
-    }),
+    BLOCK_CHANGE(53, (user, buf) -> buf.skipBytes(12)),
+    BLOCK_ACTION(54, (user, buf) -> buf.skipBytes(14)),
+    BLOCK_BREAK_ANIMATION(55, (user, buf) -> buf.skipBytes(17)),
     MAP_BULK_CHUNK(56, (user, buf) -> {
         int x = buf.readShort();
         int y = buf.readInt();
@@ -196,20 +140,14 @@ public enum ClientboundPackets1_4_2 implements ClientboundPacketType, PreNettyPa
         readString(buf);
         buf.skipBytes(17);
     }),
-    GAME_EVENT(70, (user, buf) -> {
-        buf.skipBytes(2);
-    }),
-    SPAWN_GLOBAL_ENTITY(71, (user, buf) -> {
-        buf.skipBytes(17);
-    }),
+    GAME_EVENT(70, (user, buf) -> buf.skipBytes(2)),
+    SPAWN_GLOBAL_ENTITY(71, (user, buf) -> buf.skipBytes(17)),
     OPEN_WINDOW(100, (user, buf) -> {
         buf.skipBytes(2);
         readString(buf);
         buf.skipBytes(1);
     }),
-    CLOSE_WINDOW(101, (user, buf) -> {
-        buf.skipBytes(1);
-    }),
+    CLOSE_WINDOW(101, (user, buf) -> buf.skipBytes(1)),
     SET_SLOT(103, (user, buf) -> {
         buf.skipBytes(3);
         readItemStack1_3_1(buf);
@@ -219,12 +157,8 @@ public enum ClientboundPackets1_4_2 implements ClientboundPacketType, PreNettyPa
         int x = buf.readShort();
         for (int i = 0; i < x; i++) readItemStack1_3_1(buf);
     }),
-    WINDOW_PROPERTY(105, (user, buf) -> {
-        buf.skipBytes(5);
-    }),
-    WINDOW_CONFIRMATION(106, (user, buf) -> {
-        buf.skipBytes(4);
-    }),
+    WINDOW_PROPERTY(105, (user, buf) -> buf.skipBytes(5)),
+    WINDOW_CONFIRMATION(106, (user, buf) -> buf.skipBytes(4)),
     CREATIVE_INVENTORY_ACTION(107, (user, buf) -> {
         buf.skipBytes(2);
         readItemStack1_3_1(buf);
@@ -245,19 +179,13 @@ public enum ClientboundPackets1_4_2 implements ClientboundPacketType, PreNettyPa
         buf.skipBytes(11);
         readTag(buf);
     }),
-    STATISTICS(200, (user, buf) -> {
-        buf.skipBytes(5);
-    }),
+    STATISTICS(200, (user, buf) -> buf.skipBytes(5)),
     PLAYER_INFO(201, (user, buf) -> {
         readString(buf);
         buf.skipBytes(3);
     }),
-    PLAYER_ABILITIES(202, (user, buf) -> {
-        buf.skipBytes(3);
-    }),
-    TAB_COMPLETE(203, (user, buf) -> {
-        readString(buf);
-    }),
+    PLAYER_ABILITIES(202, (user, buf) -> buf.skipBytes(3)),
+    TAB_COMPLETE(203, (user, buf) -> readString(buf)),
     PLUGIN_MESSAGE(250, (user, buf) -> {
         readString(buf);
         short s = buf.readShort();
@@ -272,9 +200,7 @@ public enum ClientboundPackets1_4_2 implements ClientboundPacketType, PreNettyPa
         readByteArray(buf);
         readByteArray(buf);
     }),
-    DISCONNECT(255, (user, buf) -> {
-        readString(buf);
-    });
+    DISCONNECT(255, (user, buf) -> readString(buf));
 
     private static final ClientboundPackets1_4_2[] REGISTRY = new ClientboundPackets1_4_2[256];
 

@@ -28,9 +28,7 @@ import static net.raphimc.vialegacy.api.splitter.PreNettyTypes.*;
 
 public enum ServerboundPackets1_5_2 implements ServerboundPacketType, PreNettyPacketType {
 
-    KEEP_ALIVE(0, (user, buf) -> {
-        buf.skipBytes(4);
-    }),
+    KEEP_ALIVE(0, (user, buf) -> buf.skipBytes(4)),
     LOGIN(1, (user, buf) -> {
         buf.skipBytes(4);
         readString(buf);
@@ -42,62 +40,36 @@ public enum ServerboundPackets1_5_2 implements ServerboundPacketType, PreNettyPa
         readString(buf);
         buf.skipBytes(4);
     }),
-    CHAT_MESSAGE(3, (user, buf) -> {
-        readString(buf);
-    }),
-    INTERACT_ENTITY(7, (user, buf) -> {
-        buf.skipBytes(9);
-    }),
+    CHAT_MESSAGE(3, (user, buf) -> readString(buf)),
+    INTERACT_ENTITY(7, (user, buf) -> buf.skipBytes(9)),
     RESPAWN(9, (user, buf) -> {
         buf.skipBytes(8);
         readString(buf);
     }),
-    PLAYER_MOVEMENT(10, (user, buf) -> {
-        buf.skipBytes(1);
-    }),
-    PLAYER_POSITION(11, (user, buf) -> {
-        buf.skipBytes(33);
-    }),
-    PLAYER_ROTATION(12, (user, buf) -> {
-        buf.skipBytes(9);
-    }),
-    PLAYER_POSITION_AND_ROTATION(13, (user, buf) -> {
-        buf.skipBytes(41);
-    }),
-    PLAYER_DIGGING(14, (user, buf) -> {
-        buf.skipBytes(11);
-    }),
+    PLAYER_MOVEMENT(10, (user, buf) -> buf.skipBytes(1)),
+    PLAYER_POSITION(11, (user, buf) -> buf.skipBytes(33)),
+    PLAYER_ROTATION(12, (user, buf) -> buf.skipBytes(9)),
+    PLAYER_POSITION_AND_ROTATION(13, (user, buf) -> buf.skipBytes(41)),
+    PLAYER_DIGGING(14, (user, buf) -> buf.skipBytes(11)),
     PLAYER_BLOCK_PLACEMENT(15, (user, buf) -> {
         buf.skipBytes(10);
         readItemStack1_3_1(buf);
         buf.skipBytes(3);
     }),
-    HELD_ITEM_CHANGE(16, (user, buf) -> {
-        buf.skipBytes(2);
-    }),
-    ANIMATION(18, (user, buf) -> {
-        buf.skipBytes(5);
-    }),
-    ENTITY_ACTION(19, (user, buf) -> {
-        buf.skipBytes(5);
-    }),
-    CLOSE_WINDOW(101, (user, buf) -> {
-        buf.skipBytes(1);
-    }),
+    HELD_ITEM_CHANGE(16, (user, buf) -> buf.skipBytes(2)),
+    ANIMATION(18, (user, buf) -> buf.skipBytes(5)),
+    ENTITY_ACTION(19, (user, buf) -> buf.skipBytes(5)),
+    CLOSE_WINDOW(101, (user, buf) -> buf.skipBytes(1)),
     CLICK_WINDOW(102, (user, buf) -> {
         buf.skipBytes(7);
         readItemStack1_3_1(buf);
     }),
-    WINDOW_CONFIRMATION(106, (user, buf) -> {
-        buf.skipBytes(4);
-    }),
+    WINDOW_CONFIRMATION(106, (user, buf) -> buf.skipBytes(4)),
     CREATIVE_INVENTORY_ACTION(107, (user, buf) -> {
         buf.skipBytes(2);
         readItemStack1_3_1(buf);
     }),
-    CLICK_WINDOW_BUTTON(108, (user, buf) -> {
-        buf.skipBytes(2);
-    }),
+    CLICK_WINDOW_BUTTON(108, (user, buf) -> buf.skipBytes(2)),
     UPDATE_SIGN(130, (user, buf) -> {
         buf.skipBytes(10);
         readString(buf);
@@ -105,20 +77,14 @@ public enum ServerboundPackets1_5_2 implements ServerboundPacketType, PreNettyPa
         readString(buf);
         readString(buf);
     }),
-    PLAYER_ABILITIES(202, (user, buf) -> {
-        buf.skipBytes(3);
-    }),
-    TAB_COMPLETE(203, (user, buf) -> {
-        readString(buf);
-    }),
+    PLAYER_ABILITIES(202, (user, buf) -> buf.skipBytes(3)),
+    TAB_COMPLETE(203, (user, buf) -> readString(buf)),
     CLIENT_SETTINGS(204, (user, buf) -> {
         readString(buf);
         buf.skipBytes(3);
         buf.readBoolean();
     }),
-    CLIENT_STATUS(205, (user, buf) -> {
-        buf.skipBytes(1);
-    }),
+    CLIENT_STATUS(205, (user, buf) -> buf.skipBytes(1)),
     PLUGIN_MESSAGE(250, (user, buf) -> {
         readString(buf);
         short s = buf.readShort();
@@ -128,12 +94,8 @@ public enum ServerboundPackets1_5_2 implements ServerboundPacketType, PreNettyPa
         readByteArray(buf);
         readByteArray(buf);
     }),
-    SERVER_PING(254, (user, buf) -> {
-        buf.skipBytes(1);
-    }),
-    DISCONNECT(255, (user, buf) -> {
-        readString(buf);
-    });
+    SERVER_PING(254, (user, buf) -> buf.skipBytes(1)),
+    DISCONNECT(255, (user, buf) -> readString(buf));
 
     private static final ServerboundPackets1_5_2[] REGISTRY = new ServerboundPackets1_5_2[256];
 

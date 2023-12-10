@@ -34,65 +34,29 @@ public enum ClientboundPacketsa1_0_15 implements ClientboundPacketType, PreNetty
         PreNettyTypes.readUTF(buf);
         PreNettyTypes.readUTF(buf);
     }),
-    CHAT_MESSAGE(3, (user, buf) -> {
-        PreNettyTypes.readUTF(buf);
-    }),
-    PLAYER_POSITION_ONLY_ONGROUND(10, (user, buf) -> {
-        buf.skipBytes(1);
-    }),
-    PLAYER_POSITION_ONLY_POSITION(11, (user, buf) -> {
-        buf.skipBytes(33);
-    }),
-    PLAYER_POSITION_ONLY_LOOK(12, (user, buf) -> {
-        buf.skipBytes(9);
-    }),
-    PLAYER_POSITION(13, (user, buf) -> {
-        buf.skipBytes(41);
-    }),
-    HELD_ITEM_CHANGE(16, (user, buf) -> {
-        buf.skipBytes(6);
-    }),
-    ADD_TO_INVENTORY(17, (user, buf) -> {
-        buf.skipBytes(5);
-    }),
-    ENTITY_ANIMATION(18, (user, buf) -> {
-        buf.skipBytes(5);
-    }),
+    CHAT_MESSAGE(3, (user, buf) -> PreNettyTypes.readUTF(buf)),
+    PLAYER_POSITION_ONLY_ONGROUND(10, (user, buf) -> buf.skipBytes(1)),
+    PLAYER_POSITION_ONLY_POSITION(11, (user, buf) -> buf.skipBytes(33)),
+    PLAYER_POSITION_ONLY_LOOK(12, (user, buf) -> buf.skipBytes(9)),
+    PLAYER_POSITION(13, (user, buf) -> buf.skipBytes(41)),
+    HELD_ITEM_CHANGE(16, (user, buf) -> buf.skipBytes(6)),
+    ADD_TO_INVENTORY(17, (user, buf) -> buf.skipBytes(5)),
+    ENTITY_ANIMATION(18, (user, buf) -> buf.skipBytes(5)),
     SPAWN_PLAYER(20, (user, buf) -> {
         buf.skipBytes(4);
         PreNettyTypes.readUTF(buf);
         buf.skipBytes(16);
     }),
-    SPAWN_ITEM(21, (user, buf) -> {
-        buf.skipBytes(22);
-    }),
-    COLLECT_ITEM(22, (user, buf) -> {
-        buf.skipBytes(8);
-    }),
-    SPAWN_ENTITY(23, (user, buf) -> {
-        buf.skipBytes(17);
-    }),
-    DESTROY_ENTITIES(29, (user, buf) -> {
-        buf.skipBytes(4);
-    }),
-    ENTITY_MOVEMENT(30, (user, buf) -> {
-        buf.skipBytes(4);
-    }),
-    ENTITY_POSITION(31, (user, buf) -> {
-        buf.skipBytes(7);
-    }),
-    ENTITY_ROTATION(32, (user, buf) -> {
-        buf.skipBytes(6);
-    }),
-    ENTITY_POSITION_AND_ROTATION(33, (user, buf) -> {
-        buf.skipBytes(9);
-    }),
-    ENTITY_TELEPORT(34, (user, buf) -> {
-        buf.skipBytes(18);
-    }),
-    PRE_CHUNK(50, (user, buf) -> {
-        buf.skipBytes(9);
-    }),
+    SPAWN_ITEM(21, (user, buf) -> buf.skipBytes(22)),
+    COLLECT_ITEM(22, (user, buf) -> buf.skipBytes(8)),
+    SPAWN_ENTITY(23, (user, buf) -> buf.skipBytes(17)),
+    DESTROY_ENTITIES(29, (user, buf) -> buf.skipBytes(4)),
+    ENTITY_MOVEMENT(30, (user, buf) -> buf.skipBytes(4)),
+    ENTITY_POSITION(31, (user, buf) -> buf.skipBytes(7)),
+    ENTITY_ROTATION(32, (user, buf) -> buf.skipBytes(6)),
+    ENTITY_POSITION_AND_ROTATION(33, (user, buf) -> buf.skipBytes(9)),
+    ENTITY_TELEPORT(34, (user, buf) -> buf.skipBytes(18)),
+    PRE_CHUNK(50, (user, buf) -> buf.skipBytes(9)),
     CHUNK_DATA(51, (user, buf) -> {
         buf.skipBytes(13);
         int x = buf.readInt();
@@ -105,12 +69,8 @@ public enum ClientboundPacketsa1_0_15 implements ClientboundPacketType, PreNetty
         for (int i = 0; i < x; i++) buf.readByte();
         for (int i = 0; i < x; i++) buf.readByte();
     }),
-    BLOCK_CHANGE(53, (user, buf) -> {
-        buf.skipBytes(11);
-    }),
-    DISCONNECT(255, (user, buf) -> {
-        PreNettyTypes.readUTF(buf);
-    });
+    BLOCK_CHANGE(53, (user, buf) -> buf.skipBytes(11)),
+    DISCONNECT(255, (user, buf) -> PreNettyTypes.readUTF(buf));
 
     private static final ClientboundPacketsa1_0_15[] REGISTRY = new ClientboundPacketsa1_0_15[256];
 

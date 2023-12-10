@@ -19,7 +19,6 @@ package net.raphimc.vialegacy.protocols.alpha.protocola1_0_16_2toa1_0_15;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_17_1_0_17_4toa1_0_16_2.ClientboundPacketsa1_0_16;
@@ -34,16 +33,11 @@ public class Protocola1_0_16_2toa1_0_15 extends StatelessProtocol<ClientboundPac
 
     @Override
     protected void registerPackets() {
-        this.registerServerbound(ServerboundPacketsa1_0_17.HANDSHAKE, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.cancel();
-                    final PacketWrapper handshake = PacketWrapper.create(ClientboundPacketsa1_0_16.HANDSHAKE, wrapper.user());
-                    handshake.write(Typesb1_7_0_3.STRING, "-"); // server hash
-                    handshake.send(Protocola1_0_16_2toa1_0_15.class);
-                });
-            }
+        this.registerServerbound(ServerboundPacketsa1_0_17.HANDSHAKE, null, wrapper -> {
+            wrapper.cancel();
+            final PacketWrapper handshake = PacketWrapper.create(ClientboundPacketsa1_0_16.HANDSHAKE, wrapper.user());
+            handshake.write(Typesb1_7_0_3.STRING, "-"); // server hash
+            handshake.send(Protocola1_0_16_2toa1_0_15.class);
         });
     }
 

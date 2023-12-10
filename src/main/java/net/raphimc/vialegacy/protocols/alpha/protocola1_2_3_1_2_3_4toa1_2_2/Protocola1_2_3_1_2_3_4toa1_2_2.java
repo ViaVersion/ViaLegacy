@@ -34,18 +34,13 @@ public class Protocola1_2_3_1_2_3_4toa1_2_2 extends StatelessProtocol<Clientboun
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsa1_2_2.JOIN_GAME, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final PacketWrapper updateHealth = PacketWrapper.create(ClientboundPacketsa1_2_3.UPDATE_HEALTH, wrapper.user());
-                    updateHealth.write(Type.BYTE, (byte) 20); // health
+        this.registerClientbound(ClientboundPacketsa1_2_2.JOIN_GAME, wrapper -> {
+            final PacketWrapper updateHealth = PacketWrapper.create(ClientboundPacketsa1_2_3.UPDATE_HEALTH, wrapper.user());
+            updateHealth.write(Type.BYTE, (byte) 20); // health
 
-                    wrapper.send(Protocola1_2_3_1_2_3_4toa1_2_2.class);
-                    updateHealth.send(Protocola1_2_3_1_2_3_4toa1_2_2.class);
-                    wrapper.cancel();
-                });
-            }
+            wrapper.send(Protocola1_2_3_1_2_3_4toa1_2_2.class);
+            updateHealth.send(Protocola1_2_3_1_2_3_4toa1_2_2.class);
+            wrapper.cancel();
         });
 
         this.registerServerbound(ServerboundPacketsa1_2_6.INTERACT_ENTITY, new PacketHandlers() {

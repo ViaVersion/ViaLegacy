@@ -191,7 +191,7 @@ public class BlockList1_6 {
 
     public static Block1_6 getByID(final int id) {
         for (Block1_6 block : blockList) {
-            if(block.blockID == id) {
+            if (block.blockID == id) {
                 return block;
             }
         }
@@ -200,7 +200,7 @@ public class BlockList1_6 {
 
     public static Block1_6 getByName(final String name) {
         for (Block1_6 block : blockList) {
-            if(block.name.equalsIgnoreCase(name)) {
+            if (block.name.equalsIgnoreCase(name)) {
                 return block;
             }
         }

@@ -184,31 +184,26 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends StatelessProtocol<ClientboundPac
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_7.CHUNK_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final Chunk chunk = wrapper.passthrough(Types1_1.CHUNK);
+        this.registerClientbound(ClientboundPacketsb1_7.CHUNK_DATA, wrapper -> {
+            final Chunk chunk = wrapper.passthrough(Types1_1.CHUNK);
 
-                    boolean hasChest = false;
-                    for (ChunkSection section : chunk.getSections()) {
-                        if (section == null || !section.getLight().hasSkyLight()) continue;
-                        for (int i = 0; i < section.palette(PaletteType.BLOCKS).size(); i++) {
-                            if (section.palette(PaletteType.BLOCKS).idByIndex(i) >> 4 == BlockList1_6.chest.blockID) {
-                                hasChest = true;
-                                break;
-                            }
-                        }
-                        if (!hasChest) continue;
-
-                        final NibbleArray1_1 sectionSkyLight = new NibbleArray1_1(section.getLight().getSkyLight(), 4);
-                        for (int y = 0; y < 16; y++)
-                            for (int x = 0; x < 16; x++)
-                                for (int z = 0; z < 16; z++)
-                                    if (section.palette(PaletteType.BLOCKS).idAt(x, y, z) >> 4 == BlockList1_6.chest.blockID)
-                                        sectionSkyLight.set(x, y, z, 15);
+            boolean hasChest = false;
+            for (ChunkSection section : chunk.getSections()) {
+                if (section == null || !section.getLight().hasSkyLight()) continue;
+                for (int i = 0; i < section.palette(PaletteType.BLOCKS).size(); i++) {
+                    if (section.palette(PaletteType.BLOCKS).idByIndex(i) >> 4 == BlockList1_6.chest.blockID) {
+                        hasChest = true;
+                        break;
                     }
-                });
+                }
+                if (!hasChest) continue;
+
+                final NibbleArray1_1 sectionSkyLight = new NibbleArray1_1(section.getLight().getSkyLight(), 4);
+                for (int y = 0; y < 16; y++)
+                    for (int x = 0; x < 16; x++)
+                        for (int z = 0; z < 16; z++)
+                            if (section.palette(PaletteType.BLOCKS).idAt(x, y, z) >> 4 == BlockList1_6.chest.blockID)
+                                sectionSkyLight.set(x, y, z, 15);
             }
         });
         this.registerClientbound(ClientboundPacketsb1_7.GAME_EVENT, new PacketHandlers() {
@@ -228,24 +223,19 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends StatelessProtocol<ClientboundPac
             }
         });
 
-        this.registerServerbound(State.PLAY, ServerboundPacketsb1_8.SERVER_PING.getId(), -2, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocolc0_30toc0_27.class)) {
-                        // Classic servers have issues with sockets connecting and disconnecting without sending any data.
-                        // Because of that we send an invalid packet id to force the server to disconnect us.
-                        // This is the reason why the packet id is mapped to -2. (-1 gets handled internally by ViaVersion)
-                        // This fix is needed for <= c0.27, >= c0.28 closes the socket after 3 seconds of inactivity.
-                        wrapper.clearPacket();
-                    } else {
-                        wrapper.cancel();
-                    }
-                    final PacketWrapper pingResponse = PacketWrapper.create(ClientboundPacketsb1_8.DISCONNECT, wrapper.user());
-                    pingResponse.write(Types1_6_4.STRING, "The server seems to be running!\nWait 5 seconds between each connection§0§1");
-                    pingResponse.send(Protocolb1_8_0_1tob1_7_0_3.class);
-                });
+        this.registerServerbound(State.PLAY, ServerboundPacketsb1_8.SERVER_PING.getId(), -2, wrapper -> {
+            if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocolc0_30toc0_27.class)) {
+                // Classic servers have issues with sockets connecting and disconnecting without sending any data.
+                // Because of that we send an invalid packet id to force the server to disconnect us.
+                // This is the reason why the packet id is mapped to -2. (-1 gets handled internally by ViaVersion)
+                // This fix is needed for <= c0.27, >= c0.28 closes the socket after 3 seconds of inactivity.
+                wrapper.clearPacket();
+            } else {
+                wrapper.cancel();
             }
+            final PacketWrapper pingResponse = PacketWrapper.create(ClientboundPacketsb1_8.DISCONNECT, wrapper.user());
+            pingResponse.write(Types1_6_4.STRING, "The server seems to be running!\nWait 5 seconds between each connection§0§1");
+            pingResponse.send(Protocolb1_8_0_1tob1_7_0_3.class);
         });
         this.registerServerbound(ServerboundPacketsb1_8.LOGIN, new PacketHandlers() {
             @Override
@@ -332,16 +322,11 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends StatelessProtocol<ClientboundPac
                 map(Types1_4_2.NBTLESS_ITEM); // item
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_8.CREATIVE_INVENTORY_ACTION, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.cancel();
-                    // Track the item for later use in classic protocols
-                    final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
-                    if (inventoryTracker != null) inventoryTracker.handleCreativeSetSlot(wrapper.read(Type.SHORT), wrapper.read(Typesb1_8_0_1.CREATIVE_ITEM));
-                });
-            }
+        this.registerServerbound(ServerboundPacketsb1_8.CREATIVE_INVENTORY_ACTION, null, wrapper -> {
+            wrapper.cancel();
+            // Track the item for later use in classic protocols
+            final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
+            if (inventoryTracker != null) inventoryTracker.handleCreativeSetSlot(wrapper.read(Type.SHORT), wrapper.read(Typesb1_8_0_1.CREATIVE_ITEM));
         });
         this.registerServerbound(ServerboundPacketsb1_8.KEEP_ALIVE, wrapper -> {
             if (wrapper.read(Type.INT) != 0) { // beta client only sends this packet with the key set to 0 every second if in downloading terrain screen

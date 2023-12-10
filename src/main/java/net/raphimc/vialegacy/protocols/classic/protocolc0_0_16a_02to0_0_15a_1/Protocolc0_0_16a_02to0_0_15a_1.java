@@ -35,17 +35,12 @@ public class Protocolc0_0_16a_02to0_0_15a_1 extends StatelessProtocol<Clientboun
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsc0_15a.JOIN_GAME, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final String username = wrapper.read(Typesc0_30.STRING); // username
+        this.registerClientbound(ClientboundPacketsc0_15a.JOIN_GAME, wrapper -> {
+            final String username = wrapper.read(Typesc0_30.STRING); // username
 
-                    wrapper.write(Type.BYTE, (byte) 0); // protocol id
-                    wrapper.write(Typesc0_30.STRING, "c0.0.15a Server"); // title
-                    wrapper.write(Typesc0_30.STRING, "Logged in as: " + username); // motd
-                });
-            }
+            wrapper.write(Type.BYTE, (byte) 0); // protocol id
+            wrapper.write(Typesc0_30.STRING, "c0.0.15a Server"); // title
+            wrapper.write(Typesc0_30.STRING, "Logged in as: " + username); // motd
         });
         this.registerClientbound(ClientboundPacketsc0_15a.ENTITY_TELEPORT, new PacketHandlers() {
             @Override
@@ -73,14 +68,9 @@ public class Protocolc0_0_16a_02to0_0_15a_1 extends StatelessProtocol<Clientboun
             }
         });
 
-        this.registerServerbound(ServerboundPacketsc0_19a.LOGIN, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.clearPacket();
-                    wrapper.write(Typesc0_30.STRING, wrapper.user().getProtocolInfo().getUsername()); // username
-                });
-            }
+        this.registerServerbound(ServerboundPacketsc0_19a.LOGIN, wrapper -> {
+            wrapper.clearPacket();
+            wrapper.write(Typesc0_30.STRING, wrapper.user().getProtocolInfo().getUsername()); // username
         });
         this.cancelServerbound(ServerboundPacketsc0_19a.CHAT_MESSAGE);
     }

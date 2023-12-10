@@ -110,23 +110,18 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                             wrapper.user().put(new ChunkTracker(wrapper.user()));
                         });
                     }
-                }, State.LOGIN, new PacketHandlers() {
-                    @Override
-                    protected void register() {
-                        handler(wrapper -> {
-                            ViaLegacy.getPlatform().getLogger().warning("Server skipped LOGIN state");
-                            final PacketWrapper sharedKey = PacketWrapper.create(ClientboundPackets1_6_4.SHARED_KEY, wrapper.user());
-                            sharedKey.write(Type.SHORT_BYTE_ARRAY, new byte[0]);
-                            sharedKey.write(Type.SHORT_BYTE_ARRAY, new byte[0]);
-                            wrapper.user().get(ProtocolMetadataStorage.class).skipEncryption = true;
-                            sharedKey.send(Protocol1_7_2_5to1_6_4.class, false); // switch to play state
-                            wrapper.user().get(ProtocolMetadataStorage.class).skipEncryption = false;
+                }, State.LOGIN, (PacketHandler) wrapper -> {
+                    ViaLegacy.getPlatform().getLogger().warning("Server skipped LOGIN state");
+                    final PacketWrapper sharedKey = PacketWrapper.create(ClientboundPackets1_6_4.SHARED_KEY, wrapper.user());
+                    sharedKey.write(Type.SHORT_BYTE_ARRAY, new byte[0]);
+                    sharedKey.write(Type.SHORT_BYTE_ARRAY, new byte[0]);
+                    wrapper.user().get(ProtocolMetadataStorage.class).skipEncryption = true;
+                    sharedKey.send(Protocol1_7_2_5to1_6_4.class, false); // switch to play state
+                    wrapper.user().get(ProtocolMetadataStorage.class).skipEncryption = false;
 
-                            wrapper.setPacketType(ClientboundPackets1_6_4.JOIN_GAME);
-                            wrapper.send(Protocol1_7_2_5to1_6_4.class, false);
-                            wrapper.cancel();
-                        });
-                    }
+                    wrapper.setPacketType(ClientboundPackets1_6_4.JOIN_GAME);
+                    wrapper.send(Protocol1_7_2_5to1_6_4.class, false);
+                    wrapper.cancel();
                 }
         );
         this.registerClientbound(ClientboundPackets1_6_4.CHAT_MESSAGE, new PacketHandlers() {
@@ -159,101 +154,86 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 });
             }
         });
-        this.registerClientbound(ClientboundPackets1_6_4.PLAYER_POSITION_ONLY_ONGROUND, ClientboundPackets1_7_2.PLAYER_POSITION, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final PlayerInfoStorage playerInfoStorage = wrapper.user().get(PlayerInfoStorage.class);
-                    final boolean supportsFlags = wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_8to1_7_6_10.class);
+        this.registerClientbound(ClientboundPackets1_6_4.PLAYER_POSITION_ONLY_ONGROUND, ClientboundPackets1_7_2.PLAYER_POSITION, wrapper -> {
+            final PlayerInfoStorage playerInfoStorage = wrapper.user().get(PlayerInfoStorage.class);
+            final boolean supportsFlags = wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_8to1_7_6_10.class);
 
-                    wrapper.write(Type.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posX); // x
-                    wrapper.write(Type.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posY + 1.62F); // y
-                    wrapper.write(Type.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posZ); // z
-                    wrapper.write(Type.FLOAT, supportsFlags ? 0F : playerInfoStorage.yaw); // yaw
-                    wrapper.write(Type.FLOAT, supportsFlags ? 0F : playerInfoStorage.pitch); // pitch
-                    if (supportsFlags) {
-                        wrapper.read(Type.BOOLEAN); // onGround
-                        wrapper.write(Type.BYTE, (byte) 0b11111); // flags
+            wrapper.write(Type.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posX); // x
+            wrapper.write(Type.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posY + 1.62F); // y
+            wrapper.write(Type.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posZ); // z
+            wrapper.write(Type.FLOAT, supportsFlags ? 0F : playerInfoStorage.yaw); // yaw
+            wrapper.write(Type.FLOAT, supportsFlags ? 0F : playerInfoStorage.pitch); // pitch
+            if (supportsFlags) {
+                wrapper.read(Type.BOOLEAN); // onGround
+                wrapper.write(Type.BYTE, (byte) 0b11111); // flags
 
-                        wrapper.setPacketType(ClientboundPackets1_8.PLAYER_POSITION);
-                        wrapper.send(Protocol1_8to1_7_6_10.class);
-                        wrapper.cancel();
-                    } else {
-                        wrapper.passthrough(Type.BOOLEAN); // onGround
-                    }
+                wrapper.setPacketType(ClientboundPackets1_8.PLAYER_POSITION);
+                wrapper.send(Protocol1_8to1_7_6_10.class);
+                wrapper.cancel();
+            } else {
+                wrapper.passthrough(Type.BOOLEAN); // onGround
+            }
 
-                    final PacketWrapper setVelocityToZero = PacketWrapper.create(ClientboundPackets1_7_2.ENTITY_VELOCITY, wrapper.user());
-                    setVelocityToZero.write(Type.INT, playerInfoStorage.entityId); // entity id
-                    setVelocityToZero.write(Type.SHORT, (short) 0); // velocity x
-                    setVelocityToZero.write(Type.SHORT, (short) 0); // velocity y
-                    setVelocityToZero.write(Type.SHORT, (short) 0); // velocity z
+            final PacketWrapper setVelocityToZero = PacketWrapper.create(ClientboundPackets1_7_2.ENTITY_VELOCITY, wrapper.user());
+            setVelocityToZero.write(Type.INT, playerInfoStorage.entityId); // entity id
+            setVelocityToZero.write(Type.SHORT, (short) 0); // velocity x
+            setVelocityToZero.write(Type.SHORT, (short) 0); // velocity y
+            setVelocityToZero.write(Type.SHORT, (short) 0); // velocity z
 
-                    if (!wrapper.isCancelled()) wrapper.send(Protocol1_7_2_5to1_6_4.class);
-                    setVelocityToZero.send(Protocol1_7_2_5to1_6_4.class);
-                    wrapper.cancel();
-                });
+            if (!wrapper.isCancelled()) wrapper.send(Protocol1_7_2_5to1_6_4.class);
+            setVelocityToZero.send(Protocol1_7_2_5to1_6_4.class);
+            wrapper.cancel();
+        });
+        this.registerClientbound(ClientboundPackets1_6_4.PLAYER_POSITION_ONLY_POSITION, ClientboundPackets1_7_2.PLAYER_POSITION, wrapper -> {
+            final PlayerInfoStorage playerInfoStorage = wrapper.user().get(PlayerInfoStorage.class);
+            final boolean supportsFlags = wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_8to1_7_6_10.class);
+
+            wrapper.passthrough(Type.DOUBLE); // x
+            wrapper.passthrough(Type.DOUBLE); // stance
+            wrapper.read(Type.DOUBLE); // y
+            wrapper.passthrough(Type.DOUBLE); // z
+            wrapper.write(Type.FLOAT, supportsFlags ? 0F : playerInfoStorage.yaw); // yaw
+            wrapper.write(Type.FLOAT, supportsFlags ? 0F : playerInfoStorage.pitch); // pitch
+            if (supportsFlags) {
+                wrapper.read(Type.BOOLEAN); // onGround
+                wrapper.write(Type.BYTE, (byte) 0b11000); // flags
+
+                wrapper.setPacketType(ClientboundPackets1_8.PLAYER_POSITION);
+                wrapper.send(Protocol1_8to1_7_6_10.class);
+                wrapper.cancel();
+            } else {
+                wrapper.passthrough(Type.BOOLEAN); // onGround
             }
         });
-        this.registerClientbound(ClientboundPackets1_6_4.PLAYER_POSITION_ONLY_POSITION, ClientboundPackets1_7_2.PLAYER_POSITION, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final PlayerInfoStorage playerInfoStorage = wrapper.user().get(PlayerInfoStorage.class);
-                    final boolean supportsFlags = wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_8to1_7_6_10.class);
+        this.registerClientbound(ClientboundPackets1_6_4.PLAYER_POSITION_ONLY_LOOK, ClientboundPackets1_7_2.PLAYER_POSITION, wrapper -> {
+            final PlayerInfoStorage playerInfoStorage = wrapper.user().get(PlayerInfoStorage.class);
+            final boolean supportsFlags = wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_8to1_7_6_10.class);
 
-                    wrapper.passthrough(Type.DOUBLE); // x
-                    wrapper.passthrough(Type.DOUBLE); // stance
-                    wrapper.read(Type.DOUBLE); // y
-                    wrapper.passthrough(Type.DOUBLE); // z
-                    wrapper.write(Type.FLOAT, supportsFlags ? 0F : playerInfoStorage.yaw); // yaw
-                    wrapper.write(Type.FLOAT, supportsFlags ? 0F : playerInfoStorage.pitch); // pitch
-                    if (supportsFlags) {
-                        wrapper.read(Type.BOOLEAN); // onGround
-                        wrapper.write(Type.BYTE, (byte) 0b11000); // flags
+            wrapper.write(Type.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posX); // x
+            wrapper.write(Type.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posY + 1.62F); // y
+            wrapper.write(Type.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posZ); // z
+            wrapper.passthrough(Type.FLOAT); // yaw
+            wrapper.passthrough(Type.FLOAT); // pitch
+            if (supportsFlags) {
+                wrapper.read(Type.BOOLEAN); // onGround
+                wrapper.write(Type.BYTE, (byte) 0b111); // flags
 
-                        wrapper.setPacketType(ClientboundPackets1_8.PLAYER_POSITION);
-                        wrapper.send(Protocol1_8to1_7_6_10.class);
-                        wrapper.cancel();
-                    } else {
-                        wrapper.passthrough(Type.BOOLEAN); // onGround
-                    }
-                });
+                wrapper.setPacketType(ClientboundPackets1_8.PLAYER_POSITION);
+                wrapper.send(Protocol1_8to1_7_6_10.class);
+                wrapper.cancel();
+            } else {
+                wrapper.passthrough(Type.BOOLEAN); // onGround
             }
-        });
-        this.registerClientbound(ClientboundPackets1_6_4.PLAYER_POSITION_ONLY_LOOK, ClientboundPackets1_7_2.PLAYER_POSITION, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final PlayerInfoStorage playerInfoStorage = wrapper.user().get(PlayerInfoStorage.class);
-                    final boolean supportsFlags = wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_8to1_7_6_10.class);
 
-                    wrapper.write(Type.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posX); // x
-                    wrapper.write(Type.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posY + 1.62F); // y
-                    wrapper.write(Type.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posZ); // z
-                    wrapper.passthrough(Type.FLOAT); // yaw
-                    wrapper.passthrough(Type.FLOAT); // pitch
-                    if (supportsFlags) {
-                        wrapper.read(Type.BOOLEAN); // onGround
-                        wrapper.write(Type.BYTE, (byte) 0b111); // flags
+            final PacketWrapper setVelocityToZero = PacketWrapper.create(ClientboundPackets1_7_2.ENTITY_VELOCITY, wrapper.user());
+            setVelocityToZero.write(Type.INT, playerInfoStorage.entityId); // entity id
+            setVelocityToZero.write(Type.SHORT, (short) 0); // velocity x
+            setVelocityToZero.write(Type.SHORT, (short) 0); // velocity y
+            setVelocityToZero.write(Type.SHORT, (short) 0); // velocity z
 
-                        wrapper.setPacketType(ClientboundPackets1_8.PLAYER_POSITION);
-                        wrapper.send(Protocol1_8to1_7_6_10.class);
-                        wrapper.cancel();
-                    } else {
-                        wrapper.passthrough(Type.BOOLEAN); // onGround
-                    }
-
-                    final PacketWrapper setVelocityToZero = PacketWrapper.create(ClientboundPackets1_7_2.ENTITY_VELOCITY, wrapper.user());
-                    setVelocityToZero.write(Type.INT, playerInfoStorage.entityId); // entity id
-                    setVelocityToZero.write(Type.SHORT, (short) 0); // velocity x
-                    setVelocityToZero.write(Type.SHORT, (short) 0); // velocity y
-                    setVelocityToZero.write(Type.SHORT, (short) 0); // velocity z
-
-                    if (!wrapper.isCancelled()) wrapper.send(Protocol1_7_2_5to1_6_4.class);
-                    setVelocityToZero.send(Protocol1_7_2_5to1_6_4.class);
-                    wrapper.cancel();
-                });
-            }
+            if (!wrapper.isCancelled()) wrapper.send(Protocol1_7_2_5to1_6_4.class);
+            setVelocityToZero.send(Protocol1_7_2_5to1_6_4.class);
+            wrapper.cancel();
         });
         this.registerClientbound(ClientboundPackets1_6_4.PLAYER_POSITION, new PacketHandlers() {
             @Override
@@ -410,14 +390,9 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 });
             }
         });
-        this.registerClientbound(ClientboundPackets1_6_4.CHUNK_DATA, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final Chunk chunk = wrapper.passthrough(Types1_7_6.getChunk(wrapper.user().get(DimensionTracker.class).getDimension()));
-                    wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
-                });
-            }
+        this.registerClientbound(ClientboundPackets1_6_4.CHUNK_DATA, wrapper -> {
+            final Chunk chunk = wrapper.passthrough(Types1_7_6.getChunk(wrapper.user().get(DimensionTracker.class).getDimension()));
+            wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
         });
         this.registerClientbound(ClientboundPackets1_6_4.MULTI_BLOCK_CHANGE, new PacketHandlers() {
             @Override
@@ -475,15 +450,10 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 map(Type.BYTE); // progress
             }
         });
-        this.registerClientbound(ClientboundPackets1_6_4.MAP_BULK_CHUNK, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final Chunk[] chunks = wrapper.passthrough(Types1_7_6.CHUNK_BULK);
-                    for (Chunk chunk : chunks) {
-                        wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
-                    }
-                });
+        this.registerClientbound(ClientboundPackets1_6_4.MAP_BULK_CHUNK, wrapper -> {
+            final Chunk[] chunks = wrapper.passthrough(Types1_7_6.CHUNK_BULK);
+            for (Chunk chunk : chunks) {
+                wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.EXPLOSION, new PacketHandlers() {
@@ -697,17 +667,12 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 map(Types1_7_6.POSITION_INT); // position
             }
         });
-        this.registerClientbound(ClientboundPackets1_6_4.STATISTICS, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.cancel();
-                    final StatisticsStorage statisticsStorage = wrapper.user().get(StatisticsStorage.class);
-                    final int statId = wrapper.read(Type.INT); // statistic id
-                    final int increment = wrapper.read(Type.INT); // increment
-                    statisticsStorage.values.put(statId, statisticsStorage.values.get(statId) + increment);
-                });
-            }
+        this.registerClientbound(ClientboundPackets1_6_4.STATISTICS, wrapper -> {
+            wrapper.cancel();
+            final StatisticsStorage statisticsStorage = wrapper.user().get(StatisticsStorage.class);
+            final int statId = wrapper.read(Type.INT); // statistic id
+            final int increment = wrapper.read(Type.INT); // increment
+            statisticsStorage.values.put(statId, statisticsStorage.values.get(statId) + increment);
         });
         this.registerClientbound(ClientboundPackets1_6_4.PLAYER_INFO, new PacketHandlers() {
             @Override
@@ -717,17 +682,12 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 map(Type.SHORT); // ping
             }
         });
-        this.registerClientbound(ClientboundPackets1_6_4.TAB_COMPLETE, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final String completions = wrapper.read(Types1_6_4.STRING); // completions
-                    final String[] completionsArray = completions.split("\0");
-                    wrapper.write(Type.VAR_INT, completionsArray.length); // completions count
-                    for (String s : completionsArray) {
-                        wrapper.write(Type.STRING, s); // completion
-                    }
-                });
+        this.registerClientbound(ClientboundPackets1_6_4.TAB_COMPLETE, wrapper -> {
+            final String completions = wrapper.read(Types1_6_4.STRING); // completions
+            final String[] completionsArray = completions.split("\0");
+            wrapper.write(Type.VAR_INT, completionsArray.length); // completions count
+            for (String s : completionsArray) {
+                wrapper.write(Type.STRING, s); // completion
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.SCOREBOARD_OBJECTIVE, new PacketHandlers() {
@@ -738,17 +698,12 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 map(Type.BYTE); // mode
             }
         });
-        this.registerClientbound(ClientboundPackets1_6_4.UPDATE_SCORE, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.write(Type.STRING, wrapper.read(Types1_6_4.STRING)); // name
-                    final byte mode = wrapper.passthrough(Type.BYTE); // mode
-                    if (mode == 0) {
-                        wrapper.write(Type.STRING, wrapper.read(Types1_6_4.STRING)); // objective
-                        wrapper.passthrough(Type.INT); // score
-                    }
-                });
+        this.registerClientbound(ClientboundPackets1_6_4.UPDATE_SCORE, wrapper -> {
+            wrapper.write(Type.STRING, wrapper.read(Types1_6_4.STRING)); // name
+            final byte mode = wrapper.passthrough(Type.BYTE); // mode
+            if (mode == 0) {
+                wrapper.write(Type.STRING, wrapper.read(Types1_6_4.STRING)); // objective
+                wrapper.passthrough(Type.INT); // score
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.DISPLAY_SCOREBOARD, new PacketHandlers() {
@@ -803,38 +758,33 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                     }
                 }, State.LOGIN, (PacketHandler) PacketWrapper::cancel
         );
-        this.registerClientboundTransition(ClientboundPackets1_6_4.SHARED_KEY, ClientboundLoginPackets.GAME_PROFILE, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final ProtocolInfo info = wrapper.user().getProtocolInfo();
-                    final ProtocolMetadataStorage protocolMetadata = wrapper.user().get(ProtocolMetadataStorage.class);
-                    wrapper.read(Type.SHORT_BYTE_ARRAY); // shared secret
-                    wrapper.read(Type.SHORT_BYTE_ARRAY); // verify token
-                    wrapper.write(Type.STRING, info.getUuid().toString().replace("-", "")); // uuid
-                    wrapper.write(Type.STRING, info.getUsername()); // user name
+        this.registerClientboundTransition(ClientboundPackets1_6_4.SHARED_KEY, ClientboundLoginPackets.GAME_PROFILE, (PacketHandler) wrapper -> {
+            final ProtocolInfo info = wrapper.user().getProtocolInfo();
+            final ProtocolMetadataStorage protocolMetadata = wrapper.user().get(ProtocolMetadataStorage.class);
+            wrapper.read(Type.SHORT_BYTE_ARRAY); // shared secret
+            wrapper.read(Type.SHORT_BYTE_ARRAY); // verify token
+            wrapper.write(Type.STRING, info.getUuid().toString().replace("-", "")); // uuid
+            wrapper.write(Type.STRING, info.getUsername()); // user name
 
-                    if (!protocolMetadata.skipEncryption) {
-                        Via.getManager().getProviders().get(EncryptionProvider.class).enableDecryption(wrapper.user());
-                    }
-
-                    // Parts of BaseProtocol1_7 GAME_PROFILE handler
-                    if (info.getProtocolVersion() < ProtocolVersion.v1_20_2.getVersion()) {
-                        info.setState(State.PLAY);
-                    }
-                    Via.getManager().getConnectionManager().onLoginSuccess(wrapper.user());
-                    if (!info.getPipeline().hasNonBaseProtocols()) {
-                        wrapper.user().setActive(false);
-                    }
-                    if (Via.getManager().isDebug()) {
-                        ViaLegacy.getPlatform().getLogger().log(Level.INFO, "{0} logged in with protocol {1}, Route: {2}", new Object[]{info.getUsername(), info.getProtocolVersion(), Joiner.on(", ").join(info.getPipeline().pipes(), ", ")});
-                    }
-
-                    final PacketWrapper respawn = PacketWrapper.create(ServerboundPackets1_6_4.CLIENT_STATUS, wrapper.user());
-                    respawn.write(Type.BYTE, (byte) 0); // force respawn
-                    respawn.sendToServer(Protocol1_7_2_5to1_6_4.class);
-                });
+            if (!protocolMetadata.skipEncryption) {
+                Via.getManager().getProviders().get(EncryptionProvider.class).enableDecryption(wrapper.user());
             }
+
+            // Parts of BaseProtocol1_7 GAME_PROFILE handler
+            if (info.getProtocolVersion() < ProtocolVersion.v1_20_2.getVersion()) {
+                info.setState(State.PLAY);
+            }
+            Via.getManager().getConnectionManager().onLoginSuccess(wrapper.user());
+            if (!info.getPipeline().hasNonBaseProtocols()) {
+                wrapper.user().setActive(false);
+            }
+            if (Via.getManager().isDebug()) {
+                ViaLegacy.getPlatform().getLogger().log(Level.INFO, "{0} logged in with protocol {1}, Route: {2}", new Object[]{info.getUsername(), info.getProtocolVersion(), Joiner.on(", ").join(info.getPipeline().pipes(), ", ")});
+            }
+
+            final PacketWrapper respawn = PacketWrapper.create(ServerboundPackets1_6_4.CLIENT_STATUS, wrapper.user());
+            respawn.write(Type.BYTE, (byte) 0); // force respawn
+            respawn.sendToServer(Protocol1_7_2_5to1_6_4.class);
         });
         this.registerClientboundTransition(ClientboundPackets1_6_4.SERVER_AUTH_DATA, ClientboundLoginPackets.HELLO, new PacketHandlers() {
             @Override
@@ -850,33 +800,28 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
             }
         });
         this.registerClientboundTransition(ClientboundPackets1_6_4.DISCONNECT,
-                ClientboundStatusPackets.STATUS_RESPONSE, new PacketHandlers() {
-                    @Override
-                    protected void register() {
-                        handler(wrapper -> {
-                            final String reason = wrapper.read(Types1_6_4.STRING); // reason
-                            try {
-                                final String[] motdParts = reason.split("\0");
-                                final JsonObject rootObject = new JsonObject();
-                                final JsonObject descriptionObject = new JsonObject();
-                                final JsonObject playersObject = new JsonObject();
-                                final JsonObject versionObject = new JsonObject();
+                ClientboundStatusPackets.STATUS_RESPONSE, (PacketHandler) wrapper -> {
+                    final String reason = wrapper.read(Types1_6_4.STRING); // reason
+                    try {
+                        final String[] motdParts = reason.split("\0");
+                        final JsonObject rootObject = new JsonObject();
+                        final JsonObject descriptionObject = new JsonObject();
+                        final JsonObject playersObject = new JsonObject();
+                        final JsonObject versionObject = new JsonObject();
 
-                                descriptionObject.addProperty("text", motdParts[3]);
-                                playersObject.addProperty("max", Integer.parseInt(motdParts[5]));
-                                playersObject.addProperty("online", Integer.parseInt(motdParts[4]));
-                                versionObject.addProperty("name", motdParts[2]);
-                                versionObject.addProperty("protocol", Integer.parseInt(motdParts[1]));
-                                rootObject.add("description", descriptionObject);
-                                rootObject.add("players", playersObject);
-                                rootObject.add("version", versionObject);
+                        descriptionObject.addProperty("text", motdParts[3]);
+                        playersObject.addProperty("max", Integer.parseInt(motdParts[5]));
+                        playersObject.addProperty("online", Integer.parseInt(motdParts[4]));
+                        versionObject.addProperty("name", motdParts[2]);
+                        versionObject.addProperty("protocol", Integer.parseInt(motdParts[1]));
+                        rootObject.add("description", descriptionObject);
+                        rootObject.add("players", playersObject);
+                        rootObject.add("version", versionObject);
 
-                                wrapper.write(Type.STRING, rootObject.toString());
-                            } catch (Throwable e) {
-                                ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Could not parse 1.6.4 ping: " + reason, e);
-                                wrapper.cancel();
-                            }
-                        });
+                        wrapper.write(Type.STRING, rootObject.toString());
+                    } catch (Throwable e) {
+                        ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Could not parse 1.6.4 ping: " + reason, e);
+                        wrapper.cancel();
                     }
                 }, ClientboundLoginPackets.LOGIN_DISCONNECT, new PacketHandlers() {
                     @Override
@@ -892,50 +837,35 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
         );
         this.cancelClientbound(ClientboundPackets1_6_4.CREATIVE_INVENTORY_ACTION);
 
-        this.registerServerboundTransition(ServerboundStatusPackets.STATUS_REQUEST, ServerboundPackets1_6_4.SERVER_PING, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final HandshakeStorage handshakeStorage = wrapper.user().get(HandshakeStorage.class);
-                    final String ip = handshakeStorage.getHostname();
-                    final int port = handshakeStorage.getPort();
-                    wrapper.write(Type.UNSIGNED_BYTE, (short) 1); // always 1
-                    wrapper.write(Type.UNSIGNED_BYTE, (short) ServerboundPackets1_6_4.PLUGIN_MESSAGE.getId()); // packet id
-                    wrapper.write(Types1_6_4.STRING, "MC|PingHost"); // channel
-                    wrapper.write(Type.UNSIGNED_SHORT, 3 + 2 * ip.length() + 4); // length
-                    wrapper.write(Type.UNSIGNED_BYTE, (short) LegacyProtocolVersion.getRealProtocolVersion(wrapper.user().getProtocolInfo().getServerProtocolVersion())); // protocol Id
-                    wrapper.write(Types1_6_4.STRING, ip); // hostname
-                    wrapper.write(Type.INT, port); // port
-                });
-            }
+        this.registerServerboundTransition(ServerboundStatusPackets.STATUS_REQUEST, ServerboundPackets1_6_4.SERVER_PING, wrapper -> {
+            final HandshakeStorage handshakeStorage = wrapper.user().get(HandshakeStorage.class);
+            final String ip = handshakeStorage.getHostname();
+            final int port = handshakeStorage.getPort();
+            wrapper.write(Type.UNSIGNED_BYTE, (short) 1); // always 1
+            wrapper.write(Type.UNSIGNED_BYTE, (short) ServerboundPackets1_6_4.PLUGIN_MESSAGE.getId()); // packet id
+            wrapper.write(Types1_6_4.STRING, "MC|PingHost"); // channel
+            wrapper.write(Type.UNSIGNED_SHORT, 3 + 2 * ip.length() + 4); // length
+            wrapper.write(Type.UNSIGNED_BYTE, (short) LegacyProtocolVersion.getRealProtocolVersion(wrapper.user().getProtocolInfo().getServerProtocolVersion())); // protocol Id
+            wrapper.write(Types1_6_4.STRING, ip); // hostname
+            wrapper.write(Type.INT, port); // port
         });
-        this.registerServerboundTransition(ServerboundStatusPackets.PING_REQUEST, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.cancel();
-                    final PacketWrapper pong = PacketWrapper.create(ClientboundStatusPackets.PONG_RESPONSE, wrapper.user());
-                    pong.write(Type.LONG, wrapper.read(Type.LONG)); // start time
-                    pong.send(Protocol1_7_2_5to1_6_4.class);
-                });
-            }
+        this.registerServerboundTransition(ServerboundStatusPackets.PING_REQUEST, null, wrapper -> {
+            wrapper.cancel();
+            final PacketWrapper pong = PacketWrapper.create(ClientboundStatusPackets.PONG_RESPONSE, wrapper.user());
+            pong.write(Type.LONG, wrapper.read(Type.LONG)); // start time
+            pong.send(Protocol1_7_2_5to1_6_4.class);
         });
-        this.registerServerboundTransition(ServerboundLoginPackets.HELLO, ServerboundPackets1_6_4.CLIENT_PROTOCOL, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final String name = wrapper.read(Type.STRING); // user name
-                    final ProtocolInfo info = wrapper.user().getProtocolInfo();
-                    final HandshakeStorage handshakeStorage = wrapper.user().get(HandshakeStorage.class);
-                    info.setUsername(name);
-                    info.setUuid(ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUUID(name) : new GameProfile(name).uuid);
+        this.registerServerboundTransition(ServerboundLoginPackets.HELLO, ServerboundPackets1_6_4.CLIENT_PROTOCOL, wrapper -> {
+            final String name = wrapper.read(Type.STRING); // user name
+            final ProtocolInfo info = wrapper.user().getProtocolInfo();
+            final HandshakeStorage handshakeStorage = wrapper.user().get(HandshakeStorage.class);
+            info.setUsername(name);
+            info.setUuid(ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUUID(name) : new GameProfile(name).uuid);
 
-                    wrapper.write(Type.UNSIGNED_BYTE, (short) LegacyProtocolVersion.getRealProtocolVersion(info.getServerProtocolVersion())); // protocol id
-                    wrapper.write(Types1_6_4.STRING, name); // user name
-                    wrapper.write(Types1_6_4.STRING, handshakeStorage.getHostname()); // hostname
-                    wrapper.write(Type.INT, handshakeStorage.getPort()); // port
-                });
-            }
+            wrapper.write(Type.UNSIGNED_BYTE, (short) LegacyProtocolVersion.getRealProtocolVersion(info.getServerProtocolVersion())); // protocol id
+            wrapper.write(Types1_6_4.STRING, name); // user name
+            wrapper.write(Types1_6_4.STRING, handshakeStorage.getHostname()); // hostname
+            wrapper.write(Type.INT, handshakeStorage.getPort()); // port
         });
         this.registerServerboundTransition(ServerboundLoginPackets.ENCRYPTION_KEY, ServerboundPackets1_6_4.SHARED_KEY, null);
         this.registerServerbound(ServerboundPackets1_7_2.CHAT_MESSAGE, new PacketHandlers() {
@@ -1057,7 +987,6 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 map(Type.STRING, Types1_6_4.STRING); // language
                 handler(wrapper -> {
                     byte renderDistance = wrapper.read(Type.BYTE); // render distance
-
                     if (renderDistance <= 2) {
                         renderDistance = 3; // TINY
                     } else if (renderDistance <= 4) {
@@ -1067,10 +996,8 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                     } else { // >= 16
                         renderDistance = 0; // FAR
                     }
-
                     wrapper.write(Type.BYTE, renderDistance);
-                });
-                handler(wrapper -> {
+
                     final byte chatVisibility = wrapper.read(Type.BYTE); // chat visibility
                     final boolean enableColors = wrapper.read(Type.BOOLEAN); // enable colors
                     final byte mask = (byte) (chatVisibility | (enableColors ? 1 : 0) << 3);
@@ -1080,35 +1007,30 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 map(Type.BOOLEAN); // show cape
             }
         });
-        this.registerServerbound(ServerboundPackets1_7_2.CLIENT_STATUS, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final int action = wrapper.read(Type.VAR_INT); // action
+        this.registerServerbound(ServerboundPackets1_7_2.CLIENT_STATUS, wrapper -> {
+            final int action = wrapper.read(Type.VAR_INT); // action
 
-                    if (action == 1) { // Request Statistics
-                        final Object2IntMap<String> loadedStatistics = new Object2IntOpenHashMap<>();
-                        for (Int2IntMap.Entry entry : wrapper.user().get(StatisticsStorage.class).values.int2IntEntrySet()) {
-                            final String key = StatisticRewriter.map(entry.getIntKey());
-                            if (key == null) continue;
-                            loadedStatistics.put(key, entry.getIntValue());
-                        }
+            if (action == 1) { // Request Statistics
+                final Object2IntMap<String> loadedStatistics = new Object2IntOpenHashMap<>();
+                for (Int2IntMap.Entry entry : wrapper.user().get(StatisticsStorage.class).values.int2IntEntrySet()) {
+                    final String key = StatisticRewriter.map(entry.getIntKey());
+                    if (key == null) continue;
+                    loadedStatistics.put(key, entry.getIntValue());
+                }
 
-                        final PacketWrapper statistics = PacketWrapper.create(ClientboundPackets1_8.STATISTICS, wrapper.user());
-                        statistics.write(Type.VAR_INT, loadedStatistics.size()); // count
-                        for (Object2IntMap.Entry<String> entry : loadedStatistics.object2IntEntrySet()) {
-                            statistics.write(Type.STRING, entry.getKey()); // statistic name
-                            statistics.write(Type.VAR_INT, entry.getIntValue()); // statistic value
-                        }
-                        statistics.send(Protocol1_7_2_5to1_6_4.class);
-                    }
-                    if (action != 0) {
-                        wrapper.cancel();
-                        return;
-                    }
-                    wrapper.write(Type.BYTE, (byte) 1); // force respawn
-                });
+                final PacketWrapper statistics = PacketWrapper.create(ClientboundPackets1_8.STATISTICS, wrapper.user());
+                statistics.write(Type.VAR_INT, loadedStatistics.size()); // count
+                for (Object2IntMap.Entry<String> entry : loadedStatistics.object2IntEntrySet()) {
+                    statistics.write(Type.STRING, entry.getKey()); // statistic name
+                    statistics.write(Type.VAR_INT, entry.getIntValue()); // statistic value
+                }
+                statistics.send(Protocol1_7_2_5to1_6_4.class);
             }
+            if (action != 0) {
+                wrapper.cancel();
+                return;
+            }
+            wrapper.write(Type.BYTE, (byte) 1); // force respawn
         });
         this.registerServerbound(ServerboundPackets1_7_2.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override

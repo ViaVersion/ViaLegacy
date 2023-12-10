@@ -42,21 +42,16 @@ public class Protocol1_6_2to1_6_1 extends StatelessProtocol<ClientboundPackets1_
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPackets1_6_1.JOIN_GAME, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final PacketWrapper brand = PacketWrapper.create(ClientboundPackets1_6_4.PLUGIN_MESSAGE, wrapper.user());
-                    brand.write(Types1_6_4.STRING, "MC|Brand");
-                    final byte[] brandBytes = "legacy".getBytes(StandardCharsets.UTF_8);
-                    brand.write(Type.SHORT, (short) brandBytes.length); // data length
-                    brand.write(Type.REMAINING_BYTES, brandBytes); // data
+        this.registerClientbound(ClientboundPackets1_6_1.JOIN_GAME, wrapper -> {
+            final PacketWrapper brand = PacketWrapper.create(ClientboundPackets1_6_4.PLUGIN_MESSAGE, wrapper.user());
+            brand.write(Types1_6_4.STRING, "MC|Brand");
+            final byte[] brandBytes = "legacy".getBytes(StandardCharsets.UTF_8);
+            brand.write(Type.SHORT, (short) brandBytes.length); // data length
+            brand.write(Type.REMAINING_BYTES, brandBytes); // data
 
-                    wrapper.send(Protocol1_6_2to1_6_1.class);
-                    brand.send(Protocol1_6_2to1_6_1.class);
-                    wrapper.cancel();
-                });
-            }
+            wrapper.send(Protocol1_6_2to1_6_1.class);
+            brand.send(Protocol1_6_2to1_6_1.class);
+            wrapper.cancel();
         });
         this.registerClientbound(ClientboundPackets1_6_1.ENTITY_PROPERTIES, new PacketHandlers() {
             @Override

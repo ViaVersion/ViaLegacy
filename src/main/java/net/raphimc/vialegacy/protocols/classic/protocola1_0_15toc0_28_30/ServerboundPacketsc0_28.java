@@ -26,18 +26,10 @@ import java.util.function.BiConsumer;
 
 public enum ServerboundPacketsc0_28 implements ServerboundPacketType, PreNettyPacketType {
 
-    LOGIN(0, (user, buf) -> {
-        buf.skipBytes(130);
-    }),
-    PLAYER_BLOCK_PLACEMENT(5, (user, buf) -> {
-        buf.skipBytes(8);
-    }),
-    PLAYER_POSITION_AND_ROTATION(8, (user, buf) -> {
-        buf.skipBytes(9);
-    }),
-    CHAT_MESSAGE(13, (user, buf) -> {
-        buf.skipBytes(65);
-    });
+    LOGIN(0, (user, buf) -> buf.skipBytes(130)),
+    PLAYER_BLOCK_PLACEMENT(5, (user, buf) -> buf.skipBytes(8)),
+    PLAYER_POSITION_AND_ROTATION(8, (user, buf) -> buf.skipBytes(9)),
+    CHAT_MESSAGE(13, (user, buf) -> buf.skipBytes(65));
 
     private static final ServerboundPacketsc0_28[] REGISTRY = new ServerboundPacketsc0_28[256];
 

@@ -64,43 +64,38 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsa1_2_6.PLAYER_INVENTORY, ClientboundPacketsb1_1.WINDOW_ITEMS, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final InventoryStorage inventoryStorage = wrapper.user().get(InventoryStorage.class);
-                    final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
-                    final int type = wrapper.read(Type.INT); // type
-                    Item[] items = wrapper.read(Types1_4_2.NBTLESS_ITEM_ARRAY); // items
+        this.registerClientbound(ClientboundPacketsa1_2_6.PLAYER_INVENTORY, ClientboundPacketsb1_1.WINDOW_ITEMS, wrapper -> {
+            final InventoryStorage inventoryStorage = wrapper.user().get(InventoryStorage.class);
+            final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
+            final int type = wrapper.read(Type.INT); // type
+            Item[] items = wrapper.read(Types1_4_2.NBTLESS_ITEM_ARRAY); // items
 
-                    final Item[] windowItems = new Item[45];
-                    System.arraycopy(inventoryStorage.mainInventory, 0, windowItems, 36, 9);
-                    System.arraycopy(inventoryStorage.mainInventory, 9, windowItems, 9, 36 - 9);
-                    System.arraycopy(inventoryStorage.craftingInventory, 0, windowItems, 1, 4);
-                    System.arraycopy(inventoryStorage.armorInventory, 0, windowItems, 5, 4);
+            final Item[] windowItems = new Item[45];
+            System.arraycopy(inventoryStorage.mainInventory, 0, windowItems, 36, 9);
+            System.arraycopy(inventoryStorage.mainInventory, 9, windowItems, 9, 36 - 9);
+            System.arraycopy(inventoryStorage.craftingInventory, 0, windowItems, 1, 4);
+            System.arraycopy(inventoryStorage.armorInventory, 0, windowItems, 5, 4);
 
-                    switch (type) {
-                        case -1: // main
-                            inventoryStorage.mainInventory = items;
-                            if (inventoryTracker != null) inventoryTracker.setMainInventory(copyItems(items));
-                            System.arraycopy(items, 0, windowItems, 36, 9);
-                            System.arraycopy(items, 9, windowItems, 9, 36 - 9);
-                            break;
-                        case -2: // crafting
-                            inventoryStorage.craftingInventory = items;
-                            if (inventoryTracker != null) inventoryTracker.setCraftingInventory(copyItems(items));
-                            System.arraycopy(items, 0, windowItems, 1, 4);
-                            break;
-                        case -3: // armor
-                            inventoryStorage.armorInventory = items;
-                            if (inventoryTracker != null) inventoryTracker.setArmorInventory(copyItems(items));
-                            System.arraycopy(reverseArray(items), 0, windowItems, 5, 4);
-                    }
-
-                    wrapper.write(Type.BYTE, (byte) 0); // window id
-                    wrapper.write(Types1_4_2.NBTLESS_ITEM_ARRAY, copyItems(windowItems)); // items
-                });
+            switch (type) {
+                case -1: // main
+                    inventoryStorage.mainInventory = items;
+                    if (inventoryTracker != null) inventoryTracker.setMainInventory(copyItems(items));
+                    System.arraycopy(items, 0, windowItems, 36, 9);
+                    System.arraycopy(items, 9, windowItems, 9, 36 - 9);
+                    break;
+                case -2: // crafting
+                    inventoryStorage.craftingInventory = items;
+                    if (inventoryTracker != null) inventoryTracker.setCraftingInventory(copyItems(items));
+                    System.arraycopy(items, 0, windowItems, 1, 4);
+                    break;
+                case -3: // armor
+                    inventoryStorage.armorInventory = items;
+                    if (inventoryTracker != null) inventoryTracker.setArmorInventory(copyItems(items));
+                    System.arraycopy(reverseArray(items), 0, windowItems, 5, 4);
             }
+
+            wrapper.write(Type.BYTE, (byte) 0); // window id
+            wrapper.write(Types1_4_2.NBTLESS_ITEM_ARRAY, copyItems(windowItems)); // items
         });
         this.registerClientbound(ClientboundPacketsa1_2_6.UPDATE_HEALTH, new PacketHandlers() {
             @Override
@@ -108,16 +103,11 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
                 map(Type.BYTE, Type.SHORT); // health
             }
         });
-        this.registerClientbound(ClientboundPacketsa1_2_6.RESPAWN, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.user().get(InventoryStorage.class).resetPlayerInventory();
+        this.registerClientbound(ClientboundPacketsa1_2_6.RESPAWN, wrapper -> {
+            wrapper.user().get(InventoryStorage.class).resetPlayerInventory();
 
-                    final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
-                    if (inventoryTracker != null) inventoryTracker.onRespawn();
-                });
-            }
+            final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
+            if (inventoryTracker != null) inventoryTracker.onRespawn();
         });
         this.registerClientbound(ClientboundPacketsa1_2_6.HELD_ITEM_CHANGE, ClientboundPacketsb1_1.ENTITY_EQUIPMENT, new PacketHandlers() {
             @Override
@@ -132,15 +122,10 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsa1_2_6.ADD_TO_INVENTORY, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.cancel();
-                    final Item item = wrapper.read(Types1_3_1.NBTLESS_ITEM); // item
-                    Via.getManager().getProviders().get(AlphaInventoryProvider.class).addToInventory(wrapper.user(), item);
-                });
-            }
+        this.registerClientbound(ClientboundPacketsa1_2_6.ADD_TO_INVENTORY, null, wrapper -> {
+            wrapper.cancel();
+            final Item item = wrapper.read(Types1_3_1.NBTLESS_ITEM); // item
+            Via.getManager().getProviders().get(AlphaInventoryProvider.class).addToInventory(wrapper.user(), item);
         });
         this.registerClientbound(ClientboundPacketsa1_2_6.PRE_CHUNK, new PacketHandlers() {
             @Override
@@ -148,64 +133,57 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
                 map(Type.INT); // chunkX
                 map(Type.INT); // chunkZ
                 map(Type.UNSIGNED_BYTE); // mode
-                handler(wrapper -> {
-                    wrapper.user().get(InventoryStorage.class).unload(wrapper.get(Type.INT, 0), wrapper.get(Type.INT, 1));
-                });
+                handler(wrapper -> wrapper.user().get(InventoryStorage.class).unload(wrapper.get(Type.INT, 0), wrapper.get(Type.INT, 1)));
             }
         });
-        this.registerClientbound(ClientboundPacketsa1_2_6.COMPLEX_ENTITY, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.cancel();
-                    final InventoryStorage tracker = wrapper.user().get(InventoryStorage.class);
-                    final Position pos = wrapper.read(Types1_7_6.POSITION_SHORT); // position
-                    final CompoundTag tag = wrapper.read(Types1_7_6.NBT); // data
+        this.registerClientbound(ClientboundPacketsa1_2_6.COMPLEX_ENTITY, null, wrapper -> {
+            wrapper.cancel();
+            final InventoryStorage tracker = wrapper.user().get(InventoryStorage.class);
+            final Position pos = wrapper.read(Types1_7_6.POSITION_SHORT); // position
+            final CompoundTag tag = wrapper.read(Types1_7_6.NBT); // data
 
-                    if (tag.<IntTag>get("x").asInt() != pos.x() || tag.<IntTag>get("y").asInt() != pos.y() || tag.<IntTag>get("z").asInt() != pos.z()) {
-                        return;
-                    }
+            if (tag.<IntTag>get("x").asInt() != pos.x() || tag.<IntTag>get("y").asInt() != pos.y() || tag.<IntTag>get("z").asInt() != pos.z()) {
+                return;
+            }
 
-                    final IdAndData block = wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos);
-                    final String blockName = tag.get("id") != null ? tag.<StringTag>get("id").getValue() : "";
+            final IdAndData block = wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos);
+            final String blockName = tag.get("id") != null ? tag.<StringTag>get("id").getValue() : "";
 
-                    if (block.id == BlockList1_6.signPost.blockID || block.id == BlockList1_6.signWall.blockID || blockName.equals("Sign")) {
-                        final PacketWrapper updateSign = PacketWrapper.create(ClientboundPacketsb1_1.UPDATE_SIGN, wrapper.user());
-                        updateSign.write(Types1_7_6.POSITION_SHORT, pos); // position
-                        updateSign.write(Typesb1_7_0_3.STRING, tag.<StringTag>get("Text1").getValue()); // line 1
-                        updateSign.write(Typesb1_7_0_3.STRING, tag.<StringTag>get("Text2").getValue()); // line 2
-                        updateSign.write(Typesb1_7_0_3.STRING, tag.<StringTag>get("Text3").getValue()); // line 3
-                        updateSign.write(Typesb1_7_0_3.STRING, tag.<StringTag>get("Text4").getValue()); // line 4
-                        updateSign.send(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
-                    } else if (block.id == BlockList1_6.mobSpawner.blockID || blockName.equals("MobSpawner")) {
-                        if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_2_1_3to1_1.class)) {
-                            final PacketWrapper spawnerData = PacketWrapper.create(ClientboundPackets1_2_1.BLOCK_ENTITY_DATA, wrapper.user());
-                            spawnerData.write(Types1_7_6.POSITION_SHORT, pos); // position
-                            spawnerData.write(Type.BYTE, (byte) 1); // type
-                            spawnerData.write(Type.INT, EntityList.getEntityId(tag.<StringTag>get("EntityId").getValue())); // entity id
-                            spawnerData.write(Type.INT, 0); // unused
-                            spawnerData.write(Type.INT, 0); // unused
-                            spawnerData.send(Protocol1_2_1_3to1_1.class);
-                        }
-                    } else if (block.id == BlockList1_6.chest.blockID || blockName.equals("Chest")) {
-                        final Item[] chestItems = new Item[3 * 9];
-                        readItemsFromTag(tag, chestItems);
-                        tracker.containers.put(pos, chestItems);
-                        if (pos.equals(tracker.openContainerPos)) sendWindowItems(wrapper.user(), InventoryStorage.CHEST_WID, chestItems);
-                    } else if (block.id == BlockList1_6.furnaceIdle.blockID || block.id == BlockList1_6.furnaceBurning.blockID || blockName.equals("Furnace")) {
-                        final Item[] furnaceItems = new Item[3];
-                        readItemsFromTag(tag, furnaceItems);
-                        tracker.containers.put(pos, furnaceItems);
-                        if (pos.equals(tracker.openContainerPos)) {
-                            sendWindowItems(wrapper.user(), InventoryStorage.FURNACE_WID, furnaceItems);
-                            sendProgressUpdate(wrapper.user(), InventoryStorage.FURNACE_WID, (short) 0, tag.<ShortTag>get("CookTime").asShort()); // cook time
-                            sendProgressUpdate(wrapper.user(), InventoryStorage.FURNACE_WID, (short) 1, tag.<ShortTag>get("BurnTime").asShort()); // furnace burn time
-                            sendProgressUpdate(wrapper.user(), InventoryStorage.FURNACE_WID, (short) 2, getBurningTime(furnaceItems[1])); // item burn time
-                        }
-                    } else {
-                        ViaLegacy.getPlatform().getLogger().warning("Unhandled Complex Entity data: " + block + "@" + pos + ": '" + tag + "'");
-                    }
-                });
+            if (block.id == BlockList1_6.signPost.blockID || block.id == BlockList1_6.signWall.blockID || blockName.equals("Sign")) {
+                final PacketWrapper updateSign = PacketWrapper.create(ClientboundPacketsb1_1.UPDATE_SIGN, wrapper.user());
+                updateSign.write(Types1_7_6.POSITION_SHORT, pos); // position
+                updateSign.write(Typesb1_7_0_3.STRING, tag.<StringTag>get("Text1").getValue()); // line 1
+                updateSign.write(Typesb1_7_0_3.STRING, tag.<StringTag>get("Text2").getValue()); // line 2
+                updateSign.write(Typesb1_7_0_3.STRING, tag.<StringTag>get("Text3").getValue()); // line 3
+                updateSign.write(Typesb1_7_0_3.STRING, tag.<StringTag>get("Text4").getValue()); // line 4
+                updateSign.send(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
+            } else if (block.id == BlockList1_6.mobSpawner.blockID || blockName.equals("MobSpawner")) {
+                if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_2_1_3to1_1.class)) {
+                    final PacketWrapper spawnerData = PacketWrapper.create(ClientboundPackets1_2_1.BLOCK_ENTITY_DATA, wrapper.user());
+                    spawnerData.write(Types1_7_6.POSITION_SHORT, pos); // position
+                    spawnerData.write(Type.BYTE, (byte) 1); // type
+                    spawnerData.write(Type.INT, EntityList.getEntityId(tag.<StringTag>get("EntityId").getValue())); // entity id
+                    spawnerData.write(Type.INT, 0); // unused
+                    spawnerData.write(Type.INT, 0); // unused
+                    spawnerData.send(Protocol1_2_1_3to1_1.class);
+                }
+            } else if (block.id == BlockList1_6.chest.blockID || blockName.equals("Chest")) {
+                final Item[] chestItems = new Item[3 * 9];
+                readItemsFromTag(tag, chestItems);
+                tracker.containers.put(pos, chestItems);
+                if (pos.equals(tracker.openContainerPos)) sendWindowItems(wrapper.user(), InventoryStorage.CHEST_WID, chestItems);
+            } else if (block.id == BlockList1_6.furnaceIdle.blockID || block.id == BlockList1_6.furnaceBurning.blockID || blockName.equals("Furnace")) {
+                final Item[] furnaceItems = new Item[3];
+                readItemsFromTag(tag, furnaceItems);
+                tracker.containers.put(pos, furnaceItems);
+                if (pos.equals(tracker.openContainerPos)) {
+                    sendWindowItems(wrapper.user(), InventoryStorage.FURNACE_WID, furnaceItems);
+                    sendProgressUpdate(wrapper.user(), InventoryStorage.FURNACE_WID, (short) 0, tag.<ShortTag>get("CookTime").asShort()); // cook time
+                    sendProgressUpdate(wrapper.user(), InventoryStorage.FURNACE_WID, (short) 1, tag.<ShortTag>get("BurnTime").asShort()); // furnace burn time
+                    sendProgressUpdate(wrapper.user(), InventoryStorage.FURNACE_WID, (short) 2, getBurningTime(furnaceItems[1])); // item burn time
+                }
+            } else {
+                ViaLegacy.getPlatform().getLogger().warning("Unhandled Complex Entity data: " + block + "@" + pos + ": '" + tag + "'");
             }
         });
 
@@ -234,159 +212,134 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
                 });
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_1.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final InventoryStorage tracker = wrapper.user().get(InventoryStorage.class);
-                    final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
-                    final Position pos = wrapper.read(Types1_7_6.POSITION_UBYTE); // position
-                    final short direction = wrapper.read(Type.UNSIGNED_BYTE); // direction
-                    Item item = fixItem(wrapper.read(Typesb1_1.NBTLESS_ITEM)); // item
+        this.registerServerbound(ServerboundPacketsb1_1.PLAYER_BLOCK_PLACEMENT, wrapper -> {
+            final InventoryStorage tracker = wrapper.user().get(InventoryStorage.class);
+            final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
+            final Position pos = wrapper.read(Types1_7_6.POSITION_UBYTE); // position
+            final short direction = wrapper.read(Type.UNSIGNED_BYTE); // direction
+            Item item = fixItem(wrapper.read(Typesb1_1.NBTLESS_ITEM)); // item
 
-                    if (item == null && inventoryTracker != null) {
-                        item = Via.getManager().getProviders().get(AlphaInventoryProvider.class).getHandItem(wrapper.user());
-                    }
+            if (item == null && inventoryTracker != null) {
+                item = Via.getManager().getProviders().get(AlphaInventoryProvider.class).getHandItem(wrapper.user());
+            }
 
-                    wrapper.write(Type.SHORT, item == null ? (short) -1 : (short) item.identifier()); // item id
-                    wrapper.write(Types1_7_6.POSITION_UBYTE, pos);
-                    wrapper.write(Type.UNSIGNED_BYTE, direction);
+            wrapper.write(Type.SHORT, item == null ? (short) -1 : (short) item.identifier()); // item id
+            wrapper.write(Types1_7_6.POSITION_UBYTE, pos);
+            wrapper.write(Type.UNSIGNED_BYTE, direction);
 
-                    if (inventoryTracker != null) inventoryTracker.onBlockPlace(pos, direction);
+            if (inventoryTracker != null) inventoryTracker.onBlockPlace(pos, direction);
 
-                    if (direction == 255) return;
+            if (direction == 255) return;
 
-                    final IdAndData block = wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos);
-                    if (block.id != BlockList1_6.furnaceIdle.blockID && block.id != BlockList1_6.furnaceBurning.blockID && block.id != BlockList1_6.chest.blockID && block.id != BlockList1_6.workbench.blockID) {
-                        return;
-                    }
+            final IdAndData block = wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos);
+            if (block.id != BlockList1_6.furnaceIdle.blockID && block.id != BlockList1_6.furnaceBurning.blockID && block.id != BlockList1_6.chest.blockID && block.id != BlockList1_6.workbench.blockID) {
+                return;
+            }
 
-                    final Item[] containerItems = tracker.containers.get(tracker.openContainerPos = pos);
-                    if (containerItems == null && block.id != BlockList1_6.workbench.blockID) {
-                        tracker.openContainerPos = null;
-                        final PacketWrapper chatMessage = PacketWrapper.create(ClientboundPacketsb1_1.CHAT_MESSAGE, wrapper.user());
-                        chatMessage.write(Typesb1_7_0_3.STRING, "§cMissing Container"); // message
-                        chatMessage.send(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
-                        return;
-                    }
+            final Item[] containerItems = tracker.containers.get(tracker.openContainerPos = pos);
+            if (containerItems == null && block.id != BlockList1_6.workbench.blockID) {
+                tracker.openContainerPos = null;
+                final PacketWrapper chatMessage = PacketWrapper.create(ClientboundPacketsb1_1.CHAT_MESSAGE, wrapper.user());
+                chatMessage.write(Typesb1_7_0_3.STRING, "§cMissing Container"); // message
+                chatMessage.send(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
+                return;
+            }
 
-                    final PacketWrapper openWindow = PacketWrapper.create(ClientboundPacketsb1_1.OPEN_WINDOW, wrapper.user());
-                    if (block.id == BlockList1_6.chest.blockID) {
-                        openWindow.write(Type.UNSIGNED_BYTE, (short) InventoryStorage.CHEST_WID); // window id
-                        openWindow.write(Type.UNSIGNED_BYTE, (short) 0); // window type
-                        openWindow.write(Typesb1_7_0_3.STRING, "Chest"); // title
-                        openWindow.write(Type.UNSIGNED_BYTE, (short) (3 * 9)); // slots
-                        if (inventoryTracker != null) inventoryTracker.onWindowOpen(0, 3 * 9);
-                    } else if (block.id == BlockList1_6.workbench.blockID) {
-                        openWindow.write(Type.UNSIGNED_BYTE, (short) InventoryStorage.WORKBENCH_WID); // window id
-                        openWindow.write(Type.UNSIGNED_BYTE, (short) 1); // window type
-                        openWindow.write(Typesb1_7_0_3.STRING, "Crafting Table"); // title
-                        openWindow.write(Type.UNSIGNED_BYTE, (short) 9); // slots
-                        if (inventoryTracker != null) inventoryTracker.onWindowOpen(1, 10);
-                    } else { // furnace
-                        openWindow.write(Type.UNSIGNED_BYTE, (short) InventoryStorage.FURNACE_WID); // window id
-                        openWindow.write(Type.UNSIGNED_BYTE, (short) 2); // window type
-                        openWindow.write(Typesb1_7_0_3.STRING, "Furnace"); // title
-                        openWindow.write(Type.UNSIGNED_BYTE, (short) 3); // slots
-                        if (inventoryTracker != null) inventoryTracker.onWindowOpen(2, 3);
-                    }
-                    openWindow.send(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
+            final PacketWrapper openWindow = PacketWrapper.create(ClientboundPacketsb1_1.OPEN_WINDOW, wrapper.user());
+            if (block.id == BlockList1_6.chest.blockID) {
+                openWindow.write(Type.UNSIGNED_BYTE, (short) InventoryStorage.CHEST_WID); // window id
+                openWindow.write(Type.UNSIGNED_BYTE, (short) 0); // window type
+                openWindow.write(Typesb1_7_0_3.STRING, "Chest"); // title
+                openWindow.write(Type.UNSIGNED_BYTE, (short) (3 * 9)); // slots
+                if (inventoryTracker != null) inventoryTracker.onWindowOpen(0, 3 * 9);
+            } else if (block.id == BlockList1_6.workbench.blockID) {
+                openWindow.write(Type.UNSIGNED_BYTE, (short) InventoryStorage.WORKBENCH_WID); // window id
+                openWindow.write(Type.UNSIGNED_BYTE, (short) 1); // window type
+                openWindow.write(Typesb1_7_0_3.STRING, "Crafting Table"); // title
+                openWindow.write(Type.UNSIGNED_BYTE, (short) 9); // slots
+                if (inventoryTracker != null) inventoryTracker.onWindowOpen(1, 10);
+            } else { // furnace
+                openWindow.write(Type.UNSIGNED_BYTE, (short) InventoryStorage.FURNACE_WID); // window id
+                openWindow.write(Type.UNSIGNED_BYTE, (short) 2); // window type
+                openWindow.write(Typesb1_7_0_3.STRING, "Furnace"); // title
+                openWindow.write(Type.UNSIGNED_BYTE, (short) 3); // slots
+                if (inventoryTracker != null) inventoryTracker.onWindowOpen(2, 3);
+            }
+            openWindow.send(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
 
-                    if (block.id != BlockList1_6.workbench.blockID) {
-                        sendWindowItems(wrapper.user(), block.id == BlockList1_6.chest.blockID ? InventoryStorage.CHEST_WID : InventoryStorage.FURNACE_WID, containerItems);
-                    }
-                });
+            if (block.id != BlockList1_6.workbench.blockID) {
+                sendWindowItems(wrapper.user(), block.id == BlockList1_6.chest.blockID ? InventoryStorage.CHEST_WID : InventoryStorage.FURNACE_WID, containerItems);
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_1.HELD_ITEM_CHANGE, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final InventoryStorage inventoryStorage = wrapper.user().get(InventoryStorage.class);
-                    short slot = wrapper.read(Type.SHORT); // slot
-                    if (slot < 0 || slot > 8) slot = 0;
-                    inventoryStorage.selectedHotbarSlot = slot;
-                    final Item selectedItem = fixItem(Via.getManager().getProviders().get(AlphaInventoryProvider.class).getHandItem(wrapper.user()));
-                    if (Objects.equals(selectedItem, inventoryStorage.handItem)) {
-                        wrapper.cancel();
-                        return;
-                    }
-                    inventoryStorage.handItem = selectedItem;
-
-                    wrapper.write(Type.INT, 0); // entity id (always 0)
-                    wrapper.write(Type.SHORT, (short) (selectedItem == null ? 0 : selectedItem.identifier())); // item id
-                });
+        this.registerServerbound(ServerboundPacketsb1_1.HELD_ITEM_CHANGE, wrapper -> {
+            final InventoryStorage inventoryStorage = wrapper.user().get(InventoryStorage.class);
+            short slot = wrapper.read(Type.SHORT); // slot
+            if (slot < 0 || slot > 8) slot = 0;
+            inventoryStorage.selectedHotbarSlot = slot;
+            final Item selectedItem = fixItem(Via.getManager().getProviders().get(AlphaInventoryProvider.class).getHandItem(wrapper.user()));
+            if (Objects.equals(selectedItem, inventoryStorage.handItem)) {
+                wrapper.cancel();
+                return;
             }
+            inventoryStorage.handItem = selectedItem;
+
+            wrapper.write(Type.INT, 0); // entity id (always 0)
+            wrapper.write(Type.SHORT, (short) (selectedItem == null ? 0 : selectedItem.identifier())); // item id
         });
-        this.registerServerbound(ServerboundPacketsb1_1.CLOSE_WINDOW, null, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.cancel();
-                    wrapper.user().get(InventoryStorage.class).openContainerPos = null;
+        this.registerServerbound(ServerboundPacketsb1_1.CLOSE_WINDOW, null, wrapper -> {
+            wrapper.cancel();
+            wrapper.user().get(InventoryStorage.class).openContainerPos = null;
 
-                    final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
-                    if (inventoryTracker != null) inventoryTracker.onWindowClose();
-                });
-            }
+            final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
+            if (inventoryTracker != null) inventoryTracker.onWindowClose();
         });
-        this.registerServerbound(ServerboundPacketsb1_1.CLICK_WINDOW, ServerboundPacketsa1_2_6.COMPLEX_ENTITY, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final InventoryStorage tracker = wrapper.user().get(InventoryStorage.class);
-                    final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
-                    final byte windowId = wrapper.read(Type.BYTE); // window id
-                    final short slot = wrapper.read(Type.SHORT); // slot
-                    final byte button = wrapper.read(Type.BYTE); // button
-                    final short action = wrapper.read(Type.SHORT); // action
-                    final Item item = fixItem(wrapper.read(Typesb1_1.NBTLESS_ITEM)); // item
+        this.registerServerbound(ServerboundPacketsb1_1.CLICK_WINDOW, ServerboundPacketsa1_2_6.COMPLEX_ENTITY, wrapper -> {
+            final InventoryStorage tracker = wrapper.user().get(InventoryStorage.class);
+            final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
+            final byte windowId = wrapper.read(Type.BYTE); // window id
+            final short slot = wrapper.read(Type.SHORT); // slot
+            final byte button = wrapper.read(Type.BYTE); // button
+            final short action = wrapper.read(Type.SHORT); // action
+            final Item item = fixItem(wrapper.read(Typesb1_1.NBTLESS_ITEM)); // item
 
-                    if (inventoryTracker != null) inventoryTracker.onWindowClick(windowId, slot, button, action, item);
-                    if ((windowId != InventoryStorage.CHEST_WID && windowId != InventoryStorage.FURNACE_WID) || tracker.openContainerPos == null) {
-                        wrapper.cancel();
-                        return;
-                    }
-
-                    final Item[] containerItems = fixItems(Via.getManager().getProviders().get(AlphaInventoryProvider.class).getContainerItems(wrapper.user()));
-                    if (Arrays.equals(tracker.containers.get(tracker.openContainerPos), containerItems)) {
-                        wrapper.cancel();
-                        return;
-                    }
-                    tracker.containers.put(tracker.openContainerPos, containerItems);
-
-                    final CompoundTag tag = new CompoundTag();
-                    tag.put("id", new StringTag(windowId == InventoryStorage.CHEST_WID ? "Chest" : "Furnace"));
-                    tag.put("x", new IntTag(tracker.openContainerPos.x()));
-                    tag.put("y", new IntTag(tracker.openContainerPos.y()));
-                    tag.put("z", new IntTag(tracker.openContainerPos.z()));
-                    writeItemsToTag(tag, containerItems);
-
-                    wrapper.write(Type.INT, tracker.openContainerPos.x());
-                    wrapper.write(Type.SHORT, (short) tracker.openContainerPos.y());
-                    wrapper.write(Type.INT, tracker.openContainerPos.z());
-                    wrapper.write(Types1_7_6.NBT, tag);
-                });
+            if (inventoryTracker != null) inventoryTracker.onWindowClick(windowId, slot, button, action, item);
+            if ((windowId != InventoryStorage.CHEST_WID && windowId != InventoryStorage.FURNACE_WID) || tracker.openContainerPos == null) {
+                wrapper.cancel();
+                return;
             }
+
+            final Item[] containerItems = fixItems(Via.getManager().getProviders().get(AlphaInventoryProvider.class).getContainerItems(wrapper.user()));
+            if (Arrays.equals(tracker.containers.get(tracker.openContainerPos), containerItems)) {
+                wrapper.cancel();
+                return;
+            }
+            tracker.containers.put(tracker.openContainerPos, containerItems);
+
+            final CompoundTag tag = new CompoundTag();
+            tag.put("id", new StringTag(windowId == InventoryStorage.CHEST_WID ? "Chest" : "Furnace"));
+            tag.put("x", new IntTag(tracker.openContainerPos.x()));
+            tag.put("y", new IntTag(tracker.openContainerPos.y()));
+            tag.put("z", new IntTag(tracker.openContainerPos.z()));
+            writeItemsToTag(tag, containerItems);
+
+            wrapper.write(Type.INT, tracker.openContainerPos.x());
+            wrapper.write(Type.SHORT, (short) tracker.openContainerPos.y());
+            wrapper.write(Type.INT, tracker.openContainerPos.z());
+            wrapper.write(Types1_7_6.NBT, tag);
         });
-        this.registerServerbound(ServerboundPacketsb1_1.UPDATE_SIGN, ServerboundPacketsa1_2_6.COMPLEX_ENTITY, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final Position pos = wrapper.passthrough(Types1_7_6.POSITION_SHORT); // position
+        this.registerServerbound(ServerboundPacketsb1_1.UPDATE_SIGN, ServerboundPacketsa1_2_6.COMPLEX_ENTITY, wrapper -> {
+            final Position pos = wrapper.passthrough(Types1_7_6.POSITION_SHORT); // position
 
-                    final CompoundTag tag = new CompoundTag();
-                    tag.put("id", new StringTag("Sign"));
-                    tag.put("x", new IntTag(pos.x()));
-                    tag.put("y", new IntTag(pos.y()));
-                    tag.put("z", new IntTag(pos.z()));
-                    tag.put("Text1", new StringTag(wrapper.read(Typesb1_7_0_3.STRING))); // line 1
-                    tag.put("Text2", new StringTag(wrapper.read(Typesb1_7_0_3.STRING))); // line 2
-                    tag.put("Text3", new StringTag(wrapper.read(Typesb1_7_0_3.STRING))); // line 3
-                    tag.put("Text4", new StringTag(wrapper.read(Typesb1_7_0_3.STRING))); // line 4
-                    wrapper.write(Types1_7_6.NBT, tag); // data
-                });
-            }
+            final CompoundTag tag = new CompoundTag();
+            tag.put("id", new StringTag("Sign"));
+            tag.put("x", new IntTag(pos.x()));
+            tag.put("y", new IntTag(pos.y()));
+            tag.put("z", new IntTag(pos.z()));
+            tag.put("Text1", new StringTag(wrapper.read(Typesb1_7_0_3.STRING))); // line 1
+            tag.put("Text2", new StringTag(wrapper.read(Typesb1_7_0_3.STRING))); // line 2
+            tag.put("Text3", new StringTag(wrapper.read(Typesb1_7_0_3.STRING))); // line 3
+            tag.put("Text4", new StringTag(wrapper.read(Typesb1_7_0_3.STRING))); // line 4
+            wrapper.write(Types1_7_6.NBT, tag); // data
         });
         this.cancelServerbound(ServerboundPacketsb1_1.WINDOW_CONFIRMATION);
     }

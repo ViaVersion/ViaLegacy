@@ -47,19 +47,14 @@ public class Protocol1_0_0_1tob1_8_0_1 extends StatelessProtocol<ClientboundPack
     protected void registerPackets() {
         this.itemRewriter.register();
 
-        this.registerClientbound(ClientboundPacketsb1_8.SET_EXPERIENCE, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    float experience = (float) wrapper.read(Type.BYTE);
-                    final byte experienceLevel = wrapper.read(Type.BYTE);
-                    final short experienceTotal = wrapper.read(Type.SHORT);
-                    experience = (experience - 1.0f) / (10 * experienceLevel);
-                    wrapper.write(Type.FLOAT, experience); // experience bar
-                    wrapper.write(Type.SHORT, (short) experienceLevel); // level
-                    wrapper.write(Type.SHORT, experienceTotal); // total experience
-                });
-            }
+        this.registerClientbound(ClientboundPacketsb1_8.SET_EXPERIENCE, wrapper -> {
+            float experience = (float) wrapper.read(Type.BYTE);
+            final byte experienceLevel = wrapper.read(Type.BYTE);
+            final short experienceTotal = wrapper.read(Type.SHORT);
+            experience = (experience - 1.0f) / (10 * experienceLevel);
+            wrapper.write(Type.FLOAT, experience); // experience bar
+            wrapper.write(Type.SHORT, (short) experienceLevel); // level
+            wrapper.write(Type.SHORT, experienceTotal); // total experience
         });
         this.registerClientbound(ClientboundPacketsb1_8.SET_SLOT, new PacketHandlers() {
             @Override

@@ -35,52 +35,28 @@ public enum ServerboundPacketsa1_2_0 implements ServerboundPacketType, PreNettyP
         PreNettyTypes.readUTF(buf);
         buf.skipBytes(9);
     }),
-    HANDSHAKE(2, (user, buf) -> {
-        PreNettyTypes.readUTF(buf);
-    }),
-    CHAT_MESSAGE(3, (user, buf) -> {
-        PreNettyTypes.readUTF(buf);
-    }),
+    HANDSHAKE(2, (user, buf) -> PreNettyTypes.readUTF(buf)),
+    CHAT_MESSAGE(3, (user, buf) -> PreNettyTypes.readUTF(buf)),
     PLAYER_INVENTORY(5, (user, buf) -> {
         buf.skipBytes(4);
         int x = buf.readShort();
         for (int i = 0; i < x; i++) PreNettyTypes.readItemStackb1_2(buf);
     }),
-    PLAYER_MOVEMENT(10, (user, buf) -> {
-        buf.skipBytes(1);
-    }),
-    PLAYER_POSITION(11, (user, buf) -> {
-        buf.skipBytes(33);
-    }),
-    PLAYER_ROTATION(12, (user, buf) -> {
-        buf.skipBytes(9);
-    }),
-    PLAYER_POSITION_AND_ROTATION(13, (user, buf) -> {
-        buf.skipBytes(41);
-    }),
-    PLAYER_DIGGING(14, (user, buf) -> {
-        buf.skipBytes(11);
-    }),
-    PLAYER_BLOCK_PLACEMENT(15, (user, buf) -> {
-        buf.skipBytes(12);
-    }),
-    HELD_ITEM_CHANGE(16, (user, buf) -> {
-        buf.skipBytes(6);
-    }),
-    ANIMATION(18, (user, buf) -> {
-        buf.skipBytes(5);
-    }),
-    SPAWN_ITEM(21, (user, buf) -> {
-        buf.skipBytes(22);
-    }),
+    PLAYER_MOVEMENT(10, (user, buf) -> buf.skipBytes(1)),
+    PLAYER_POSITION(11, (user, buf) -> buf.skipBytes(33)),
+    PLAYER_ROTATION(12, (user, buf) -> buf.skipBytes(9)),
+    PLAYER_POSITION_AND_ROTATION(13, (user, buf) -> buf.skipBytes(41)),
+    PLAYER_DIGGING(14, (user, buf) -> buf.skipBytes(11)),
+    PLAYER_BLOCK_PLACEMENT(15, (user, buf) -> buf.skipBytes(12)),
+    HELD_ITEM_CHANGE(16, (user, buf) -> buf.skipBytes(6)),
+    ANIMATION(18, (user, buf) -> buf.skipBytes(5)),
+    SPAWN_ITEM(21, (user, buf) -> buf.skipBytes(22)),
     COMPLEX_ENTITY(59, (user, buf) -> {
         buf.skipBytes(10);
         int x = buf.readUnsignedShort();
         for (int i = 0; i < x; i++) buf.readByte();
     }),
-    DISCONNECT(255, (user, buf) -> {
-        PreNettyTypes.readUTF(buf);
-    });
+    DISCONNECT(255, (user, buf) -> PreNettyTypes.readUTF(buf));
 
     private static final ServerboundPacketsa1_2_0[] REGISTRY = new ServerboundPacketsa1_2_0[256];
 

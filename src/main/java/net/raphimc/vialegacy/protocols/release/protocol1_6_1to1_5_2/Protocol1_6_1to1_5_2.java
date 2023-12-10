@@ -110,9 +110,7 @@ public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_
             public void register() {
                 map(Type.INT); // collected entity id
                 map(Type.INT); // collector entity id
-                handler(wrapper -> {
-                    wrapper.user().get(EntityTracker.class).getTrackedEntities().remove(wrapper.get(Type.INT, 0));
-                });
+                handler(wrapper -> wrapper.user().get(EntityTracker.class).getTrackedEntities().remove(wrapper.get(Type.INT, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_5_2.SPAWN_ENTITY, new PacketHandlers() {
@@ -296,14 +294,9 @@ public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_
             }
         });
 
-        this.registerServerbound(ServerboundPackets1_6_4.SERVER_PING, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.clearPacket();
-                    wrapper.write(Type.BYTE, (byte) 1); // readSuccessfully
-                });
-            }
+        this.registerServerbound(ServerboundPackets1_6_4.SERVER_PING, wrapper -> {
+            wrapper.clearPacket();
+            wrapper.write(Type.BYTE, (byte) 1); // readSuccessfully
         });
         this.registerServerbound(ServerboundPackets1_6_4.ENTITY_ACTION, new PacketHandlers() {
             @Override
@@ -316,29 +309,24 @@ public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_
                 });
             }
         });
-        this.registerServerbound(ServerboundPackets1_6_4.STEER_VEHICLE, ServerboundPackets1_5_2.INTERACT_ENTITY, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    final AttachTracker attachTracker = wrapper.user().get(AttachTracker.class);
-                    final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
-                    wrapper.read(Type.FLOAT); // sideways
-                    wrapper.read(Type.FLOAT); // forwards
-                    wrapper.read(Type.BOOLEAN); // jumping
-                    final boolean sneaking = wrapper.read(Type.BOOLEAN); // sneaking
+        this.registerServerbound(ServerboundPackets1_6_4.STEER_VEHICLE, ServerboundPackets1_5_2.INTERACT_ENTITY, wrapper -> {
+            final AttachTracker attachTracker = wrapper.user().get(AttachTracker.class);
+            final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
+            wrapper.read(Type.FLOAT); // sideways
+            wrapper.read(Type.FLOAT); // forwards
+            wrapper.read(Type.BOOLEAN); // jumping
+            final boolean sneaking = wrapper.read(Type.BOOLEAN); // sneaking
 
-                    if (attachTracker.lastSneakState != sneaking) {
-                        attachTracker.lastSneakState = sneaking;
-                        if (sneaking) {
-                            wrapper.write(Type.INT, entityTracker.getPlayerID()); // player id
-                            wrapper.write(Type.INT, attachTracker.vehicleEntityId); // entity id
-                            wrapper.write(Type.BYTE, (byte) 0); // mode
-                            return;
-                        }
-                    }
-                    wrapper.cancel();
-                });
+            if (attachTracker.lastSneakState != sneaking) {
+                attachTracker.lastSneakState = sneaking;
+                if (sneaking) {
+                    wrapper.write(Type.INT, entityTracker.getPlayerID()); // player id
+                    wrapper.write(Type.INT, attachTracker.vehicleEntityId); // entity id
+                    wrapper.write(Type.BYTE, (byte) 0); // mode
+                    return;
+                }
             }
+            wrapper.cancel();
         });
         this.registerServerbound(ServerboundPackets1_6_4.PLAYER_ABILITIES, new PacketHandlers() {
             @Override

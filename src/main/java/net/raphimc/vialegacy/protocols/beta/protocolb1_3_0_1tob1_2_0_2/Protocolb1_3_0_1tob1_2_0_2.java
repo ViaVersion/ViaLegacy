@@ -72,46 +72,41 @@ public class Protocolb1_3_0_1tob1_2_0_2 extends StatelessProtocol<ClientboundPac
             }
         });
 
-        this.registerServerbound(ServerboundPacketsb1_4.PLAYER_DIGGING, new PacketHandlers() {
-            @Override
-            public void register() {
-                handler(wrapper -> {
-                    wrapper.cancel();
-                    final short status = wrapper.read(Type.UNSIGNED_BYTE); // status
-                    final Position pos = wrapper.read(Types1_7_6.POSITION_UBYTE); // position
-                    final short facing = wrapper.read(Type.UNSIGNED_BYTE); // direction
+        this.registerServerbound(ServerboundPacketsb1_4.PLAYER_DIGGING, wrapper -> {
+            wrapper.cancel();
+            final short status = wrapper.read(Type.UNSIGNED_BYTE); // status
+            final Position pos = wrapper.read(Types1_7_6.POSITION_UBYTE); // position
+            final short facing = wrapper.read(Type.UNSIGNED_BYTE); // direction
 
-                    if (status != 4) {
-                        wrapper.user().getStoredObjects().remove(BlockDigStorage.class);
-                    }
+            if (status != 4) {
+                wrapper.user().getStoredObjects().remove(BlockDigStorage.class);
+            }
 
-                    switch (status) {
-                        case 0:
-                            final IdAndData blockBeingBroken = wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos);
-                            if (BlockHardnessList.canBeBrokenInstantly(blockBeingBroken)) {
-                                sendBlockDigPacket(wrapper.user(), (byte) 0, pos, facing);
-                                sendBlockDigPacket(wrapper.user(), (byte) 3, pos, facing);
-                                sendBlockDigPacket(wrapper.user(), (byte) 1, pos, facing);
-                                sendBlockDigPacket(wrapper.user(), (byte) 2, pos, facing);
-                                return;
-                            }
-                            wrapper.user().put(new BlockDigStorage(wrapper.user(), pos, facing));
-                            sendBlockDigPacket(wrapper.user(), (byte) 0, pos, facing);
-                            sendBlockDigPacket(wrapper.user(), (byte) 1, pos, facing);
-                            break;
-                        case 1:
-                            sendBlockDigPacket(wrapper.user(), (byte) 2, pos, facing);
-                            break;
-                        case 2:
-                            sendBlockDigPacket(wrapper.user(), (byte) 1, pos, facing);
-                            sendBlockDigPacket(wrapper.user(), (byte) 3, pos, facing);
-                            sendBlockDigPacket(wrapper.user(), (byte) 2, pos, facing);
-                            break;
-                        case 4:
-                            sendBlockDigPacket(wrapper.user(), (byte) 4, pos, facing);
-                            break;
+            switch (status) {
+                case 0:
+                    final IdAndData blockBeingBroken = wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos);
+                    if (BlockHardnessList.canBeBrokenInstantly(blockBeingBroken)) {
+                        sendBlockDigPacket(wrapper.user(), (byte) 0, pos, facing);
+                        sendBlockDigPacket(wrapper.user(), (byte) 3, pos, facing);
+                        sendBlockDigPacket(wrapper.user(), (byte) 1, pos, facing);
+                        sendBlockDigPacket(wrapper.user(), (byte) 2, pos, facing);
+                        return;
                     }
-                });
+                    wrapper.user().put(new BlockDigStorage(wrapper.user(), pos, facing));
+                    sendBlockDigPacket(wrapper.user(), (byte) 0, pos, facing);
+                    sendBlockDigPacket(wrapper.user(), (byte) 1, pos, facing);
+                    break;
+                case 1:
+                    sendBlockDigPacket(wrapper.user(), (byte) 2, pos, facing);
+                    break;
+                case 2:
+                    sendBlockDigPacket(wrapper.user(), (byte) 1, pos, facing);
+                    sendBlockDigPacket(wrapper.user(), (byte) 3, pos, facing);
+                    sendBlockDigPacket(wrapper.user(), (byte) 2, pos, facing);
+                    break;
+                case 4:
+                    sendBlockDigPacket(wrapper.user(), (byte) 4, pos, facing);
+                    break;
             }
         });
         this.registerServerbound(ServerboundPacketsb1_4.ENTITY_ACTION, new PacketHandlers() {
