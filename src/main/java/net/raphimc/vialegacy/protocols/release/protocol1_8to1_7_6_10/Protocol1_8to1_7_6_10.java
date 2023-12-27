@@ -40,18 +40,17 @@ import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_8;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.gson.JsonObject;
+import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSerializer;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
 import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
-import net.raphimc.vialegacy.api.util.converter.JsonConverter;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ClientboundPackets1_7_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ServerboundPackets1_7_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.data.Particle;
@@ -1309,7 +1308,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 handler(wrapper -> {
                     for (int i = 0; i < 4; i++) {
                         final JsonElement component = wrapper.read(Type.COMPONENT); // line
-                        String text = TextComponentSerializer.V1_8.deserialize(JsonConverter.viaToGson(component)).asLegacyFormatString();
+                        String text = TextComponentSerializer.V1_8.deserialize(component).asLegacyFormatString();
                         if (text.length() > 15) text = text.substring(0, 15);
                         wrapper.write(Type.STRING, text);
                     }

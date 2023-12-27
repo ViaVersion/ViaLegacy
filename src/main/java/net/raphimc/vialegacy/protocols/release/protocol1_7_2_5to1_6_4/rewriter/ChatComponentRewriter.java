@@ -17,12 +17,13 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.rewriter;
 
-import net.lenni0451.mcstructs.text.ATextComponent;
-import net.lenni0451.mcstructs.text.components.StringComponent;
-import net.lenni0451.mcstructs.text.components.TranslationComponent;
-import net.lenni0451.mcstructs.text.serializer.LegacyStringDeserializer;
-import net.lenni0451.mcstructs.text.serializer.TextComponentSerializer;
-import net.lenni0451.mcstructs.text.utils.TextUtils;
+
+import com.viaversion.viaversion.libs.mcstructs.text.ATextComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.components.StringComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.components.TranslationComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.serializer.LegacyStringDeserializer;
+import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSerializer;
+import com.viaversion.viaversion.libs.mcstructs.text.utils.TextUtils;
 
 public class ChatComponentRewriter {
 

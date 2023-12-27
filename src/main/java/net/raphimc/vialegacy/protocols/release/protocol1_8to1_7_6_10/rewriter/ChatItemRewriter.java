@@ -24,14 +24,14 @@ import com.viaversion.viaversion.libs.gson.JsonArray;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.gson.JsonObject;
 import com.viaversion.viaversion.libs.gson.JsonPrimitive;
+import com.viaversion.viaversion.libs.mcstructs.snbt.SNbtSerializer;
+import com.viaversion.viaversion.libs.mcstructs.snbt.exceptions.SNbtSerializeException;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.ShortTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
-import net.lenni0451.mcstructs.snbt.SNbtSerializer;
-import net.lenni0451.mcstructs.snbt.exceptions.SNbtSerializeException;
+import com.viaversion.viaversion.util.NBTConverter;
 import net.raphimc.vialegacy.ViaLegacy;
-import net.raphimc.vialegacy.api.util.converter.NbtConverter;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ClientboundPackets1_7_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 
@@ -377,7 +377,7 @@ public class ChatItemRewriter {
 
                 final CompoundTag tag;
                 try {
-                    tag = (CompoundTag) NbtConverter.mcStructsToVia(SNbtSerializer.V1_7.deserialize(text));
+                    tag = (CompoundTag) NBTConverter.mcStructsToVia(SNbtSerializer.V1_7.deserialize(text));
                 } catch (Throwable e) {
                     ViaLegacy.getPlatform().getLogger().warning("Error reading NBT in show_item:" + text);
                     throw new RuntimeException(e);
@@ -410,7 +410,7 @@ public class ChatItemRewriter {
                 array.add(object);
                 final String serializedNBT;
                 try {
-                    serializedNBT = SNbtSerializer.V1_8.serialize(NbtConverter.viaToMcStructs(tag));
+                    serializedNBT = SNbtSerializer.V1_8.serialize(NBTConverter.viaToMcStructs(tag));
                     object.addProperty("text", serializedNBT);
                     hoverEvent.add("value", array);
                 } catch (SNbtSerializeException e) {
