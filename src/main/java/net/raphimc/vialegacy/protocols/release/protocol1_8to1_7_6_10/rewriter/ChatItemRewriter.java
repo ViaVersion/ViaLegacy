@@ -30,7 +30,6 @@ import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.ShortTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.rewriter.ComponentRewriter;
-import com.viaversion.viaversion.util.NBTConverter;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ClientboundPackets1_7_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
@@ -377,7 +376,7 @@ public class ChatItemRewriter {
 
                 final CompoundTag tag;
                 try {
-                    tag = (CompoundTag) NBTConverter.mcStructsToVia(SNbtSerializer.V1_7.deserialize(text));
+                    tag = (CompoundTag) SNbtSerializer.V1_7.deserialize(text);
                 } catch (Throwable e) {
                     ViaLegacy.getPlatform().getLogger().warning("Error reading NBT in show_item:" + text);
                     throw new RuntimeException(e);
@@ -410,7 +409,7 @@ public class ChatItemRewriter {
                 array.add(object);
                 final String serializedNBT;
                 try {
-                    serializedNBT = SNbtSerializer.V1_8.serialize(NBTConverter.viaToMcStructs(tag));
+                    serializedNBT = SNbtSerializer.V1_8.serialize(tag);
                     object.addProperty("text", serializedNBT);
                     hoverEvent.add("value", array);
                 } catch (SNbtSerializeException e) {
