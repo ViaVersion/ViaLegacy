@@ -97,7 +97,7 @@ public class Protocol1_7_6_10to1_7_2_5 extends AbstractProtocol<ClientboundPacke
                         final GameProfileFetcher gameProfileFetcher = Via.getManager().getProviders().get(GameProfileFetcher.class);
 
                         final String skullName = extraType == null ? "" : extraType.getValue();
-                        final CompoundTag newTag = tag.clone();
+                        final CompoundTag newTag = tag.copy();
 
                         if (gameProfileFetcher.isUUIDLoaded(skullName)) { // short cut if skull is already loaded
                             final UUID uuid = gameProfileFetcher.getMojangUUID(skullName);
