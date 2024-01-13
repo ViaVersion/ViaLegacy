@@ -1058,7 +1058,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.STRING); // name
                 map(Type.BYTE, Type.VAR_INT); // mode
                 handler(wrapper -> {
-                    final int mode = wrapper.get(Type.VAR_INT, 0); // mode
+                    final int mode = wrapper.get(Type.VAR_INT, 0);
                     if (mode == 0/*UPDATE*/) {
                         wrapper.passthrough(Type.STRING); // objective
                         wrapper.write(Type.VAR_INT, wrapper.read(Type.INT)); // score
