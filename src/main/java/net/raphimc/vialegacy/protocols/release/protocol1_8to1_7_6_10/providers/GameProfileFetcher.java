@@ -24,9 +24,9 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 import net.raphimc.vialegacy.ViaLegacy;
+import net.raphimc.vialegacy.api.util.UuidUtil;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.GameProfile;
 
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import java.util.concurrent.*;
 import java.util.logging.Level;
@@ -63,7 +63,7 @@ public abstract class GameProfileFetcher implements Provider {
             while (e instanceof ExecutionException || e instanceof UncheckedExecutionException || e instanceof CompletionException) e = e.getCause();
             ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Failed to load uuid for player '" + playerName + "' (" + e.getClass().getName() + ")");
         }
-        final UUID uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + playerName).getBytes(StandardCharsets.UTF_8));
+        final UUID uuid = UuidUtil.createOfflinePlayerUuid(playerName);
         UUID_CACHE.put(playerName, uuid);
         return uuid;
     }

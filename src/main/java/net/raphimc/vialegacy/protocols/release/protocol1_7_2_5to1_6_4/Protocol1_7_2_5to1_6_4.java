@@ -856,14 +856,10 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
             pong.send(Protocol1_7_2_5to1_6_4.class);
         });
         this.registerServerboundTransition(ServerboundLoginPackets.HELLO, ServerboundPackets1_6_4.CLIENT_PROTOCOL, wrapper -> {
-            final String name = wrapper.read(Type.STRING); // user name
-            final ProtocolInfo info = wrapper.user().getProtocolInfo();
             final HandshakeStorage handshakeStorage = wrapper.user().get(HandshakeStorage.class);
-            info.setUsername(name);
-            info.setUuid(ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUUID(name) : new GameProfile(name).uuid);
 
-            wrapper.write(Type.UNSIGNED_BYTE, (short) LegacyProtocolVersion.getRealProtocolVersion(info.getServerProtocolVersion())); // protocol id
-            wrapper.write(Types1_6_4.STRING, name); // user name
+            wrapper.write(Type.UNSIGNED_BYTE, (short) LegacyProtocolVersion.getRealProtocolVersion(wrapper.user().getProtocolInfo().getServerProtocolVersion())); // protocol id
+            wrapper.write(Types1_6_4.STRING, wrapper.read(Type.STRING)); // user name
             wrapper.write(Types1_6_4.STRING, handshakeStorage.getHostname()); // hostname
             wrapper.write(Type.INT, handshakeStorage.getPort()); // port
         });

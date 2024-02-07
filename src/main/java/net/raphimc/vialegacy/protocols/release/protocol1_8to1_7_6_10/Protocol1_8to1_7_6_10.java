@@ -29,6 +29,7 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
@@ -59,6 +60,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.GameP
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.MapData;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.MapIcon;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.TabListEntry;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.providers.GameProfileFetcher;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.ChatItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.TranslationRewriter;
@@ -106,6 +108,18 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.STRING); // server hash
                 map(Type.SHORT_BYTE_ARRAY, Type.BYTE_ARRAY_PRIMITIVE); // public key
                 map(Type.SHORT_BYTE_ARRAY, Type.BYTE_ARRAY_PRIMITIVE); // verify token
+            }
+        });
+        this.registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), new PacketHandlers() {
+            @Override
+            public void register() {
+                read(Type.STRING); // uuid
+                read(Type.STRING); // name
+                handler(wrapper -> { // 1.7.10 ignores the data from the server
+                    final ProtocolInfo protocolInfo = wrapper.user().getProtocolInfo();
+                    wrapper.write(Type.STRING, protocolInfo.getUuid().toString()); // uuid
+                    wrapper.write(Type.STRING, protocolInfo.getUsername()); // name
+                });
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.KEEP_ALIVE, new PacketHandlers() {
@@ -1146,6 +1160,18 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             }
         });
 
+        this.registerServerbound(State.LOGIN, ServerboundLoginPackets.HELLO.getId(), ServerboundLoginPackets.HELLO.getId(), new PacketHandlers() {
+            @Override
+            public void register() {
+                handler(wrapper -> {
+                    final String name = wrapper.passthrough(Type.STRING); // name
+                    final ProtocolInfo info = wrapper.user().getProtocolInfo();
+                    // Set the information early
+                    info.setUsername(name);
+                    info.setUuid(ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUUID(name) : new GameProfile(name).uuid);
+                });
+            }
+        });
         this.registerServerbound(State.LOGIN, ServerboundLoginPackets.ENCRYPTION_KEY.getId(), ServerboundLoginPackets.ENCRYPTION_KEY.getId(), new PacketHandlers() {
             @Override
             public void register() {
@@ -1502,6 +1528,11 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         else if (type == EntityTypes1_10.EntityType.EXPERIENCE_ORB)
             yOffset = 0.5F / 2F;
         return (int) Math.floor((yPos - yOffset) * 32F);
+    }
+
+    @Override
+    public void register(ViaProviders providers) {
+        providers.require(GameProfileFetcher.class);
     }
 
     @Override

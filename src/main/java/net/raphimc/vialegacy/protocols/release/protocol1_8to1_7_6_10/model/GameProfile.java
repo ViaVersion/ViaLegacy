@@ -17,7 +17,8 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model;
 
-import java.nio.charset.StandardCharsets;
+import net.raphimc.vialegacy.api.util.UuidUtil;
+
 import java.util.*;
 
 public class GameProfile {
@@ -37,14 +38,14 @@ public class GameProfile {
     public GameProfile(final String userName) {
         if (userName == null) throw new IllegalStateException("Username can't be null");
         this.userName = userName;
-        this.offlineUuid = this.uuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + userName).getBytes(StandardCharsets.UTF_8));
+        this.offlineUuid = this.uuid = UuidUtil.createOfflinePlayerUuid(userName);
     }
 
     public GameProfile(final String userName, final UUID uuid) {
         if (userName == null || uuid == null) throw new IllegalStateException("Username and UUID can't be null");
         this.userName = userName;
         this.uuid = uuid;
-        this.offlineUuid = UUID.nameUUIDFromBytes(("OfflinePlayer:" + userName).getBytes(StandardCharsets.UTF_8));
+        this.offlineUuid = UuidUtil.createOfflinePlayerUuid(userName);
     }
 
     public void addProperty(final Property property) {

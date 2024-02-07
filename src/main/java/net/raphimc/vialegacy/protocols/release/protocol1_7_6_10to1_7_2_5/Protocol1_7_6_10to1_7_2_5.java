@@ -31,6 +31,7 @@ import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.protocols.base.BaseProtocol1_7;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import net.raphimc.vialegacy.ViaLegacy;
+import net.raphimc.vialegacy.api.util.UuidUtil;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.rewriter.TranslationRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.GameProfile;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.providers.GameProfileFetcher;
@@ -174,7 +175,7 @@ public class Protocol1_7_6_10to1_7_2_5 extends AbstractProtocol<ClientboundPacke
                 return dashedUuid;
             }
         }
-        return new GameProfile(name).uuid.toString();
+        return UuidUtil.createOfflinePlayerUuid(name).toString();
     }
 
 }
