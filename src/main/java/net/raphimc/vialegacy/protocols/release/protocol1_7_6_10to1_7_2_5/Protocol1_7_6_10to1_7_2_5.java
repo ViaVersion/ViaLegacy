@@ -42,6 +42,8 @@ import java.util.UUID;
 
 public class Protocol1_7_6_10to1_7_2_5 extends AbstractProtocol<ClientboundPackets1_7_2, ClientboundPackets1_7_2, ServerboundPackets1_7_2, ServerboundPackets1_7_2> {
 
+    private static final String UUID_PATTERN = "[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
+
     public Protocol1_7_6_10to1_7_2_5() {
         super(ClientboundPackets1_7_2.class, ClientboundPackets1_7_2.class, ServerboundPackets1_7_2.class, ServerboundPackets1_7_2.class);
     }
@@ -51,15 +53,16 @@ public class Protocol1_7_6_10to1_7_2_5 extends AbstractProtocol<ClientboundPacke
         this.registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING, Type.STRING, BaseProtocol1_7::addDashes); // uuid
+                map(Type.STRING); // uuid
                 map(Type.STRING); // name
+                handler(wrapper -> wrapper.set(Type.STRING, 0, fixGameProfileUuid(wrapper.get(Type.STRING, 0), wrapper.get(Type.STRING, 1))));
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.SPAWN_PLAYER, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.VAR_INT); // entity id
-                map(Type.STRING, Type.STRING, BaseProtocol1_7::addDashes); // uuid
+                map(Type.STRING); // uuid
                 map(Type.STRING); // name
                 create(Type.VAR_INT, 0); // properties count
                 map(Type.INT); // x
@@ -69,6 +72,7 @@ public class Protocol1_7_6_10to1_7_2_5 extends AbstractProtocol<ClientboundPacke
                 map(Type.BYTE); // pitch
                 map(Type.SHORT); // item in hand
                 map(Types1_7_6.METADATA_LIST); // metadata
+                handler(wrapper -> wrapper.set(Type.STRING, 0, fixGameProfileUuid(wrapper.get(Type.STRING, 0), wrapper.get(Type.STRING, 1))));
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.CHAT_MESSAGE, new PacketHandlers() {
@@ -159,6 +163,18 @@ public class Protocol1_7_6_10to1_7_2_5 extends AbstractProtocol<ClientboundPacke
         }
 
         return ownerTag;
+    }
+
+    private static String fixGameProfileUuid(final String uuid, final String name) {
+        if (uuid.matches(UUID_PATTERN)) {
+            return uuid;
+        } else if (uuid.length() == 32) {
+            final String dashedUuid = BaseProtocol1_7.addDashes(uuid);
+            if (dashedUuid.matches(UUID_PATTERN)) {
+                return dashedUuid;
+            }
+        }
+        return new GameProfile(name).uuid.toString();
     }
 
 }
