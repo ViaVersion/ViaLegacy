@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
 import net.raphimc.vialegacy.api.model.IdAndData;
@@ -33,7 +34,6 @@ import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.
 import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.data.CraftingManager;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_2_0_2tob1_1_2.ClientboundPacketsb1_1;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_2_0_2tob1_1_2.types.Typesb1_1;
-import net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_28_30cpe.Protocolc0_30toc0_30cpe;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2.types.Types1_4_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.ChunkTracker;
 
@@ -339,8 +339,8 @@ public class AlphaInventoryTracker extends StoredObject {
     }
 
     // Add support for cheating items and classic block placement
-    public void handleCreativeSetSlot(short slot, Item item) throws Exception {
-        if (!this.getUser().getProtocolInfo().getPipeline().contains(Protocolc0_30toc0_30cpe.class)) item = fixItem(item);
+    public void handleCreativeSetSlot(short slot, Item item) {
+        if (!this.getUser().getProtocolInfo().serverProtocolVersion().equals(LegacyProtocolVersion.c0_30cpe)) item = fixItem(item);
         if (slot <= 0) return;
 
         if (slot <= 4) {

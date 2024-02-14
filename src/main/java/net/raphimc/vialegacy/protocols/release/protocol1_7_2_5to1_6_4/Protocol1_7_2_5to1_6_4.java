@@ -50,7 +50,6 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import net.raphimc.vialegacy.ViaLegacy;
-import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.protocol.StatelessTransitionProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
@@ -156,7 +155,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
         });
         this.registerClientbound(ClientboundPackets1_6_4.PLAYER_POSITION_ONLY_ONGROUND, ClientboundPackets1_7_2.PLAYER_POSITION, wrapper -> {
             final PlayerInfoStorage playerInfoStorage = wrapper.user().get(PlayerInfoStorage.class);
-            final boolean supportsFlags = wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_8to1_7_6_10.class);
+            final boolean supportsFlags = wrapper.user().getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_8);
 
             wrapper.write(Type.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posX); // x
             wrapper.write(Type.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posY + 1.62F); // y
@@ -186,7 +185,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
         });
         this.registerClientbound(ClientboundPackets1_6_4.PLAYER_POSITION_ONLY_POSITION, ClientboundPackets1_7_2.PLAYER_POSITION, wrapper -> {
             final PlayerInfoStorage playerInfoStorage = wrapper.user().get(PlayerInfoStorage.class);
-            final boolean supportsFlags = wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_8to1_7_6_10.class);
+            final boolean supportsFlags = wrapper.user().getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_8);
 
             wrapper.passthrough(Type.DOUBLE); // x
             wrapper.passthrough(Type.DOUBLE); // stance
@@ -207,7 +206,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
         });
         this.registerClientbound(ClientboundPackets1_6_4.PLAYER_POSITION_ONLY_LOOK, ClientboundPackets1_7_2.PLAYER_POSITION, wrapper -> {
             final PlayerInfoStorage playerInfoStorage = wrapper.user().get(PlayerInfoStorage.class);
-            final boolean supportsFlags = wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_8to1_7_6_10.class);
+            final boolean supportsFlags = wrapper.user().getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_8);
 
             wrapper.write(Type.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posX); // x
             wrapper.write(Type.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posY + 1.62F); // y
@@ -771,7 +770,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
             }
 
             // Parts of BaseProtocol1_7 GAME_PROFILE handler
-            if (info.getProtocolVersion() < ProtocolVersion.v1_20_2.getVersion()) {
+            if (info.protocolVersion().olderThan(ProtocolVersion.v1_20_2)) {
                 info.setState(State.PLAY);
             }
             Via.getManager().getConnectionManager().onLoginSuccess(wrapper.user());
@@ -779,7 +778,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 wrapper.user().setActive(false);
             }
             if (Via.getManager().isDebug()) {
-                ViaLegacy.getPlatform().getLogger().log(Level.INFO, "{0} logged in with protocol {1}, Route: {2}", new Object[]{info.getUsername(), info.getProtocolVersion(), Joiner.on(", ").join(info.getPipeline().pipes(), ", ")});
+                ViaLegacy.getPlatform().getLogger().log(Level.INFO, "{0} logged in with protocol {1}, Route: {2}", new Object[]{info.getUsername(), info.protocolVersion().getName(), Joiner.on(", ").join(info.getPipeline().pipes(), ", ")});
             }
 
             final PacketWrapper respawn = PacketWrapper.create(ServerboundPackets1_6_4.CLIENT_STATUS, wrapper.user());
@@ -845,7 +844,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
             wrapper.write(Type.UNSIGNED_BYTE, (short) ServerboundPackets1_6_4.PLUGIN_MESSAGE.getId()); // packet id
             wrapper.write(Types1_6_4.STRING, "MC|PingHost"); // channel
             wrapper.write(Type.UNSIGNED_SHORT, 3 + 2 * ip.length() + 4); // length
-            wrapper.write(Type.UNSIGNED_BYTE, (short) LegacyProtocolVersion.getRealProtocolVersion(wrapper.user().getProtocolInfo().getServerProtocolVersion())); // protocol Id
+            wrapper.write(Type.UNSIGNED_BYTE, (short) wrapper.user().getProtocolInfo().serverProtocolVersion().getVersion()); // protocol Id
             wrapper.write(Types1_6_4.STRING, ip); // hostname
             wrapper.write(Type.INT, port); // port
         });
@@ -858,7 +857,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
         this.registerServerboundTransition(ServerboundLoginPackets.HELLO, ServerboundPackets1_6_4.CLIENT_PROTOCOL, wrapper -> {
             final HandshakeStorage handshakeStorage = wrapper.user().get(HandshakeStorage.class);
 
-            wrapper.write(Type.UNSIGNED_BYTE, (short) LegacyProtocolVersion.getRealProtocolVersion(wrapper.user().getProtocolInfo().getServerProtocolVersion())); // protocol id
+            wrapper.write(Type.UNSIGNED_BYTE, (short) wrapper.user().getProtocolInfo().serverProtocolVersion().getVersion()); // protocol id
             wrapper.write(Types1_6_4.STRING, wrapper.read(Type.STRING)); // user name
             wrapper.write(Types1_6_4.STRING, handshakeStorage.getHostname()); // hostname
             wrapper.write(Type.INT, handshakeStorage.getPort()); // port

@@ -18,13 +18,13 @@
 package net.raphimc.vialegacy.protocols.classic.protocolc0_28_30toc0_0_20a_27;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.ClientboundPacketsc0_28;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.ServerboundPacketsc0_28;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.data.ClassicBlocks;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.storage.ClassicBlockRemapper;
-import net.raphimc.vialegacy.protocols.classic.protocolc0_0_20a_27toc0_0_19a_06.Protocolc0_27toc0_0_19a_06;
 
 public class Protocolc0_30toc0_27 extends StatelessProtocol<ClientboundPacketsc0_20a, ClientboundPacketsc0_28, ServerboundPacketsc0_28, ServerboundPacketsc0_28> {
 
@@ -40,7 +40,7 @@ public class Protocolc0_30toc0_27 extends StatelessProtocol<ClientboundPacketsc0
         userConnection.put(new ClassicBlockRemapper(previousRemapper.getMapper(), o -> {
             int block = previousRemapper.getReverseMapper().getInt(o);
 
-            if (!userConnection.getProtocolInfo().getPipeline().contains(Protocolc0_27toc0_0_19a_06.class)) {
+            if (userConnection.getProtocolInfo().serverProtocolVersion().equals(LegacyProtocolVersion.c0_0_20ac0_27)) {
                 if (block == ClassicBlocks.GOLD_ORE || block == ClassicBlocks.IRON_ORE || block == ClassicBlocks.COAL_ORE || block == ClassicBlocks.SLAB || block == ClassicBlocks.BRICK || block == ClassicBlocks.TNT || block == ClassicBlocks.BOOKSHELF || block == ClassicBlocks.MOSSY_COBBLESTONE || block == ClassicBlocks.OBSIDIAN) {
                     block = ClassicBlocks.STONE;
                 }

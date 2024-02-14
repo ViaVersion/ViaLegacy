@@ -79,8 +79,8 @@ public interface ViaLegacyPlatform {
 
         final ProtocolManager protocolManager = Via.getManager().getProtocolManager();
         protocolManager.registerProtocol(new Protocol1_8to1_7_6_10(), ProtocolVersion.v1_8, ProtocolVersion.v1_7_6);
-        protocolManager.registerProtocol(new Protocol1_7_6_10to1_7_2_5(), ProtocolVersion.v1_7_6, ProtocolVersion.v1_7_1);
-        protocolManager.registerProtocol(new Protocol1_7_2_5to1_6_4(), ProtocolVersion.v1_7_1, LegacyProtocolVersion.r1_6_4);
+        protocolManager.registerProtocol(new Protocol1_7_6_10to1_7_2_5(), ProtocolVersion.v1_7_6, ProtocolVersion.v1_7_2);
+        protocolManager.registerProtocol(new Protocol1_7_2_5to1_6_4(), ProtocolVersion.v1_7_2, LegacyProtocolVersion.r1_6_4);
         protocolManager.registerProtocol(new Protocol1_6_4to1_6_2(), LegacyProtocolVersion.r1_6_4, LegacyProtocolVersion.r1_6_2);
         protocolManager.registerProtocol(new Protocol1_6_2to1_6_1(), LegacyProtocolVersion.r1_6_2, LegacyProtocolVersion.r1_6_1);
         protocolManager.registerProtocol(new Protocol1_6_1to1_5_2(), LegacyProtocolVersion.r1_6_1, LegacyProtocolVersion.r1_5_2);
@@ -119,7 +119,7 @@ public interface ViaLegacyPlatform {
         protocolManager.registerProtocol(new Protocolc0_0_16a_02to0_0_15a_1(), LegacyProtocolVersion.c0_0_16a_02, LegacyProtocolVersion.c0_0_15a_1);
 
         for (ProtocolVersion version : LegacyProtocolVersion.PROTOCOLS) {
-            Via.getManager().getProtocolManager().registerBaseProtocol(new EmptyBaseProtocol(), Range.singleton(version.getVersion()));
+            Via.getManager().getProtocolManager().registerBaseProtocol(new EmptyBaseProtocol(), Range.singleton(version));
         }
     }
 

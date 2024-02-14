@@ -29,12 +29,11 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.ViaLegacy;
+import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
-import net.raphimc.vialegacy.protocols.beta.protocolb1_8_0_1tob1_7_0_3.Protocolb1_8_0_1tob1_7_0_3;
-import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.Protocola1_0_15toc0_30;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.EndBiomeGenerator;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.NetherBiomeGenerator;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.PlainsBiomeGenerator;
@@ -327,9 +326,9 @@ public class Protocol1_2_1_3to1_1 extends StatelessProtocol<ClientboundPackets1_
                 seedStorage.worldChunkManager = new EndBiomeGenerator();
             } else if (dimensionId == 0) { // Overworld
 
-                if (!user.getProtocolInfo().getPipeline().contains(Protocolb1_8_0_1tob1_7_0_3.class)) {
+                if (user.getProtocolInfo().protocolVersion().newerThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
                     seedStorage.worldChunkManager = new WorldChunkManager_r1_1(user, seedStorage.seed);
-                } else if (!user.getProtocolInfo().getPipeline().contains(Protocola1_0_15toc0_30.class)) {
+                } else if (user.getProtocolInfo().protocolVersion().newerThanOrEqualTo(LegacyProtocolVersion.a1_0_15)) {
                     seedStorage.worldChunkManager = new WorldChunkManager_b1_7(seedStorage.seed);
                 } else {
                     seedStorage.worldChunkManager = new PlainsBiomeGenerator();
