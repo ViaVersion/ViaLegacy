@@ -17,14 +17,12 @@
  */
 package net.raphimc.vialegacy.platform;
 
-import com.google.common.collect.Range;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.protocol.ProtocolManager;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.ViaLegacyConfig;
 import net.raphimc.vialegacy.api.LegacyProtocolVersion;
-import net.raphimc.vialegacy.api.protocol.EmptyBaseProtocol;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_16_2toa1_0_15.Protocola1_0_16_2toa1_0_15;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_17_1_0_17_4toa1_0_16_2.Protocola1_0_17_1_0_17_4toa1_0_16_2;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_1_0_1_1_2_1toa1_0_17_1_0_17_4.Protocola1_1_0_1_1_2_1toa1_0_17_1_0_17_4;
@@ -117,10 +115,6 @@ public interface ViaLegacyPlatform {
         protocolManager.registerProtocol(new Protocolc0_0_19a_06toc0_0_18a_02(), LegacyProtocolVersion.c0_0_19a_06, LegacyProtocolVersion.c0_0_18a_02);
         protocolManager.registerProtocol(new Protocolc0_0_18a_02toc0_0_16a_02(), LegacyProtocolVersion.c0_0_18a_02, LegacyProtocolVersion.c0_0_16a_02);
         protocolManager.registerProtocol(new Protocolc0_0_16a_02to0_0_15a_1(), LegacyProtocolVersion.c0_0_16a_02, LegacyProtocolVersion.c0_0_15a_1);
-
-        for (ProtocolVersion version : LegacyProtocolVersion.PROTOCOLS) {
-            Via.getManager().getProtocolManager().registerBaseProtocol(new EmptyBaseProtocol(), Range.singleton(version));
-        }
     }
 
     Logger getLogger();
