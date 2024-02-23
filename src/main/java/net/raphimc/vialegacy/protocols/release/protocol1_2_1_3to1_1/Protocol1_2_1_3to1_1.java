@@ -326,9 +326,9 @@ public class Protocol1_2_1_3to1_1 extends StatelessProtocol<ClientboundPackets1_
                 seedStorage.worldChunkManager = new EndBiomeGenerator();
             } else if (dimensionId == 0) { // Overworld
 
-                if (user.getProtocolInfo().protocolVersion().newerThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
+                if (user.getProtocolInfo().serverProtocolVersion().newerThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
                     seedStorage.worldChunkManager = new WorldChunkManager_r1_1(user, seedStorage.seed);
-                } else if (user.getProtocolInfo().protocolVersion().newerThanOrEqualTo(LegacyProtocolVersion.a1_0_15)) {
+                } else if (user.getProtocolInfo().serverProtocolVersion().newerThanOrEqualTo(LegacyProtocolVersion.a1_0_15)) {
                     seedStorage.worldChunkManager = new WorldChunkManager_b1_7(seedStorage.seed);
                 } else {
                     seedStorage.worldChunkManager = new PlainsBiomeGenerator();
