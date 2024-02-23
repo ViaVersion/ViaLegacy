@@ -17,6 +17,7 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -305,7 +306,7 @@ public class HologramPartEntity {
         for (final Map.Entry<MetaIndex1_8to1_7_6, Object> entry : this.metadata.entrySet()) {
             metadataList.add(new Metadata(entry.getKey().getOldIndex(), entry.getKey().getOldType(), entry.getValue()));
         }
-        this.user.getProtocolInfo().getPipeline().getProtocol(Protocol1_8to1_7_6_10.class).getMetadataRewriter().transform(this.entityType, metadataList);
+        Via.getManager().getProtocolManager().getProtocol(Protocol1_8to1_7_6_10.class).getMetadataRewriter().transform(this.entityType, metadataList);
         return metadataList;
     }
 
