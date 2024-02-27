@@ -74,7 +74,7 @@ public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacket
                 final PacketWrapper brand = PacketWrapper.create(ClientboundPackets1_6_4.PLUGIN_MESSAGE, wrapper.user());
                 brand.write(Types1_6_4.STRING, "MC|Brand");
                 final byte[] brandBytes = protocolMetadataStorage.getServerSoftwareName().getBytes(StandardCharsets.UTF_8);
-                brand.write(Type.SHORT, (short) brandBytes.length); // data length
+                brand.write(Type.SHORT, (short) brandBytes.length); // length
                 brand.write(Type.REMAINING_BYTES, brandBytes); // data
 
                 wrapper.send(Protocolc0_30toc0_30cpe.class);

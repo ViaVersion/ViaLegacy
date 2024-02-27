@@ -44,8 +44,6 @@ import com.viaversion.viaversion.protocols.base.ClientboundStatusPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundStatusPackets;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
@@ -54,6 +52,7 @@ import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.protocol.StatelessTransitionProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
+import net.raphimc.vialegacy.api.util.PacketUtil;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.providers.EncryptionProvider;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.rewriter.*;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.*;
@@ -737,10 +736,16 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 ClientboundPackets1_7_2.PLUGIN_MESSAGE, new PacketHandlers() {
                     @Override
                     public void register() {
-                        map(Types1_6_4.STRING, Type.STRING); // channel
                         handler(wrapper -> {
-                            final String channel = wrapper.get(Type.STRING, 0);
-                            wrapper.passthrough(Type.SHORT); // length
+                            final String channel = wrapper.read(Types1_6_4.STRING); // channel
+                            int length = wrapper.read(Type.SHORT); // length
+
+                            if (length < 0) {
+                                wrapper.write(Type.STRING, channel); // channel
+                                wrapper.write(Type.UNSIGNED_SHORT, 0); // length
+                                return;
+                            }
+
                             if (channel.equals("MC|TrList")) {
                                 wrapper.passthrough(Type.INT); // window id
                                 final int count = wrapper.passthrough(Type.UNSIGNED_BYTE); // count
@@ -752,7 +757,12 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                                     }
                                     wrapper.passthrough(Type.BOOLEAN); // unavailable
                                 }
+                                length = PacketUtil.calculateLength(wrapper);
                             }
+
+                            wrapper.resetReader();
+                            wrapper.write(Type.STRING, channel); // channel
+                            wrapper.write(Type.UNSIGNED_SHORT, length); // length
                         });
                     }
                 }, State.LOGIN, (PacketHandler) PacketWrapper::cancel
@@ -843,7 +853,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
             wrapper.write(Type.UNSIGNED_BYTE, (short) 1); // always 1
             wrapper.write(Type.UNSIGNED_BYTE, (short) ServerboundPackets1_6_4.PLUGIN_MESSAGE.getId()); // packet id
             wrapper.write(Types1_6_4.STRING, "MC|PingHost"); // channel
-            wrapper.write(Type.UNSIGNED_SHORT, 3 + 2 * ip.length() + 4); // length
+            wrapper.write(Type.SHORT, (short) (3 + 2 * ip.length() + 4)); // length
             wrapper.write(Type.UNSIGNED_BYTE, (short) wrapper.user().getProtocolInfo().serverProtocolVersion().getVersion()); // protocol Id
             wrapper.write(Types1_6_4.STRING, ip); // hostname
             wrapper.write(Type.INT, port); // port
@@ -1030,50 +1040,34 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
         this.registerServerbound(ServerboundPackets1_7_2.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING, Types1_6_4.STRING); // channel
-                map(Type.SHORT); // length
                 handler(wrapper -> {
-                    final String channel = wrapper.get(Types1_6_4.STRING, 0);
-                    final PacketWrapper lengthPacketWrapper = PacketWrapper.create(null, wrapper.user());
-                    final ByteBuf lengthBuffer = Unpooled.buffer();
+                    final String channel = wrapper.read(Type.STRING); // channel
+                    short length = wrapper.read(Type.SHORT); // length
 
                     switch (channel) {
                         case "MC|BEdit":
                         case "MC|BSign":
-                            final Item item = wrapper.read(Types1_7_6.ITEM); // book
-                            itemRewriter.handleItemToServer(item);
-
-                            lengthPacketWrapper.write(Types1_7_6.ITEM, item);
-                            lengthPacketWrapper.writeToBuffer(lengthBuffer);
-
-                            wrapper.set(Type.SHORT, 0, (short) lengthBuffer.readableBytes()); // length
-                            wrapper.write(Types1_7_6.ITEM, item); // book
+                            itemRewriter.handleItemToServer(wrapper.passthrough(Types1_7_6.ITEM));
+                            length = (short) PacketUtil.calculateLength(wrapper);
                             break;
                         case "MC|AdvCdm":
                             final byte type = wrapper.read(Type.BYTE); // command block type
                             if (type == 0) {
-                                final int posX = wrapper.read(Type.INT); // x
-                                final int posY = wrapper.read(Type.INT); // y
-                                final int posZ = wrapper.read(Type.INT); // z
-                                final String command = wrapper.read(Type.STRING); // command
-
-                                lengthPacketWrapper.write(Type.INT, posX);
-                                lengthPacketWrapper.write(Type.INT, posY);
-                                lengthPacketWrapper.write(Type.INT, posZ);
-                                lengthPacketWrapper.write(Types1_6_4.STRING, command);
-                                lengthPacketWrapper.writeToBuffer(lengthBuffer);
-
-                                wrapper.set(Type.SHORT, 0, (short) lengthBuffer.readableBytes()); // length
-                                wrapper.write(Type.INT, posX); // x
-                                wrapper.write(Type.INT, posY); // y
-                                wrapper.write(Type.INT, posZ); // z
-                                wrapper.write(Types1_6_4.STRING, command); // command
+                                wrapper.passthrough(Type.INT); // x
+                                wrapper.passthrough(Type.INT); // y
+                                wrapper.passthrough(Type.INT); // z
+                                wrapper.passthrough(Type.STRING); // command
                             } else {
                                 wrapper.cancel();
+                                return;
                             }
+                            length = (short) PacketUtil.calculateLength(wrapper);
                             break;
                     }
-                    lengthBuffer.release();
+
+                    wrapper.resetReader();
+                    wrapper.write(Types1_6_4.STRING, channel); // channel
+                    wrapper.write(Type.SHORT, length); // length
                 });
             }
         });

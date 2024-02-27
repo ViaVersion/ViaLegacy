@@ -33,6 +33,7 @@ import net.raphimc.vialegacy.api.data.ItemList1_6;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
+import net.raphimc.vialegacy.api.util.PacketUtil;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.rewriter.SoundRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.types.Types1_3_1;
@@ -268,11 +269,11 @@ public class Protocol1_4_2to1_3_1_2 extends StatelessProtocol<ClientboundPackets
         this.registerClientbound(ClientboundPackets1_3_1.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_6_4.STRING); // channel
                 handler(wrapper -> {
-                    final String channel = wrapper.get(Types1_6_4.STRING, 0);
-                    wrapper.passthrough(Type.SHORT); // length
-                    if (channel.equalsIgnoreCase("MC|TrList")) {
+                    final String channel = wrapper.read(Types1_6_4.STRING); // channel
+                    int length = wrapper.read(Type.SHORT); // length
+
+                    if (channel.equals("MC|TrList")) {
                         wrapper.passthrough(Type.INT); // window Id
                         final int count = wrapper.passthrough(Type.UNSIGNED_BYTE); // count
                         for (int i = 0; i < count; i++) {
@@ -283,7 +284,12 @@ public class Protocol1_4_2to1_3_1_2 extends StatelessProtocol<ClientboundPackets
                             }
                             wrapper.write(Type.BOOLEAN, false); // unavailable
                         }
+                        length = PacketUtil.calculateLength(wrapper);
                     }
+
+                    wrapper.resetReader();
+                    wrapper.write(Type.STRING, channel); // channel
+                    wrapper.write(Type.UNSIGNED_SHORT, length); // length
                 });
             }
         });

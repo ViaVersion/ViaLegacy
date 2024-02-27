@@ -46,12 +46,11 @@ import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
-import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
 import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
+import net.raphimc.vialegacy.api.util.PacketUtil;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ClientboundPackets1_7_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ServerboundPackets1_7_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.data.Particle;
@@ -1110,10 +1109,14 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         this.registerClientbound(ClientboundPackets1_7_2.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // channel
                 handler(wrapper -> {
-                    final String channel = wrapper.get(Type.STRING, 0);
-                    wrapper.read(Type.SHORT); // length
+                    final String channel = wrapper.read(Type.STRING); // channel
+                    final int length = wrapper.read(Type.UNSIGNED_SHORT); // length
+                    final int availableDataLength = PacketUtil.calculateLength(wrapper);
+                    if (availableDataLength < length) {
+                        throw new IllegalStateException("Custom payload length longer than actual data: " + length + " > " + availableDataLength);
+                    }
+                    wrapper.write(Type.STRING, channel);
 
                     switch (channel) {
                         case "MC|Brand": {
@@ -1361,9 +1364,8 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         this.registerServerbound(ServerboundPackets1_8.PLUGIN_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // channel
                 handler(wrapper -> {
-                    final String channel = wrapper.get(Type.STRING, 0);
+                    final String channel = wrapper.read(Type.STRING); // channel
 
                     if (ViaLegacy.getConfig().isIgnoreLong1_8ChannelNames() && channel.length() > 16) {
                         if (!Via.getConfig().isSuppressConversionWarnings()) {
@@ -1373,95 +1375,33 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                         return;
                     }
 
-                    final PacketWrapper lengthPacketWrapper = PacketWrapper.create(null, wrapper.user());
-                    final ByteBuf lengthBuffer = Unpooled.buffer();
-
                     switch (channel) {
                         case "MC|BEdit":
                         case "MC|BSign":
                             final Item item = wrapper.read(Type.ITEM1_8); // book
                             itemRewriter.handleItemToServer(item);
-
-                            lengthPacketWrapper.write(Types1_7_6.ITEM, item);
-                            lengthPacketWrapper.writeToBuffer(lengthBuffer);
-
-                            wrapper.write(Type.SHORT, (short) lengthBuffer.readableBytes()); // length
                             wrapper.write(Types1_7_6.ITEM, item); // book
-                            break;
-                        case "MC|TrSel":
-                            final int selectedTrade = wrapper.read(Type.INT); // selected trade
-
-                            lengthPacketWrapper.write(Type.INT, selectedTrade);
-                            lengthPacketWrapper.writeToBuffer(lengthBuffer);
-
-                            wrapper.write(Type.SHORT, (short) lengthBuffer.readableBytes()); // length
-                            wrapper.write(Type.INT, selectedTrade); // selected trade
                             break;
                         case "MC|Brand":
                         case "MC|ItemName":
                             final String content = wrapper.read(Type.STRING); // client brand or item name
-
-                            lengthPacketWrapper.write(Type.REMAINING_BYTES, content.getBytes(StandardCharsets.UTF_8));
-                            lengthPacketWrapper.writeToBuffer(lengthBuffer);
-
-                            wrapper.write(Type.SHORT, (short) lengthBuffer.readableBytes()); // length
                             wrapper.write(Type.REMAINING_BYTES, content.getBytes(StandardCharsets.UTF_8)); // client brand or item name
                             break;
                         case "MC|AdvCdm":
-                            final byte type = wrapper.read(Type.BYTE); // command block type (0 = Block, 1 = Minecart)
-                            final int posXOrEntityId;
-                            final int posY;
-                            final int posZ;
+                            final byte type = wrapper.passthrough(Type.BYTE); // command block type (0 = Block, 1 = Minecart)
                             if (type == 0) {
-                                posXOrEntityId = wrapper.read(Type.INT); // x
-                                posY = wrapper.read(Type.INT); // y
-                                posZ = wrapper.read(Type.INT); // z
+                                wrapper.passthrough(Type.INT); // x
+                                wrapper.passthrough(Type.INT); // y
+                                wrapper.passthrough(Type.INT); // z
                             } else if (type == 1) {
-                                posXOrEntityId = wrapper.read(Type.INT); // entity id
-                                posY = 0;
-                                posZ = 0;
+                                wrapper.passthrough(Type.INT); // entity id
                             } else {
                                 ViaLegacy.getPlatform().getLogger().warning("Unknown 1.8 command block type: " + type);
                                 wrapper.cancel();
-                                lengthBuffer.release();
                                 return;
                             }
-                            final String command = wrapper.read(Type.STRING); // command
+                            wrapper.passthrough(Type.STRING); // command
                             wrapper.read(Type.BOOLEAN); // track output
-
-                            lengthPacketWrapper.write(Type.BYTE, type);
-                            if (type == 0) {
-                                lengthPacketWrapper.write(Type.INT, posXOrEntityId);
-                                lengthPacketWrapper.write(Type.INT, posY);
-                                lengthPacketWrapper.write(Type.INT, posZ);
-                            } else {
-                                lengthPacketWrapper.write(Type.INT, posXOrEntityId);
-                            }
-                            lengthPacketWrapper.write(Type.STRING, command);
-                            lengthPacketWrapper.writeToBuffer(lengthBuffer);
-
-                            wrapper.write(Type.SHORT, (short) lengthBuffer.readableBytes()); // length
-                            wrapper.write(Type.BYTE, type); // type
-                            if (type == 0) {
-                                wrapper.write(Type.INT, posXOrEntityId); // x
-                                wrapper.write(Type.INT, posY); // y
-                                wrapper.write(Type.INT, posZ); // z
-                            } else {
-                                wrapper.write(Type.INT, posXOrEntityId); // entity id
-                            }
-                            wrapper.write(Type.STRING, command); // command
-                            break;
-                        case "MC|Beacon":
-                            final int primaryEffect = wrapper.read(Type.INT); // primary effect
-                            final int secondaryEffect = wrapper.read(Type.INT); // secondary effect
-
-                            lengthPacketWrapper.write(Type.INT, primaryEffect);
-                            lengthPacketWrapper.write(Type.INT, secondaryEffect);
-                            lengthPacketWrapper.writeToBuffer(lengthBuffer);
-
-                            wrapper.write(Type.SHORT, (short) lengthBuffer.readableBytes()); // length
-                            wrapper.write(Type.INT, primaryEffect); // primary effect
-                            wrapper.write(Type.INT, secondaryEffect); // secondary effect
                             break;
                         case "REGISTER":
                         case "UNREGISTER":
@@ -1486,17 +1426,14 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                                 channels = Joiner.on('\0').join(validChannels).getBytes(StandardCharsets.UTF_8);
                             }
 
-                            wrapper.write(Type.SHORT, (short) channels.length); // data length
                             wrapper.write(Type.REMAINING_BYTES, channels); // data
                             break;
-                        default:
-                            final byte[] data = wrapper.read(Type.REMAINING_BYTES);
-
-                            wrapper.write(Type.SHORT, (short) data.length); // data length
-                            wrapper.write(Type.REMAINING_BYTES, data); // data
-                            break;
                     }
-                    lengthBuffer.release();
+
+                    final short length = (short) PacketUtil.calculateLength(wrapper);
+                    wrapper.resetReader();
+                    wrapper.write(Type.STRING, channel); // channel
+                    wrapper.write(Type.SHORT, length); // length
                 });
             }
         });

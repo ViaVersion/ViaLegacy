@@ -46,7 +46,7 @@ public class Protocol1_6_2to1_6_1 extends StatelessProtocol<ClientboundPackets1_
             final PacketWrapper brand = PacketWrapper.create(ClientboundPackets1_6_4.PLUGIN_MESSAGE, wrapper.user());
             brand.write(Types1_6_4.STRING, "MC|Brand");
             final byte[] brandBytes = "legacy".getBytes(StandardCharsets.UTF_8);
-            brand.write(Type.SHORT, (short) brandBytes.length); // data length
+            brand.write(Type.SHORT, (short) brandBytes.length); // length
             brand.write(Type.REMAINING_BYTES, brandBytes); // data
 
             wrapper.send(Protocol1_6_2to1_6_1.class);
