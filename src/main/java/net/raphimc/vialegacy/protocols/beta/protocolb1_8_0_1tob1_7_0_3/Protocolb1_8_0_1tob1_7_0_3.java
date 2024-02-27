@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
@@ -96,6 +97,12 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends StatelessProtocol<ClientboundPac
                 create(Type.SHORT, (short) 6); // food
                 create(Type.FLOAT, 0F); // saturation
                 handler(wrapper -> wrapper.user().get(PlayerHealthTracker.class).setHealth(wrapper.get(Type.SHORT, 0)));
+                handler(wrapper -> {
+                    if (ViaLegacy.getConfig().enableB1_7_3Sprinting()) {
+                        wrapper.set(Type.SHORT, 1, (short) 20); // food
+                        wrapper.set(Type.FLOAT, 0, 0F); // saturation
+                    }
+                });
             }
         });
         this.registerClientbound(ClientboundPacketsb1_7.RESPAWN, new PacketHandlers() {

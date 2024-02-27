@@ -35,6 +35,8 @@ public interface ViaLegacyConfig extends Config {
 
     boolean isRemapBasedOnColor();
 
+    boolean enableB1_7_3Sprinting();
+
     int getClassicChunkRange();
 
     boolean enableClassicFly();
