@@ -1170,8 +1170,12 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     final String name = wrapper.passthrough(Type.STRING); // name
                     final ProtocolInfo info = wrapper.user().getProtocolInfo();
                     // Set the information early
-                    info.setUsername(name);
-                    info.setUuid(ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUUID(name) : new GameProfile(name).uuid);
+                    if (info.getUsername() == null) {
+                        info.setUsername(name);
+                    }
+                    if (info.getUuid() == null) {
+                        info.setUuid(ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUUID(name) : new GameProfile(name).uuid);
+                    }
                 });
             }
         });
