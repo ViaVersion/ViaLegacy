@@ -29,6 +29,7 @@ import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
+import net.raphimc.vialegacy.api.util.PacketUtil;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.metadata.MetadataRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.rewriter.SoundRewriter;
@@ -40,6 +41,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Type
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata.MetaIndex1_8to1_7_6;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_5_2, ClientboundPackets1_6_1, ServerboundPackets1_5_2, ServerboundPackets1_6_4> {
@@ -290,6 +292,33 @@ public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_
                     wrapper.send(Protocol1_6_1to1_5_2.class);
                     entityProperties.send(Protocol1_6_1to1_5_2.class);
                     wrapper.cancel();
+                });
+            }
+        });
+        this.registerClientbound(ClientboundPackets1_5_2.PLUGIN_MESSAGE, new PacketHandlers() {
+            @Override
+            public void register() {
+                handler(wrapper -> {
+                    String channel = wrapper.read(Types1_6_4.STRING); // channel
+                    short length = wrapper.read(Type.SHORT); // length
+
+                    if (channel.equals("MC|TPack")) {
+                        channel = "MC|RPack";
+                        final String[] data = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0"); // data
+                        final String url = data[0];
+                        final String resolution = data[1];
+                        if (!resolution.equals("16")) {
+                            wrapper.cancel();
+                            return;
+                        }
+
+                        wrapper.write(Type.REMAINING_BYTES, url.getBytes(StandardCharsets.UTF_8));
+                        length = (short) PacketUtil.calculateLength(wrapper);
+                    }
+
+                    wrapper.resetReader();
+                    wrapper.write(Types1_6_4.STRING, channel); // channel
+                    wrapper.write(Type.SHORT, length); // length
                 });
             }
         });

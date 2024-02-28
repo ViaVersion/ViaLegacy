@@ -271,7 +271,7 @@ public class Protocol1_4_2to1_3_1_2 extends StatelessProtocol<ClientboundPackets
             public void register() {
                 handler(wrapper -> {
                     final String channel = wrapper.read(Types1_6_4.STRING); // channel
-                    int length = wrapper.read(Type.SHORT); // length
+                    short length = wrapper.read(Type.SHORT); // length
 
                     if (channel.equals("MC|TrList")) {
                         wrapper.passthrough(Type.INT); // window Id
@@ -284,12 +284,12 @@ public class Protocol1_4_2to1_3_1_2 extends StatelessProtocol<ClientboundPackets
                             }
                             wrapper.write(Type.BOOLEAN, false); // unavailable
                         }
-                        length = PacketUtil.calculateLength(wrapper);
+                        length = (short) PacketUtil.calculateLength(wrapper);
                     }
 
                     wrapper.resetReader();
-                    wrapper.write(Type.STRING, channel); // channel
-                    wrapper.write(Type.UNSIGNED_SHORT, length); // length
+                    wrapper.write(Types1_6_4.STRING, channel); // channel
+                    wrapper.write(Type.SHORT, length); // length
                 });
             }
         });

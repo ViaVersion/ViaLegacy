@@ -1120,9 +1120,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
 
                     switch (channel) {
                         case "MC|Brand": {
-                            final byte[] data = wrapper.read(Type.REMAINING_BYTES);
-                            final String brand = new String(data, StandardCharsets.UTF_8);
-                            wrapper.write(Type.STRING, brand);
+                            wrapper.write(Type.STRING, new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8)); // brand
                             break;
                         }
                         case "MC|TrList":
@@ -1150,12 +1148,11 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                             }
                             break;
                         case "MC|RPack": {
-                            final byte[] data = wrapper.read(Type.REMAINING_BYTES);
-                            final String resourcePackURL = new String(data, StandardCharsets.UTF_8);
-                            wrapper.setPacketType(ClientboundPackets1_8.RESOURCE_PACK);
+                            final String url = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8); // url
                             wrapper.clearPacket();
-                            wrapper.write(Type.STRING, resourcePackURL);
-                            wrapper.write(Type.STRING, "legacy");
+                            wrapper.setPacketType(ClientboundPackets1_8.RESOURCE_PACK);
+                            wrapper.write(Type.STRING, url); // url
+                            wrapper.write(Type.STRING, "legacy"); // hash
                             break;
                         }
                     }
@@ -1261,7 +1258,6 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     if (item != null && item.identifier() == ItemList1_6.writtenBook.itemID && direction == 255) { // If placed item is a book then cancel it and send a MC|BOpen to the client
                         final PacketWrapper openBook = PacketWrapper.create(ClientboundPackets1_8.PLUGIN_MESSAGE, wrapper.user());
                         openBook.write(Type.STRING, "MC|BOpen"); // channel
-                        openBook.write(Type.REMAINING_BYTES, new byte[0]); // data
                         openBook.send(Protocol1_8to1_7_6_10.class);
                         wrapper.cancel();
                     }
