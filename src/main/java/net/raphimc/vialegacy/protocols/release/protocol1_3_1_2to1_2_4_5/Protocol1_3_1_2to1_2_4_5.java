@@ -711,14 +711,6 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                 map(Types1_7_6.ITEM, Types1_2_4.NBT_ITEM); // item
             }
         });
-        this.registerServerbound(ServerboundPackets1_3_1.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Type.SHORT); // slot
-                map(Types1_7_6.ITEM, Types1_2_4.NBT_ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_2_4.NBT_ITEM, 0)));
-            }
-        });
         this.registerServerbound(ServerboundPackets1_3_1.PLAYER_ABILITIES, wrapper -> {
             final byte mask = wrapper.read(Type.BYTE); // flags
             wrapper.read(Type.BYTE); // fly speed

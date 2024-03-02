@@ -27,7 +27,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 public class ItemRewriter extends LegacyItemRewriter<Protocol1_4_2to1_3_1_2> {
 
     public ItemRewriter(final Protocol1_4_2to1_3_1_2 protocol) {
-        super(protocol, "1.3.2");
+        super(protocol, "1.3.2", Types1_7_6.ITEM, Types1_7_6.ITEM_ARRAY);
 
         this.addNonExistentItemRange(137, 145);
         this.addNonExistentItemRange(389, 400);
@@ -38,7 +38,7 @@ public class ItemRewriter extends LegacyItemRewriter<Protocol1_4_2to1_3_1_2> {
 
     @Override
     protected void registerPackets() {
-        this.registerCreativeInventoryAction(ServerboundPackets1_5_2.CREATIVE_INVENTORY_ACTION, Types1_7_6.ITEM);
+        this.registerCreativeInventoryAction(ServerboundPackets1_5_2.CREATIVE_INVENTORY_ACTION);
     }
 
     @Override

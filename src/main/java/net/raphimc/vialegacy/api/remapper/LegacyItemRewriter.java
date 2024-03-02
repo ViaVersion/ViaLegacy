@@ -19,8 +19,8 @@ package net.raphimc.vialegacy.api.remapper;
 
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
-import com.viaversion.viaversion.api.protocol.remapper.PacketHandler;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
@@ -37,11 +37,23 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
     private final ObjectList<NonExistentEntry> nonExistentItems = new ObjectArrayList<>();
     protected final String tagName;
     protected final String protocolName;
+    private final Type<Item> itemType;
+    private final Type<Item> mappedItemType;
+    private final Type<Item[]> itemArrayType;
+    private final Type<Item[]> mappedItemArrayType;
 
-    public LegacyItemRewriter(final P protocol, final String protocolName) {
+    public LegacyItemRewriter(final P protocol, final String protocolName, final Type<Item> itemType, final Type<Item[]> itemArrayType) {
+        this(protocol, protocolName, itemType, itemArrayType, itemType, itemArrayType);
+    }
+
+    public LegacyItemRewriter(final P protocol, final String protocolName, final Type<Item> itemType, final Type<Item[]> itemArrayType, final Type<Item> mappedItemType, final Type<Item[]> mappedItemArrayType) {
         super(protocol);
         this.tagName = protocolName.replace(".", "_") + "_ViaLegacy_" + System.currentTimeMillis();
         this.protocolName = protocolName;
+        this.itemType = itemType;
+        this.itemArrayType = itemArrayType;
+        this.mappedItemType = mappedItemType;
+        this.mappedItemArrayType = mappedItemArrayType;
     }
 
     protected void addRemappedItem(final int oldItemId, final int newItemId, final String newItemName) {
@@ -79,13 +91,12 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
     }
 
 
-    public void registerCreativeInventoryAction(final ServerboundPacketType packetType, final Type<Item> type) {
+    public void registerCreativeInventoryAction(final ServerboundPacketType packetType) {
         this.protocol.registerServerbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
                 map(Type.SHORT); // slot
-                map(type); // item
-                handler(itemToServerHandler(type));
+                handler(wrapper -> handleServerboundItem(wrapper));
             }
         });
     }
@@ -124,13 +135,35 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
         return item;
     }
 
-
-    private PacketHandler itemToClientHandler(Type<Item> type) {
-        return wrapper -> handleItemToClient(wrapper.get(type, 0));
+    @Override
+    public Type<Item> itemType() {
+        return this.itemType;
     }
 
-    private PacketHandler itemToServerHandler(Type<Item> type) {
-        return wrapper -> handleItemToServer(wrapper.get(type, 0));
+    @Override
+    public Type<Item[]> itemArrayType() {
+        return this.itemArrayType;
+    }
+
+    @Override
+    public Type<Item> mappedItemType() {
+        return this.mappedItemType;
+    }
+
+    @Override
+    public Type<Item[]> mappedItemArrayType() {
+        return this.mappedItemArrayType;
+    }
+
+
+    private void handleClientboundItem(final PacketWrapper wrapper) throws Exception {
+        final Item item = this.handleItemToClient(wrapper.read(this.itemType));
+        wrapper.write(this.mappedItemType, item);
+    }
+
+    private void handleServerboundItem(final PacketWrapper wrapper) throws Exception {
+        final Item item = this.handleItemToServer(wrapper.read(this.mappedItemType));
+        wrapper.write(this.itemType, item);
     }
 
     private void setRemappedNameRead(final Item item, final String name) {

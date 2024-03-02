@@ -25,7 +25,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 public class ItemRewriter extends LegacyItemRewriter<Protocol1_7_2_5to1_6_4> {
 
     public ItemRewriter(final Protocol1_7_2_5to1_6_4 protocol) {
-        super(protocol, "1.6.4");
+        super(protocol, "1.6.4", Types1_7_6.ITEM, Types1_7_6.ITEM_ARRAY);
 
         this.addRemappedItem(26, 355, "Bed Block");
         this.addRemappedItem(34, 33, "Piston Head");
@@ -71,7 +71,7 @@ public class ItemRewriter extends LegacyItemRewriter<Protocol1_7_2_5to1_6_4> {
 
     @Override
     protected void registerPackets() {
-        this.registerCreativeInventoryAction(ServerboundPackets1_7_2.CREATIVE_INVENTORY_ACTION, Types1_7_6.ITEM);
+        this.registerCreativeInventoryAction(ServerboundPackets1_7_2.CREATIVE_INVENTORY_ACTION);
     }
 
 }

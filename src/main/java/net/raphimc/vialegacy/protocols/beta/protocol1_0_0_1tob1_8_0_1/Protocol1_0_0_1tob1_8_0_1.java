@@ -28,7 +28,6 @@ import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.storage.PlayerAirTimeStorage;
 import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.task.PlayerAirTimeUpdateTask;
-import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.types.Typesb1_8_0_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_1to1_0_0_1.ClientboundPackets1_0;
 import net.raphimc.vialegacy.protocols.release.protocol1_1to1_0_0_1.ServerboundPackets1_0;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.types.Types1_2_4;
@@ -89,14 +88,6 @@ public class Protocol1_0_0_1tob1_8_0_1 extends StatelessProtocol<ClientboundPack
                 map(Type.SHORT); // action
                 map(Type.BYTE); // mode
                 map(Types1_2_4.NBT_ITEM, Types1_4_2.NBTLESS_ITEM); // item
-            }
-        });
-        this.registerServerbound(ServerboundPackets1_0.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
-            @Override
-            public void register() {
-                map(Type.SHORT); // slot
-                map(Types1_2_4.NBT_ITEM, Typesb1_8_0_1.CREATIVE_ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Typesb1_8_0_1.CREATIVE_ITEM, 0)));
             }
         });
         this.cancelServerbound(ServerboundPackets1_0.CLICK_WINDOW_BUTTON);

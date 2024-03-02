@@ -19,16 +19,24 @@ package net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.rewriter;
 
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.Protocol1_0_0_1tob1_8_0_1;
+import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.types.Typesb1_8_0_1;
+import net.raphimc.vialegacy.protocols.release.protocol1_1to1_0_0_1.ServerboundPackets1_0;
+import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.types.Types1_2_4;
 
 public class ItemRewriter extends LegacyItemRewriter<Protocol1_0_0_1tob1_8_0_1> {
 
     public ItemRewriter(final Protocol1_0_0_1tob1_8_0_1 protocol) {
-        super(protocol, "b1.8.1");
+        super(protocol, "b1.8.1", Typesb1_8_0_1.CREATIVE_ITEM, null, Types1_2_4.NBT_ITEM, Types1_2_4.NBT_ITEM_ARRAY);
 
         this.addNonExistentItemRange(110, 122);
         this.addNonExistentItemRange(369, 382);
         this.addNonExistentItems(438);
         this.addNonExistentItemRange(2256, 2266);
+    }
+
+    @Override
+    protected void registerPackets() {
+        this.registerCreativeInventoryAction(ServerboundPackets1_0.CREATIVE_INVENTORY_ACTION);
     }
 
 }

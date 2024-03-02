@@ -19,6 +19,7 @@ package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import net.raphimc.vialegacy.ViaLegacy;
@@ -28,13 +29,14 @@ import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.Protoco
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.GameProfile;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.providers.GameProfileFetcher;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
 import java.util.UUID;
 
 public class ItemRewriter extends LegacyItemRewriter<Protocol1_8to1_7_6_10> {
 
     public ItemRewriter(final Protocol1_8to1_7_6_10 protocol) {
-        super(protocol, "1.7.10");
+        super(protocol, "1.7.10", Types1_7_6.ITEM, Types1_7_6.ITEM_ARRAY, Type.ITEM1_8, Type.ITEM1_8_SHORT_ARRAY);
 
         this.addRemappedItem(8, 326, "Water Block");
         this.addRemappedItem(9, 326, "Stationary Water Block");

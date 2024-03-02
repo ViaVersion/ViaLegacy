@@ -25,14 +25,14 @@ import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.types.Ty
 public class ItemRewriter extends LegacyItemRewriter<Protocol1_1to1_0_0_1> {
 
     public ItemRewriter(final Protocol1_1to1_0_0_1 protocol) {
-        super(protocol, "1.0");
+        super(protocol, "1.0", Types1_2_4.NBT_ITEM, Types1_2_4.NBT_ITEM_ARRAY);
 
         this.addNonExistentItems(383);
     }
 
     @Override
     protected void registerPackets() {
-        this.registerCreativeInventoryAction(ServerboundPackets1_1.CREATIVE_INVENTORY_ACTION, Types1_2_4.NBT_ITEM);
+        this.registerCreativeInventoryAction(ServerboundPackets1_1.CREATIVE_INVENTORY_ACTION);
     }
 
 }
