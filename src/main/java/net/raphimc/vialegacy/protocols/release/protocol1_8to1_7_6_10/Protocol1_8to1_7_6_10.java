@@ -1110,13 +1110,8 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final String channel = wrapper.read(Type.STRING); // channel
-                    final int length = wrapper.read(Type.UNSIGNED_SHORT); // length
-                    final int availableDataLength = PacketUtil.calculateLength(wrapper);
-                    if (availableDataLength < length) {
-                        throw new IllegalStateException("Custom payload length longer than actual data: " + length + " > " + availableDataLength);
-                    }
-                    wrapper.write(Type.STRING, channel);
+                    final String channel = wrapper.passthrough(Type.STRING); // channel
+                    wrapper.read(Type.UNSIGNED_SHORT); // length
 
                     switch (channel) {
                         case "MC|Brand": {
