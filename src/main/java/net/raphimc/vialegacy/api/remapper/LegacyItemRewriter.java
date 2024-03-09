@@ -27,9 +27,9 @@ import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.fastutil.objects.ObjectArrayList;
 import com.viaversion.viaversion.libs.fastutil.objects.ObjectList;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.*;
-
-import java.util.List;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
+import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 
 public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBase<P> implements ItemRewriter<P> {
 
@@ -48,7 +48,7 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
 
     public LegacyItemRewriter(final P protocol, final String protocolName, final Type<Item> itemType, final Type<Item[]> itemArrayType, final Type<Item> mappedItemType, final Type<Item[]> mappedItemArrayType) {
         super(protocol);
-        this.tagName = protocolName.replace(".", "_") + "_ViaLegacy_" + System.currentTimeMillis();
+        this.tagName = "ViaLegacy_" + protocolName.replace(".", "_");
         this.protocolName = protocolName;
         this.itemType = itemType;
         this.itemArrayType = itemArrayType;
@@ -167,65 +167,56 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
     }
 
     private void setRemappedNameRead(final Item item, final String name) {
-        //Set ViaLegacy tag for later remapping
-        final CompoundTag viaLegacyTag = (item.tag() != null && item.tag().contains(tagName) ? item.tag().get(tagName) : new CompoundTag());
-        if (item.tag() == null || !item.tag().contains(tagName)) {
-            viaLegacyTag.put("Id", new IntTag(item.identifier()));
-            viaLegacyTag.put("Meta", new ShortTag(item.data()));
-        }
+        final CompoundTag viaLegacyTag = new CompoundTag();
+        viaLegacyTag.putInt("Id", item.identifier());
+        viaLegacyTag.putShort("Meta", item.data());
 
-        //Get Item tag
         CompoundTag tag = item.tag();
         if (tag == null) {
             tag = new CompoundTag();
             item.setTag(tag);
-            viaLegacyTag.put("RemoveTag", new IntTag(0));
+            viaLegacyTag.putBoolean("RemoveTag", true);
         }
-        tag.put(tagName, viaLegacyTag);
+        tag.put(this.tagName, viaLegacyTag);
 
-        //Set name/lore of item
-        CompoundTag display = tag.get("display");
+        CompoundTag display = tag.getCompoundTag("display");
         if (display == null) {
             display = new CompoundTag();
             tag.put("display", display);
-            viaLegacyTag.put("RemoveDisplayTag", new IntTag(0));
+            viaLegacyTag.putBoolean("RemoveDisplayTag", true);
         }
         if (display.contains("Name")) {
-            ListTag lore = display.get("Lore");
+            ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
             if (lore == null) {
-                lore = new ListTag();
+                lore = new ListTag<>(StringTag.class);
                 display.put("Lore", lore);
-                viaLegacyTag.put("RemoveLore", new IntTag(0));
+                viaLegacyTag.putBoolean("RemoveLore", true);
             }
             lore.add(new StringTag("§r " + this.protocolName + " Item ID: " + item.identifier() + " (" + name + ")"));
-            viaLegacyTag.put("RemoveLastLore", new IntTag(0));
+            viaLegacyTag.putBoolean("RemoveLastLore", true);
         } else {
-            display.put("Name", new StringTag("§r" + this.protocolName + " " + name));
-            viaLegacyTag.put("RemoveDisplayName", new IntTag(0));
+            display.putString("Name", "§r" + this.protocolName + " " + name);
+            viaLegacyTag.putBoolean("RemoveDisplayName", true);
         }
     }
 
     private void setRemappedTagWrite(final Item item) {
-        if (item.tag() == null) return;
-        if (!item.tag().contains(tagName)) return;
-
         final CompoundTag tag = item.tag();
-        final CompoundTag viaLegacyTag = tag.get(tagName);
-        tag.remove(tagName);
+        if (tag == null) return;
+        final CompoundTag viaLegacyTag = tag.removeUnchecked(this.tagName);
+        if (viaLegacyTag == null) return;
 
-        item.setIdentifier(((IntTag) viaLegacyTag.get("Id")).asInt());
-        item.setData(((ShortTag) viaLegacyTag.get("Meta")).asShort());
+        item.setIdentifier(viaLegacyTag.getNumberTag("Id").asInt());
+        item.setData(viaLegacyTag.getNumberTag("Meta").asShort());
         if (viaLegacyTag.contains("RemoveLastLore")) {
-            ListTag lore = ((CompoundTag) tag.get("display")).get("Lore");
-            List<Tag> tags = lore.getValue();
-            tags.remove(lore.size() - 1);
-            lore.setValue(tags);
+            final ListTag<StringTag> lore = tag.getCompoundTag("display").getListTag("Lore", StringTag.class);
+            lore.remove(lore.size() - 1);
         }
         if (viaLegacyTag.contains("RemoveLore")) {
-            ((CompoundTag) tag.get("display")).remove("Lore");
+            tag.getCompoundTag("display").remove("Lore");
         }
         if (viaLegacyTag.contains("RemoveDisplayName")) {
-            ((CompoundTag) tag.get("display")).remove("Name");
+            tag.getCompoundTag("display").remove("Name");
         }
         if (viaLegacyTag.contains("RemoveDisplayTag")) {
             tag.remove("display");

@@ -360,7 +360,7 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
     }
 
     private void readItemsFromTag(final CompoundTag tag, final Item[] items) {
-        final ListTag slotList = tag.get("Items");
+        final ListTag<?> slotList = tag.get("Items");
         for (Tag itemTag : slotList) {
             final CompoundTag slotTag = (CompoundTag) itemTag;
             items[slotTag.<ByteTag>get("Slot").asByte() & 255] = new DataItem(slotTag.<ShortTag>get("id").asShort(), slotTag.<ByteTag>get("Count").asByte(), slotTag.<ShortTag>get("Damage").asShort(), null);
