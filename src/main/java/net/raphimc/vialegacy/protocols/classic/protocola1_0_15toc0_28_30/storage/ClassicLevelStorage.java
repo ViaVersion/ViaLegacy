@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.util.ChunkUtil;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.model.ChunkCoord;
 import net.raphimc.vialegacy.api.util.ChunkCoordSpiral;
@@ -69,7 +70,7 @@ public class ClassicLevelStorage extends StoredObject {
         this.netBuffer.write(part, 0, partSize);
     }
 
-    public void finish(final int sizeX, final int sizeY, final int sizeZ) {
+    public void finish(final int sizeX, final int sizeY, final int sizeZ) throws Exception {
         try {
             final DataInputStream dis = new DataInputStream(new GZIPInputStream(new ByteArrayInputStream(this.netBuffer.toByteArray()), 64 * 1024));
             final byte[] blocks = new byte[dis.readInt()];
@@ -95,6 +96,20 @@ public class ClassicLevelStorage extends StoredObject {
         this.subChunkZLength = Math.min(16, sizeZ);
         this.sectionBitmask = 0;
         for (int i = 0; i < this.sectionYCount; i++) this.sectionBitmask = (this.sectionBitmask << 1) | 1;
+
+        { // Sodium fix (Sodium requires a ring of empty chunks around the loaded chunks)
+            for (int chunkX = -1; chunkX <= this.chunkXCount; chunkX++) {
+                for (int chunkZ = -1; chunkZ <= this.chunkZCount; chunkZ++) {
+                    if (chunkX < 0 || chunkX >= this.chunkXCount || chunkZ < 0 || chunkZ >= this.chunkZCount) {
+                        final Chunk chunk = ChunkUtil.createEmptyChunk(chunkX, chunkZ, Math.max(8, this.sectionYCount), this.sectionBitmask);
+                        ChunkUtil.setDummySkylight(chunk, true);
+                        final PacketWrapper chunkData = PacketWrapper.create(ClientboundPacketsa1_0_15.CHUNK_DATA, this.getUser());
+                        chunkData.write(Types1_1.CHUNK, chunk);
+                        chunkData.send(Protocola1_0_15toc0_30.class);
+                    }
+                }
+            }
+        }
     }
 
     public void tick() throws Exception {

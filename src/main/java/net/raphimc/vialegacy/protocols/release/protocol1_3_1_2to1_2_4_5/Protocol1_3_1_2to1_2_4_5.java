@@ -23,7 +23,9 @@ import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.minecraft.chunks.*;
+import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -36,6 +38,7 @@ import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.IntTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.ShortTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
+import com.viaversion.viaversion.util.ChunkUtil;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.model.IdAndData;
@@ -68,7 +71,6 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata.Me
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -454,15 +456,9 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
 
             if (chunk.isFullChunk() && chunk.getBitmask() == 0) { // Remap to empty chunk
                 ViaLegacy.getPlatform().getLogger().warning("Received empty 1.2.5 chunk packet");
-                chunk = new BaseChunk(chunk.getX(), chunk.getZ(), true, false, 65535, new ChunkSection[16], new int[256], new ArrayList<>());
-                for (int i = 0; i < chunk.getSections().length; i++) {
-                    final ChunkSection section = chunk.getSections()[i] = new ChunkSectionImpl(true);
-                    section.palette(PaletteType.BLOCKS).addId(0);
-                    if (dimension == Environment.NORMAL) {
-                        final byte[] skyLight = new byte[2048];
-                        Arrays.fill(skyLight, (byte) 255);
-                        section.getLight().setSkyLight(skyLight);
-                    }
+                chunk = ChunkUtil.createEmptyChunk(chunk.getX(), chunk.getZ());
+                if (dimension == Environment.NORMAL) {
+                    ChunkUtil.setDummySkylight(chunk, true);
                 }
             }
 
