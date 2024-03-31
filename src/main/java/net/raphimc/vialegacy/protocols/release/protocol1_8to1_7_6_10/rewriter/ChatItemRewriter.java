@@ -23,9 +23,9 @@ import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
 import com.viaversion.viaversion.libs.gson.JsonArray;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.gson.JsonObject;
-import com.viaversion.viaversion.libs.gson.JsonPrimitive;
 import com.viaversion.viaversion.libs.mcstructs.snbt.SNbtSerializer;
-import com.viaversion.viaversion.libs.mcstructs.snbt.exceptions.SNbtSerializeException;
+import com.viaversion.viaversion.libs.mcstructs.text.ATextComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSerializer;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.ShortTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
@@ -371,73 +371,45 @@ public class ChatItemRewriter {
                 final JsonElement value = hoverEvent.get("value");
                 if (value == null) return;
 
-                final String text = findItemNBT(value);
-                if (text == null) return;
+                final ATextComponent nbt = TextComponentSerializer.V1_7.deserialize(value);
 
-                final CompoundTag tag;
                 try {
-                    tag = (CompoundTag) SNbtSerializer.V1_7.deserialize(text);
-                } catch (Throwable e) {
-                    ViaLegacy.getPlatform().getLogger().warning("Error reading NBT in show_item:" + text);
-                    throw new RuntimeException(e);
-                }
+                    final CompoundTag tag = (CompoundTag) SNbtSerializer.V1_7.deserialize(nbt.asUnformattedString());
+                    final CompoundTag itemTag = tag.get("tag");
+                    final ShortTag idTag = tag.get("id");
+                    final ShortTag damageTag = tag.get("Damage");
 
-                final CompoundTag itemTag = tag.get("tag");
-                final ShortTag idTag = tag.get("id");
-                final ShortTag damageTag = tag.get("Damage");
+                    // Call item converter
+                    final short damage = damageTag != null ? damageTag.asShort() : 0;
+                    final short id = idTag != null ? idTag.asShort() : 1;
+                    final Item item = new DataItem();
+                    item.setIdentifier(id);
+                    item.setData(damage);
+                    item.setTag(itemTag);
+                    this.handleItem(item);
 
-                // Call item converter
-                final short damage = damageTag != null ? damageTag.asShort() : 0;
-                final short id = idTag != null ? idTag.asShort() : 1;
-                final Item item = new DataItem();
-                item.setIdentifier(id);
-                item.setData(damage);
-                item.setTag(itemTag);
-                handleItem(item);
+                    // Serialize again
+                    if (damage != item.data()) {
+                        tag.put("Damage", new ShortTag(item.data()));
+                    }
+                    tag.put("id", new StringTag("minecraft:" + ID_TO_NAME.getOrDefault(item.identifier(), "stone")));
+                    if (item.tag() != null) {
+                        tag.put("tag", new CompoundTag(item.tag().getValue()));
+                    }
 
-                // Serialize again
-                if (damage != item.data()) {
-                    tag.put("Damage", new ShortTag(item.data()));
-                }
-                tag.put("id", new StringTag("minecraft:" + ID_TO_NAME.getOrDefault(item.identifier(), "stone")));
-                if (item.tag() != null) {
-                    tag.put("tag", new CompoundTag(item.tag().getValue()));
-                }
-
-                final JsonArray array = new JsonArray();
-                final JsonObject object = new JsonObject();
-                array.add(object);
-                final String serializedNBT;
-                try {
-                    serializedNBT = SNbtSerializer.V1_8.serialize(tag);
+                    final JsonArray array = new JsonArray();
+                    final JsonObject object = new JsonObject();
+                    array.add(object);
+                    final String serializedNBT = SNbtSerializer.V1_8.serialize(tag);
                     object.addProperty("text", serializedNBT);
                     hoverEvent.add("value", array);
-                } catch (SNbtSerializeException e) {
-                    ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error writing NBT in show_item:" + text, e);
+                } catch (Throwable e) {
+                    ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error remapping NBT in show_item:" + nbt.asUnformattedString(), e);
                 }
             }
 
             private void handleItem(Item item) {
                 this.protocol.getItemRewriter().handleItemToClient(item);
-            }
-
-            private String findItemNBT(JsonElement element) {
-                if (element.isJsonArray()) {
-                    for (JsonElement jsonElement : element.getAsJsonArray()) {
-                        String value = findItemNBT(jsonElement);
-                        if (value != null) {
-                            return value;
-                        }
-                    }
-                } else if (element.isJsonObject()) {
-                    final JsonPrimitive text = element.getAsJsonObject().getAsJsonPrimitive("text");
-                    if (text != null) {
-                        return text.getAsString();
-                    }
-                } else if (element.isJsonPrimitive()) {
-                    return element.getAsJsonPrimitive().getAsString();
-                }
-                return null;
             }
         };
     }
