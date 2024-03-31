@@ -1234,6 +1234,12 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.VAR_INT, Type.UNSIGNED_BYTE); // status
                 map(Type.POSITION1_8, Types1_7_6.POSITION_UBYTE); // position
                 map(Type.UNSIGNED_BYTE); // direction
+                handler(wrapper -> {
+                    final short status = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                    if (status == 5) { // RELEASE_USE_ITEM
+                        wrapper.set(Type.UNSIGNED_BYTE, 1, (short) 255);
+                    }
+                });
             }
         });
         this.registerServerbound(ServerboundPackets1_8.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
