@@ -18,9 +18,6 @@ sound-emulation: true
 # Calculate <= 1.1 biomes. Requires a lot of extra calculations
 old-biomes: true
 #
-# Remap <= 1.1 biomes based on color
-remap-based-on-color: true
-#
 # Enables sprinting for versions below beta 1.8. !THIS CAN CAUSE ISSUES WITH ANTI-CHEAT PLUGINS!
 enable-b1_7_3-sprinting: false
 #

@@ -26,8 +26,8 @@ public class NewBiomeGenBase {
     public static final NewBiomeGenBase desert = new NewBiomeGenBase(2).setTemperatureRainfall(2.0F, 0.0F);
     public static final NewBiomeGenBase extremeHills = new NewBiomeGenBase(3).setTemperatureRainfall(0.2F, 0.3F);
     public static final NewBiomeGenBase forest = new NewBiomeGenBase(4).setTemperatureRainfall(0.7F, 0.8F);
-    public static final NewBiomeGenBase taiga = new NewBiomeGenBase(5, 30).setTemperatureRainfall(0.05F, 0.8F);
-    public static final NewBiomeGenBase swampland = new NewBiomeGenBase(6, 1).setTemperatureRainfall(0.8F, 0.9F);
+    public static final NewBiomeGenBase taiga = new NewBiomeGenBase(5).setTemperatureRainfall(0.05F, 0.8F);
+    public static final NewBiomeGenBase swampland = new NewBiomeGenBase(6).setTemperatureRainfall(0.8F, 0.9F);
     public static final NewBiomeGenBase river = new NewBiomeGenBase(7);
     public static final NewBiomeGenBase hell = new NewBiomeGenBase(8).setTemperatureRainfall(2.0F, 0.0F);
     public static final NewBiomeGenBase sky = new NewBiomeGenBase(9);
@@ -49,21 +49,14 @@ public class NewBiomeGenBase {
     public static final NewBiomeGenBase mutatedJungleEdge = new NewBiomeGenBase(151); //This is here for the OldWorldChunkManager
 
     public final int biomeID;
-    public int colorBiomeID;
     public float temperature;
     public float rainfall;
 
     protected NewBiomeGenBase(int i) {
         biomeID = i;
-        colorBiomeID = i;
         if (i <= 20) {
             BIOME_LIST[i] = this;
         }
-    }
-
-    public NewBiomeGenBase(int i, int colorBiomeID) {
-        this(i);
-        this.colorBiomeID = colorBiomeID;
     }
 
     private NewBiomeGenBase setTemperatureRainfall(float f, float f1) {

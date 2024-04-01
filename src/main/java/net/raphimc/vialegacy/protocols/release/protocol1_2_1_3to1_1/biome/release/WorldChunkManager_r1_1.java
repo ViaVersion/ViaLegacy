@@ -18,7 +18,6 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.release;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.IWorldChunkManager;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.release.genlayer.GenLayer;
 
@@ -29,12 +28,9 @@ public class WorldChunkManager_r1_1 implements IWorldChunkManager {
     private GenLayer rainfallLayer;
     private final BiomeCache biomeCache;
 
-    private final boolean remapBasedOnColor;
-
     protected WorldChunkManager_r1_1() {
         IntCache.resetEverything();
         biomeCache = new BiomeCache(this);
-        this.remapBasedOnColor = ViaLegacy.getConfig().isRemapBasedOnColor();
     }
 
     public WorldChunkManager_r1_1(final UserConnection user, final long seed) {
@@ -50,11 +46,7 @@ public class WorldChunkManager_r1_1 implements IWorldChunkManager {
         final byte[] biomeData = new byte[256];
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                if (this.remapBasedOnColor) {
-                    biomeData[z << 4 | x] = (byte) this.getBiomeGenAt((chunkX * 16) + x, (chunkZ * 16) + z).colorBiomeID;
-                } else {
-                    biomeData[z << 4 | x] = (byte) this.getBiomeGenAt((chunkX * 16) + x, (chunkZ * 16) + z).biomeID;
-                }
+                biomeData[z << 4 | x] = (byte) this.getBiomeGenAt((chunkX * 16) + x, (chunkZ * 16) + z).biomeID;
             }
         }
         return biomeData;

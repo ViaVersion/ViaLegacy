@@ -33,7 +33,6 @@ public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.pla
     private boolean legacySkinLoading;
     private boolean soundEmulation;
     private boolean oldBiomes;
-    private boolean remapBasedOnColor;
     private boolean enableB1_7_3Sprinting;
     private int classicChunkRange;
     private boolean enableClassicFly;
@@ -55,7 +54,6 @@ public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.pla
         this.legacySkinLoading = this.getBoolean("legacy-skin-loading", false);
         this.soundEmulation = this.getBoolean("sound-emulation", true);
         this.oldBiomes = this.getBoolean("old-biomes", true);
-        this.remapBasedOnColor = this.getBoolean("remap-based-on-color", true);
         this.enableB1_7_3Sprinting = this.getBoolean("enable-b1_7_3-sprinting", false);
         this.classicChunkRange = this.getInt("classic-chunk-range", 10);
         this.enableClassicFly = this.getBoolean("enable-classic-fly", false);
@@ -103,11 +101,6 @@ public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.pla
     @Override
     public boolean isOldBiomes() {
         return this.oldBiomes;
-    }
-
-    @Override
-    public boolean isRemapBasedOnColor() {
-        return this.remapBasedOnColor;
     }
 
     @Override

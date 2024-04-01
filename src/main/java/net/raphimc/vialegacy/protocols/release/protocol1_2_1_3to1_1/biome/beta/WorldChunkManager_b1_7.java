@@ -17,7 +17,6 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.beta;
 
-import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.model.ChunkCoord;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.IWorldChunkManager;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.release.NewBiomeGenBase;
@@ -34,13 +33,10 @@ public class WorldChunkManager_b1_7 implements IWorldChunkManager {
     public double[] field_4196_c;
     public OldBiomeGenBase[] field_4195_d;
 
-    private final boolean remapBasedOnColor;
-
     public WorldChunkManager_b1_7(final long seed) {
         field_4194_e = new NoiseGeneratorOctaves2(new Random(seed * 9871L), 4);
         field_4193_f = new NoiseGeneratorOctaves2(new Random(seed * 39811L), 4);
         field_4192_g = new NoiseGeneratorOctaves2(new Random(seed * 0x84a59L), 2);
-        this.remapBasedOnColor = ViaLegacy.getConfig().isRemapBasedOnColor();
     }
 
     @Override
@@ -48,11 +44,7 @@ public class WorldChunkManager_b1_7 implements IWorldChunkManager {
         final byte[] biomeData = new byte[256];
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                if (this.remapBasedOnColor) {
-                    biomeData[z << 4 | x] = (byte) this.getBiomeGenAt((chunkX * 16) + x, (chunkZ * 16) + z).colorBiomeID;
-                } else {
-                    biomeData[z << 4 | x] = (byte) this.getBiomeGenAt((chunkX * 16) + x, (chunkZ * 16) + z).biomeID;
-                }
+                biomeData[z << 4 | x] = (byte) this.getBiomeGenAt((chunkX * 16) + x, (chunkZ * 16) + z).biomeID;
             }
         }
         return biomeData;
