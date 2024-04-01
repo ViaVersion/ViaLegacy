@@ -37,6 +37,8 @@ public class ChunkTracker extends AbstractChunkTracker {
         for (int i = 1; i < 7; i++) { // stone variants
             this.registerReplacement(new IdAndData(BlockList1_6.stone.blockID, i), new IdAndData(BlockList1_6.stone.blockID, 0));
         }
+        this.registerInvalidDirectionReplacements(BlockList1_6.ladder.blockID, new IdAndData(BlockList1_6.planks.blockID, 0)); // Ladders with broken data values use the last ladder collision box the player has looked at. We just set them to a full block to avoid glitches.
+        this.registerInvalidDirectionReplacements(BlockList1_6.furnaceBurning.blockID, new IdAndData(BlockList1_6.furnaceBurning.blockID, 2));
         this.registerReplacement(new IdAndData(BlockList1_6.chest.blockID, 0), new IdAndData(BlockList1_6.chest.blockID, 3));
     }
 
@@ -54,6 +56,15 @@ public class ChunkTracker extends AbstractChunkTracker {
     @Override
     protected void postRemap(DataPalette palette) {
         palette.replaceId(BlockList1_6.portal.blockID << 4, 0);
+    }
+    
+    private void registerInvalidDirectionReplacements(final int blockId, final IdAndData replacement) {
+        for (int i = 0; i < 2; i++) {
+            this.registerReplacement(new IdAndData(blockId, i), replacement);
+        }
+        for (int i = 6; i < 16; i++) {
+            this.registerReplacement(new IdAndData(blockId, i), replacement);
+        }
     }
 
 }
