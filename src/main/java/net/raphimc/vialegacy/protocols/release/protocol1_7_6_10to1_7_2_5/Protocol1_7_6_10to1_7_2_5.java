@@ -32,7 +32,7 @@ import com.viaversion.viaversion.protocols.base.BaseProtocol1_7;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.util.UuidUtil;
-import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.rewriter.TranslationRewriter;
+import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.rewriter.ChatComponentRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.GameProfile;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.providers.GameProfileFetcher;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
@@ -79,7 +79,7 @@ public class Protocol1_7_6_10to1_7_2_5 extends AbstractProtocol<ClientboundPacke
         this.registerClientbound(ClientboundPackets1_7_2.CHAT_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING, Type.STRING, TranslationRewriter::toClient); // message
+                map(Type.STRING, Type.STRING, ChatComponentRewriter::toClient); // message
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.BLOCK_ENTITY_DATA, new PacketHandlers() {

@@ -17,30 +17,94 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter;
 
+
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
+import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
-import com.viaversion.viaversion.libs.gson.JsonArray;
-import com.viaversion.viaversion.libs.gson.JsonElement;
-import com.viaversion.viaversion.libs.gson.JsonObject;
+import com.viaversion.viaversion.libs.fastutil.objects.Object2ObjectMap;
+import com.viaversion.viaversion.libs.fastutil.objects.Object2ObjectOpenHashMap;
 import com.viaversion.viaversion.libs.mcstructs.snbt.SNbtSerializer;
 import com.viaversion.viaversion.libs.mcstructs.text.ATextComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.components.StringComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.components.TranslationComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.events.hover.HoverEventAction;
+import com.viaversion.viaversion.libs.mcstructs.text.events.hover.impl.TextHoverEvent;
 import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSerializer;
+import com.viaversion.viaversion.libs.mcstructs.text.utils.TextUtils;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.ShortTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
 import net.raphimc.vialegacy.ViaLegacy;
-import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ClientboundPackets1_7_2;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 
 import java.util.logging.Level;
 
-public class ChatItemRewriter {
+public class ChatComponentRewriter {
 
+    private static final Object2ObjectMap<String, String> TRANSLATIONS = new Object2ObjectOpenHashMap<>(59, 0.99F);
     private static final Int2ObjectOpenHashMap<String> ID_TO_NAME = new Int2ObjectOpenHashMap<>(315, 0.99F);
 
     static {
+        TRANSLATIONS.put("gui.toMenu", "Back to title screen");
+        TRANSLATIONS.put("generator.amplified", "Amplified");
+        TRANSLATIONS.put("disconnect.loginFailedInfo.serversUnavailable", "The authentication are currently down for maintenance.");
+        TRANSLATIONS.put("options.aoDesc0", "Enable faux ambient occlusion on blocks.");
+        TRANSLATIONS.put("options.framerateLimitDesc0", "Selects the maximum frame rate:");
+        TRANSLATIONS.put("options.framerateLimitDesc1", "35fps, 120fps, or 200+fps.");
+        TRANSLATIONS.put("options.viewBobbingDesc0", "Enables view-bob when moving.");
+        TRANSLATIONS.put("options.renderCloudsDesc0", "Enables the rendering of clouds.");
+        TRANSLATIONS.put("options.graphicsDesc0", "'Fancy': Enables extra transparency.");
+        TRANSLATIONS.put("options.graphicsDesc1", "'Fast': Suggested for lower-end hardware.");
+        TRANSLATIONS.put("options.renderDistanceDesc0", "Maximum render distance. Smaller values");
+        TRANSLATIONS.put("options.renderDistanceDesc1", "run better on lower-end hardware.");
+        TRANSLATIONS.put("options.particlesDesc0", "Selects the overall amount of particles.");
+        TRANSLATIONS.put("options.particlesDesc1", "On lower-end hardware, less is better.");
+        TRANSLATIONS.put("options.advancedOpenglDesc0", "Enables occlusion queries. On AMD and Intel");
+        TRANSLATIONS.put("options.advancedOpenglDesc1", "hardware, this may decrease performance.");
+        TRANSLATIONS.put("options.fboEnableDesc0", "Enables the use of Framebuffer Objects.");
+        TRANSLATIONS.put("options.fboEnableDesc1", "Necessary for certain Minecraft features.");
+        TRANSLATIONS.put("options.postProcessEnableDesc0", "Enables post-processing. Disabling will");
+        TRANSLATIONS.put("options.postProcessEnableDesc1", "result in reduction in Awesome Levels.");
+        TRANSLATIONS.put("options.showCape", "Show Cape");
+        TRANSLATIONS.put("options.anisotropicFiltering", "Anisotropic Filtering");
+        TRANSLATIONS.put("tile.stone.name", "Stone");
+        TRANSLATIONS.put("tile.sapling.roofed_oak.name", "Dark Oak Sapling");
+        TRANSLATIONS.put("tile.sponge.name", "Sponge");
+        TRANSLATIONS.put("tile.stairsStone.name", "Stone Stairs");
+        TRANSLATIONS.put("tile.pressurePlate.name", "Pressure Plate");
+        TRANSLATIONS.put("tile.fence.name", "Fence");
+        TRANSLATIONS.put("tile.fenceGate.name", "Fence Gate");
+        TRANSLATIONS.put("tile.trapdoor.name", "Trapdoor");
+        TRANSLATIONS.put("item.doorWood.name", "Wooden Door");
+        TRANSLATIONS.put("entity.Arrow.name", "arrow");
+        TRANSLATIONS.put("achievement.overkill.desc", "Deal eight hearts of damage in a single hit");
+        TRANSLATIONS.put("commands.generic.deprecatedId", "Warning: Using numeric IDs will not be supported in the future. Please use names, such as '%s'");
+        TRANSLATIONS.put("commands.give.notFound", "There is no such item with ID %s");
+        TRANSLATIONS.put("commands.effect.usage", "/effect <player> <effect> [seconds] [amplifier]");
+        TRANSLATIONS.put("commands.clear.usage", "/clear <player> [item] [data]");
+        TRANSLATIONS.put("commands.time.usage", "/time <set|add> <value>");
+        TRANSLATIONS.put("commands.kill.usage", "/kill");
+        TRANSLATIONS.put("commands.kill.success", "Ouch! That looked like it hurt");
+        TRANSLATIONS.put("commands.tp.success.coordinates", "Teleported %s to %s,%s,%s");
+        TRANSLATIONS.put("commands.tp.usage", "/tp [target player] <destination player> OR /tp [target player] <x> <y> <z>");
+        TRANSLATIONS.put("commands.scoreboard.usage", "/scoreboard <objectives|players|teams>");
+        TRANSLATIONS.put("commands.scoreboard.objectives.usage", "/scoreboard objectives <list|add|remove|setdisplay>");
+        TRANSLATIONS.put("commands.scoreboard.players.usage", "/scoreboard players <set|add|remove|reset|list>");
+        TRANSLATIONS.put("commands.scoreboard.players.set.usage", "/scoreboard players set <player> <objective> <score>");
+        TRANSLATIONS.put("commands.scoreboard.players.add.usage", "/scoreboard players add <player> <objective> <count>");
+        TRANSLATIONS.put("commands.scoreboard.players.remove.usage", "/scoreboard players remove <player> <objective> <count>");
+        TRANSLATIONS.put("commands.scoreboard.players.reset.usage", "/scoreboard players reset <player>");
+        TRANSLATIONS.put("commands.scoreboard.players.reset.success", "Reset all scores of player %s");
+        TRANSLATIONS.put("commands.scoreboard.teams.usage", "/scoreboard teams <list|add|remove|empty|join|leave|option>");
+        TRANSLATIONS.put("commands.scoreboard.teams.empty.usage", "/scoreboard teams empty");
+        TRANSLATIONS.put("commands.scoreboard.teams.option.usage", "/scoreboard teams option <team> <friendlyfire|color|seeFriendlyInvisibles> <value>");
+        TRANSLATIONS.put("commands.spawnpoint.usage", "/spawnpoint OR /spawnpoint <player> OR /spawnpoint <player> <x> <y> <z>");
+        TRANSLATIONS.put("commands.setworldspawn.usage", "/setworldspawn OR /setworldspawn <x> <y> <z>");
+        TRANSLATIONS.put("commands.gamerule.usage", "/gamerule <rule name> <value> OR /gamerule <rule name>");
+        TRANSLATIONS.put("commands.testfor.usage", "/testfor <player>");
+        TRANSLATIONS.put("commands.testfor.failed", "/testfor is only usable by commandblocks with analog output");
+        TRANSLATIONS.put("commands.achievement.usage", "/achievement give <stat_name> [player]");
+
         ID_TO_NAME.put(1, "stone");
         ID_TO_NAME.put(2, "grass");
         ID_TO_NAME.put(3, "dirt");
@@ -358,64 +422,61 @@ public class ChatItemRewriter {
         ID_TO_NAME.put(2267, "record_wait");
     }
 
-    private final ComponentRewriter<ClientboundPackets1_7_2> SHOW_ITEM;
+    private final Protocol<?, ?, ?, ?> protocol;
 
-    public ChatItemRewriter(final Protocol1_8to1_7_6_10 protocol) {
-        this.SHOW_ITEM = new ComponentRewriter<ClientboundPackets1_7_2>(protocol, ComponentRewriter.ReadType.JSON) {
-            @Override
-            protected void handleHoverEvent(JsonObject hoverEvent) {
-                super.handleHoverEvent(hoverEvent);
-                final String action = hoverEvent.getAsJsonPrimitive("action").getAsString();
-                if (!action.equals("show_item")) return;
-
-                final JsonElement value = hoverEvent.get("value");
-                if (value == null) return;
-
-                final ATextComponent nbt = TextComponentSerializer.V1_7.deserialize(value);
-
-                try {
-                    final CompoundTag tag = (CompoundTag) SNbtSerializer.V1_7.deserialize(nbt.asUnformattedString());
-                    final CompoundTag itemTag = tag.get("tag");
-                    final ShortTag idTag = tag.get("id");
-                    final ShortTag damageTag = tag.get("Damage");
-
-                    // Call item converter
-                    final short damage = damageTag != null ? damageTag.asShort() : 0;
-                    final short id = idTag != null ? idTag.asShort() : 1;
-                    final Item item = new DataItem();
-                    item.setIdentifier(id);
-                    item.setData(damage);
-                    item.setTag(itemTag);
-                    this.handleItem(item);
-
-                    // Serialize again
-                    if (damage != item.data()) {
-                        tag.put("Damage", new ShortTag(item.data()));
-                    }
-                    tag.put("id", new StringTag("minecraft:" + ID_TO_NAME.getOrDefault(item.identifier(), "stone")));
-                    if (item.tag() != null) {
-                        tag.put("tag", new CompoundTag(item.tag().getValue()));
-                    }
-
-                    final JsonArray array = new JsonArray();
-                    final JsonObject object = new JsonObject();
-                    array.add(object);
-                    final String serializedNBT = SNbtSerializer.V1_8.serialize(tag);
-                    object.addProperty("text", serializedNBT);
-                    hoverEvent.add("value", array);
-                } catch (Throwable e) {
-                    ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error remapping NBT in show_item:" + nbt.asUnformattedString(), e);
-                }
-            }
-
-            private void handleItem(Item item) {
-                this.protocol.getItemRewriter().handleItemToClient(item);
-            }
-        };
+    public ChatComponentRewriter(final Protocol<?, ?, ?, ?> protocol) {
+        this.protocol = protocol;
     }
 
-    public String remapShowItem(final String text) {
-        return SHOW_ITEM.processText(text).toString();
+    public String toClient(final String text) {
+        final ATextComponent component = TextComponentSerializer.V1_7.deserialize(text);
+        // Replace translation keys with their actual translations
+        TextUtils.iterateAll(component, c -> {
+            if (c instanceof TranslationComponent) {
+                final TranslationComponent translationComponent = (TranslationComponent) c;
+                if (TRANSLATIONS.containsKey(translationComponent.getKey())) {
+                    translationComponent.setKey(TRANSLATIONS.get(translationComponent.getKey()));
+                }
+            }
+        });
+        // Translate item hover events
+        TextUtils.iterateAll(component, c -> {
+            if (c.getStyle().getHoverEvent() instanceof TextHoverEvent) {
+                final TextHoverEvent textHoverEvent = (TextHoverEvent) c.getStyle().getHoverEvent();
+                if (textHoverEvent.getAction().equals(HoverEventAction.SHOW_ITEM)) {
+                    try {
+                        final CompoundTag tag = (CompoundTag) SNbtSerializer.V1_7.deserialize(textHoverEvent.getText().asUnformattedString());
+                        final ShortTag idTag = tag.get("id");
+                        final ShortTag damageTag = tag.get("Damage");
+                        final CompoundTag itemTag = tag.get("tag");
+
+                        final short damage = damageTag != null ? damageTag.asShort() : 0;
+                        Item item = new DataItem();
+                        item.setIdentifier(idTag.asShort());
+                        item.setData(damage);
+                        item.setTag(itemTag);
+                        item = this.protocol.getItemRewriter().handleItemToClient(item);
+
+                        if (!ID_TO_NAME.containsKey(item.identifier())) {
+                            throw new IllegalArgumentException("Invalid item ID: " + item.identifier());
+                        }
+                        tag.put("id", new StringTag("minecraft:" + ID_TO_NAME.get(item.identifier())));
+                        if (damage != item.data()) {
+                            tag.put("Damage", new ShortTag(item.data()));
+                        }
+                        if (item.tag() != itemTag) {
+                            tag.put("tag", item.tag());
+                        }
+
+                        c.getStyle().setHoverEvent(new TextHoverEvent(textHoverEvent.getAction(), new StringComponent(SNbtSerializer.V1_8.serialize(tag))));
+                    } catch (Throwable e) {
+                        ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error remapping NBT in show_item:" + textHoverEvent.getText().asUnformattedString(), e);
+                        c.getStyle().setHoverEvent(new TextHoverEvent(textHoverEvent.getAction(), new StringComponent())); // Invalid item
+                    }
+                }
+            }
+        });
+        return TextComponentSerializer.V1_8.serialize(component);
     }
 
 }

@@ -54,7 +54,10 @@ import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.api.util.PacketUtil;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.providers.EncryptionProvider;
-import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.rewriter.*;
+import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.rewriter.ChatComponentRewriter;
+import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.rewriter.ItemRewriter;
+import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.rewriter.SoundRewriter;
+import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.rewriter.StatisticRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.*;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.MetaType1_6_4;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types.Types1_6_4;
@@ -125,7 +128,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
         this.registerClientbound(ClientboundPackets1_6_4.CHAT_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_6_4.STRING, Type.STRING, msg -> TranslationRewriter.toClient(ChatComponentRewriter.toClient(msg))); // message
+                map(Types1_6_4.STRING, Type.STRING, ChatComponentRewriter::toClient); // message
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.ENTITY_EQUIPMENT, new PacketHandlers() {

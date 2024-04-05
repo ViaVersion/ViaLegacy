@@ -60,9 +60,8 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.MapDa
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.MapIcon;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.TabListEntry;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.providers.GameProfileFetcher;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.ChatItemRewriter;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.ChatComponentRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.ItemRewriter;
-import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter.TranslationRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage.*;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types1_7_6;
 
@@ -72,7 +71,7 @@ import java.util.*;
 public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_7_2, ClientboundPackets1_8, ServerboundPackets1_7_2, ServerboundPackets1_8> {
 
     private final LegacyItemRewriter<Protocol1_8to1_7_6_10> itemRewriter = new ItemRewriter(this);
-    private final ChatItemRewriter chatItemRewriter = new ChatItemRewriter(this);
+    private final ChatComponentRewriter chatComponentRewriter = new ChatComponentRewriter(this);
     private final MetadataRewriter metadataRewriter = new MetadataRewriter(this);
 
     public Protocol1_8to1_7_6_10() {
@@ -154,7 +153,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         this.registerClientbound(ClientboundPackets1_7_2.CHAT_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING, Type.STRING, msg -> TranslationRewriter.toClient(chatItemRewriter.remapShowItem(msg))); // message
+                map(Type.STRING, Type.STRING, chatComponentRewriter::toClient); // message
                 create(Type.BYTE, (byte) 0); // position
             }
         });

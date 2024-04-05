@@ -19,11 +19,12 @@ package net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.rewrit
 
 import com.viaversion.viaversion.libs.fastutil.objects.Object2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2ObjectOpenHashMap;
-import com.viaversion.viaversion.libs.gson.JsonObject;
-import com.viaversion.viaversion.rewriter.ComponentRewriter;
-import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ClientboundPackets1_7_2;
+import com.viaversion.viaversion.libs.mcstructs.text.ATextComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.components.TranslationComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSerializer;
+import com.viaversion.viaversion.libs.mcstructs.text.utils.TextUtils;
 
-public class TranslationRewriter {
+public class ChatComponentRewriter {
 
     private static final Object2ObjectMap<String, String> TRANSLATIONS = new Object2ObjectOpenHashMap<>(86, 0.99F);
 
@@ -116,18 +117,18 @@ public class TranslationRewriter {
         TRANSLATIONS.put("mco.invites.nopending", "No pending invitations!");
     }
 
-    private static final ComponentRewriter<ClientboundPackets1_7_2> REWRITER = new ComponentRewriter<ClientboundPackets1_7_2>(null, ComponentRewriter.ReadType.JSON) {
-        @Override
-        protected void handleTranslate(JsonObject object, String translate) {
-            final String text = TRANSLATIONS.get(translate);
-            if (text != null) {
-                object.addProperty("translate", text);
-            }
-        }
-    };
-
     public static String toClient(final String text) {
-        return REWRITER.processText(text).toString();
+        final ATextComponent component = TextComponentSerializer.V1_7.deserialize(text);
+        // Replace translation keys with their actual translations
+        TextUtils.iterateAll(component, c -> {
+            if (c instanceof TranslationComponent) {
+                final TranslationComponent translationComponent = (TranslationComponent) c;
+                if (TRANSLATIONS.containsKey(translationComponent.getKey())) {
+                    translationComponent.setKey(TRANSLATIONS.get(translationComponent.getKey()));
+                }
+            }
+        });
+        return TextComponentSerializer.V1_7.serialize(component);
     }
 
 }
