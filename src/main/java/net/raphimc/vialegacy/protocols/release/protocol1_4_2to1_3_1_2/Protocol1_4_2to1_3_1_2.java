@@ -18,6 +18,7 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2;
 
 import com.google.common.collect.Lists;
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
@@ -273,18 +274,26 @@ public class Protocol1_4_2to1_3_1_2 extends StatelessProtocol<ClientboundPackets
                     final String channel = wrapper.read(Types1_6_4.STRING); // channel
                     short length = wrapper.read(Type.SHORT); // length
 
-                    if (channel.equals("MC|TrList")) {
-                        wrapper.passthrough(Type.INT); // window Id
-                        final int count = wrapper.passthrough(Type.UNSIGNED_BYTE); // count
-                        for (int i = 0; i < count; i++) {
-                            wrapper.passthrough(Types1_7_6.ITEM); // item 1
-                            wrapper.passthrough(Types1_7_6.ITEM); // item 3
-                            if (wrapper.passthrough(Type.BOOLEAN)) { // has 3 items
-                                wrapper.passthrough(Types1_7_6.ITEM); // item 2
+                    try {
+                        if (channel.equals("MC|TrList")) {
+                            wrapper.passthrough(Type.INT); // window Id
+                            final int count = wrapper.passthrough(Type.UNSIGNED_BYTE); // count
+                            for (int i = 0; i < count; i++) {
+                                wrapper.passthrough(Types1_7_6.ITEM); // item 1
+                                wrapper.passthrough(Types1_7_6.ITEM); // item 3
+                                if (wrapper.passthrough(Type.BOOLEAN)) { // has 3 items
+                                    wrapper.passthrough(Types1_7_6.ITEM); // item 2
+                                }
+                                wrapper.write(Type.BOOLEAN, false); // unavailable
                             }
-                            wrapper.write(Type.BOOLEAN, false); // unavailable
+                            length = (short) PacketUtil.calculateLength(wrapper);
                         }
-                        length = (short) PacketUtil.calculateLength(wrapper);
+                    } catch (Exception e) {
+                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to handle packet", e);
+                        }
+                        wrapper.cancel();
+                        return;
                     }
 
                     wrapper.resetReader();

@@ -749,18 +749,26 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                                 return;
                             }
 
-                            if (channel.equals("MC|TrList")) {
-                                wrapper.passthrough(Type.INT); // window id
-                                final int count = wrapper.passthrough(Type.UNSIGNED_BYTE); // count
-                                for (int i = 0; i < count; i++) {
-                                    itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.ITEM)); // item 1
-                                    itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.ITEM)); // item 3
-                                    if (wrapper.passthrough(Type.BOOLEAN)) { // has 3 items
-                                        itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.ITEM)); // item 2
+                            try {
+                                if (channel.equals("MC|TrList")) {
+                                    wrapper.passthrough(Type.INT); // window id
+                                    final int count = wrapper.passthrough(Type.UNSIGNED_BYTE); // count
+                                    for (int i = 0; i < count; i++) {
+                                        itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.ITEM)); // item 1
+                                        itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.ITEM)); // item 3
+                                        if (wrapper.passthrough(Type.BOOLEAN)) { // has 3 items
+                                            itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.ITEM)); // item 2
+                                        }
+                                        wrapper.passthrough(Type.BOOLEAN); // unavailable
                                     }
-                                    wrapper.passthrough(Type.BOOLEAN); // unavailable
+                                    length = PacketUtil.calculateLength(wrapper);
                                 }
-                                length = PacketUtil.calculateLength(wrapper);
+                            } catch (Exception e) {
+                                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                                    Via.getPlatform().getLogger().log(Level.WARNING, "Failed to handle packet", e);
+                                }
+                                wrapper.cancel();
+                                return;
                             }
 
                             wrapper.resetReader();
@@ -1058,25 +1066,33 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                     final String channel = wrapper.read(Type.STRING); // channel
                     short length = wrapper.read(Type.SHORT); // length
 
-                    switch (channel) {
-                        case "MC|BEdit":
-                        case "MC|BSign":
-                            itemRewriter.handleItemToServer(wrapper.passthrough(Types1_7_6.ITEM));
-                            length = (short) PacketUtil.calculateLength(wrapper);
-                            break;
-                        case "MC|AdvCdm":
-                            final byte type = wrapper.read(Type.BYTE); // command block type
-                            if (type == 0) {
-                                wrapper.passthrough(Type.INT); // x
-                                wrapper.passthrough(Type.INT); // y
-                                wrapper.passthrough(Type.INT); // z
-                                wrapper.passthrough(Type.STRING); // command
-                            } else {
-                                wrapper.cancel();
-                                return;
-                            }
-                            length = (short) PacketUtil.calculateLength(wrapper);
-                            break;
+                    try {
+                        switch (channel) {
+                            case "MC|BEdit":
+                            case "MC|BSign":
+                                itemRewriter.handleItemToServer(wrapper.passthrough(Types1_7_6.ITEM));
+                                length = (short) PacketUtil.calculateLength(wrapper);
+                                break;
+                            case "MC|AdvCdm":
+                                final byte type = wrapper.read(Type.BYTE); // command block type
+                                if (type == 0) {
+                                    wrapper.passthrough(Type.INT); // x
+                                    wrapper.passthrough(Type.INT); // y
+                                    wrapper.passthrough(Type.INT); // z
+                                    wrapper.passthrough(Type.STRING); // command
+                                } else {
+                                    wrapper.cancel();
+                                    return;
+                                }
+                                length = (short) PacketUtil.calculateLength(wrapper);
+                                break;
+                        }
+                    } catch (Exception e) {
+                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to handle packet", e);
+                        }
+                        wrapper.cancel();
+                        return;
                     }
 
                     wrapper.resetReader();

@@ -17,6 +17,7 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
@@ -43,6 +44,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.logging.Level;
 
 public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_5_2, ClientboundPackets1_6_1, ServerboundPackets1_5_2, ServerboundPackets1_6_4> {
 
@@ -302,18 +304,26 @@ public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_
                     String channel = wrapper.read(Types1_6_4.STRING); // channel
                     short length = wrapper.read(Type.SHORT); // length
 
-                    if (channel.equals("MC|TPack")) {
-                        channel = "MC|RPack";
-                        final String[] data = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0"); // data
-                        final String url = data[0];
-                        final String resolution = data[1];
-                        if (!resolution.equals("16")) {
-                            wrapper.cancel();
-                            return;
-                        }
+                    try {
+                        if (channel.equals("MC|TPack")) {
+                            channel = "MC|RPack";
+                            final String[] data = new String(wrapper.read(Type.REMAINING_BYTES), StandardCharsets.UTF_8).split("\0"); // data
+                            final String url = data[0];
+                            final String resolution = data[1];
+                            if (!resolution.equals("16")) {
+                                wrapper.cancel();
+                                return;
+                            }
 
-                        wrapper.write(Type.REMAINING_BYTES, url.getBytes(StandardCharsets.UTF_8));
-                        length = (short) PacketUtil.calculateLength(wrapper);
+                            wrapper.write(Type.REMAINING_BYTES, url.getBytes(StandardCharsets.UTF_8));
+                            length = (short) PacketUtil.calculateLength(wrapper);
+                        }
+                    } catch (Exception e) {
+                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to handle packet", e);
+                        }
+                        wrapper.cancel();
+                        return;
                     }
 
                     wrapper.resetReader();
