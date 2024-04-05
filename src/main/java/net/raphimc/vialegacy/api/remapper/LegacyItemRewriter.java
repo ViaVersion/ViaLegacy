@@ -35,7 +35,6 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
 
     private final ObjectList<RewriteEntry> rewriteEntries = new ObjectArrayList<>();
     private final ObjectList<NonExistentEntry> nonExistentItems = new ObjectArrayList<>();
-    protected final String tagName;
     protected final String protocolName;
     private final Type<Item> itemType;
     private final Type<Item> mappedItemType;
@@ -48,7 +47,6 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
 
     public LegacyItemRewriter(final P protocol, final String protocolName, final Type<Item> itemType, final Type<Item[]> itemArrayType, final Type<Item> mappedItemType, final Type<Item[]> mappedItemArrayType) {
         super(protocol);
-        this.tagName = "ViaLegacy_" + protocolName.replace(".", "_");
         this.protocolName = protocolName;
         this.itemType = itemType;
         this.itemArrayType = itemArrayType;
@@ -155,6 +153,10 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
         return this.mappedItemArrayType;
     }
 
+    @Override
+    public String nbtTagName() {
+        return "VL|" + this.protocol.getClass().getSimpleName();
+    }
 
     private void handleClientboundItem(final PacketWrapper wrapper) throws Exception {
         final Item item = this.handleItemToClient(wrapper.read(this.itemType));
@@ -177,7 +179,7 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
             item.setTag(tag);
             viaLegacyTag.putBoolean("RemoveTag", true);
         }
-        tag.put(this.tagName, viaLegacyTag);
+        tag.put(this.nbtTagName(), viaLegacyTag);
 
         CompoundTag display = tag.getCompoundTag("display");
         if (display == null) {
@@ -203,7 +205,7 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
     private void setRemappedTagWrite(final Item item) {
         final CompoundTag tag = item.tag();
         if (tag == null) return;
-        final CompoundTag viaLegacyTag = tag.removeUnchecked(this.tagName);
+        final CompoundTag viaLegacyTag = tag.removeUnchecked(this.nbtTagName());
         if (viaLegacyTag == null) return;
 
         item.setIdentifier(viaLegacyTag.getNumberTag("Id").asInt());
