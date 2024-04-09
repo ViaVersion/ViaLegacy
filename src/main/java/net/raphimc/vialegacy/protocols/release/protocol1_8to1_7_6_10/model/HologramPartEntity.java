@@ -306,7 +306,7 @@ public class HologramPartEntity {
         for (final Map.Entry<MetaIndex1_8to1_7_6, Object> entry : this.metadata.entrySet()) {
             metadataList.add(new Metadata(entry.getKey().getOldIndex(), entry.getKey().getOldType(), entry.getValue()));
         }
-        Via.getManager().getProtocolManager().getProtocol(Protocol1_8to1_7_6_10.class).getMetadataRewriter().transform(this.entityType, metadataList);
+        Via.getManager().getProtocolManager().getProtocol(Protocol1_8to1_7_6_10.class).getMetadataRewriter().transform(this.user, this.entityType, metadataList);
         return metadataList;
     }
 

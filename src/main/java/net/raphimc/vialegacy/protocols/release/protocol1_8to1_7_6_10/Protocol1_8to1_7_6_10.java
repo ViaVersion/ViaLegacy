@@ -248,7 +248,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             wrapper.write(Type.SHORT, (short) currentItem.identifier());
 
             final List<Metadata> metadata = wrapper.read(Types1_7_6.METADATA_LIST); // metadata
-            metadataRewriter.transform(EntityTypes1_10.EntityType.PLAYER, metadata);
+            metadataRewriter.transform(wrapper.user(), EntityTypes1_10.EntityType.PLAYER, metadata);
             wrapper.write(Types1_8.METADATA_LIST, metadata);
 
             tablistStorage.sendTempEntry(tempTabEntry);
@@ -352,7 +352,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     tracker.updateEntityLocation(entityID, x, y, z, false);
                     tracker.updateEntityMetadata(entityID, metadataList);
 
-                    metadataRewriter.transform(entityType, metadataList);
+                    metadataRewriter.transform(wrapper.user(), entityType, metadataList);
                 });
             }
         });
@@ -558,7 +558,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     final int entityID = wrapper.get(Type.VAR_INT, 0);
                     if (tracker.getTrackedEntities().containsKey(entityID)) {
                         tracker.updateEntityMetadata(entityID, metadataList);
-                        metadataRewriter.transform(tracker.getTrackedEntities().get(entityID), metadataList);
+                        metadataRewriter.transform(wrapper.user(), tracker.getTrackedEntities().get(entityID), metadataList);
                         if (metadataList.isEmpty()) wrapper.cancel();
                     } else {
                         wrapper.cancel();
@@ -1488,7 +1488,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         userConnection.put(new EntityTracker(userConnection));
         userConnection.put(new MapStorage());
         userConnection.put(new DimensionTracker());
-        userConnection.put(new ChunkTracker(userConnection));
+        userConnection.put(new ChunkTracker());
     }
 
     @Override

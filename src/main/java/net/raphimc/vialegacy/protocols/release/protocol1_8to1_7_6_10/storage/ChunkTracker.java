@@ -17,7 +17,6 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage;
 
-import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.model.IdAndData;
@@ -25,8 +24,8 @@ import net.raphimc.vialegacy.api.remapper.AbstractChunkTracker;
 
 public class ChunkTracker extends AbstractChunkTracker {
 
-    public ChunkTracker(final UserConnection user) {
-        super(user, BlockList1_6.obsidian.blockID, BlockList1_6.portal.blockID);
+    public ChunkTracker() {
+        super(BlockList1_6.obsidian.blockID, BlockList1_6.portal.blockID);
 
         for (int i = 9; i < 16; i++) { // double plant
             this.registerReplacement(new IdAndData(175, i), new IdAndData(175, 0));
@@ -57,7 +56,7 @@ public class ChunkTracker extends AbstractChunkTracker {
     protected void postRemap(DataPalette palette) {
         palette.replaceId(BlockList1_6.portal.blockID << 4, 0);
     }
-    
+
     private void registerInvalidDirectionReplacements(final int blockId, final IdAndData replacement) {
         for (int i = 0; i < 2; i++) {
             this.registerReplacement(new IdAndData(blockId, i), replacement);

@@ -17,8 +17,7 @@
  */
 package net.raphimc.vialegacy.api.remapper;
 
-import com.viaversion.viaversion.api.connection.StoredObject;
-import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2IntMap;
@@ -32,16 +31,14 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class AbstractChunkTracker extends StoredObject {
+public abstract class AbstractChunkTracker implements StorableObject {
 
     private final Map<ChunkCoord, Chunk> chunks = new HashMap<>();
     private final IntSet toTrack = new IntOpenHashSet();
     private final boolean trackAll;
     private final Int2IntMap replacements = new Int2IntOpenHashMap();
 
-    public AbstractChunkTracker(final UserConnection user, final int... toTrack) {
-        super(user);
-
+    public AbstractChunkTracker(final int... toTrack) {
         for (final int trackedBlock : toTrack) {
             this.toTrack.add(trackedBlock);
         }

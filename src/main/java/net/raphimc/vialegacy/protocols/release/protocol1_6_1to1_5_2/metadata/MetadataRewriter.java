@@ -27,7 +27,7 @@ import java.util.logging.Level;
 
 public class MetadataRewriter {
 
-    public static void transform(EntityTypes1_10.EntityType type, List<Metadata> list) {
+    public static void transform(final EntityTypes1_10.EntityType type, final List<Metadata> list) {
         for (Metadata entry : new ArrayList<>(list)) {
             final MetaIndex1_6_1to1_5_2 metaIndex = MetaIndex1_6_1to1_5_2.searchIndex(type, entry.id());
             try {

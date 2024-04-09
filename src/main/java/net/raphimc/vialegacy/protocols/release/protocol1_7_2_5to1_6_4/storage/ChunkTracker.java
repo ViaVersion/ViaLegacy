@@ -30,6 +30,7 @@ import java.util.Map;
 public class ChunkTracker extends AbstractChunkTracker {
 
     private static final Map<Integer, Boolean> SOLID_BLOCKS = new HashMap<>();
+    private final boolean b173;
 
     static {
         SOLID_BLOCKS.put(0, false);
@@ -206,7 +207,8 @@ public class ChunkTracker extends AbstractChunkTracker {
     }
 
     public ChunkTracker(final UserConnection user) {
-        super(user, 0);
+        super(0);
+        this.b173 = user.getProtocolInfo().serverProtocolVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_7tob1_7_3);
 
         this.registerReplacement(new IdAndData(BlockList1_6.signWall.blockID, 0), new IdAndData(BlockList1_6.signWall.blockID, 3));
         for (int i = 0; i < 16; i++) {
@@ -239,7 +241,7 @@ public class ChunkTracker extends AbstractChunkTracker {
 
     @Override
     protected void remapBlock(final IdAndData block, final int x, final int y, final int z) {
-        if (block.id == BlockList1_6.chest.blockID && this.getUser().getProtocolInfo().serverProtocolVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_7tob1_7_3)) {
+        if (this.b173 && block.id == BlockList1_6.chest.blockID) {
             byte blockData = 3;
             int rot1 = this.getBlockNotNull(x, y, z - 1).id;
             int rot2 = this.getBlockNotNull(x, y, z + 1).id;
@@ -307,7 +309,7 @@ public class ChunkTracker extends AbstractChunkTracker {
 
     @Override
     protected void postRemap(DataPalette palette) {
-        if (this.getUser().getProtocolInfo().serverProtocolVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_7tob1_7_3)) {
+        if (this.b173) {
             palette.replaceId(BlockList1_6.chest.blockID << 4, 0);
             palette.replaceId(BlockList1_6.chest.blockID << 4 | 1, 0);
         }

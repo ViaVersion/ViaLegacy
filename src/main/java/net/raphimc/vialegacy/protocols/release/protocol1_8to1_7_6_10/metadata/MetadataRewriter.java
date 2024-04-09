@@ -17,11 +17,14 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import net.raphimc.vialegacy.ViaLegacy;
+import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
+import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage.ChunkTracker;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +38,7 @@ public class MetadataRewriter {
         this.protocol = protocol;
     }
 
-    public void transform(EntityTypes1_10.EntityType type, List<Metadata> list) {
+    public void transform(final UserConnection user, final EntityTypes1_10.EntityType type, final List<Metadata> list) {
         for (Metadata entry : new ArrayList<>(list)) {
             final MetaIndex1_8to1_7_6 metaIndex = MetaIndex1_8to1_7_6.searchIndex(type, entry.id());
             try {
@@ -67,7 +70,9 @@ public class MetadataRewriter {
                         }
                     }
                     final byte data = blockDataMeta != null ? (Byte) blockDataMeta.getValue() : 0;
-                    entry.setValue((short) (id | (data << 12)));
+                    final IdAndData block = new IdAndData(id, data);
+                    user.get(ChunkTracker.class).remapBlockParticle(block);
+                    entry.setValue((short) (block.id | (block.data << 12)));
                     continue;
                 } else if (metaIndex == MetaIndex1_8to1_7_6.HUMAN_SKIN_FLAGS) {
                     byte flags = (byte) value;
