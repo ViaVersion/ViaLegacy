@@ -18,7 +18,7 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.model;
 
 import com.viaversion.viaversion.api.minecraft.Position;
-import net.raphimc.vialegacy.api.model.IdAndData;
+import com.viaversion.viaversion.util.IdAndData;
 
 public class PendingBlockEntry {
 

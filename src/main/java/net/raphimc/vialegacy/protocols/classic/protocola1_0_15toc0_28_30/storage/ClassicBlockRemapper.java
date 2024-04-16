@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.storag
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectFunction;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2IntFunction;
-import net.raphimc.vialegacy.api.model.IdAndData;
+import com.viaversion.viaversion.util.IdAndData;
 
 public class ClassicBlockRemapper implements StorableObject {
 

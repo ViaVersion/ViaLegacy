@@ -297,7 +297,7 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends StatelessProtocol<ClientboundPac
                         }
                     } else {
                         final Position pos = wrapper.get(Types1_7_6.POSITION_UBYTE, 0);
-                        if (wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos).id == BlockList1_6.cake.blockID) {
+                        if (wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos).getId() == BlockList1_6.cake.blockID) {
                             final PacketWrapper updateHealth = PacketWrapper.create(ClientboundPacketsb1_7.UPDATE_HEALTH, wrapper.user());
                             updateHealth.write(Type.SHORT, wrapper.user().get(PlayerHealthTracker.class).getHealth()); // health
                             updateHealth.send(Protocolb1_8_0_1tob1_7_0_3.class, false);

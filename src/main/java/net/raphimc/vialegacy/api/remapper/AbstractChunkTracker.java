@@ -24,8 +24,8 @@ import com.viaversion.viaversion.libs.fastutil.ints.Int2IntMap;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2IntOpenHashMap;
 import com.viaversion.viaversion.libs.fastutil.ints.IntOpenHashSet;
 import com.viaversion.viaversion.libs.fastutil.ints.IntSet;
+import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.api.model.ChunkCoord;
-import net.raphimc.vialegacy.api.model.IdAndData;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -107,9 +107,9 @@ public abstract class AbstractChunkTracker implements StorableObject {
                     for (int z = 0; z < 16; z++) {
                         final int flatBlock = palette.idAt(x, y, z);
                         if (this.trackAll || this.toTrack.contains(flatBlock >> 4)) {
-                            final IdAndData block = IdAndData.fromCompressedData(flatBlock);
+                            final IdAndData block = IdAndData.fromRawData(flatBlock);
                             this.remapBlock(block, x + (chunk.getX() << 4), y + (i * 16), z + (chunk.getZ() << 4));
-                            final int newFlatBlock = block.toCompressedData();
+                            final int newFlatBlock = block.toRawData();
                             if (newFlatBlock != flatBlock) {
                                 palette.setIdAt(x, y, z, newFlatBlock);
                             }
@@ -130,34 +130,34 @@ public abstract class AbstractChunkTracker implements StorableObject {
 
         if (chunk != null && y >= 0 && y >> 4 < chunk.getSections().length) {
             ChunkSection section = chunk.getSections()[y >> 4];
-            if (this.trackAll || this.toTrack.contains(block.id)) {
+            if (this.trackAll || this.toTrack.contains(block.getId())) {
                 if (section == null) {
                     section = chunk.getSections()[y >> 4] = new ChunkSectionImpl(false);
                     section.palette(PaletteType.BLOCKS).addId(0);
                 }
-                section.palette(PaletteType.BLOCKS).setIdAt(x & 15, y & 15, z & 15, block.toCompressedData());
+                section.palette(PaletteType.BLOCKS).setIdAt(x & 15, y & 15, z & 15, block.toRawData());
             } else if (section != null) {
                 section.palette(PaletteType.BLOCKS).setIdAt(x & 15, y & 15, z & 15, 0);
             }
         }
 
-        if (this.replacements.containsKey(block.toCompressedData())) {
-            final int newFlatBlock = this.replacements.get(block.toCompressedData());
-            block.id = newFlatBlock >> 4;
-            block.data = newFlatBlock & 15;
+        if (this.replacements.containsKey(block.toRawData())) {
+            final int newFlatBlock = this.replacements.get(block.toRawData());
+            block.setId(newFlatBlock >> 4);
+            block.setData(newFlatBlock & 15);
         }
-        if (this.trackAll || this.toTrack.contains(block.id)) {
+        if (this.trackAll || this.toTrack.contains(block.getId())) {
             this.remapBlock(block, x, y, z);
         }
     }
 
     public void remapBlockParticle(final IdAndData block) {
-        if (this.replacements.containsKey(block.toCompressedData())) {
-            final int newFlatBlock = this.replacements.get(block.toCompressedData());
-            block.id = newFlatBlock >> 4;
-            block.data = newFlatBlock & 15;
+        if (this.replacements.containsKey(block.toRawData())) {
+            final int newFlatBlock = this.replacements.get(block.toRawData());
+            block.setId(newFlatBlock >> 4);
+            block.setData(newFlatBlock & 15);
         }
-        if (this.trackAll || this.toTrack.contains(block.id)) {
+        if (this.trackAll || this.toTrack.contains(block.getId())) {
             this.remapBlock(block, 0, -16, 0);
         }
     }
@@ -190,14 +190,14 @@ public abstract class AbstractChunkTracker implements StorableObject {
             if (y < 0 || y >> 4 > chunk.getSections().length - 1) return null;
             final ChunkSection section = chunk.getSections()[y >> 4];
             if (section != null) {
-                return IdAndData.fromCompressedData(section.palette(PaletteType.BLOCKS).idAt(x & 15, y & 15, z & 15));
+                return IdAndData.fromRawData(section.palette(PaletteType.BLOCKS).idAt(x & 15, y & 15, z & 15));
             }
         }
         return null;
     }
 
     protected void registerReplacement(final IdAndData from, final IdAndData to) {
-        this.replacements.put(from.toCompressedData(), to.toCompressedData());
+        this.replacements.put(from.toRawData(), to.toRawData());
     }
 
     protected void remapBlock(final IdAndData block, final int x, final int y, final int z) {

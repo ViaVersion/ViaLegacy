@@ -20,8 +20,8 @@ package net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.util.IdAndData;
 import io.netty.buffer.ByteBuf;
-import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.chunks.NibbleArray1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.model.NonFullChunk1_1;
 
@@ -149,7 +149,7 @@ public class ChunkType1_1 extends Type<Chunk> {
 
             for (int x = startX; x < endX; x++) {
                 for (int z = startZ; z < endZ; z++) {
-                    section.palette(PaletteType.BLOCKS).setIdAt(x, y & 15, z, IdAndData.toCompressedData(blockArray[x << 11 | z << 7 | y] & 255, blockDataArray.get(x, y, z)));
+                    section.palette(PaletteType.BLOCKS).setIdAt(x, y & 15, z, IdAndData.toRawData(blockArray[x << 11 | z << 7 | y] & 255, blockDataArray.get(x, y, z)));
                     sectionSkyLight.set(x, y & 15, z, skyLightArray.get(x, y, z));
                     sectionBlockLight.set(x, y & 15, z, blockLightArray.get(x, y, z));
                 }

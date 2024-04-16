@@ -44,11 +44,11 @@ import com.viaversion.viaversion.protocols.base.ClientboundStatusPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundStatusPackets;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.util.IdAndData;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOutboundHandlerAdapter;
 import io.netty.channel.ChannelPromise;
 import net.raphimc.vialegacy.ViaLegacy;
-import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.protocol.StatelessTransitionProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
@@ -321,7 +321,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                         final int metadata = data >> 16;
                         final IdAndData block = new IdAndData(id, metadata);
                         wrapper.user().get(ChunkTracker.class).remapBlockParticle(block);
-                        data = (block.id & 0xFFFF) | block.data << 16;
+                        data = (block.getId() & 0xFFFF) | block.getData() << 16;
                     }
                     wrapper.set(Type.INT, 3, data);
                 });
@@ -409,10 +409,10 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                         final int targetX = record.getSectionX() + (chunkX << 4);
                         final int targetY = record.getY(-1);
                         final int targetZ = record.getSectionZ() + (chunkZ << 4);
-                        final IdAndData block = IdAndData.fromCompressedData(record.getBlockId());
+                        final IdAndData block = IdAndData.fromRawData(record.getBlockId());
                         final Position pos = new Position(targetX, targetY, targetZ);
                         wrapper.user().get(ChunkTracker.class).trackAndRemap(pos, block);
-                        record.setBlockId(block.toCompressedData());
+                        record.setBlockId(block.toRawData());
                     }
                 });
             }
@@ -429,8 +429,8 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                     final int data = wrapper.get(Type.UNSIGNED_BYTE, 0); // block data
                     final IdAndData block = new IdAndData(blockId, data);
                     wrapper.user().get(ChunkTracker.class).trackAndRemap(pos, block);
-                    wrapper.set(Type.VAR_INT, 0, block.id); // block id
-                    wrapper.set(Type.UNSIGNED_BYTE, 0, (short) block.data); // block data
+                    wrapper.set(Type.VAR_INT, 0, block.getId()); // block id
+                    wrapper.set(Type.UNSIGNED_BYTE, 0, (short) block.getData()); // block data
                 });
             }
         });
@@ -523,7 +523,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                         final int blockData = data >> 12 & 255;
                         final IdAndData block = new IdAndData(blockID, blockData);
                         chunkTracker.remapBlockParticle(block);
-                        data = (block.id & 4095) | block.data << 12;
+                        data = (block.getId() & 4095) | block.getData() << 12;
 
                         wrapper.set(Type.INT, 1, data);
                     }
@@ -552,8 +552,8 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                         final int metadata = Integer.parseInt(parts[2]);
                         final IdAndData block = new IdAndData(id, metadata);
                         wrapper.user().get(ChunkTracker.class).remapBlockParticle(block);
-                        parts[1] = String.valueOf(block.id);
-                        parts[2] = String.valueOf(block.data);
+                        parts[1] = String.valueOf(block.getId());
+                        parts[2] = String.valueOf(block.getData());
                     }
 
                     wrapper.set(Type.STRING, 0, String.join("_", parts));

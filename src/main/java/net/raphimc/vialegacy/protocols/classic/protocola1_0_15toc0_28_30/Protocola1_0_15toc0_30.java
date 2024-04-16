@@ -26,10 +26,10 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.model.ChunkCoord;
-import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.api.util.BlockFaceUtil;
@@ -199,8 +199,8 @@ public class Protocola1_0_15toc0_30 extends StatelessProtocol<ClientboundPackets
                         return;
                     }
                     final IdAndData mappedBlock = remapper.getMapper().get(blockId);
-                    wrapper.write(Type.UNSIGNED_BYTE, (short) mappedBlock.id); // block id
-                    wrapper.write(Type.UNSIGNED_BYTE, (short) mappedBlock.data); // block data
+                    wrapper.write(Type.UNSIGNED_BYTE, (short) mappedBlock.getId()); // block id
+                    wrapper.write(Type.UNSIGNED_BYTE, (short) mappedBlock.getData()); // block data
                 });
             }
         });
@@ -479,8 +479,8 @@ public class Protocola1_0_15toc0_30 extends StatelessProtocol<ClientboundPackets
     private void sendBlockChange(final UserConnection user, final Position pos, final IdAndData block) throws Exception {
         final PacketWrapper blockChange = PacketWrapper.create(ClientboundPacketsa1_0_15.BLOCK_CHANGE, user);
         blockChange.write(Types1_7_6.POSITION_UBYTE, pos); // position
-        blockChange.write(Type.UNSIGNED_BYTE, (short) block.id); // block id
-        blockChange.write(Type.UNSIGNED_BYTE, (short) block.data); // block data
+        blockChange.write(Type.UNSIGNED_BYTE, (short) block.getId()); // block id
+        blockChange.write(Type.UNSIGNED_BYTE, (short) block.getData()); // block data
         blockChange.send(Protocola1_0_15toc0_30.class);
     }
 

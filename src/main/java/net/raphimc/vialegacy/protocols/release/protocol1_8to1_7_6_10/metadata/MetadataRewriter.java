@@ -21,8 +21,8 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.ViaLegacy;
-import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage.ChunkTracker;
 
@@ -72,7 +72,7 @@ public class MetadataRewriter {
                     final byte data = blockDataMeta != null ? (Byte) blockDataMeta.getValue() : 0;
                     final IdAndData block = new IdAndData(id, data);
                     user.get(ChunkTracker.class).remapBlockParticle(block);
-                    entry.setValue((short) (block.id | (block.data << 12)));
+                    entry.setValue((short) (block.getId() | (block.getData() << 12)));
                     continue;
                 } else if (metaIndex == MetaIndex1_8to1_7_6.HUMAN_SKIN_FLAGS) {
                     byte flags = (byte) value;
