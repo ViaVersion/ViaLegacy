@@ -252,7 +252,9 @@ public class Protocol1_6_1to1_5_2 extends StatelessProtocol<ClientboundPackets1_
                     String newSound = SoundRewriter.map(oldSound);
                     if (oldSound.isEmpty()) newSound = "";
                     if (newSound == null) {
-                        ViaLegacy.getPlatform().getLogger().warning("Unable to map 1.5.2 sound '" + oldSound + "'");
+                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                            ViaLegacy.getPlatform().getLogger().warning("Unable to map 1.5.2 sound '" + oldSound + "'");
+                        }
                         newSound = "";
                     }
                     if (newSound.isEmpty()) {

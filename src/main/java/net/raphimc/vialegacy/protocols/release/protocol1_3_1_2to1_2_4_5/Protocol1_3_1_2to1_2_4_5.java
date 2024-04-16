@@ -455,7 +455,9 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
             wrapper.user().get(ChestStateTracker.class).unload(chunk.getX(), chunk.getZ());
 
             if (chunk.isFullChunk() && chunk.getBitmask() == 0) { // Remap to empty chunk
-                ViaLegacy.getPlatform().getLogger().warning("Received empty 1.2.5 chunk packet");
+                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                    ViaLegacy.getPlatform().getLogger().warning("Received empty 1.2.5 chunk packet");
+                }
                 chunk = ChunkUtil.createEmptyChunk(chunk.getX(), chunk.getZ());
                 if (dimension == Environment.NORMAL) {
                     ChunkUtil.setDummySkylight(chunk, true);

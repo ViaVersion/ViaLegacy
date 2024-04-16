@@ -17,6 +17,7 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -43,7 +44,9 @@ public class MetadataRewriter {
             final MetaIndex1_8to1_7_6 metaIndex = MetaIndex1_8to1_7_6.searchIndex(type, entry.id());
             try {
                 if (metaIndex == null) {
-                    ViaLegacy.getPlatform().getLogger().warning("Could not find valid metaindex entry for " + type.name() + ": " + entry);
+                    if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                        ViaLegacy.getPlatform().getLogger().warning("Could not find valid metaindex entry for " + type.name() + ": " + entry);
+                    }
                     list.remove(entry);
                     continue;
                 }
@@ -103,12 +106,16 @@ public class MetadataRewriter {
                     case Rotation:
                         break;
                     default:
-                        ViaLegacy.getPlatform().getLogger().warning("1.7.10 MetaDataType: Unhandled Type: " + metaIndex.getNewType() + " " + entry);
+                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                            ViaLegacy.getPlatform().getLogger().warning("1.7.10 MetaDataType: Unhandled Type: " + metaIndex.getNewType() + " " + entry);
+                        }
                         list.remove(entry);
                         break;
                 }
             } catch (Throwable e) {
-                ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error rewriting metadata entry for " + type.name() + ": " + entry, e);
+                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                    ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error rewriting metadata entry for " + type.name() + ": " + entry, e);
+                }
                 list.remove(entry);
             }
         }

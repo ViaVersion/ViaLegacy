@@ -763,7 +763,9 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             Particle particle = Particle.find(parts[0]);
             if (particle == null) {
                 particle = Particle.BARRIER;
-                ViaLegacy.getPlatform().getLogger().warning("Could not find 1.8 particle for " + Arrays.toString(parts));
+                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                    ViaLegacy.getPlatform().getLogger().warning("Could not find 1.8 particle for " + Arrays.toString(parts));
+                }
             }
             wrapper.write(Type.INT, particle.ordinal()); // particle id
             wrapper.write(Type.BOOLEAN, false); // long distance
@@ -1398,7 +1400,9 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                                 } else if (type == 1) {
                                     wrapper.passthrough(Type.INT); // entity id
                                 } else {
-                                    ViaLegacy.getPlatform().getLogger().warning("Unknown 1.8 command block type: " + type);
+                                    if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                                        ViaLegacy.getPlatform().getLogger().warning("Unknown 1.8 command block type: " + type);
+                                    }
                                     wrapper.cancel();
                                     return;
                                 }
