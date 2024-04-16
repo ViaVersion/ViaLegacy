@@ -167,7 +167,7 @@ public class ClassicLevelStorage extends StoredObject {
                     final int totalX = x + (coord.chunkX * 16);
                     for (int z = 0; z < this.subChunkZLength; z++) {
                         final int totalZ = z + (coord.chunkZ * 16);
-                        section.palette(PaletteType.BLOCKS).setIdAt(x, y, z, remapper.getMapper().get(this.classicLevel.getBlock(totalX, totalY, totalZ)).toCompressedData());
+                        section.palette(PaletteType.BLOCKS).setIdAt(x, y, z, remapper.getMapper().get(this.classicLevel.getBlock(totalX, totalY, totalZ)).toRawData());
                         skyLight.set(x, y, z, this.classicLevel.isLit(totalX, totalY, totalZ) ? 15 : 9);
                     }
                 }

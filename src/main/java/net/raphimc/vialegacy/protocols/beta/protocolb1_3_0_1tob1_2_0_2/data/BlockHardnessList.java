@@ -17,7 +17,7 @@
  */
 package net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.data;
 
-import net.raphimc.vialegacy.api.model.IdAndData;
+import com.viaversion.viaversion.util.IdAndData;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -116,7 +116,7 @@ public class BlockHardnessList {
     }
 
     public static boolean canBeBrokenInstantly(final IdAndData block) {
-        return canBeBrokenInstantly(block.id);
+        return canBeBrokenInstantly(block.getId());
     }
 
 }

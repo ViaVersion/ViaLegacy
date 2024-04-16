@@ -24,10 +24,10 @@ import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
-import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.util.BlockFaceUtil;
 import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.Protocolb1_0_1_1_1toa1_2_3_5_1_2_6;
 import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.data.AlphaItems;
@@ -261,13 +261,13 @@ public class AlphaInventoryTracker extends StoredObject {
             AlphaItems.doPlace(handItem, direction, placedAgainst);
 
             if (handItem.identifier() < 256 || handItem.identifier() == ItemList1_6.reed.itemID) { // block item
-                if (targetBlock.id == 0 || targetBlock.id == BlockList1_6.waterStill.blockID || targetBlock.id == BlockList1_6.waterMoving.blockID || targetBlock.id == BlockList1_6.lavaStill.blockID || targetBlock.id == BlockList1_6.lavaMoving.blockID || targetBlock.id == BlockList1_6.fire.blockID || targetBlock.id == BlockList1_6.snow.blockID) {
+                if (targetBlock.getId() == 0 || targetBlock.getId() == BlockList1_6.waterStill.blockID || targetBlock.getId() == BlockList1_6.waterMoving.blockID || targetBlock.getId() == BlockList1_6.lavaStill.blockID || targetBlock.getId() == BlockList1_6.lavaMoving.blockID || targetBlock.getId() == BlockList1_6.fire.blockID || targetBlock.getId() == BlockList1_6.snow.blockID) {
                     handItem.setAmount(handItem.amount() - 1);
                 }
             } else if (handItem.identifier() == ItemList1_6.sign.itemID) {
-                if (direction != 0 && targetBlock.id == 0) handItem.setAmount(handItem.amount() - 1);
+                if (direction != 0 && targetBlock.getId() == 0) handItem.setAmount(handItem.amount() - 1);
             } else if (handItem.identifier() == ItemList1_6.redstone.itemID) {
-                if (targetBlock.id == 0) handItem.setAmount(handItem.amount() - 1);
+                if (targetBlock.getId() == 0) handItem.setAmount(handItem.amount() - 1);
             }
         }
 

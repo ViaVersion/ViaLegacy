@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2IntMap;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2IntOpenHashMap;
-import net.raphimc.vialegacy.api.model.IdAndData;
+import com.viaversion.viaversion.util.IdAndData;
 
 public abstract class AbstractBlockRemapper {
 
@@ -35,7 +35,7 @@ public abstract class AbstractBlockRemapper {
     }
 
     protected void registerReplacement(final IdAndData from, final IdAndData to) {
-        this.REPLACEMENTS.put(from.toCompressedData(), to.toCompressedData());
+        this.REPLACEMENTS.put(from.toRawData(), to.toRawData());
     }
 
     public void remapChunk(final Chunk chunk) {
@@ -60,10 +60,10 @@ public abstract class AbstractBlockRemapper {
     }
 
     public void remapBlock(final IdAndData block) {
-        if (this.REPLACEMENTS.containsKey(block.toCompressedData())) {
-            final int replacement = this.REPLACEMENTS.get(block.toCompressedData());
-            block.id = replacement >> 4;
-            block.data = replacement & 15;
+        if (this.REPLACEMENTS.containsKey(block.toRawData())) {
+            final int replacement = this.REPLACEMENTS.get(block.toRawData());
+            block.setId(replacement >> 4);
+            block.setData(replacement & 15);
         }
     }
 

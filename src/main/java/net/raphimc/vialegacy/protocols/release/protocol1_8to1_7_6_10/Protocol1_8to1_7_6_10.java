@@ -46,9 +46,9 @@ import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
 import com.viaversion.viaversion.protocols.protocol1_8.ServerboundPackets1_8;
+import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
-import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.util.PacketUtil;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ClientboundPackets1_7_2;
@@ -311,7 +311,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                         final int metadata = data >> 16;
                         final IdAndData block = new IdAndData(id, metadata);
                         wrapper.user().get(ChunkTracker.class).remapBlockParticle(block);
-                        data = block.id | block.data << 12;
+                        data = block.getId() | block.getData() << 12;
                     }
 
                     y = realignEntityY(type, y);
@@ -632,10 +632,10 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                         final int targetX = record.getSectionX() + (chunkX << 4);
                         final int targetY = record.getY(-1);
                         final int targetZ = record.getSectionZ() + (chunkZ << 4);
-                        final IdAndData block = IdAndData.fromCompressedData(record.getBlockId());
+                        final IdAndData block = IdAndData.fromRawData(record.getBlockId());
                         final Position pos = new Position(targetX, targetY, targetZ);
                         wrapper.user().get(ChunkTracker.class).trackAndRemap(pos, block);
-                        record.setBlockId(block.toCompressedData());
+                        record.setBlockId(block.toRawData());
                     }
                 });
             }
@@ -650,7 +650,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     final Position pos = wrapper.get(Type.POSITION1_8, 0); // position
                     final IdAndData block = new IdAndData(blockId, data);
                     wrapper.user().get(ChunkTracker.class).trackAndRemap(pos, block);
-                    wrapper.write(Type.VAR_INT, block.toCompressedData());
+                    wrapper.write(Type.VAR_INT, block.toRawData());
                 });
             }
         });
@@ -713,7 +713,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 final Random rnd = new Random();
                 final ChunkTracker chunkTracker = wrapper.user().get(ChunkTracker.class);
                 final IdAndData block = chunkTracker.getBlockNotNull(pos);
-                if (block.id != 0) {
+                if (block.getId() != 0) {
                     double var21 = Math.min(0.2F + (float) data / 15.0F, 10.0F);
                     if (var21 > 2.5D) var21 = 2.5D;
                     final float var25 = randomFloatClamp(rnd, 0.0F, ((float) Math.PI * 2F));
@@ -734,7 +734,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     wrapper.write(Type.FLOAT, offsetZ);
                     wrapper.write(Type.FLOAT, 0.15000000596046448F); // particleSpeed
                     wrapper.write(Type.INT, amount);
-                    wrapper.write(Type.VAR_INT, block.id | (block.data << 12));
+                    wrapper.write(Type.VAR_INT, block.getId() | (block.getData() << 12));
                 } else {
                     wrapper.cancel();
                 }
@@ -749,7 +749,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     final int blockData = data >> 12 & 255;
                     final IdAndData block = new IdAndData(blockID, blockData);
                     chunkTracker.remapBlockParticle(block);
-                    data = block.id | (block.data << 12);
+                    data = block.getId() | (block.getData() << 12);
                 }
 
                 wrapper.write(Type.INT, effectId);
@@ -790,7 +790,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 final int metadata = Integer.parseInt(parts[2]);
                 final IdAndData block = new IdAndData(id, metadata);
                 wrapper.user().get(ChunkTracker.class).remapBlockParticle(block);
-                wrapper.write(Type.VAR_INT, block.id | block.data << 12); // particle data
+                wrapper.write(Type.VAR_INT, block.getId() | block.getData() << 12); // particle data
             } else if (particle.extra > 0)
                 throw new IllegalStateException("Tried to write particle which requires extra data, but no handler was found");
         });

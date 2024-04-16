@@ -18,8 +18,8 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage;
 
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
-import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.remapper.AbstractChunkTracker;
 
 public class ChunkTracker extends AbstractChunkTracker {
@@ -43,11 +43,11 @@ public class ChunkTracker extends AbstractChunkTracker {
 
     @Override
     protected void remapBlock(IdAndData block, int x, int y, int z) {
-        if (block.id == BlockList1_6.portal.blockID && block.data == 0) {
-            if (this.getBlockNotNull(x - 1, y, z).id == BlockList1_6.obsidian.blockID || this.getBlockNotNull(x + 1, y, z).id == BlockList1_6.obsidian.blockID) {
-                block.data = 1;
+        if (block.getId() == BlockList1_6.portal.blockID && block.getData() == 0) {
+            if (this.getBlockNotNull(x - 1, y, z).getId() == BlockList1_6.obsidian.blockID || this.getBlockNotNull(x + 1, y, z).getId() == BlockList1_6.obsidian.blockID) {
+                block.setData(1);
             } else {
-                block.data = 2;
+                block.setData(2);
             }
         }
     }

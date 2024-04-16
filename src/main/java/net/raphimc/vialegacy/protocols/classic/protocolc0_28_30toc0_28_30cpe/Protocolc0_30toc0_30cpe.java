@@ -27,10 +27,10 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.FixedByteArrayType;
+import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.model.ChunkCoord;
-import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_16_2toa1_0_15.ClientboundPacketsa1_0_15;
@@ -199,7 +199,7 @@ public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacket
                     level.setBlock(pos, blockId);
                     if (!levelStorage.isChunkLoaded(pos)) continue;
                     final IdAndData mappedBlock = remapper.getMapper().get(blockId);
-                    records.computeIfAbsent(new ChunkCoord(pos.x() >> 4, pos.z() >> 4), k -> new ArrayList<>()).add(new BlockChangeRecord1_8(pos.x() & 15, pos.y(), pos.z() & 15, mappedBlock.toCompressedData()));
+                    records.computeIfAbsent(new ChunkCoord(pos.x() >> 4, pos.z() >> 4), k -> new ArrayList<>()).add(new BlockChangeRecord1_8(pos.x() & 15, pos.y(), pos.z() & 15, mappedBlock.toRawData()));
                 }
 
                 for (Map.Entry<ChunkCoord, List<BlockChangeRecord>> entry : records.entrySet()) {

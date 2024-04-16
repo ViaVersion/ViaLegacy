@@ -27,10 +27,10 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.*;
+import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
-import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.data.AlphaItems;
@@ -149,7 +149,7 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
             final IdAndData block = wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos);
             final String blockName = tag.get("id") != null ? tag.<StringTag>get("id").getValue() : "";
 
-            if (block.id == BlockList1_6.signPost.blockID || block.id == BlockList1_6.signWall.blockID || blockName.equals("Sign")) {
+            if (block.getId() == BlockList1_6.signPost.blockID || block.getId() == BlockList1_6.signWall.blockID || blockName.equals("Sign")) {
                 final PacketWrapper updateSign = PacketWrapper.create(ClientboundPacketsb1_1.UPDATE_SIGN, wrapper.user());
                 updateSign.write(Types1_7_6.POSITION_SHORT, pos); // position
                 updateSign.write(Typesb1_7_0_3.STRING, tag.<StringTag>get("Text1").getValue()); // line 1
@@ -157,7 +157,7 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
                 updateSign.write(Typesb1_7_0_3.STRING, tag.<StringTag>get("Text3").getValue()); // line 3
                 updateSign.write(Typesb1_7_0_3.STRING, tag.<StringTag>get("Text4").getValue()); // line 4
                 updateSign.send(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
-            } else if (block.id == BlockList1_6.mobSpawner.blockID || blockName.equals("MobSpawner")) {
+            } else if (block.getId() == BlockList1_6.mobSpawner.blockID || blockName.equals("MobSpawner")) {
                 if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_2_1_3to1_1.class)) {
                     final PacketWrapper spawnerData = PacketWrapper.create(ClientboundPackets1_2_1.BLOCK_ENTITY_DATA, wrapper.user());
                     spawnerData.write(Types1_7_6.POSITION_SHORT, pos); // position
@@ -167,12 +167,12 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
                     spawnerData.write(Type.INT, 0); // unused
                     spawnerData.send(Protocol1_2_1_3to1_1.class);
                 }
-            } else if (block.id == BlockList1_6.chest.blockID || blockName.equals("Chest")) {
+            } else if (block.getId() == BlockList1_6.chest.blockID || blockName.equals("Chest")) {
                 final Item[] chestItems = new Item[3 * 9];
                 readItemsFromTag(tag, chestItems);
                 tracker.containers.put(pos, chestItems);
                 if (pos.equals(tracker.openContainerPos)) sendWindowItems(wrapper.user(), InventoryStorage.CHEST_WID, chestItems);
-            } else if (block.id == BlockList1_6.furnaceIdle.blockID || block.id == BlockList1_6.furnaceBurning.blockID || blockName.equals("Furnace")) {
+            } else if (block.getId() == BlockList1_6.furnaceIdle.blockID || block.getId() == BlockList1_6.furnaceBurning.blockID || blockName.equals("Furnace")) {
                 final Item[] furnaceItems = new Item[3];
                 readItemsFromTag(tag, furnaceItems);
                 tracker.containers.put(pos, furnaceItems);
@@ -232,12 +232,12 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
             if (direction == 255) return;
 
             final IdAndData block = wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos);
-            if (block.id != BlockList1_6.furnaceIdle.blockID && block.id != BlockList1_6.furnaceBurning.blockID && block.id != BlockList1_6.chest.blockID && block.id != BlockList1_6.workbench.blockID) {
+            if (block.getId() != BlockList1_6.furnaceIdle.blockID && block.getId() != BlockList1_6.furnaceBurning.blockID && block.getId() != BlockList1_6.chest.blockID && block.getId() != BlockList1_6.workbench.blockID) {
                 return;
             }
 
             final Item[] containerItems = tracker.containers.get(tracker.openContainerPos = pos);
-            if (containerItems == null && block.id != BlockList1_6.workbench.blockID) {
+            if (containerItems == null && block.getId() != BlockList1_6.workbench.blockID) {
                 tracker.openContainerPos = null;
                 final PacketWrapper chatMessage = PacketWrapper.create(ClientboundPacketsb1_1.CHAT_MESSAGE, wrapper.user());
                 chatMessage.write(Typesb1_7_0_3.STRING, "§cMissing Container"); // message
@@ -246,13 +246,13 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
             }
 
             final PacketWrapper openWindow = PacketWrapper.create(ClientboundPacketsb1_1.OPEN_WINDOW, wrapper.user());
-            if (block.id == BlockList1_6.chest.blockID) {
+            if (block.getId() == BlockList1_6.chest.blockID) {
                 openWindow.write(Type.UNSIGNED_BYTE, (short) InventoryStorage.CHEST_WID); // window id
                 openWindow.write(Type.UNSIGNED_BYTE, (short) 0); // window type
                 openWindow.write(Typesb1_7_0_3.STRING, "Chest"); // title
                 openWindow.write(Type.UNSIGNED_BYTE, (short) (3 * 9)); // slots
                 if (inventoryTracker != null) inventoryTracker.onWindowOpen(0, 3 * 9);
-            } else if (block.id == BlockList1_6.workbench.blockID) {
+            } else if (block.getId() == BlockList1_6.workbench.blockID) {
                 openWindow.write(Type.UNSIGNED_BYTE, (short) InventoryStorage.WORKBENCH_WID); // window id
                 openWindow.write(Type.UNSIGNED_BYTE, (short) 1); // window type
                 openWindow.write(Typesb1_7_0_3.STRING, "Crafting Table"); // title
@@ -267,8 +267,8 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
             }
             openWindow.send(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
 
-            if (block.id != BlockList1_6.workbench.blockID) {
-                sendWindowItems(wrapper.user(), block.id == BlockList1_6.chest.blockID ? InventoryStorage.CHEST_WID : InventoryStorage.FURNACE_WID, containerItems);
+            if (block.getId() != BlockList1_6.workbench.blockID) {
+                sendWindowItems(wrapper.user(), block.getId() == BlockList1_6.chest.blockID ? InventoryStorage.CHEST_WID : InventoryStorage.FURNACE_WID, containerItems);
             }
         });
         this.registerServerbound(ServerboundPacketsb1_1.HELD_ITEM_CHANGE, wrapper -> {

@@ -39,9 +39,9 @@ import com.viaversion.viaversion.libs.opennbt.tag.builtin.IntTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.ShortTag;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 import com.viaversion.viaversion.util.ChunkUtil;
+import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
-import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.model.Location;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
@@ -487,7 +487,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                 map(Type.BYTE); // data
                 handler(wrapper -> {
                     final IdAndData block = wrapper.user().get(ChunkTracker.class).getBlockNotNull(wrapper.get(Types1_7_6.POSITION_SHORT, 0));
-                    wrapper.write(Type.SHORT, (short) block.id); // block id
+                    wrapper.write(Type.SHORT, (short) block.getId()); // block id
 
                     final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                     final Position pos = wrapper.get(Types1_7_6.POSITION_SHORT, 0);
@@ -500,7 +500,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                     float pitch = 1F;
                     Sound sound = null;
 
-                    if (blockId == BlockList1_6.music.blockID) {
+                    if (block.getId() == BlockList1_6.music.blockID) {
                         switch (type) {
                             default:
                             case 0:
@@ -521,7 +521,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                         }
                         volume = 3F;
                         pitch = (float) Math.pow(2D, (double) (data - 12) / 12D);
-                    } else if (blockId == BlockList1_6.chest.blockID) {
+                    } else if (block.getId() == BlockList1_6.chest.blockID) {
                         if (type == 1) {
                             final ChestStateTracker chestStateTracker = wrapper.user().get(ChestStateTracker.class);
                             if (chestStateTracker.isChestOpen(pos) && data <= 0) {
@@ -534,7 +534,7 @@ public class Protocol1_3_1_2to1_2_4_5 extends StatelessProtocol<ClientboundPacke
                             volume = 0.5F;
                             pitch = entityTracker.RND.nextFloat() * 0.1F + 0.9F;
                         }
-                    } else if (blockId == BlockList1_6.pistonBase.blockID || blockId == BlockList1_6.pistonStickyBase.blockID) {
+                    } else if (block.getId() == BlockList1_6.pistonBase.blockID || block.getId() == BlockList1_6.pistonStickyBase.blockID) {
                         if (type == 0) {
                             sound = Sound.PISTON_OUT;
                             volume = 0.5F;

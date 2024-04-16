@@ -23,9 +23,9 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
-import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.Protocol1_0_0_1tob1_8_0_1;
 import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.storage.PlayerAirTimeStorage;
 import net.raphimc.vialegacy.protocols.release.protocol1_1to1_0_0_1.ClientboundPackets1_0;
@@ -50,7 +50,7 @@ public class PlayerAirTimeUpdateTask implements Runnable {
 
                     try {
                         final IdAndData headBlock = info.get(ChunkTracker.class).getBlockNotNull(floor(playerInfoStorage.posX), floor(playerInfoStorage.posY + 1.62F), floor(playerInfoStorage.posZ));
-                        if (headBlock.id == BlockList1_6.waterMoving.blockID || headBlock.id == BlockList1_6.waterStill.blockID) {
+                        if (headBlock.getId() == BlockList1_6.waterMoving.blockID || headBlock.getId() == BlockList1_6.waterStill.blockID) {
                             playerAirTimeStorage.sentPacket = false;
                             playerAirTimeStorage.air--;
                             if (playerAirTimeStorage.air < 0) playerAirTimeStorage.air = 0;

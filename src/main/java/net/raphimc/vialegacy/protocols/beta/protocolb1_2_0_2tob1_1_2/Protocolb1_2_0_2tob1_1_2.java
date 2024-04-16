@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
-import net.raphimc.vialegacy.api.model.IdAndData;
+import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_2_0_2tob1_1_2.rewriter.BlockDataRewriter;
@@ -155,8 +155,8 @@ public class Protocolb1_2_0_2tob1_1_2 extends StatelessProtocol<ClientboundPacke
                 handler(wrapper -> {
                     final IdAndData block = new IdAndData(wrapper.get(Type.UNSIGNED_BYTE, 0), wrapper.get(Type.UNSIGNED_BYTE, 1));
                     BLOCK_DATA_REWRITER.remapBlock(block);
-                    wrapper.set(Type.UNSIGNED_BYTE, 0, (short) block.id);
-                    wrapper.set(Type.UNSIGNED_BYTE, 1, (short) block.data);
+                    wrapper.set(Type.UNSIGNED_BYTE, 0, (short) block.getId());
+                    wrapper.set(Type.UNSIGNED_BYTE, 1, (short) block.getData());
                 });
             }
         });

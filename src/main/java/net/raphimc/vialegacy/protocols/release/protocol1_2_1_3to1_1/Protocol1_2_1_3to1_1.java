@@ -28,9 +28,9 @@ import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.LegacyProtocolVersion;
-import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
@@ -253,7 +253,7 @@ public class Protocol1_2_1_3to1_1 extends StatelessProtocol<ClientboundPackets1_
                     for (int i = 0; i < recordCount; i++) {
                         final Position pos = new Position(x + wrapper.passthrough(Type.BYTE), y + wrapper.passthrough(Type.BYTE), z + wrapper.passthrough(Type.BYTE));
                         final IdAndData block = chunkTracker.getBlockNotNull(pos);
-                        if (block.id != 0) {
+                        if (block.getId() != 0) {
                             pendingBlocksTracker.addPending(pos, block);
                         }
                     }

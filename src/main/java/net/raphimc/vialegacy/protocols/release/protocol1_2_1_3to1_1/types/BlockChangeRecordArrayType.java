@@ -20,8 +20,8 @@ package net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.types;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord1_8;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.util.IdAndData;
 import io.netty.buffer.ByteBuf;
-import net.raphimc.vialegacy.api.model.IdAndData;
 
 public class BlockChangeRecordArrayType extends Type<BlockChangeRecord[]> {
 
@@ -47,7 +47,7 @@ public class BlockChangeRecordArrayType extends Type<BlockChangeRecord[]> {
 
         final BlockChangeRecord[] blockChangeRecords = new BlockChangeRecord[length];
         for (int i = 0; i < length; i++) {
-            blockChangeRecords[i] = new BlockChangeRecord1_8(positions[i] >> 12 & 15, positions[i] & 255, positions[i] >> 8 & 15, IdAndData.toCompressedData(blocks[i], metas[i]));
+            blockChangeRecords[i] = new BlockChangeRecord1_8(positions[i] >> 12 & 15, positions[i] & 255, positions[i] >> 8 & 15, IdAndData.toRawData(blocks[i], metas[i]));
         }
         return blockChangeRecords;
     }

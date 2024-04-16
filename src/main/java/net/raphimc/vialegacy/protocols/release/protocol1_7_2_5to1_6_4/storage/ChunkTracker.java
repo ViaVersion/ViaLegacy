@@ -19,9 +19,9 @@ package net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
-import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.remapper.AbstractChunkTracker;
 
 import java.util.HashMap;
@@ -241,25 +241,25 @@ public class ChunkTracker extends AbstractChunkTracker {
 
     @Override
     protected void remapBlock(final IdAndData block, final int x, final int y, final int z) {
-        if (this.b173 && block.id == BlockList1_6.chest.blockID) {
+        if (this.b173 && block.getId() == BlockList1_6.chest.blockID) {
             byte blockData = 3;
-            int rot1 = this.getBlockNotNull(x, y, z - 1).id;
-            int rot2 = this.getBlockNotNull(x, y, z + 1).id;
-            int rot3 = this.getBlockNotNull(x - 1, y, z).id;
-            int rot4 = this.getBlockNotNull(x + 1, y, z).id;
+            int rot1 = this.getBlockNotNull(x, y, z - 1).getId();
+            int rot2 = this.getBlockNotNull(x, y, z + 1).getId();
+            int rot3 = this.getBlockNotNull(x - 1, y, z).getId();
+            int rot4 = this.getBlockNotNull(x + 1, y, z).getId();
 
             int rot5;
             if (rot3 == BlockList1_6.chest.blockID) {
-                rot5 = this.getBlockNotNull(x - 1, y, z - 1).id;
+                rot5 = this.getBlockNotNull(x - 1, y, z - 1).getId();
             } else {
-                rot5 = this.getBlockNotNull(x + 1, y, z - 1).id;
+                rot5 = this.getBlockNotNull(x + 1, y, z - 1).getId();
             }
 
             int rot6;
             if (rot3 == BlockList1_6.chest.blockID) {
-                rot6 = this.getBlockNotNull(x - 1, y, z + 1).id;
+                rot6 = this.getBlockNotNull(x - 1, y, z + 1).getId();
             } else {
-                rot6 = this.getBlockNotNull(x + 1, y, z + 1).id;
+                rot6 = this.getBlockNotNull(x + 1, y, z + 1).getId();
             }
 
             if (rot1 != BlockList1_6.chest.blockID && rot2 != BlockList1_6.chest.blockID) {
@@ -286,15 +286,15 @@ public class ChunkTracker extends AbstractChunkTracker {
                 blockData = 5;
 
                 if (rot1 == BlockList1_6.chest.blockID) {
-                    rot5 = this.getBlockNotNull(x - 1, y, z - 1).id;
+                    rot5 = this.getBlockNotNull(x - 1, y, z - 1).getId();
                 } else {
-                    rot5 = this.getBlockNotNull(x - 1, y, z + 1).id;
+                    rot5 = this.getBlockNotNull(x - 1, y, z + 1).getId();
                 }
 
                 if (rot1 == BlockList1_6.chest.blockID) {
-                    rot6 = this.getBlockNotNull(x + 1, y, z - 1).id;
+                    rot6 = this.getBlockNotNull(x + 1, y, z - 1).getId();
                 } else {
-                    rot6 = this.getBlockNotNull(x + 1, y, z + 1).id;
+                    rot6 = this.getBlockNotNull(x + 1, y, z + 1).getId();
                 }
 
                 if (SOLID_BLOCKS.get(rot4) || SOLID_BLOCKS.get(rot6)) {
@@ -303,7 +303,7 @@ public class ChunkTracker extends AbstractChunkTracker {
                     }
                 }
             }
-            block.data = blockData;
+            block.setData(blockData);
         }
     }
 

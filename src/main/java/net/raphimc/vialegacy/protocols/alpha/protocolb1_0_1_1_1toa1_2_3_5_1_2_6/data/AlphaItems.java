@@ -19,8 +19,8 @@ package net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6
 
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.libs.fastutil.ints.*;
+import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
-import net.raphimc.vialegacy.api.model.IdAndData;
 
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
@@ -312,7 +312,7 @@ public class AlphaItems {
             }
         });
         PLACE_ACTION.put(290, (i, d) -> {
-            if (d.value().id == BlockList1_6.grass.blockID || d.value().id == BlockList1_6.dirt.blockID) {
+            if (d.value().getId() == BlockList1_6.grass.blockID || d.value().getId() == BlockList1_6.dirt.blockID) {
                 i.setData((short) (i.data() + 1));
                 if (i.data() > 32) {
                     i.setAmount(i.amount() - 1);
@@ -320,7 +320,7 @@ public class AlphaItems {
             }
         });
         PLACE_ACTION.put(291, (i, d) -> {
-            if (d.value().id == BlockList1_6.grass.blockID || d.value().id == BlockList1_6.dirt.blockID) {
+            if (d.value().getId() == BlockList1_6.grass.blockID || d.value().getId() == BlockList1_6.dirt.blockID) {
                 i.setData((short) (i.data() + 1));
                 if (i.data() > 64) {
                     i.setAmount(i.amount() - 1);
@@ -328,7 +328,7 @@ public class AlphaItems {
             }
         });
         PLACE_ACTION.put(292, (i, d) -> {
-            if (d.value().id == BlockList1_6.grass.blockID || d.value().id == BlockList1_6.dirt.blockID) {
+            if (d.value().getId() == BlockList1_6.grass.blockID || d.value().getId() == BlockList1_6.dirt.blockID) {
                 i.setData((short) (i.data() + 1));
                 if (i.data() > 128) {
                     i.setAmount(i.amount() - 1);
@@ -336,7 +336,7 @@ public class AlphaItems {
             }
         });
         PLACE_ACTION.put(293, (i, d) -> {
-            if (d.value().id == BlockList1_6.grass.blockID || d.value().id == BlockList1_6.dirt.blockID) {
+            if (d.value().getId() == BlockList1_6.grass.blockID || d.value().getId() == BlockList1_6.dirt.blockID) {
                 i.setData((short) (i.data() + 1));
                 if (i.data() > 256) {
                     i.setAmount(i.amount() - 1);
@@ -344,7 +344,7 @@ public class AlphaItems {
             }
         });
         PLACE_ACTION.put(294, (i, d) -> {
-            if (d.value().id == BlockList1_6.grass.blockID || d.value().id == BlockList1_6.dirt.blockID) {
+            if (d.value().getId() == BlockList1_6.grass.blockID || d.value().getId() == BlockList1_6.dirt.blockID) {
                 i.setData((short) (i.data() + 1));
                 if (i.data() > 64) {
                     i.setAmount(i.amount() - 1);
@@ -352,7 +352,7 @@ public class AlphaItems {
             }
         });
         PLACE_ACTION.put(295, (i, d) -> {
-            if (d.keyInt() == 1 && d.value().id == BlockList1_6.tilledField.blockID) {
+            if (d.keyInt() == 1 && d.value().getId() == BlockList1_6.tilledField.blockID) {
                 i.setAmount(i.amount() - 1);
             }
         });
@@ -363,7 +363,7 @@ public class AlphaItems {
             if (d.keyInt() == 1) i.setAmount(i.amount() - 1);
         });
         PLACE_ACTION.put(328, (i, d) -> {
-            if (d.value().id == BlockList1_6.rail.blockID) {
+            if (d.value().getId() == BlockList1_6.rail.blockID) {
                 i.setAmount(i.amount() - 1);
             }
         });
@@ -371,22 +371,22 @@ public class AlphaItems {
             if (d.keyInt() == 1) i.setAmount(i.amount() - 1);
         });
         PLACE_ACTION.put(342, (i, d) -> {
-            if (d.value().id == BlockList1_6.rail.blockID) {
+            if (d.value().getId() == BlockList1_6.rail.blockID) {
                 i.setAmount(i.amount() - 1);
             }
         });
         PLACE_ACTION.put(343, (i, d) -> {
-            if (d.value().id == BlockList1_6.rail.blockID) {
+            if (d.value().getId() == BlockList1_6.rail.blockID) {
                 i.setAmount(i.amount() - 1);
             }
         });
         PLACE_ACTION.put(2256, (i, d) -> {
-            if (d.value().id == BlockList1_6.jukebox.blockID && d.value().data == 0) {
+            if (d.value().getId() == BlockList1_6.jukebox.blockID && d.value().getData() == 0) {
                 i.setAmount(i.amount() - 1);
             }
         });
         PLACE_ACTION.put(2257, (i, d) -> {
-            if (d.value().id == BlockList1_6.jukebox.blockID && d.value().data == 0) {
+            if (d.value().getId() == BlockList1_6.jukebox.blockID && d.value().getData() == 0) {
                 i.setAmount(i.amount() - 1);
             }
         });

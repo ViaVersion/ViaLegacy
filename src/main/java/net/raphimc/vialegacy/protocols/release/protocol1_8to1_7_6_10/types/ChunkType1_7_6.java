@@ -19,9 +19,9 @@ package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types;
 
 import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.util.IdAndData;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
-import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.chunks.ExtendedBlockStorage;
 
 import java.io.ByteArrayOutputStream;
@@ -188,7 +188,7 @@ public class ChunkType1_7_6 extends Type<Chunk> {
                 for (int x = 0; x < 16; x++) {
                     for (int z = 0; z < 16; z++) {
                         for (int y = 0; y < 16; y++) {
-                            section.palette(PaletteType.BLOCKS).setIdAt(x, y, z, IdAndData.toCompressedData(storage.getBlockId(x, y, z), storage.getBlockMetadata(x, y, z)));
+                            section.palette(PaletteType.BLOCKS).setIdAt(x, y, z, IdAndData.toRawData(storage.getBlockId(x, y, z), storage.getBlockMetadata(x, y, z)));
                         }
                     }
                 }

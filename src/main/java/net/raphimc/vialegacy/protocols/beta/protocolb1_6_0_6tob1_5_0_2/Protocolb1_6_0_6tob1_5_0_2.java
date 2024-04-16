@@ -25,9 +25,9 @@ import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
-import net.raphimc.vialegacy.api.model.IdAndData;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_6_0_6tob1_5_0_2.storage.WorldTimeStorage;
@@ -90,17 +90,17 @@ public class Protocolb1_6_0_6tob1_5_0_2 extends StatelessProtocol<ClientboundPac
                     Position pos = wrapper.get(Types1_7_6.POSITION_UBYTE, 0);
                     IdAndData block = wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos);
                     final Item item = wrapper.get(Types1_4_2.NBTLESS_ITEM, 0);
-                    if (block.id == BlockList1_6.bed.blockID) {
+                    if (block.getId() == BlockList1_6.bed.blockID) {
                         final byte[][] headBlockToFootBlock = {{0, 1}, {-1, 0}, {0, -1}, {1, 0}};
-                        final boolean isFoot = (block.data & 8) != 0;
+                        final boolean isFoot = (block.getData() & 8) != 0;
                         if (!isFoot) {
-                            final int bedDirection = block.data & 3;
+                            final int bedDirection = block.getData() & 3;
                             pos = new Position(pos.x() + headBlockToFootBlock[bedDirection][0], pos.y(), pos.z() + headBlockToFootBlock[bedDirection][1]);
                             block = wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos);
-                            if (block.id != BlockList1_6.bed.blockID) return;
+                            if (block.getId() != BlockList1_6.bed.blockID) return;
                         }
 
-                        final boolean isOccupied = (block.data & 4) != 0;
+                        final boolean isOccupied = (block.getData() & 4) != 0;
                         if (isOccupied) {
                             final PacketWrapper chat = PacketWrapper.create(ClientboundPacketsb1_7.CHAT_MESSAGE, wrapper.user());
                             chat.write(Types1_6_4.STRING, "This bed is occupied");
@@ -138,8 +138,8 @@ public class Protocolb1_6_0_6tob1_5_0_2 extends StatelessProtocol<ClientboundPac
                         useBed.write(Type.BYTE, (byte) 0); // magic value (always 0)
                         useBed.write(Types1_7_6.POSITION_BYTE, pos); // position
                         useBed.send(Protocolb1_6_0_6tob1_5_0_2.class);
-                    } else if (block.id == BlockList1_6.jukebox.blockID) {
-                        if (block.data > 0) {
+                    } else if (block.getId() == BlockList1_6.jukebox.blockID) {
+                        if (block.getData() > 0) {
                             final PacketWrapper effect = PacketWrapper.create(ClientboundPacketsb1_7.EFFECT, wrapper.user());
                             effect.write(Type.INT, 1005); // effect id
                             effect.write(Types1_7_6.POSITION_UBYTE, pos); // position
