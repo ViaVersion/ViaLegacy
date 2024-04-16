@@ -2,7 +2,7 @@
 # Calculate 1.7.10 OnGround field dynamically. Requires a bit of extra caching
 dynamic-onground: true
 #
-# Ignores incoming plugin channel messages of 1.8+ clients with channel names longer than 16 characters
+# Ignores serverbound plugin channel messages of 1.8+ clients with channel names longer than 16 characters
 # CraftBukkit had this limit hardcoded until 1.8
 ignore-long-1_8-channel-names: true
 #

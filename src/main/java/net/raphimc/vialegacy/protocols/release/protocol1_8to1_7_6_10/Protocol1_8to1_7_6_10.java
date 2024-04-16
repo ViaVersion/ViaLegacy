@@ -1370,7 +1370,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
 
                     if (ViaLegacy.getConfig().isIgnoreLong1_8ChannelNames() && channel.length() > 16) {
                         if (!Via.getConfig().isSuppressConversionWarnings()) {
-                            ViaLegacy.getPlatform().getLogger().warning("Ignoring incoming plugin channel, as it is longer than 16 characters: '" + channel + "'");
+                            ViaLegacy.getPlatform().getLogger().warning("Ignoring serverbound plugin channel, as it is longer than 16 characters: '" + channel + "'");
                         }
                         wrapper.cancel();
                         return;
@@ -1415,7 +1415,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                                     for (String registeredChannel : registeredChannels) {
                                         if (registeredChannel.length() > 16) {
                                             if (!Via.getConfig().isSuppressConversionWarnings()) {
-                                                ViaLegacy.getPlatform().getLogger().warning("Ignoring incoming plugin channel register of '" + registeredChannel + "', as it is longer than 16 characters");
+                                                ViaLegacy.getPlatform().getLogger().warning("Ignoring serverbound plugin channel register of '" + registeredChannel + "', as it is longer than 16 characters");
                                             }
                                             continue;
                                         }
