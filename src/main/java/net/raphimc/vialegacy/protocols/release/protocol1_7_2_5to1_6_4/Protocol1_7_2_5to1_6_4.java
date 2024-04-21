@@ -489,7 +489,9 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                     String newSound = SoundRewriter.map(oldSound);
                     if (oldSound.isEmpty()) newSound = "";
                     if (newSound == null) {
-                        ViaLegacy.getPlatform().getLogger().warning("Unable to map 1.6.4 sound '" + oldSound + "'");
+                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                            ViaLegacy.getPlatform().getLogger().warning("Unable to map 1.6.4 sound '" + oldSound + "'");
+                        }
                         newSound = "";
                     }
                     if (newSound.isEmpty()) {

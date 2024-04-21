@@ -103,7 +103,9 @@ public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacket
             if (extension != null) {
                 protocolMetadataStorage.addServerExtension(extension, extensionVersion);
             } else {
-                ViaLegacy.getPlatform().getLogger().warning("Received unknown classic protocol extension: (" + extensionName + " v" + extensionVersion + ")");
+                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                    ViaLegacy.getPlatform().getLogger().warning("Received unknown classic protocol extension: (" + extensionName + " v" + extensionVersion + ")");
+                }
             }
 
             protocolMetadataStorage.incrementReceivedExtensions();

@@ -18,6 +18,7 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter;
 
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -471,7 +472,9 @@ public class ChatComponentRewriter {
 
                         c.getStyle().setHoverEvent(new TextHoverEvent(textHoverEvent.getAction(), new StringComponent(SNbtSerializer.V1_8.serialize(tag))));
                     } catch (Throwable e) {
-                        ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error remapping NBT in show_item:" + textHoverEvent.getText().asUnformattedString(), e);
+                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                            ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error remapping NBT in show_item:" + textHoverEvent.getText().asUnformattedString(), e);
+                        }
                         c.getStyle().setHoverEvent(new TextHoverEvent(textHoverEvent.getAction(), new StringComponent())); // Invalid item
                     }
                 }

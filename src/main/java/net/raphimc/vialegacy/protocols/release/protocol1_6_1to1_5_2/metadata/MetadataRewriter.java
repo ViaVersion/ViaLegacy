@@ -17,6 +17,7 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.metadata;
 
+import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import net.raphimc.vialegacy.ViaLegacy;
@@ -56,12 +57,16 @@ public class MetadataRewriter {
                     case Position:
                         break;
                     default:
-                        ViaLegacy.getPlatform().getLogger().warning("1.5.2 MetaDataType: Unhandled Type: " + metaIndex.getNewType() + " " + entry);
+                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                            ViaLegacy.getPlatform().getLogger().warning("1.5.2 MetaDataType: Unhandled Type: " + metaIndex.getNewType() + " " + entry);
+                        }
                         list.remove(entry);
                         break;
                 }
             } catch (Throwable e) {
-                ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error rewriting metadata entry for " + type.name() + ": " + entry, e);
+                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                    ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error rewriting metadata entry for " + type.name() + ": " + entry, e);
+                }
                 list.remove(entry);
             }
         }
