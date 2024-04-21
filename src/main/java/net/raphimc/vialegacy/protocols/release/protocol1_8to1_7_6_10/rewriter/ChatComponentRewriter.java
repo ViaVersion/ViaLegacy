@@ -18,6 +18,7 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter;
 
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
@@ -428,7 +429,7 @@ public class ChatComponentRewriter {
         this.protocol = protocol;
     }
 
-    public String toClient(final String text) {
+    public String toClient(final UserConnection user, final String text) {
         final ATextComponent component = TextComponentSerializer.V1_7.deserialize(text);
         // Replace translation keys with their actual translations
         TextUtils.iterateAll(component, c -> {
@@ -455,7 +456,7 @@ public class ChatComponentRewriter {
                         item.setIdentifier(idTag.asShort());
                         item.setData(damage);
                         item.setTag(itemTag);
-                        item = this.protocol.getItemRewriter().handleItemToClient(item);
+                        item = this.protocol.getItemRewriter().handleItemToClient(user, item);
 
                         if (!ID_TO_NAME.containsKey(item.identifier())) {
                             throw new IllegalArgumentException("Invalid item ID: " + item.identifier());

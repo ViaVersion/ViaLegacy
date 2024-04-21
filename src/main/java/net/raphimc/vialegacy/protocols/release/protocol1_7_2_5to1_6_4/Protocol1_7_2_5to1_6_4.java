@@ -137,7 +137,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 map(Type.INT); // entity id
                 map(Type.SHORT); // slot
                 map(Types1_7_6.ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Types1_7_6.ITEM, 0)));
+                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.RESPAWN, new PacketHandlers() {
@@ -296,11 +296,11 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 map(Type.BYTE); // pitch
                 handler(wrapper -> {
                     final Item currentItem = new DataItem(wrapper.read(Type.UNSIGNED_SHORT), (byte) 1, (short) 0, null); // item
-                    itemRewriter.handleItemToClient(currentItem);
+                    itemRewriter.handleItemToClient(wrapper.user(), currentItem);
                     wrapper.write(Type.SHORT, (short) currentItem.identifier());
                 });
                 map(Types1_6_4.METADATA_LIST, Types1_7_6.METADATA_LIST); // metadata
-                handler(wrapper -> rewriteMetadata(wrapper.get(Types1_7_6.METADATA_LIST, 0)));
+                handler(wrapper -> rewriteMetadata(wrapper.user(), wrapper.get(Types1_7_6.METADATA_LIST, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.SPAWN_ENTITY, new PacketHandlers() {
@@ -342,7 +342,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 map(Type.SHORT); // velocity y
                 map(Type.SHORT); // velocity z
                 map(Types1_6_4.METADATA_LIST, Types1_7_6.METADATA_LIST); // metadata
-                handler(wrapper -> rewriteMetadata(wrapper.get(Types1_7_6.METADATA_LIST, 0)));
+                handler(wrapper -> rewriteMetadata(wrapper.user(), wrapper.get(Types1_7_6.METADATA_LIST, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.SPAWN_PAINTING, new PacketHandlers() {
@@ -369,7 +369,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
             public void register() {
                 map(Type.INT); // entity id
                 map(Types1_6_4.METADATA_LIST, Types1_7_6.METADATA_LIST); // metadata
-                handler(wrapper -> rewriteMetadata(wrapper.get(Types1_7_6.METADATA_LIST, 0)));
+                handler(wrapper -> rewriteMetadata(wrapper.user(), wrapper.get(Types1_7_6.METADATA_LIST, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.ENTITY_PROPERTIES, new PacketHandlers() {
@@ -620,7 +620,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 map(Type.BYTE); // window id
                 map(Type.SHORT); // slot
                 map(Types1_7_6.ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Types1_7_6.ITEM, 0)));
+                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.WINDOW_ITEMS, new PacketHandlers() {
@@ -630,7 +630,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 handler(wrapper -> {
                     final Item[] items = wrapper.passthrough(Types1_7_6.ITEM_ARRAY); // items
                     for (Item item : items) {
-                        itemRewriter.handleItemToClient(item);
+                        itemRewriter.handleItemToClient(wrapper.user(), item);
                     }
                 });
             }
@@ -754,10 +754,10 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                                     wrapper.passthrough(Type.INT); // window id
                                     final int count = wrapper.passthrough(Type.UNSIGNED_BYTE); // count
                                     for (int i = 0; i < count; i++) {
-                                        itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.ITEM)); // item 1
-                                        itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.ITEM)); // item 3
+                                        itemRewriter.handleItemToClient(wrapper.user(), wrapper.passthrough(Types1_7_6.ITEM)); // item 1
+                                        itemRewriter.handleItemToClient(wrapper.user(), wrapper.passthrough(Types1_7_6.ITEM)); // item 3
                                         if (wrapper.passthrough(Type.BOOLEAN)) { // has 3 items
-                                            itemRewriter.handleItemToClient(wrapper.passthrough(Types1_7_6.ITEM)); // item 2
+                                            itemRewriter.handleItemToClient(wrapper.user(), wrapper.passthrough(Types1_7_6.ITEM)); // item 2
                                         }
                                         wrapper.passthrough(Type.BOOLEAN); // unavailable
                                     }
@@ -974,7 +974,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 map(Types1_7_6.POSITION_UBYTE); // position
                 map(Type.UNSIGNED_BYTE); // direction
                 map(Types1_7_6.ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.ITEM, 0)));
+                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
                 map(Type.UNSIGNED_BYTE); // offset x
                 map(Type.UNSIGNED_BYTE); // offset y
                 map(Type.UNSIGNED_BYTE); // offset z
@@ -989,7 +989,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                 map(Type.SHORT); // action
                 map(Type.BYTE); // mode
                 map(Types1_7_6.ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.ITEM, 0)));
+                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
             }
         });
         this.registerServerbound(ServerboundPackets1_7_2.UPDATE_SIGN, new PacketHandlers() {
@@ -1070,7 +1070,7 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
                         switch (channel) {
                             case "MC|BEdit":
                             case "MC|BSign":
-                                itemRewriter.handleItemToServer(wrapper.passthrough(Types1_7_6.ITEM));
+                                itemRewriter.handleItemToServer(wrapper.user(), wrapper.passthrough(Types1_7_6.ITEM));
                                 length = (short) PacketUtil.calculateLength(wrapper);
                                 break;
                             case "MC|AdvCdm":
@@ -1103,10 +1103,10 @@ public class Protocol1_7_2_5to1_6_4 extends StatelessTransitionProtocol<Clientbo
         });
     }
 
-    private void rewriteMetadata(final List<Metadata> metadataList) {
+    private void rewriteMetadata(final UserConnection user, final List<Metadata> metadataList) {
         for (Metadata metadata : metadataList) {
             if (metadata.metaType().equals(MetaType1_6_4.Slot)) {
-                itemRewriter.handleItemToClient(metadata.value());
+                itemRewriter.handleItemToClient(user, metadata.value());
             }
             metadata.setMetaType(MetaType1_7_6.byId(metadata.metaType().typeId()));
         }

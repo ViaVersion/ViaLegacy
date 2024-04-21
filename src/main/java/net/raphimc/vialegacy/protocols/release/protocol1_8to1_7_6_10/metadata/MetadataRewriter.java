@@ -96,7 +96,7 @@ public class MetadataRewriter {
                         entry.setValue(((Number) value).floatValue());
                         break;
                     case Slot:
-                        this.protocol.getItemRewriter().handleItemToClient((Item) value);
+                        this.protocol.getItemRewriter().handleItemToClient(user, (Item) value);
                         break;
                     case String:
                     case Position:

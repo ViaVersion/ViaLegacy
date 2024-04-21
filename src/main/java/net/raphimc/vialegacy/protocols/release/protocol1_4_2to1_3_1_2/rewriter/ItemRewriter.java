@@ -17,6 +17,7 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.rewriter;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
@@ -42,12 +43,12 @@ public class ItemRewriter extends LegacyItemRewriter<Protocol1_4_2to1_3_1_2> {
     }
 
     @Override
-    public Item handleItemToServer(Item item) {
+    public Item handleItemToServer(final UserConnection user, final Item item) {
         if (item != null && item.identifier() == ItemList1_6.emptyMap.itemID) {
             item.setIdentifier(ItemList1_6.map.itemID);
         }
 
-        return super.handleItemToServer(item);
+        return super.handleItemToServer(user, item);
     }
 
 }

@@ -18,6 +18,7 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter;
 
 import com.viaversion.viaversion.api.Via;
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
@@ -65,8 +66,8 @@ public class ItemRewriter extends LegacyItemRewriter<Protocol1_8to1_7_6_10> {
     }
 
     @Override
-    public Item handleItemToClient(Item item) {
-        super.handleItemToClient(item);
+    public Item handleItemToClient(final UserConnection user, final Item item) {
+        super.handleItemToClient(user, item);
         if (item == null) return null;
 
         if (item.identifier() == ItemList1_6.skull.itemID && item.data() == 3 && item.tag() != null) { // player_skull
@@ -106,7 +107,7 @@ public class ItemRewriter extends LegacyItemRewriter<Protocol1_8to1_7_6_10> {
     }
 
     @Override
-    public Item handleItemToServer(Item item) {
+    public Item handleItemToServer(final UserConnection user, final Item item) {
         if (item == null) return null;
 
         NOT_VALID:
@@ -117,7 +118,7 @@ public class ItemRewriter extends LegacyItemRewriter<Protocol1_8to1_7_6_10> {
             }
         }
 
-        return super.handleItemToServer(item);
+        return super.handleItemToServer(user, item);
     }
 
 }

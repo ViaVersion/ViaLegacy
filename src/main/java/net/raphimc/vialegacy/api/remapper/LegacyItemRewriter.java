@@ -17,6 +17,7 @@
  */
 package net.raphimc.vialegacy.api.remapper;
 
+import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -100,7 +101,7 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
     }
 
     @Override
-    public Item handleItemToClient(final Item item) {
+    public Item handleItemToClient(final UserConnection user, final Item item) {
         if (item == null) return null;
 
         for (RewriteEntry rewriteEntry : this.rewriteEntries) {
@@ -117,7 +118,7 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
     }
 
     @Override
-    public Item handleItemToServer(final Item item) {
+    public Item handleItemToServer(final UserConnection user, final Item item) {
         if (item == null) return null;
 
         for (NonExistentEntry nonExistentEntry : this.nonExistentItems) {
@@ -159,12 +160,12 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
     }
 
     private void handleClientboundItem(final PacketWrapper wrapper) throws Exception {
-        final Item item = this.handleItemToClient(wrapper.read(this.itemType));
+        final Item item = this.handleItemToClient(wrapper.user(), wrapper.read(this.itemType));
         wrapper.write(this.mappedItemType, item);
     }
 
     private void handleServerboundItem(final PacketWrapper wrapper) throws Exception {
-        final Item item = this.handleItemToServer(wrapper.read(this.mappedItemType));
+        final Item item = this.handleItemToServer(wrapper.user(), wrapper.read(this.mappedItemType));
         wrapper.write(this.itemType, item);
     }
 

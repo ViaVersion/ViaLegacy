@@ -154,7 +154,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
         this.registerClientbound(ClientboundPackets1_7_2.CHAT_MESSAGE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING, Type.STRING, chatComponentRewriter::toClient); // message
+                handler(wrapper -> wrapper.write(Type.STRING, chatComponentRewriter.toClient(wrapper.user(), wrapper.read(Type.STRING)))); // message
                 create(Type.BYTE, (byte) 0); // position
             }
         });
@@ -164,7 +164,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.INT, Type.VAR_INT); // entity id
                 map(Type.SHORT); // slot
                 map(Types1_7_6.ITEM, Type.ITEM1_8); // item
-                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Type.ITEM1_8, 0)));
+                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.user(), wrapper.get(Type.ITEM1_8, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.SPAWN_POSITION, new PacketHandlers() {
@@ -244,7 +244,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
 
             final short itemId = wrapper.read(Type.SHORT); // item in hand
             final Item currentItem = new DataItem(itemId, (byte) 1, (short) 0, null);
-            itemRewriter.handleItemToClient(currentItem);
+            itemRewriter.handleItemToClient(wrapper.user(), currentItem);
             wrapper.write(Type.SHORT, (short) currentItem.identifier());
 
             final List<Metadata> metadata = wrapper.read(Types1_7_6.METADATA_LIST); // metadata
@@ -781,7 +781,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 int damage = 0;
                 if (parts.length > 2) damage = Integer.parseInt(parts[2]);
                 final DataItem item = new DataItem(id, (byte) 1, (short) damage, null);
-                itemRewriter.handleItemToClient(item);
+                itemRewriter.handleItemToClient(wrapper.user(), item);
                 wrapper.write(Type.VAR_INT, item.identifier()); // particle data
                 if (item.data() != 0)
                     wrapper.write(Type.VAR_INT, (int) item.data()); // particle data
@@ -891,7 +891,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                     wrapper.write(Type.SHORT, slot);
                 });
                 map(Types1_7_6.ITEM, Type.ITEM1_8); // item
-                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.get(Type.ITEM1_8, 0)));
+                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.user(), wrapper.get(Type.ITEM1_8, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.WINDOW_ITEMS, new PacketHandlers() {
@@ -909,7 +909,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                         items[1] = new DataItem(351/*lapis_lazuli*/, (byte) 3, (short) 4, null);
                     }
                     for (Item item : items) {
-                        itemRewriter.handleItemToClient(item);
+                        itemRewriter.handleItemToClient(wrapper.user(), item);
                     }
                     wrapper.write(Type.ITEM1_8_SHORT_ARRAY, items);
                 });
@@ -1123,17 +1123,17 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                             final int count = wrapper.passthrough(Type.UNSIGNED_BYTE); // count
                             for (int i = 0; i < count; i++) {
                                 Item item = wrapper.read(Types1_7_6.ITEM);
-                                itemRewriter.handleItemToClient(item);
+                                itemRewriter.handleItemToClient(wrapper.user(), item);
                                 wrapper.write(Type.ITEM1_8, item); // item 1
 
                                 item = wrapper.read(Types1_7_6.ITEM);
-                                itemRewriter.handleItemToClient(item);
+                                itemRewriter.handleItemToClient(wrapper.user(), item);
                                 wrapper.write(Type.ITEM1_8, item); // item 3
 
                                 final boolean has3Items = wrapper.passthrough(Type.BOOLEAN); // has 3 items
                                 if (has3Items) {
                                     item = wrapper.read(Types1_7_6.ITEM);
-                                    itemRewriter.handleItemToClient(item);
+                                    itemRewriter.handleItemToClient(wrapper.user(), item);
                                     wrapper.write(Type.ITEM1_8, item); // item 2
                                 }
 
@@ -1254,7 +1254,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 handler(wrapper -> {
                     final short direction = wrapper.get(Type.UNSIGNED_BYTE, 0);
                     final Item item = wrapper.get(Types1_7_6.ITEM, 0);
-                    itemRewriter.handleItemToServer(item);
+                    itemRewriter.handleItemToServer(wrapper.user(), item);
 
                     if (item != null && item.identifier() == ItemList1_6.writtenBook.itemID && direction == 255) { // If placed item is a book then cancel it and send a MC|BOpen to the client
                         final PacketWrapper openBook = PacketWrapper.create(ClientboundPackets1_8.PLUGIN_MESSAGE, wrapper.user());
@@ -1321,7 +1321,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                 map(Type.SHORT); // transaction id
                 map(Type.BYTE); // action
                 map(Type.ITEM1_8, Types1_7_6.ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.ITEM, 0)));
+                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
             }
         });
         this.registerServerbound(ServerboundPackets1_8.CREATIVE_INVENTORY_ACTION, new PacketHandlers() {
@@ -1329,7 +1329,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
             public void register() {
                 map(Type.SHORT); // slot
                 map(Type.ITEM1_8, Types1_7_6.ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.get(Types1_7_6.ITEM, 0)));
+                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
             }
         });
         this.registerServerbound(ServerboundPackets1_8.UPDATE_SIGN, new PacketHandlers() {
@@ -1381,7 +1381,7 @@ public class Protocol1_8to1_7_6_10 extends AbstractProtocol<ClientboundPackets1_
                             case "MC|BEdit":
                             case "MC|BSign":
                                 final Item item = wrapper.read(Type.ITEM1_8); // book
-                                itemRewriter.handleItemToServer(item);
+                                itemRewriter.handleItemToServer(wrapper.user(), item);
                                 wrapper.write(Types1_7_6.ITEM, item); // book
                                 break;
                             case "MC|Brand":
