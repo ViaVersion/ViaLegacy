@@ -39,7 +39,7 @@ public class ChunkType1_2_4 extends ChunkType1_7_6 {
     }
 
     @Override
-    public void write(ByteBuf byteBuf, Chunk chunk) throws Exception {
+    public void write(ByteBuf byteBuf, Chunk chunk) {
         for (ChunkSection section : chunk.getSections()) {
             if (section != null && !section.getLight().hasSkyLight()) {
                 throw new IllegalStateException("Chunk section does not have skylight");

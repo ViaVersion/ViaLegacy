@@ -19,9 +19,8 @@ package net.raphimc.vialegacy.protocols.release.protocol1_1to1_0_0_1;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
-import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_1to1_0_0_1.rewriter.ChatFilter;
 import net.raphimc.vialegacy.protocols.release.protocol1_1to1_0_0_1.rewriter.ItemRewriter;
@@ -32,7 +31,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 
 public class Protocol1_1to1_0_0_1 extends StatelessProtocol<ClientboundPackets1_0, ClientboundPackets1_1, ServerboundPackets1_0, ServerboundPackets1_1> {
 
-    private final LegacyItemRewriter<Protocol1_1to1_0_0_1> itemRewriter = new ItemRewriter(this);
+    private final ItemRewriter itemRewriter = new ItemRewriter(this);
 
     public Protocol1_1to1_0_0_1() {
         super(ClientboundPackets1_0.class, ClientboundPackets1_1.class, ServerboundPackets1_0.class, ServerboundPackets1_1.class);
@@ -45,18 +44,18 @@ public class Protocol1_1to1_0_0_1 extends StatelessProtocol<ClientboundPackets1_
         this.registerServerbound(ServerboundPackets1_1.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // protocol id
+                map(Types.INT); // protocol id
                 map(Types1_6_4.STRING); // username
-                map(Type.LONG); // seed
+                map(Types.LONG); // seed
                 read(Types1_6_4.STRING); // level type
-                map(Type.INT); // game mode
-                map(Type.BYTE); // dimension id
-                map(Type.BYTE); // difficulty
-                map(Type.BYTE); // world height
-                map(Type.BYTE); // max players
+                map(Types.INT); // game mode
+                map(Types.BYTE); // dimension id
+                map(Types.BYTE); // difficulty
+                map(Types.BYTE); // world height
+                map(Types.BYTE); // max players
             }
         });
-        this.registerServerbound(ServerboundPackets1_1.CHAT_MESSAGE, new PacketHandlers() {
+        this.registerServerbound(ServerboundPackets1_1.CHAT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types1_6_4.STRING, Types1_6_4.STRING, ChatFilter::filter); // message
@@ -65,31 +64,31 @@ public class Protocol1_1to1_0_0_1 extends StatelessProtocol<ClientboundPackets1_
         this.registerServerbound(ServerboundPackets1_1.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // dimension id
-                map(Type.BYTE); // difficulty
-                map(Type.BYTE); // game mode
-                map(Type.SHORT); // world height
-                map(Type.LONG); // seed
+                map(Types.BYTE); // dimension id
+                map(Types.BYTE); // difficulty
+                map(Types.BYTE); // game mode
+                map(Types.SHORT); // world height
+                map(Types.LONG); // seed
                 read(Types1_6_4.STRING); // level type
             }
         });
-        this.cancelServerbound(ServerboundPackets1_1.PLUGIN_MESSAGE);
+        this.cancelServerbound(ServerboundPackets1_1.CUSTOM_PAYLOAD);
 
-        this.registerClientbound(ClientboundPackets1_0.JOIN_GAME, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_0.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
+                map(Types.INT); // entity id
                 map(Types1_6_4.STRING); // username
-                map(Type.LONG); // seed
+                map(Types.LONG); // seed
                 create(Types1_6_4.STRING, "default_1_1"); // level type
-                map(Type.INT); // game mode
-                map(Type.BYTE); // dimension id
-                map(Type.BYTE); // difficulty
-                map(Type.BYTE); // world height
-                map(Type.BYTE); // max players
+                map(Types.INT); // game mode
+                map(Types.BYTE); // dimension id
+                map(Types.BYTE); // difficulty
+                map(Types.BYTE); // world height
+                map(Types.BYTE); // max players
             }
         });
-        this.registerClientbound(ClientboundPackets1_0.CHAT_MESSAGE, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_0.CHAT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types1_6_4.STRING, Types1_6_4.STRING, msg -> msg.replace("\u00C2", "")); // message
@@ -98,11 +97,11 @@ public class Protocol1_1to1_0_0_1 extends StatelessProtocol<ClientboundPackets1_
         this.registerClientbound(ClientboundPackets1_0.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // dimension id
-                map(Type.BYTE); // difficulty
-                map(Type.BYTE); // game mode
-                map(Type.SHORT); // world height
-                map(Type.LONG); // seed
+                map(Types.BYTE); // dimension id
+                map(Types.BYTE); // difficulty
+                map(Types.BYTE); // game mode
+                map(Types.SHORT); // world height
+                map(Types.LONG); // seed
                 create(Types1_6_4.STRING, "default_1_1"); // level type
             }
         });
@@ -132,7 +131,7 @@ public class Protocol1_1to1_0_0_1 extends StatelessProtocol<ClientboundPackets1_
     }
 
     @Override
-    public LegacyItemRewriter<Protocol1_1to1_0_0_1> getItemRewriter() {
+    public ItemRewriter getItemRewriter() {
         return this.itemRewriter;
     }
 

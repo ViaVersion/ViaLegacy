@@ -17,11 +17,11 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types;
 
+import com.viaversion.nbt.io.NBTIO;
+import com.viaversion.nbt.limiter.TagLimiter;
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.api.type.types.misc.NamedCompoundTagType;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
-import com.viaversion.viaversion.libs.opennbt.tag.io.NBTIO;
-import com.viaversion.viaversion.libs.opennbt.tag.limiter.TagLimiter;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
@@ -37,7 +37,7 @@ public class NBTType extends Type<CompoundTag> {
     }
 
     @Override
-    public CompoundTag read(ByteBuf buffer) throws IOException {
+    public CompoundTag read(ByteBuf buffer) {
         final short length = buffer.readShort();
         if (length < 0) {
             return null;
@@ -46,11 +46,13 @@ public class NBTType extends Type<CompoundTag> {
         final ByteBuf data = buffer.readSlice(length);
         try (InputStream in = new GZIPInputStream(new ByteBufInputStream(data))) {
             return NBTIO.readTag(new DataInputStream(in), TagLimiter.create(NamedCompoundTagType.MAX_NBT_BYTES, NamedCompoundTagType.MAX_NESTING_LEVEL), true, CompoundTag.class);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void write(ByteBuf buffer, CompoundTag nbt) throws IOException {
+    public void write(ByteBuf buffer, CompoundTag nbt) {
         if (nbt == null) {
             buffer.writeShort(-1);
             return;
@@ -60,6 +62,8 @@ public class NBTType extends Type<CompoundTag> {
         try {
             try (OutputStream out = new GZIPOutputStream(new ByteBufOutputStream(data))) {
                 NBTIO.writeTag(new DataOutputStream(out), nbt, true);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
 
             buffer.writeShort(data.readableBytes());

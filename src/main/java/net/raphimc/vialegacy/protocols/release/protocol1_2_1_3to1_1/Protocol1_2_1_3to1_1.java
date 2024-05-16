@@ -27,12 +27,11 @@ import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
-import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.EndBiomeGenerator;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.biome.NetherBiomeGenerator;
@@ -59,7 +58,7 @@ import java.util.Arrays;
 
 public class Protocol1_2_1_3to1_1 extends StatelessProtocol<ClientboundPackets1_1, ClientboundPackets1_2_1, ServerboundPackets1_1, ServerboundPackets1_2_1> {
 
-    private final LegacyItemRewriter<Protocol1_2_1_3to1_1> itemRewriter = new ItemRewriter(this);
+    private final ItemRewriter itemRewriter = new ItemRewriter(this);
 
     public Protocol1_2_1_3to1_1() {
         super(ClientboundPackets1_1.class, ClientboundPackets1_2_1.class, ServerboundPackets1_1.class, ServerboundPackets1_2_1.class);
@@ -69,81 +68,81 @@ public class Protocol1_2_1_3to1_1 extends StatelessProtocol<ClientboundPackets1_
     protected void registerPackets() {
         this.itemRewriter.register();
 
-        this.registerClientbound(ClientboundPackets1_1.JOIN_GAME, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_1.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
+                map(Types.INT); // entity id
                 map(Types1_6_4.STRING); // username
-                handler(wrapper -> wrapper.user().get(SeedStorage.class).seed = wrapper.read(Type.LONG)); // seed
+                handler(wrapper -> wrapper.user().get(SeedStorage.class).seed = wrapper.read(Types.LONG)); // seed
                 map(Types1_6_4.STRING); // level type
-                map(Type.INT); // game mode
-                map(Type.BYTE, Type.INT); // dimension id
-                map(Type.BYTE); // difficulty
-                map(Type.BYTE); // world height
-                map(Type.BYTE); // max players
-                handler(wrapper -> handleRespawn(wrapper.get(Type.INT, 2), wrapper.user()));
+                map(Types.INT); // game mode
+                map(Types.BYTE, Types.INT); // dimension id
+                map(Types.BYTE); // difficulty
+                map(Types.BYTE); // world height
+                map(Types.BYTE); // max players
+                handler(wrapper -> handleRespawn(wrapper.get(Types.INT, 2), wrapper.user()));
             }
         });
         this.registerClientbound(ClientboundPackets1_1.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE, Type.INT); // dimension id
-                map(Type.BYTE); // difficulty
-                map(Type.BYTE); // game mode
-                map(Type.SHORT); // world height
-                handler(wrapper -> wrapper.user().get(SeedStorage.class).seed = wrapper.read(Type.LONG)); // seed
+                map(Types.BYTE, Types.INT); // dimension id
+                map(Types.BYTE); // difficulty
+                map(Types.BYTE); // game mode
+                map(Types.SHORT); // world height
+                handler(wrapper -> wrapper.user().get(SeedStorage.class).seed = wrapper.read(Types.LONG)); // seed
                 map(Types1_6_4.STRING); // level type
-                handler(wrapper -> handleRespawn(wrapper.get(Type.INT, 0), wrapper.user()));
+                handler(wrapper -> handleRespawn(wrapper.get(Types.INT, 0), wrapper.user()));
             }
         });
-        this.registerClientbound(ClientboundPackets1_1.SPAWN_MOB, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_1.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.UNSIGNED_BYTE); // type id
-                map(Type.INT); // x
-                map(Type.INT); // y
-                map(Type.INT); // z
-                map(Type.BYTE); // yaw
-                map(Type.BYTE); // pitch
-                handler(wrapper -> wrapper.write(Type.BYTE, wrapper.get(Type.BYTE, 0))); // head yaw
+                map(Types.INT); // entity id
+                map(Types.UNSIGNED_BYTE); // type id
+                map(Types.INT); // x
+                map(Types.INT); // y
+                map(Types.INT); // z
+                map(Types.BYTE); // yaw
+                map(Types.BYTE); // pitch
+                handler(wrapper -> wrapper.write(Types.BYTE, wrapper.get(Types.BYTE, 0))); // head yaw
                 map(Types1_3_1.METADATA_LIST); // metadata
             }
         });
-        this.registerClientbound(ClientboundPackets1_1.ENTITY_ROTATION, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_1.MOVE_ENTITY_ROT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.BYTE); // yaw
-                map(Type.BYTE); // pitch
-                handler(wrapper -> sendEntityHeadLook(wrapper.get(Type.INT, 0), wrapper.get(Type.BYTE, 0), wrapper));
+                map(Types.INT); // entity id
+                map(Types.BYTE); // yaw
+                map(Types.BYTE); // pitch
+                handler(wrapper -> sendEntityHeadLook(wrapper.get(Types.INT, 0), wrapper.get(Types.BYTE, 0), wrapper));
             }
         });
-        this.registerClientbound(ClientboundPackets1_1.ENTITY_POSITION_AND_ROTATION, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_1.MOVE_ENTITY_POS_ROT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.BYTE); // x
-                map(Type.BYTE); // y
-                map(Type.BYTE); // z
-                map(Type.BYTE); // yaw
-                map(Type.BYTE); // pitch
-                handler(wrapper -> sendEntityHeadLook(wrapper.get(Type.INT, 0), wrapper.get(Type.BYTE, 3), wrapper));
+                map(Types.INT); // entity id
+                map(Types.BYTE); // x
+                map(Types.BYTE); // y
+                map(Types.BYTE); // z
+                map(Types.BYTE); // yaw
+                map(Types.BYTE); // pitch
+                handler(wrapper -> sendEntityHeadLook(wrapper.get(Types.INT, 0), wrapper.get(Types.BYTE, 3), wrapper));
             }
         });
-        this.registerClientbound(ClientboundPackets1_1.ENTITY_TELEPORT, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_1.TELEPORT_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.INT); // x
-                map(Type.INT); // y
-                map(Type.INT); // z
-                map(Type.BYTE); // yaw
-                map(Type.BYTE); // pitch
-                handler(wrapper -> sendEntityHeadLook(wrapper.get(Type.INT, 0), wrapper.get(Type.BYTE, 0), wrapper));
+                map(Types.INT); // entity id
+                map(Types.INT); // x
+                map(Types.INT); // y
+                map(Types.INT); // z
+                map(Types.BYTE); // yaw
+                map(Types.BYTE); // pitch
+                handler(wrapper -> sendEntityHeadLook(wrapper.get(Types.INT, 0), wrapper.get(Types.BYTE, 0), wrapper));
             }
         });
-        this.registerClientbound(ClientboundPackets1_1.CHUNK_DATA, wrapper -> {
+        this.registerClientbound(ClientboundPackets1_1.LEVEL_CHUNK, wrapper -> {
             final ChunkTracker chunkTracker = wrapper.user().get(ChunkTracker.class);
             final SeedStorage seedStorage = wrapper.user().get(SeedStorage.class);
             final PendingBlocksTracker pendingBlocksTracker = wrapper.user().get(PendingBlocksTracker.class);
@@ -156,9 +155,9 @@ public class Protocol1_2_1_3to1_1 extends StatelessProtocol<ClientboundPackets1_
                 }
 
                 final NonFullChunk1_1 nfc = (NonFullChunk1_1) chunk;
-                wrapper.setPacketType(ClientboundPackets1_2_1.MULTI_BLOCK_CHANGE);
-                wrapper.write(Type.INT, nfc.getX());
-                wrapper.write(Type.INT, nfc.getZ());
+                wrapper.setPacketType(ClientboundPackets1_2_1.CHUNK_BLOCKS_UPDATE);
+                wrapper.write(Types.INT, nfc.getX());
+                wrapper.write(Types.INT, nfc.getZ());
                 wrapper.write(Types1_7_6.BLOCK_CHANGE_RECORD_ARRAY, nfc.asBlockChangeRecords().toArray(new BlockChangeRecord[0]));
 
                 pendingBlocksTracker.markReceived(new Position((nfc.getX() << 4) + nfc.getStartPos().x(), nfc.getStartPos().y(), (nfc.getZ() << 4) + nfc.getStartPos().z()), new Position((nfc.getX() << 4) + nfc.getEndPos().x() - 1, nfc.getEndPos().y() - 1, (nfc.getZ() << 4) + nfc.getEndPos().z() - 1));
@@ -206,16 +205,16 @@ public class Protocol1_2_1_3to1_1 extends StatelessProtocol<ClientboundPackets1_
 
             wrapper.write(Types1_2_4.CHUNK, chunk);
         });
-        this.registerClientbound(ClientboundPackets1_1.MULTI_BLOCK_CHANGE, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_1.CHUNK_BLOCKS_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // chunkX
-                map(Type.INT); // chunkZ
+                map(Types.INT); // chunkX
+                map(Types.INT); // chunkZ
                 map(Types1_1.BLOCK_CHANGE_RECORD_ARRAY, Types1_7_6.BLOCK_CHANGE_RECORD_ARRAY); // blockChangeRecords
                 handler(wrapper -> {
                     final PendingBlocksTracker pendingBlocksTracker = wrapper.user().get(PendingBlocksTracker.class);
-                    final int chunkX = wrapper.get(Type.INT, 0);
-                    final int chunkZ = wrapper.get(Type.INT, 1);
+                    final int chunkX = wrapper.get(Types.INT, 0);
+                    final int chunkZ = wrapper.get(Types.INT, 1);
                     final BlockChangeRecord[] blockChangeRecords = wrapper.get(Types1_7_6.BLOCK_CHANGE_RECORD_ARRAY, 0);
                     for (BlockChangeRecord record : blockChangeRecords) {
                         final int targetX = record.getSectionX() + (chunkX << 4);
@@ -226,32 +225,32 @@ public class Protocol1_2_1_3to1_1 extends StatelessProtocol<ClientboundPackets1_
                 });
             }
         });
-        this.registerClientbound(ClientboundPackets1_1.BLOCK_CHANGE, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_1.BLOCK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types1_7_6.POSITION_UBYTE); // position
-                map(Type.UNSIGNED_BYTE); // block id
-                map(Type.UNSIGNED_BYTE); // block data
+                map(Types.UNSIGNED_BYTE); // block id
+                map(Types.UNSIGNED_BYTE); // block data
                 handler(wrapper -> wrapper.user().get(PendingBlocksTracker.class).markReceived(wrapper.get(Types1_7_6.POSITION_UBYTE, 0)));
             }
         });
-        this.registerClientbound(ClientboundPackets1_1.EXPLOSION, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_1.EXPLODE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.DOUBLE); // x
-                map(Type.DOUBLE); // y
-                map(Type.DOUBLE); // z
-                map(Type.FLOAT); // radius
-                map(Type.INT); // record count
+                map(Types.DOUBLE); // x
+                map(Types.DOUBLE); // y
+                map(Types.DOUBLE); // z
+                map(Types.FLOAT); // radius
+                map(Types.INT); // record count
                 handler(wrapper -> {
                     final PendingBlocksTracker pendingBlocksTracker = wrapper.user().get(PendingBlocksTracker.class);
                     final ChunkTracker chunkTracker = wrapper.user().get(ChunkTracker.class);
-                    final int x = wrapper.get(Type.DOUBLE, 0).intValue();
-                    final int y = wrapper.get(Type.DOUBLE, 1).intValue();
-                    final int z = wrapper.get(Type.DOUBLE, 2).intValue();
-                    final int recordCount = wrapper.get(Type.INT, 0);
+                    final int x = wrapper.get(Types.DOUBLE, 0).intValue();
+                    final int y = wrapper.get(Types.DOUBLE, 1).intValue();
+                    final int z = wrapper.get(Types.DOUBLE, 2).intValue();
+                    final int recordCount = wrapper.get(Types.INT, 0);
                     for (int i = 0; i < recordCount; i++) {
-                        final Position pos = new Position(x + wrapper.passthrough(Type.BYTE), y + wrapper.passthrough(Type.BYTE), z + wrapper.passthrough(Type.BYTE));
+                        final Position pos = new Position(x + wrapper.passthrough(Types.BYTE), y + wrapper.passthrough(Types.BYTE), z + wrapper.passthrough(Types.BYTE));
                         final IdAndData block = chunkTracker.getBlockNotNull(pos);
                         if (block.getId() != 0) {
                             pendingBlocksTracker.addPending(pos, block);
@@ -260,21 +259,21 @@ public class Protocol1_2_1_3to1_1 extends StatelessProtocol<ClientboundPackets1_
                 });
             }
         });
-        this.registerClientbound(ClientboundPackets1_1.EFFECT, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_1.LEVEL_EVENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // effect id
+                map(Types.INT); // effect id
                 map(Types1_7_6.POSITION_UBYTE); // position
-                map(Type.INT); // data
+                map(Types.INT); // data
                 handler(wrapper -> {
-                    final int sfxId = wrapper.get(Type.INT, 0);
-                    final int sfxData = wrapper.get(Type.INT, 1);
+                    final int sfxId = wrapper.get(Types.INT, 0);
+                    final int sfxData = wrapper.get(Types.INT, 1);
                     if (sfxId == 2001) { // Block Break effect
                         final int blockID = sfxData & 255;
                         final int blockData = sfxData >> 8 & 255;
-                        wrapper.set(Type.INT, 1, blockID + (blockData << 12));
+                        wrapper.set(Types.INT, 1, blockID + (blockData << 12));
                     } else if (sfxId == 1009) { // Ghast fireball effect (volume 1) (sound packet would be a better replacement but changing the id is easier and the difference is minimal)
-                        wrapper.set(Type.INT, 0, 1008); // Ghast fireball effect (volume 10)
+                        wrapper.set(Types.INT, 0, 1008); // Ghast fireball effect (volume 10)
                     }
                 });
             }
@@ -289,25 +288,25 @@ public class Protocol1_2_1_3to1_1 extends StatelessProtocol<ClientboundPackets1_
         this.registerServerbound(ServerboundPackets1_2_1.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // protocol id
+                map(Types.INT); // protocol id
                 map(Types1_6_4.STRING); // username
-                create(Type.LONG, 0L); // seed
+                create(Types.LONG, 0L); // seed
                 map(Types1_6_4.STRING); // level type
-                map(Type.INT); // game mode
-                map(Type.INT, Type.BYTE); // dimension id
-                map(Type.BYTE); // difficulty
-                map(Type.BYTE); // world height
-                map(Type.BYTE); // max players
+                map(Types.INT); // game mode
+                map(Types.INT, Types.BYTE); // dimension id
+                map(Types.BYTE); // difficulty
+                map(Types.BYTE); // world height
+                map(Types.BYTE); // max players
             }
         });
         this.registerServerbound(ServerboundPackets1_2_1.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT, Type.BYTE); // dimension id
-                map(Type.BYTE); // difficulty
-                map(Type.BYTE); // game mode
-                map(Type.SHORT); // world height
-                create(Type.LONG, 0L); // seed
+                map(Types.INT, Types.BYTE); // dimension id
+                map(Types.BYTE); // difficulty
+                map(Types.BYTE); // game mode
+                map(Types.SHORT); // world height
+                create(Types.LONG, 0L); // seed
                 map(Types1_6_4.STRING); // level type
             }
         });
@@ -339,10 +338,10 @@ public class Protocol1_2_1_3to1_1 extends StatelessProtocol<ClientboundPackets1_
         }
     }
 
-    private void sendEntityHeadLook(final int entityId, final byte headYaw, final PacketWrapper wrapper) throws Exception {
-        final PacketWrapper entityHeadLook = PacketWrapper.create(ClientboundPackets1_2_1.ENTITY_HEAD_LOOK, wrapper.user());
-        entityHeadLook.write(Type.INT, entityId); // entity id
-        entityHeadLook.write(Type.BYTE, headYaw); // head yaw
+    private void sendEntityHeadLook(final int entityId, final byte headYaw, final PacketWrapper wrapper) {
+        final PacketWrapper entityHeadLook = PacketWrapper.create(ClientboundPackets1_2_1.ROTATE_HEAD, wrapper.user());
+        entityHeadLook.write(Types.INT, entityId); // entity id
+        entityHeadLook.write(Types.BYTE, headYaw); // head yaw
 
         wrapper.send(Protocol1_2_1_3to1_1.class);
         entityHeadLook.send(Protocol1_2_1_3to1_1.class);
@@ -364,7 +363,7 @@ public class Protocol1_2_1_3to1_1 extends StatelessProtocol<ClientboundPackets1_
     }
 
     @Override
-    public LegacyItemRewriter<Protocol1_2_1_3to1_1> getItemRewriter() {
+    public ItemRewriter getItemRewriter() {
         return this.itemRewriter;
     }
 

@@ -26,14 +26,14 @@ import java.util.Optional;
 
 public enum MetaIndex1_6_1to1_5_2 {
 
-    ENTITY_LIVING_POTION_EFFECT_COLOR(EntityTypes1_10.EntityType.ENTITY_LIVING, 8, MetaType1_6_4.Int, 7, MetaType1_6_4.Int),
-    ENTITY_LIVING_IS_POTION_EFFECT_AMBIENT(EntityTypes1_10.EntityType.ENTITY_LIVING, 9, MetaType1_6_4.Byte, 8, MetaType1_6_4.Byte),
-    ENTITY_LIVING_ARROWS(EntityTypes1_10.EntityType.ENTITY_LIVING, 10, MetaType1_6_4.Byte, 9, MetaType1_6_4.Byte),
-    ENTITY_LIVING_NAME_TAG(EntityTypes1_10.EntityType.ENTITY_LIVING, 5, MetaType1_6_4.String, 10, MetaType1_6_4.String),
-    ENTITY_LIVING_NAME_TAG_VISIBILITY(EntityTypes1_10.EntityType.ENTITY_LIVING, 6, MetaType1_6_4.Byte, 11, MetaType1_6_4.Byte),
-    HUMAN_ABSORPTION_HEARTS(EntityTypes1_10.EntityType.ENTITY_HUMAN, 17, MetaType1_6_4.Byte, MetaType1_6_4.Float),
+    ENTITY_LIVING_POTION_EFFECT_COLOR(EntityTypes1_10.EntityType.LIVING_ENTITY_BASE, 8, MetaType1_6_4.Int, 7, MetaType1_6_4.Int),
+    ENTITY_LIVING_IS_POTION_EFFECT_AMBIENT(EntityTypes1_10.EntityType.LIVING_ENTITY_BASE, 9, MetaType1_6_4.Byte, 8, MetaType1_6_4.Byte),
+    ENTITY_LIVING_ARROWS(EntityTypes1_10.EntityType.LIVING_ENTITY_BASE, 10, MetaType1_6_4.Byte, 9, MetaType1_6_4.Byte),
+    ENTITY_LIVING_NAME_TAG(EntityTypes1_10.EntityType.LIVING_ENTITY_BASE, 5, MetaType1_6_4.String, 10, MetaType1_6_4.String),
+    ENTITY_LIVING_NAME_TAG_VISIBILITY(EntityTypes1_10.EntityType.LIVING_ENTITY_BASE, 6, MetaType1_6_4.Byte, 11, MetaType1_6_4.Byte),
+    HUMAN_ABSORPTION_HEARTS(EntityTypes1_10.EntityType.PLAYER, 17, MetaType1_6_4.Byte, MetaType1_6_4.Float),
     BOAT_DAMAGE_TAKEN(EntityTypes1_10.EntityType.BOAT, 19, MetaType1_6_4.Int, MetaType1_6_4.Float),
-    MINECART_DAMAGE_TAKEN(EntityTypes1_10.EntityType.MINECART_ABSTRACT, 19, MetaType1_6_4.Int, MetaType1_6_4.Float),
+    MINECART_DAMAGE_TAKEN(EntityTypes1_10.EntityType.ABSTRACT_MINECART, 19, MetaType1_6_4.Int, MetaType1_6_4.Float),
     WITHER_HEALTH(EntityTypes1_10.EntityType.WITHER, 16, MetaType1_6_4.Int, 6, MetaType1_6_4.Float),
     ENDER_DRAGON_HEALTH(EntityTypes1_10.EntityType.ENDER_DRAGON, 16, MetaType1_6_4.Int, 6, MetaType1_6_4.Float),
     WOLF_HEALTH(EntityTypes1_10.EntityType.WOLF, 18, MetaType1_6_4.Int, MetaType1_6_4.Float),

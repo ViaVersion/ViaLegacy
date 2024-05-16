@@ -23,7 +23,7 @@ import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
@@ -67,7 +67,7 @@ public class AlphaInventoryTracker extends StoredObject {
         this.openContainerItems = new Item[containerSlots];
     }
 
-    public void onWindowClose() throws Exception {
+    public void onWindowClose() {
         if (this.openWindowType == 1) { // crafting table
             for (int i = 1; i <= 9; i++) {
                 final Item item = this.openContainerItems[i];
@@ -93,7 +93,7 @@ public class AlphaInventoryTracker extends StoredObject {
         this.updateCursorItem();
     }
 
-    public void onWindowClick(final byte windowId, final short slot, final byte button, final short action, final Item item) throws Exception {
+    public void onWindowClick(final byte windowId, final short slot, final byte button, final short action, final Item item) {
         final boolean leftClick = button != 1;
 
         if (slot == -999) {
@@ -405,15 +405,11 @@ public class AlphaInventoryTracker extends StoredObject {
     }
 
     private void updateInventorySlot(final byte windowId, final short slot, final Item item) {
-        try {
-            final PacketWrapper setSlot = PacketWrapper.create(ClientboundPacketsb1_1.SET_SLOT, this.getUser());
-            setSlot.write(Type.BYTE, windowId); // window id
-            setSlot.write(Type.SHORT, slot); // slot
-            setSlot.write(Typesb1_1.NBTLESS_ITEM, copyItem(item)); // item
-            setSlot.send(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
+        final PacketWrapper setSlot = PacketWrapper.create(ClientboundPacketsb1_1.CONTAINER_SET_SLOT, this.getUser());
+        setSlot.write(Types.BYTE, windowId); // window id
+        setSlot.write(Types.SHORT, slot); // slot
+        setSlot.write(Typesb1_1.NBTLESS_ITEM, copyItem(item)); // item
+        setSlot.send(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
     }
 
     private void updatePlayerInventory() {
@@ -427,14 +423,10 @@ public class AlphaInventoryTracker extends StoredObject {
     }
 
     private void updateInventory(final byte windowId, final Item[] items) {
-        try {
-            final PacketWrapper windowItems = PacketWrapper.create(ClientboundPacketsb1_1.WINDOW_ITEMS, this.getUser());
-            windowItems.write(Type.BYTE, windowId); // window id
-            windowItems.write(Types1_4_2.NBTLESS_ITEM_ARRAY, copyItems(items)); // items
-            windowItems.send(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
+        final PacketWrapper windowItems = PacketWrapper.create(ClientboundPacketsb1_1.CONTAINER_SET_CONTENT, this.getUser());
+        windowItems.write(Types.BYTE, windowId); // window id
+        windowItems.write(Types1_4_2.NBTLESS_ITEM_ARRAY, copyItems(items)); // items
+        windowItems.send(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
     }
 
     private Item splitStack(final Item item, final int size) {

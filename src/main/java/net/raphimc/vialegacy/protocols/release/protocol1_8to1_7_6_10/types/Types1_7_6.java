@@ -17,15 +17,16 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types;
 
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.metadata.MetaListType;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.api.type.types.entitydata.EntityDataListType;
 
 import java.util.List;
 
@@ -38,15 +39,15 @@ public class Types1_7_6 {
     public static final Type<Item> ITEM = new ItemType();
     public static final Type<Item[]> ITEM_ARRAY = new ItemArrayType<>(ITEM);
 
-    public static final Type<Metadata> METADATA = new MetadataType();
-    public static final Type<List<Metadata>> METADATA_LIST = new MetaListType(METADATA);
+    public static final Type<EntityData> METADATA = new MetadataType();
+    public static final Type<List<EntityData>> METADATA_LIST = new EntityDataListType(METADATA);
 
     public static final Type<BlockChangeRecord[]> BLOCK_CHANGE_RECORD_ARRAY = new BlockChangeRecordArrayType();
 
-    public static final Type<Position> POSITION_BYTE = new PositionVarYType<>(Type.BYTE, i -> (byte) i);
-    public static final Type<Position> POSITION_UBYTE = new PositionVarYType<>(Type.UNSIGNED_BYTE, i -> (short) i);
-    public static final Type<Position> POSITION_SHORT = new PositionVarYType<>(Type.SHORT, i -> (short) i);
-    public static final Type<Position> POSITION_INT = new PositionVarYType<>(Type.INT, i -> i);
+    public static final Type<Position> POSITION_BYTE = new PositionVarYType<>(Types.BYTE, i -> (byte) i);
+    public static final Type<Position> POSITION_UBYTE = new PositionVarYType<>(Types.UNSIGNED_BYTE, i -> (short) i);
+    public static final Type<Position> POSITION_SHORT = new PositionVarYType<>(Types.SHORT, i -> (short) i);
+    public static final Type<Position> POSITION_INT = new PositionVarYType<>(Types.INT, i -> i);
 
     public static final Type<Chunk> CHUNK_WITH_SKYLIGHT = new ChunkType1_7_6(true);
     public static final Type<Chunk> CHUNK_WITHOUT_SKYLIGHT = new ChunkType1_7_6(false);

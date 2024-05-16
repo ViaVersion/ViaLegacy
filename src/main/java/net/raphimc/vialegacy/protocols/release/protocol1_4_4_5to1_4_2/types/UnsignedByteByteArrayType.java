@@ -26,12 +26,12 @@ public class UnsignedByteByteArrayType extends Type<byte[]> {
         super(byte[].class);
     }
 
-    public void write(ByteBuf buffer, byte[] array) throws Exception {
+    public void write(ByteBuf buffer, byte[] array) {
         buffer.writeByte(array.length & 255);
         buffer.writeBytes(array);
     }
 
-    public byte[] read(ByteBuf buffer) throws Exception {
+    public byte[] read(ByteBuf buffer) {
         final byte[] array = new byte[buffer.readUnsignedByte()];
         buffer.readBytes(array);
         return array;

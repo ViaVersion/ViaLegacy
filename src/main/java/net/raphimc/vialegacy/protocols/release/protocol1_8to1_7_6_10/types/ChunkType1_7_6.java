@@ -25,7 +25,6 @@ import io.netty.buffer.ByteBuf;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.chunks.ExtendedBlockStorage;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
@@ -58,7 +57,7 @@ public class ChunkType1_7_6 extends Type<Chunk> {
     }
 
     @Override
-    public Chunk read(ByteBuf byteBuf) throws Exception {
+    public Chunk read(ByteBuf byteBuf) {
         final int chunkX = byteBuf.readInt();
         final int chunkZ = byteBuf.readInt();
         final boolean fullChunk = byteBuf.readBoolean();
@@ -75,7 +74,7 @@ public class ChunkType1_7_6 extends Type<Chunk> {
             inflater.setInput(data, 0, compressedSize);
             inflater.inflate(uncompressedData);
         } catch (DataFormatException ex) {
-            throw new IOException("Bad compressed data format");
+            throw new RuntimeException("Bad compressed data format");
         } finally {
             inflater.end();
         }
@@ -89,7 +88,7 @@ public class ChunkType1_7_6 extends Type<Chunk> {
     }
 
     @Override
-    public void write(ByteBuf byteBuf, Chunk chunk) throws Exception {
+    public void write(ByteBuf byteBuf, Chunk chunk) {
         final Pair<byte[], Short> chunkData = serialize(chunk);
         final byte[] data = chunkData.key();
         final short additionalBitMask = chunkData.value();
@@ -202,7 +201,7 @@ public class ChunkType1_7_6 extends Type<Chunk> {
         return new BaseChunk(chunkX, chunkZ, fullChunk, false, primaryBitMask, sections, biomeData, new ArrayList<>());
     }
 
-    public static Pair<byte[], Short> serialize(final Chunk chunk) throws IOException {
+    public static Pair<byte[], Short> serialize(final Chunk chunk) {
         final ExtendedBlockStorage[] storageArrays = new ExtendedBlockStorage[16];
         for (int i = 0; i < storageArrays.length; i++) {
             final ChunkSection section = chunk.getSections()[i];
@@ -228,25 +227,25 @@ public class ChunkType1_7_6 extends Type<Chunk> {
 
         for (int i = 0; i < storageArrays.length; i++) {
             if ((chunk.getBitmask() & 1 << i) != 0) {
-                output.write(storageArrays[i].getBlockLSBArray());
+                output.writeBytes(storageArrays[i].getBlockLSBArray());
             }
         }
 
         for (int i = 0; i < storageArrays.length; i++) {
             if ((chunk.getBitmask() & 1 << i) != 0) {
-                output.write(storageArrays[i].getBlockMetadataArray().getHandle());
+                output.writeBytes(storageArrays[i].getBlockMetadataArray().getHandle());
             }
         }
 
         for (int i = 0; i < storageArrays.length; i++) {
             if ((chunk.getBitmask() & 1 << i) != 0) {
-                output.write(storageArrays[i].getBlockLightArray().getHandle());
+                output.writeBytes(storageArrays[i].getBlockLightArray().getHandle());
             }
         }
 
         for (int i = 0; i < storageArrays.length; i++) {
             if ((chunk.getBitmask() & 1 << i) != 0 && storageArrays[i].getSkyLightArray() != null) {
-                output.write(storageArrays[i].getSkyLightArray().getHandle());
+                output.writeBytes(storageArrays[i].getSkyLightArray().getHandle());
             }
         }
 
@@ -254,7 +253,7 @@ public class ChunkType1_7_6 extends Type<Chunk> {
         for (int i = 0; i < storageArrays.length; i++) {
             if ((chunk.getBitmask() & 1 << i) != 0 && storageArrays[i].hasBlockMSBArray()) {
                 additionalBitMask |= 1 << i;
-                output.write(storageArrays[i].getOrCreateBlockMSBArray().getHandle());
+                output.writeBytes(storageArrays[i].getOrCreateBlockMSBArray().getHandle());
             }
         }
 

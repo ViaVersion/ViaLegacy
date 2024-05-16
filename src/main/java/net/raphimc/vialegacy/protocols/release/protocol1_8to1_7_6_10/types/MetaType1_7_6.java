@@ -17,18 +17,19 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types;
 
-import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 
-public enum MetaType1_7_6 implements MetaType {
+public enum MetaType1_7_6 implements EntityDataType {
 
-    Byte(0, Type.BYTE),
-    Short(1, Type.SHORT),
-    Int(2, Type.INT),
-    Float(3, Type.FLOAT),
-    String(4, Type.STRING),
+    Byte(0, Types.BYTE),
+    Short(1, Types.SHORT),
+    Int(2, Types.INT),
+    Float(3, Types.FLOAT),
+    String(4, Types.STRING),
     Slot(5, Types1_7_6.ITEM),
-    Position(6, Type.VECTOR);
+    Position(6, Types.VECTOR);
 
     private final int typeID;
     private final Type<?> type;

@@ -27,9 +27,9 @@ import java.util.function.BiConsumer;
 public enum ServerboundPacketsc0_19a implements ServerboundPacketType, PreNettyPacketType {
 
     LOGIN(0, (user, buf) -> buf.skipBytes(129)),
-    PLAYER_BLOCK_PLACEMENT(5, (user, buf) -> buf.skipBytes(8)),
-    PLAYER_POSITION_AND_ROTATION(8, (user, buf) -> buf.skipBytes(9)),
-    CHAT_MESSAGE(13, (user, buf) -> buf.skipBytes(65));
+    USE_ITEM_ON(5, (user, buf) -> buf.skipBytes(8)),
+    MOVE_PLAYER_POS_ROT(8, (user, buf) -> buf.skipBytes(9)),
+    CHAT(13, (user, buf) -> buf.skipBytes(65));
 
     private static final ServerboundPacketsc0_19a[] REGISTRY = new ServerboundPacketsc0_19a[256];
 

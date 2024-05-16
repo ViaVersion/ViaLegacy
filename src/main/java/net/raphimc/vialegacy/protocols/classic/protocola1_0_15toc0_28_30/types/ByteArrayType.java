@@ -26,13 +26,13 @@ public class ByteArrayType extends Type<byte[]> {
         super(byte[].class);
     }
 
-    public void write(ByteBuf buffer, byte[] array) throws Exception {
+    public void write(ByteBuf buffer, byte[] array) {
         if (array.length != 1024) throw new IllegalStateException("Byte array needs to be exactly 1024 bytes long");
 
         buffer.writeBytes(array);
     }
 
-    public byte[] read(ByteBuf buffer) throws Exception {
+    public byte[] read(ByteBuf buffer) {
         final byte[] array = new byte[1024];
         buffer.readBytes(array);
         return array;

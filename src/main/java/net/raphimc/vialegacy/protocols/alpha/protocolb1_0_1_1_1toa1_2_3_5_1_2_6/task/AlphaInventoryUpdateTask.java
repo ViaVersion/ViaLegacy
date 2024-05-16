@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.Protocolb1_0_1_1_1toa1_2_3_5_1_2_6;
 import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.ServerboundPacketsa1_2_6;
@@ -54,8 +54,8 @@ public class AlphaInventoryUpdateTask implements Runnable {
                     final Item handItem = fixItem(Via.getManager().getProviders().get(AlphaInventoryProvider.class).getHandItem(info));
 
                     if (!Objects.equals(handItem, inventoryStorage.handItem)) {
-                        final PacketWrapper heldItemChange = PacketWrapper.create(ServerboundPacketsb1_1.HELD_ITEM_CHANGE, info);
-                        heldItemChange.write(Type.SHORT, inventoryStorage.selectedHotbarSlot); // slot
+                        final PacketWrapper heldItemChange = PacketWrapper.create(ServerboundPacketsb1_1.SET_CARRIED_ITEM, info);
+                        heldItemChange.write(Types.SHORT, inventoryStorage.selectedHotbarSlot); // slot
                         heldItemChange.sendToServer(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class, false);
                     }
 
@@ -74,15 +74,15 @@ public class AlphaInventoryUpdateTask implements Runnable {
                     inventoryStorage.armorInventory = copyItems(mergedArmorInventory);
 
                     final PacketWrapper mainContent = PacketWrapper.create(ServerboundPacketsa1_2_6.PLAYER_INVENTORY, info);
-                    mainContent.write(Type.INT, -1); // type
+                    mainContent.write(Types.INT, -1); // type
                     mainContent.write(Types1_4_2.NBTLESS_ITEM_ARRAY, mergedMainInventory); // items
 
                     final PacketWrapper craftingContent = PacketWrapper.create(ServerboundPacketsa1_2_6.PLAYER_INVENTORY, info);
-                    craftingContent.write(Type.INT, -2); // type
+                    craftingContent.write(Types.INT, -2); // type
                     craftingContent.write(Types1_4_2.NBTLESS_ITEM_ARRAY, mergedCraftingInventory); // items
 
                     final PacketWrapper armorContent = PacketWrapper.create(ServerboundPacketsa1_2_6.PLAYER_INVENTORY, info);
-                    armorContent.write(Type.INT, -3); // type
+                    armorContent.write(Types.INT, -3); // type
                     armorContent.write(Types1_4_2.NBTLESS_ITEM_ARRAY, mergedArmorInventory); // items
 
                     mainContent.sendToServer(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);

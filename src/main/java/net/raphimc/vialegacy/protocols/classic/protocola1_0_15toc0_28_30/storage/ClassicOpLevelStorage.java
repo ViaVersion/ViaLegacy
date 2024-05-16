@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.storag
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_16_2toa1_0_15.ClientboundPacketsa1_0_15;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_8_0_1tob1_7_0_3.types.Typesb1_7_0_3;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.Protocola1_0_15toc0_30;
@@ -49,7 +49,7 @@ public class ClassicOpLevelStorage extends StoredObject {
         }
     }
 
-    public void updateHax(final boolean flying, final boolean noClip, final boolean speed, final boolean respawn) throws Exception {
+    public void updateHax(final boolean flying, final boolean noClip, final boolean speed, final boolean respawn) {
         if (!this.haxEnabled) return;
 
         boolean changed = this.flying != flying;
@@ -76,13 +76,13 @@ public class ClassicOpLevelStorage extends StoredObject {
             statusMessage += " ";
             statusMessage += this.respawn ? "§aRespawn" : "§cRespawn";
 
-            final PacketWrapper chatMessage = PacketWrapper.create(ClientboundPacketsa1_0_15.CHAT_MESSAGE, this.getUser());
+            final PacketWrapper chatMessage = PacketWrapper.create(ClientboundPacketsa1_0_15.CHAT, this.getUser());
             chatMessage.write(Typesb1_7_0_3.STRING, statusMessage); // message
             chatMessage.send(Protocola1_0_15toc0_30.class);
         }
     }
 
-    public void setOpLevel(final byte opLevel) throws Exception {
+    public void setOpLevel(final byte opLevel) {
         final boolean changed = this.opLevel != opLevel;
         this.opLevel = opLevel;
 
@@ -99,13 +99,13 @@ public class ClassicOpLevelStorage extends StoredObject {
         return this.opLevel;
     }
 
-    public void updateAbilities() throws Exception {
+    public void updateAbilities() {
         if (this.getUser().getProtocolInfo().getPipeline().contains(Protocol1_2_4_5to1_2_1_3.class)) {
             final PacketWrapper playerAbilities = PacketWrapper.create(ClientboundPackets1_2_4.PLAYER_ABILITIES, this.getUser());
-            playerAbilities.write(Type.BOOLEAN, true); // invulnerable
-            playerAbilities.write(Type.BOOLEAN, false); // flying
-            playerAbilities.write(Type.BOOLEAN, this.flying); // allow flying
-            playerAbilities.write(Type.BOOLEAN, true); // creative mode
+            playerAbilities.write(Types.BOOLEAN, true); // invulnerable
+            playerAbilities.write(Types.BOOLEAN, false); // flying
+            playerAbilities.write(Types.BOOLEAN, this.flying); // allow flying
+            playerAbilities.write(Types.BOOLEAN, true); // creative mode
             playerAbilities.scheduleSend(Protocol1_2_4_5to1_2_1_3.class);
         }
     }

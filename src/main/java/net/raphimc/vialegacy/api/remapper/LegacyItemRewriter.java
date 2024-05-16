@@ -17,22 +17,24 @@
  */
 package net.raphimc.vialegacy.api.remapper;
 
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
+import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.ServerboundPacketType;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.rewriter.ItemRewriter;
 import com.viaversion.viaversion.api.rewriter.RewriterBase;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.libs.fastutil.objects.ObjectArrayList;
 import com.viaversion.viaversion.libs.fastutil.objects.ObjectList;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
 
-public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBase<P> implements ItemRewriter<P> {
+public abstract class LegacyItemRewriter<C extends ClientboundPacketType, S extends ServerboundPacketType, P extends Protocol<C, ?, ?, S>> extends RewriterBase<P> implements ItemRewriter<P> {
 
     private final ObjectList<RewriteEntry> rewriteEntries = new ObjectArrayList<>();
     private final ObjectList<NonExistentEntry> nonExistentItems = new ObjectArrayList<>();
@@ -90,11 +92,11 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
     }
 
 
-    public void registerCreativeInventoryAction(final ServerboundPacketType packetType) {
+    public void registerCreativeInventoryAction(final S packetType) {
         this.protocol.registerServerbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.SHORT); // slot
+                map(Types.SHORT); // slot
                 handler(wrapper -> handleServerboundItem(wrapper));
             }
         });
@@ -159,12 +161,12 @@ public abstract class LegacyItemRewriter<P extends Protocol> extends RewriterBas
         return "VL|" + this.protocol.getClass().getSimpleName();
     }
 
-    private void handleClientboundItem(final PacketWrapper wrapper) throws Exception {
+    private void handleClientboundItem(final PacketWrapper wrapper) {
         final Item item = this.handleItemToClient(wrapper.user(), wrapper.read(this.itemType));
         wrapper.write(this.mappedItemType, item);
     }
 
-    private void handleServerboundItem(final PacketWrapper wrapper) throws Exception {
+    private void handleServerboundItem(final PacketWrapper wrapper) {
         final Item item = this.handleItemToServer(wrapper.user(), wrapper.read(this.mappedItemType));
         wrapper.write(this.itemType, item);
     }

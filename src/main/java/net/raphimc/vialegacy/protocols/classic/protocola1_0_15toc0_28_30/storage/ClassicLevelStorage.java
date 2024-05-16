@@ -70,7 +70,7 @@ public class ClassicLevelStorage extends StoredObject {
         this.netBuffer.write(part, 0, partSize);
     }
 
-    public void finish(final int sizeX, final int sizeY, final int sizeZ) throws Exception {
+    public void finish(final int sizeX, final int sizeY, final int sizeZ) {
         try {
             final DataInputStream dis = new DataInputStream(new GZIPInputStream(new ByteArrayInputStream(this.netBuffer.toByteArray()), 64 * 1024));
             final byte[] blocks = new byte[dis.readInt()];
@@ -103,7 +103,7 @@ public class ClassicLevelStorage extends StoredObject {
                     if (chunkX < 0 || chunkX >= this.chunkXCount || chunkZ < 0 || chunkZ >= this.chunkZCount) {
                         final Chunk chunk = ChunkUtil.createEmptyChunk(chunkX, chunkZ, Math.max(8, this.sectionYCount), this.sectionBitmask);
                         ChunkUtil.setDummySkylight(chunk, true);
-                        final PacketWrapper chunkData = PacketWrapper.create(ClientboundPacketsa1_0_15.CHUNK_DATA, this.getUser());
+                        final PacketWrapper chunkData = PacketWrapper.create(ClientboundPacketsa1_0_15.LEVEL_CHUNK, this.getUser());
                         chunkData.write(Types1_1.CHUNK, chunk);
                         chunkData.send(Protocola1_0_15toc0_30.class);
                     }
@@ -112,7 +112,7 @@ public class ClassicLevelStorage extends StoredObject {
         }
     }
 
-    public void tick() throws Exception {
+    public void tick() {
         final ClassicPositionTracker positionTracker = this.getUser().get(ClassicPositionTracker.class);
         if (!positionTracker.spawned) return;
 
@@ -136,11 +136,11 @@ public class ClassicLevelStorage extends StoredObject {
         }
     }
 
-    public void sendChunks(final ChunkCoord center, final int radius) throws Exception {
+    public void sendChunks(final ChunkCoord center, final int radius) {
         this.sendChunks(center, radius, Integer.MAX_VALUE);
     }
 
-    public void sendChunks(final ChunkCoord center, final int radius, int limit) throws Exception {
+    public void sendChunks(final ChunkCoord center, final int radius, int limit) {
         final ChunkCoordSpiral spiral = new ChunkCoordSpiral(center, new ChunkCoord(radius, radius));
         for (ChunkCoord coord : spiral) {
             if (!this.shouldSend(coord)) continue;
@@ -149,7 +149,7 @@ public class ClassicLevelStorage extends StoredObject {
         }
     }
 
-    public void sendChunk(final ChunkCoord coord) throws Exception {
+    public void sendChunk(final ChunkCoord coord) {
         if (!this.shouldSend(coord)) return;
         final ClassicBlockRemapper remapper = this.getUser().get(ClassicBlockRemapper.class);
 
@@ -179,7 +179,7 @@ public class ClassicLevelStorage extends StoredObject {
         this.loadedChunks.add(coord);
 
         final Chunk viaChunk = new BaseChunk(coord.chunkX, coord.chunkZ, true, false, this.sectionBitmask, modernSections, new int[256], new ArrayList<>());
-        final PacketWrapper chunkData = PacketWrapper.create(ClientboundPacketsa1_0_15.CHUNK_DATA, this.getUser());
+        final PacketWrapper chunkData = PacketWrapper.create(ClientboundPacketsa1_0_15.LEVEL_CHUNK, this.getUser());
         chunkData.write(Types1_1.CHUNK, viaChunk);
         chunkData.send(Protocola1_0_15toc0_30.class);
     }

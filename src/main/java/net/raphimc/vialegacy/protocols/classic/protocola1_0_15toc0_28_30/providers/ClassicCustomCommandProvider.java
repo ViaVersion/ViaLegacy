@@ -30,8 +30,8 @@ public class ClassicCustomCommandProvider implements Provider {
         return false;
     }
 
-    public void sendFeedback(final UserConnection user, final String message) throws Exception {
-        final PacketWrapper chatMessage = PacketWrapper.create(ClientboundPacketsa1_0_15.CHAT_MESSAGE, user);
+    public void sendFeedback(final UserConnection user, final String message) {
+        final PacketWrapper chatMessage = PacketWrapper.create(ClientboundPacketsa1_0_15.CHAT, user);
         chatMessage.write(Typesb1_7_0_3.STRING, message); // message
         chatMessage.send(Protocola1_0_15toc0_30.class);
     }

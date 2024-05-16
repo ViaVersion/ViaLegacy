@@ -20,10 +20,7 @@ package net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.storage;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
-import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2.Protocolb1_3_0_1tob1_2_0_2;
-
-import java.util.logging.Level;
 
 public class BlockDigStorage extends StoredObject {
 
@@ -38,17 +35,13 @@ public class BlockDigStorage extends StoredObject {
     }
 
     public void tick() {
-        try {
-            if (tick >= 5) {
-                Protocolb1_3_0_1tob1_2_0_2.sendBlockDigPacket(this.getUser(), (byte) 0, position, facing);
-                tick = 0;
-            } else {
-                tick++;
-            }
-            Protocolb1_3_0_1tob1_2_0_2.sendBlockDigPacket(this.getUser(), (byte) 1, position, facing);
-        } catch (Throwable e) {
-            ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error while ticking BlockDigStorage", e);
+        if (this.tick >= 5) {
+            Protocolb1_3_0_1tob1_2_0_2.sendBlockDigPacket(this.getUser(), (byte) 0, this.position, this.facing);
+            this.tick = 0;
+        } else {
+            this.tick++;
         }
+        Protocolb1_3_0_1tob1_2_0_2.sendBlockDigPacket(this.getUser(), (byte) 1, this.position, this.facing);
     }
 
 }

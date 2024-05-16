@@ -19,7 +19,7 @@ package net.raphimc.vialegacy.protocols.alpha.protocola1_2_0_1_2_1_1toa1_1_0_1_1
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_2_2toa1_2_0_1_2_1_1.ClientboundPacketsa1_2_0;
@@ -34,25 +34,25 @@ public class Protocola1_2_0_1_2_1_1toa1_1_0_1_1_2_1 extends StatelessProtocol<Cl
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsa1_1_0.JOIN_GAME, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsa1_1_0.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
+                map(Types.INT); // entity id
                 map(Typesb1_7_0_3.STRING); // username
                 map(Typesb1_7_0_3.STRING); // password
-                create(Type.LONG, 0L); // seed
-                create(Type.BYTE, (byte) 0); // dimension id
+                create(Types.LONG, 0L); // seed
+                create(Types.BYTE, (byte) 0); // dimension id
             }
         });
 
         this.registerServerbound(ServerboundPacketsa1_2_0.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // protocol id
+                map(Types.INT); // protocol id
                 map(Typesb1_7_0_3.STRING); // username
                 map(Typesb1_7_0_3.STRING); // password
-                read(Type.LONG); // seed
-                read(Type.BYTE); // dimension id
+                read(Types.LONG); // seed
+                read(Types.BYTE); // dimension id
             }
         });
     }

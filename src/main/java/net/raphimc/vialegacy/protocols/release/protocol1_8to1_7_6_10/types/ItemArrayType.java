@@ -31,7 +31,7 @@ public class ItemArrayType<T extends Item> extends Type<Item[]> {
     }
 
     @Override
-    public Item[] read(ByteBuf buffer) throws Exception {
+    public Item[] read(ByteBuf buffer) {
         final int amount = buffer.readShort();
         final Item[] items = new Item[amount];
 
@@ -42,7 +42,7 @@ public class ItemArrayType<T extends Item> extends Type<Item[]> {
     }
 
     @Override
-    public void write(ByteBuf buffer, Item[] items) throws Exception {
+    public void write(ByteBuf buffer, Item[] items) {
         buffer.writeShort(items.length);
         for (Item item : items) {
             this.itemType.write(buffer, (T) item);

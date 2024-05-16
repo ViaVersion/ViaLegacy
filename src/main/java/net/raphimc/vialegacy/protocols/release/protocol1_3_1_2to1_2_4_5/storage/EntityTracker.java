@@ -20,9 +20,9 @@ package net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.storage
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.MathUtil;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.model.Location;
@@ -83,7 +83,7 @@ public class EntityTracker extends StoredObject {
         }
     }
 
-    public void updateEntityMetadata(int entityId, List<Metadata> metadataList) {
+    public void updateEntityMetadata(int entityId, List<EntityData> metadataList) {
         final AbstractTrackedEntity entity = this.entityMap.get(entityId);
         if (entity instanceof TrackedLivingEntity) {
             final TrackedLivingEntity livingEntity = (TrackedLivingEntity) entity;
@@ -160,18 +160,14 @@ public class EntityTracker extends StoredObject {
             return;
         }
 
-        try {
-            final PacketWrapper entitySound = PacketWrapper.create(ClientboundPackets1_3_1.NAMED_SOUND, this.getUser());
-            entitySound.write(Types1_6_4.STRING, sound.getSound().getSoundName()); // sound
-            entitySound.write(Type.INT, ((int) sourceLocation.getX()) * 8); // x
-            entitySound.write(Type.INT, ((int) sourceLocation.getY()) * 8); // y
-            entitySound.write(Type.INT, ((int) sourceLocation.getZ()) * 8); // z
-            entitySound.write(Type.FLOAT, vol); // volume
-            entitySound.write(Type.UNSIGNED_BYTE, correctedPitch); // pitch
-            entitySound.send(Protocol1_3_1_2to1_2_4_5.class);
-        } catch (Throwable e) {
-            throw new RuntimeException(e);
-        }
+        final PacketWrapper entitySound = PacketWrapper.create(ClientboundPackets1_3_1.CUSTOM_SOUND, this.getUser());
+        entitySound.write(Types1_6_4.STRING, sound.getSound().getSoundName()); // sound
+        entitySound.write(Types.INT, ((int) sourceLocation.getX()) * 8); // x
+        entitySound.write(Types.INT, ((int) sourceLocation.getY()) * 8); // y
+        entitySound.write(Types.INT, ((int) sourceLocation.getZ()) * 8); // z
+        entitySound.write(Types.FLOAT, vol); // volume
+        entitySound.write(Types.UNSIGNED_BYTE, correctedPitch); // pitch
+        entitySound.send(Protocol1_3_1_2to1_2_4_5.class);
     }
 
 }

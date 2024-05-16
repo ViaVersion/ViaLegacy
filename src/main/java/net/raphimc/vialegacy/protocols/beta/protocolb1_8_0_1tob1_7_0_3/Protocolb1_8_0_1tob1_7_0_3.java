@@ -26,7 +26,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
@@ -61,27 +61,27 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends StatelessProtocol<ClientboundPac
     @Override
     protected void registerPackets() {
         this.registerClientbound(ClientboundPacketsb1_7.KEEP_ALIVE, wrapper -> {
-            wrapper.write(Type.INT, ThreadLocalRandom.current().nextInt(1, Short.MAX_VALUE)); // key
+            wrapper.write(Types.INT, ThreadLocalRandom.current().nextInt(1, Short.MAX_VALUE)); // key
         });
-        this.registerClientbound(ClientboundPacketsb1_7.JOIN_GAME, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_7.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
+                map(Types.INT); // entity id
                 map(Types1_6_4.STRING); // username
-                map(Type.LONG); // seed
-                create(Type.INT, 0); // game mode
-                map(Type.BYTE); // dimension id
-                create(Type.BYTE, (byte) 1); // difficulty
-                create(Type.BYTE, (byte) -128); // world height
-                create(Type.BYTE, (byte) 100); // max players
+                map(Types.LONG); // seed
+                create(Types.INT, 0); // game mode
+                map(Types.BYTE); // dimension id
+                create(Types.BYTE, (byte) 1); // difficulty
+                create(Types.BYTE, (byte) -128); // world height
+                create(Types.BYTE, (byte) 100); // max players
                 handler(wrapper -> {
                     final PacketWrapper playerListEntry = PacketWrapper.create(ClientboundPacketsb1_8.PLAYER_INFO, wrapper.user());
                     playerListEntry.write(Types1_6_4.STRING, wrapper.user().getProtocolInfo().getUsername()); // name
-                    playerListEntry.write(Type.BOOLEAN, true); // online
-                    playerListEntry.write(Type.SHORT, (short) 0); // ping
+                    playerListEntry.write(Types.BOOLEAN, true); // online
+                    playerListEntry.write(Types.SHORT, (short) 0); // ping
 
-                    final PacketWrapper updateHealth = PacketWrapper.create(ClientboundPacketsb1_7.UPDATE_HEALTH, wrapper.user());
-                    updateHealth.write(Type.SHORT, (short) 20); // health
+                    final PacketWrapper updateHealth = PacketWrapper.create(ClientboundPacketsb1_7.SET_HEALTH, wrapper.user());
+                    updateHealth.write(Types.SHORT, (short) 20); // health
 
                     wrapper.send(Protocolb1_8_0_1tob1_7_0_3.class);
                     wrapper.cancel();
@@ -90,17 +90,17 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends StatelessProtocol<ClientboundPac
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_7.UPDATE_HEALTH, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_7.SET_HEALTH, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.SHORT); // health
-                create(Type.SHORT, (short) 6); // food
-                create(Type.FLOAT, 0F); // saturation
-                handler(wrapper -> wrapper.user().get(PlayerHealthTracker.class).setHealth(wrapper.get(Type.SHORT, 0)));
+                map(Types.SHORT); // health
+                create(Types.SHORT, (short) 6); // food
+                create(Types.FLOAT, 0F); // saturation
+                handler(wrapper -> wrapper.user().get(PlayerHealthTracker.class).setHealth(wrapper.get(Types.SHORT, 0)));
                 handler(wrapper -> {
                     if (ViaLegacy.getConfig().enableB1_7_3Sprinting()) {
-                        wrapper.set(Type.SHORT, 1, (short) 20); // food
-                        wrapper.set(Type.FLOAT, 0, 0F); // saturation
+                        wrapper.set(Types.SHORT, 1, (short) 20); // food
+                        wrapper.set(Types.FLOAT, 0, 0F); // saturation
                     }
                 });
             }
@@ -108,63 +108,63 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends StatelessProtocol<ClientboundPac
         this.registerClientbound(ClientboundPacketsb1_7.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // dimension id
-                create(Type.BYTE, (byte) 1); // difficulty
-                create(Type.BYTE, (byte) 0); // game mode
-                create(Type.SHORT, (short) 128); // world height
-                handler(wrapper -> wrapper.write(Type.LONG, wrapper.user().get(SeedStorage.class).seed)); // seed
+                map(Types.BYTE); // dimension id
+                create(Types.BYTE, (byte) 1); // difficulty
+                create(Types.BYTE, (byte) 0); // game mode
+                create(Types.SHORT, (short) 128); // world height
+                handler(wrapper -> wrapper.write(Types.LONG, wrapper.user().get(SeedStorage.class).seed)); // seed
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_7.SPAWN_PLAYER, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_7.ADD_PLAYER, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
+                map(Types.INT); // entity id
                 map(Types1_6_4.STRING); // username
-                map(Type.INT); // x
-                map(Type.INT); // y
-                map(Type.INT); // z
-                map(Type.BYTE); // yaw
-                map(Type.BYTE); // pitch
-                map(Type.UNSIGNED_SHORT); // item
+                map(Types.INT); // x
+                map(Types.INT); // y
+                map(Types.INT); // z
+                map(Types.BYTE); // yaw
+                map(Types.BYTE); // pitch
+                map(Types.UNSIGNED_SHORT); // item
                 handler(wrapper -> {
-                    final int entityId = wrapper.get(Type.INT, 0);
+                    final int entityId = wrapper.get(Types.INT, 0);
                     final PlayerNameTracker playerNameTracker = wrapper.user().get(PlayerNameTracker.class);
                     playerNameTracker.names.put(entityId, wrapper.get(Types1_6_4.STRING, 0));
 
                     final PacketWrapper playerListEntry = PacketWrapper.create(ClientboundPacketsb1_8.PLAYER_INFO, wrapper.user());
                     playerListEntry.write(Types1_6_4.STRING, playerNameTracker.names.get(entityId)); // name
-                    playerListEntry.write(Type.BOOLEAN, true); // online
-                    playerListEntry.write(Type.SHORT, (short) 0); // ping
+                    playerListEntry.write(Types.BOOLEAN, true); // online
+                    playerListEntry.write(Types.SHORT, (short) 0); // ping
                     playerListEntry.send(Protocolb1_8_0_1tob1_7_0_3.class);
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_7.SPAWN_MOB, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_7.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.UNSIGNED_BYTE); // type id
-                map(Type.INT); // x
-                map(Type.INT); // y
-                map(Type.INT); // z
-                map(Type.BYTE); // yaw
-                map(Type.BYTE); // pitch
+                map(Types.INT); // entity id
+                map(Types.UNSIGNED_BYTE); // type id
+                map(Types.INT); // x
+                map(Types.INT); // y
+                map(Types.INT); // z
+                map(Types.BYTE); // yaw
+                map(Types.BYTE); // pitch
                 map(Types1_3_1.METADATA_LIST); // metadata
                 handler(wrapper -> {
-                    final short entityType = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                    final short entityType = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     if (entityType == 49) { // monster
-                        final PacketWrapper spawnMonster = PacketWrapper.create(ClientboundPacketsb1_8.SPAWN_PLAYER, wrapper.user());
-                        spawnMonster.write(Type.INT, wrapper.get(Type.INT, 0)); // entity id
+                        final PacketWrapper spawnMonster = PacketWrapper.create(ClientboundPacketsb1_8.ADD_PLAYER, wrapper.user());
+                        spawnMonster.write(Types.INT, wrapper.get(Types.INT, 0)); // entity id
                         spawnMonster.write(Types1_6_4.STRING, "Monster"); // username
-                        spawnMonster.write(Type.INT, wrapper.get(Type.INT, 1)); // x
-                        spawnMonster.write(Type.INT, wrapper.get(Type.INT, 2)); // y
-                        spawnMonster.write(Type.INT, wrapper.get(Type.INT, 3)); // z
-                        spawnMonster.write(Type.BYTE, wrapper.get(Type.BYTE, 0)); // yaw
-                        spawnMonster.write(Type.BYTE, wrapper.get(Type.BYTE, 1)); // pitch
-                        spawnMonster.write(Type.UNSIGNED_SHORT, 0); // item
+                        spawnMonster.write(Types.INT, wrapper.get(Types.INT, 1)); // x
+                        spawnMonster.write(Types.INT, wrapper.get(Types.INT, 2)); // y
+                        spawnMonster.write(Types.INT, wrapper.get(Types.INT, 3)); // z
+                        spawnMonster.write(Types.BYTE, wrapper.get(Types.BYTE, 0)); // yaw
+                        spawnMonster.write(Types.BYTE, wrapper.get(Types.BYTE, 1)); // pitch
+                        spawnMonster.write(Types.UNSIGNED_SHORT, 0); // item
 
-                        final PacketWrapper entityMetadata = PacketWrapper.create(ClientboundPacketsb1_8.ENTITY_METADATA, wrapper.user());
-                        entityMetadata.write(Type.INT, wrapper.get(Type.INT, 0)); // entity id
+                        final PacketWrapper entityMetadata = PacketWrapper.create(ClientboundPacketsb1_8.SET_ENTITY_DATA, wrapper.user());
+                        entityMetadata.write(Types.INT, wrapper.get(Types.INT, 0)); // entity id
                         entityMetadata.write(Types1_3_1.METADATA_LIST, wrapper.get(Types1_3_1.METADATA_LIST, 0)); // metadata
 
                         wrapper.cancel();
@@ -174,24 +174,24 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends StatelessProtocol<ClientboundPac
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_7.DESTROY_ENTITIES, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_7.REMOVE_ENTITIES, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
+                map(Types.INT); // entity id
                 handler(wrapper -> {
                     final PlayerNameTracker playerNameTracker = wrapper.user().get(PlayerNameTracker.class);
-                    final String name = playerNameTracker.names.get(wrapper.get(Type.INT, 0).intValue());
+                    final String name = playerNameTracker.names.get(wrapper.get(Types.INT, 0).intValue());
                     if (name != null) {
                         final PacketWrapper playerListEntry = PacketWrapper.create(ClientboundPacketsb1_8.PLAYER_INFO, wrapper.user());
                         playerListEntry.write(Types1_6_4.STRING, name); // name
-                        playerListEntry.write(Type.BOOLEAN, false); // online
-                        playerListEntry.write(Type.SHORT, (short) 0); // ping
+                        playerListEntry.write(Types.BOOLEAN, false); // online
+                        playerListEntry.write(Types.SHORT, (short) 0); // ping
                         playerListEntry.send(Protocolb1_8_0_1tob1_7_0_3.class);
                     }
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_7.CHUNK_DATA, wrapper -> {
+        this.registerClientbound(ClientboundPacketsb1_7.LEVEL_CHUNK, wrapper -> {
             final Chunk chunk = wrapper.passthrough(Types1_1.CHUNK);
 
             boolean hasChest = false;
@@ -216,17 +216,17 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends StatelessProtocol<ClientboundPac
         this.registerClientbound(ClientboundPacketsb1_7.GAME_EVENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // reason
-                create(Type.BYTE, (byte) 0); // value
+                map(Types.BYTE); // reason
+                create(Types.BYTE, (byte) 0); // value
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_7.OPEN_WINDOW, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_7.OPEN_SCREEN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // window id
-                map(Type.UNSIGNED_BYTE); // window type
+                map(Types.UNSIGNED_BYTE); // window id
+                map(Types.UNSIGNED_BYTE); // window type
                 map(Typesb1_7_0_3.STRING, Types1_6_4.STRING); // title
-                map(Type.UNSIGNED_BYTE); // slots
+                map(Types.UNSIGNED_BYTE); // slots
             }
         });
 
@@ -247,96 +247,96 @@ public class Protocolb1_8_0_1tob1_7_0_3 extends StatelessProtocol<ClientboundPac
         this.registerServerbound(ServerboundPacketsb1_8.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // protocol id
+                map(Types.INT); // protocol id
                 map(Types1_6_4.STRING); // username
-                map(Type.LONG); // seed
-                read(Type.INT); // game mode
-                map(Type.BYTE); // dimension id
-                read(Type.BYTE); // difficulty
-                read(Type.BYTE); // world height
-                read(Type.BYTE); // max players
+                map(Types.LONG); // seed
+                read(Types.INT); // game mode
+                map(Types.BYTE); // dimension id
+                read(Types.BYTE); // difficulty
+                read(Types.BYTE); // world height
+                read(Types.BYTE); // max players
             }
         });
         this.registerServerbound(ServerboundPacketsb1_8.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // dimension id
-                read(Type.BYTE); // difficulty
-                read(Type.BYTE); // game mode
-                read(Type.SHORT); // world height
-                read(Type.LONG); // seed
+                map(Types.BYTE); // dimension id
+                read(Types.BYTE); // difficulty
+                read(Types.BYTE); // game mode
+                read(Types.SHORT); // world height
+                read(Types.LONG); // seed
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_8.PLAYER_DIGGING, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsb1_8.PLAYER_ACTION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // status
+                map(Types.UNSIGNED_BYTE); // status
                 handler(wrapper -> {
-                    final short status = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                    final short status = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     if (status == 5) wrapper.cancel(); // Stop using item
                 });
                 map(Types1_7_6.POSITION_UBYTE); // position
-                map(Type.UNSIGNED_BYTE); // direction
+                map(Types.UNSIGNED_BYTE); // direction
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_8.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsb1_8.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types1_7_6.POSITION_UBYTE); // position
-                map(Type.UNSIGNED_BYTE); // direction
+                map(Types.UNSIGNED_BYTE); // direction
                 map(Types1_4_2.NBTLESS_ITEM); // item
                 handler(wrapper -> {
-                    if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 255) {
+                    if (wrapper.get(Types.UNSIGNED_BYTE, 0) == 255) {
                         final Item item = wrapper.get(Types1_4_2.NBTLESS_ITEM, 0);
                         if (item != null && isSword(item)) {
                             wrapper.cancel();
-                            final PacketWrapper entityStatus = PacketWrapper.create(ClientboundPacketsb1_8.ENTITY_STATUS, wrapper.user());
-                            entityStatus.write(Type.INT, wrapper.user().get(EntityTracker.class).getPlayerID()); // entity id
-                            entityStatus.write(Type.BYTE, (byte) 9); // status | 9 = STOP_ITEM_USE
+                            final PacketWrapper entityStatus = PacketWrapper.create(ClientboundPacketsb1_8.ENTITY_EVENT, wrapper.user());
+                            entityStatus.write(Types.INT, wrapper.user().get(EntityTracker.class).getPlayerID()); // entity id
+                            entityStatus.write(Types.BYTE, (byte) 9); // status | 9 = STOP_ITEM_USE
                             entityStatus.send(Protocolb1_8_0_1tob1_7_0_3.class);
                         }
                     } else {
                         final Position pos = wrapper.get(Types1_7_6.POSITION_UBYTE, 0);
                         if (wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos).getId() == BlockList1_6.cake.blockID) {
-                            final PacketWrapper updateHealth = PacketWrapper.create(ClientboundPacketsb1_7.UPDATE_HEALTH, wrapper.user());
-                            updateHealth.write(Type.SHORT, wrapper.user().get(PlayerHealthTracker.class).getHealth()); // health
+                            final PacketWrapper updateHealth = PacketWrapper.create(ClientboundPacketsb1_7.SET_HEALTH, wrapper.user());
+                            updateHealth.write(Types.SHORT, wrapper.user().get(PlayerHealthTracker.class).getHealth()); // health
                             updateHealth.send(Protocolb1_8_0_1tob1_7_0_3.class, false);
                         }
                     }
                 });
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_8.ENTITY_ACTION, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsb1_8.PLAYER_COMMAND, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.BYTE); // action id
+                map(Types.INT); // entity id
+                map(Types.BYTE); // action id
                 handler(wrapper -> {
-                    if (wrapper.get(Type.BYTE, 0) > 3) wrapper.cancel();
+                    if (wrapper.get(Types.BYTE, 0) > 3) wrapper.cancel();
                 });
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_8.CLICK_WINDOW, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsb1_8.CONTAINER_CLICK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // window id
+                map(Types.BYTE); // window id
                 handler(wrapper -> {
-                    if (wrapper.passthrough(Type.SHORT) /*slot*/ == -1) wrapper.cancel();
+                    if (wrapper.passthrough(Types.SHORT) /*slot*/ == -1) wrapper.cancel();
                 });
-                map(Type.BYTE); // button
-                map(Type.SHORT); // action
-                map(Type.BYTE); // mode
+                map(Types.BYTE); // button
+                map(Types.SHORT); // action
+                map(Types.BYTE); // mode
                 map(Types1_4_2.NBTLESS_ITEM); // item
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_8.CREATIVE_INVENTORY_ACTION, null, wrapper -> {
+        this.registerServerbound(ServerboundPacketsb1_8.SET_CREATIVE_MODE_SLOT, null, wrapper -> {
             wrapper.cancel();
             // Track the item for later use in classic protocols
             final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
-            if (inventoryTracker != null) inventoryTracker.handleCreativeSetSlot(wrapper.read(Type.SHORT), wrapper.read(Typesb1_8_0_1.CREATIVE_ITEM));
+            if (inventoryTracker != null) inventoryTracker.handleCreativeSetSlot(wrapper.read(Types.SHORT), wrapper.read(Typesb1_8_0_1.CREATIVE_ITEM));
         });
         this.registerServerbound(ServerboundPacketsb1_8.KEEP_ALIVE, wrapper -> {
-            if (wrapper.read(Type.INT) != 0) { // beta client only sends this packet with the key set to 0 every second if in downloading terrain screen
+            if (wrapper.read(Types.INT) != 0) { // beta client only sends this packet with the key set to 0 every second if in downloading terrain screen
                 wrapper.cancel();
             }
         });

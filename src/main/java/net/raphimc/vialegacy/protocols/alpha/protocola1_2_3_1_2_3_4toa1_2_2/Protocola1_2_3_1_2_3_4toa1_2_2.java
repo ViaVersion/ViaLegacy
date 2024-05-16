@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.protocols.alpha.protocola1_2_3_1_2_3_4toa1_2_2;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_2_3_5_1_2_6toa1_2_3_1_2_3_4.ClientboundPacketsa1_2_3;
@@ -34,21 +34,21 @@ public class Protocola1_2_3_1_2_3_4toa1_2_2 extends StatelessProtocol<Clientboun
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsa1_2_2.JOIN_GAME, wrapper -> {
-            final PacketWrapper updateHealth = PacketWrapper.create(ClientboundPacketsa1_2_3.UPDATE_HEALTH, wrapper.user());
-            updateHealth.write(Type.BYTE, (byte) 20); // health
+        this.registerClientbound(ClientboundPacketsa1_2_2.LOGIN, wrapper -> {
+            final PacketWrapper updateHealth = PacketWrapper.create(ClientboundPacketsa1_2_3.SET_HEALTH, wrapper.user());
+            updateHealth.write(Types.BYTE, (byte) 20); // health
 
             wrapper.send(Protocola1_2_3_1_2_3_4toa1_2_2.class);
             updateHealth.send(Protocola1_2_3_1_2_3_4toa1_2_2.class);
             wrapper.cancel();
         });
 
-        this.registerServerbound(ServerboundPacketsa1_2_6.INTERACT_ENTITY, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsa1_2_6.INTERACT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // player id
-                map(Type.INT); // entity id
-                read(Type.BYTE); // mode
+                map(Types.INT); // player id
+                map(Types.INT); // entity id
+                read(Types.BYTE); // mode
             }
         });
         this.cancelServerbound(ServerboundPacketsa1_2_6.RESPAWN);

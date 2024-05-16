@@ -21,8 +21,8 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.GameProfile;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.TabListEntry;
@@ -39,44 +39,39 @@ public class TablistStorage extends StoredObject {
         super(user);
     }
 
-    public void sendTempEntry(final TabListEntry entry) throws Exception {
+    public void sendTempEntry(final TabListEntry entry) {
         entry.ping = -1;
         this.sendAddEntry(entry); // send tablist entry before spawning player
-        Via.getPlatform().runSync(() -> { // wait for the client to load the skin then remove the fake tablist entry
-            try {
-                sendRemoveEntry(entry);
-            } catch (Throwable ignored) {
-            }
-        }, entry.gameProfile.isOffline() ? 2L : 60L);
+        Via.getPlatform().runSync(() -> this.sendRemoveEntry(entry), entry.gameProfile.isOffline() ? 2L : 60L); // wait for the client to load the skin then remove the fake tablist entry
     }
 
-    public void sendAddEntry(final TabListEntry entry) throws Exception {
+    public void sendAddEntry(final TabListEntry entry) {
         final List<GameProfile.Property> gameProfileProperties = entry.gameProfile.getAllProperties();
 
         final PacketWrapper addPlayerListItemPacket = PacketWrapper.create(ClientboundPackets1_8.PLAYER_INFO, this.getUser());
-        addPlayerListItemPacket.write(Type.VAR_INT, 0); // action
-        addPlayerListItemPacket.write(Type.VAR_INT, 1); // count
-        addPlayerListItemPacket.write(Type.UUID, entry.gameProfile.uuid); // uuid
-        addPlayerListItemPacket.write(Type.STRING, entry.gameProfile.userName); // name
-        addPlayerListItemPacket.write(Type.VAR_INT, gameProfileProperties.size()); // properties count
+        addPlayerListItemPacket.write(Types.VAR_INT, 0); // action
+        addPlayerListItemPacket.write(Types.VAR_INT, 1); // count
+        addPlayerListItemPacket.write(Types.UUID, entry.gameProfile.uuid); // uuid
+        addPlayerListItemPacket.write(Types.STRING, entry.gameProfile.userName); // name
+        addPlayerListItemPacket.write(Types.VAR_INT, gameProfileProperties.size()); // properties count
         { // properties
             for (GameProfile.Property profileEntry : gameProfileProperties) {
-                addPlayerListItemPacket.write(Type.STRING, profileEntry.key); // key
-                addPlayerListItemPacket.write(Type.STRING, profileEntry.value); // value
-                addPlayerListItemPacket.write(Type.OPTIONAL_STRING, profileEntry.signature); // signature
+                addPlayerListItemPacket.write(Types.STRING, profileEntry.key); // key
+                addPlayerListItemPacket.write(Types.STRING, profileEntry.value); // value
+                addPlayerListItemPacket.write(Types.OPTIONAL_STRING, profileEntry.signature); // signature
             }
         }
-        addPlayerListItemPacket.write(Type.VAR_INT, entry.gameMode); // gamemode
-        addPlayerListItemPacket.write(Type.VAR_INT, entry.ping); // ping
-        addPlayerListItemPacket.write(Type.OPTIONAL_STRING, null); // display name
+        addPlayerListItemPacket.write(Types.VAR_INT, entry.gameMode); // gamemode
+        addPlayerListItemPacket.write(Types.VAR_INT, entry.ping); // ping
+        addPlayerListItemPacket.write(Types.OPTIONAL_STRING, null); // display name
         addPlayerListItemPacket.send(Protocol1_8to1_7_6_10.class);
     }
 
-    public void sendRemoveEntry(final TabListEntry entry) throws Exception {
+    public void sendRemoveEntry(final TabListEntry entry) {
         final PacketWrapper removePlayerListItemPacket = PacketWrapper.create(ClientboundPackets1_8.PLAYER_INFO, this.getUser());
-        removePlayerListItemPacket.write(Type.VAR_INT, 4); // action
-        removePlayerListItemPacket.write(Type.VAR_INT, 1); // count
-        removePlayerListItemPacket.write(Type.UUID, entry.gameProfile.uuid); // uuid
+        removePlayerListItemPacket.write(Types.VAR_INT, 4); // action
+        removePlayerListItemPacket.write(Types.VAR_INT, 1); // count
+        removePlayerListItemPacket.write(Types.UUID, entry.gameProfile.uuid); // uuid
         removePlayerListItemPacket.send(Protocol1_8to1_7_6_10.class);
     }
 

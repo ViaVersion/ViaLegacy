@@ -17,25 +17,26 @@
  */
 package net.raphimc.vialegacy.protocols.beta.protocolb1_5_0_2tob1_4_0_1.types;
 
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
 import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_8_0_1tob1_7_0_3.types.Typesb1_7_0_3;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_2to1_3_1_2.types.Types1_3_1;
 
-public enum MetaTypeb1_4 implements MetaType {
+public enum MetaTypeb1_4 implements EntityDataType {
 
-    Byte(0, Type.BYTE),
-    Short(1, Type.SHORT),
-    Int(2, Type.INT),
-    Float(3, Type.FLOAT),
+    Byte(0, Types.BYTE),
+    Short(1, Types.SHORT),
+    Int(2, Types.INT),
+    Float(3, Types.FLOAT),
     String(4, Typesb1_7_0_3.STRING),
     Slot(5, new Type<Item>(Item.class) { // b1.3 - b1.4 had broken read/write code where type 5 had a missing break statement causing it to read a type 6 as well (Both are unused)
         @Override
-        public Item read(ByteBuf buffer) throws Exception {
+        public Item read(ByteBuf buffer) {
             Types1_3_1.NBTLESS_ITEM.read(buffer);
-            Type.VECTOR.read(buffer);
+            Types.VECTOR.read(buffer);
             return null;
         }
 
@@ -44,7 +45,7 @@ public enum MetaTypeb1_4 implements MetaType {
             throw new UnsupportedOperationException();
         }
     }),
-    Position(6, Type.VECTOR);
+    Position(6, Types.VECTOR);
 
     private final int typeID;
     private final Type<?> type;

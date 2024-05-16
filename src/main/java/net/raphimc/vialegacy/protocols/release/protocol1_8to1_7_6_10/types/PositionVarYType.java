@@ -35,12 +35,12 @@ public class PositionVarYType<T extends Number> extends Type<Position> {
     }
 
     @Override
-    public Position read(ByteBuf buffer) throws Exception {
+    public Position read(ByteBuf buffer) {
         return new Position(buffer.readInt(), this.yType.read(buffer).intValue(), buffer.readInt());
     }
 
     @Override
-    public void write(ByteBuf buffer, Position position) throws Exception {
+    public void write(ByteBuf buffer, Position position) {
         buffer.writeInt(position.x());
         this.yType.write(buffer, this.yConverter.apply(position.y()));
         buffer.writeInt(position.z());

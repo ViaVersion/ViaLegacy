@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.AbstractSimpleProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.base.ServerboundHandshakePackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.storage.HandshakeStorage;
@@ -39,9 +39,9 @@ public class PreNettyBaseProtocol extends AbstractSimpleProtocol {
     protected void registerPackets() {
         this.registerServerbound(State.HANDSHAKE, ServerboundHandshakePackets.CLIENT_INTENTION.getId(), ServerboundHandshakePackets.CLIENT_INTENTION.getId(), wrapper -> {
             wrapper.cancel();
-            wrapper.read(Type.VAR_INT); // protocolVersion
-            final String hostname = wrapper.read(Type.STRING); // hostName
-            final int port = wrapper.read(Type.UNSIGNED_SHORT); // port
+            wrapper.read(Types.VAR_INT); // protocolVersion
+            final String hostname = wrapper.read(Types.STRING); // hostName
+            final int port = wrapper.read(Types.UNSIGNED_SHORT); // port
             wrapper.user().put(new HandshakeStorage(hostname, port));
         });
 

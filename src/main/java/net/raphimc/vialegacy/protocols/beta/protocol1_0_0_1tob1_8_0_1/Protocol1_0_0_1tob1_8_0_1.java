@@ -21,9 +21,8 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
-import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.storage.PlayerAirTimeStorage;
@@ -36,7 +35,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 
 public class Protocol1_0_0_1tob1_8_0_1 extends StatelessProtocol<ClientboundPacketsb1_8, ClientboundPackets1_0, ServerboundPacketsb1_8, ServerboundPackets1_0> {
 
-    private final LegacyItemRewriter<Protocol1_0_0_1tob1_8_0_1> itemRewriter = new ItemRewriter(this);
+    private final ItemRewriter itemRewriter = new ItemRewriter(this);
 
     public Protocol1_0_0_1tob1_8_0_1() {
         super(ClientboundPacketsb1_8.class, ClientboundPackets1_0.class, ServerboundPacketsb1_8.class, ServerboundPackets1_0.class);
@@ -47,50 +46,50 @@ public class Protocol1_0_0_1tob1_8_0_1 extends StatelessProtocol<ClientboundPack
         this.itemRewriter.register();
 
         this.registerClientbound(ClientboundPacketsb1_8.SET_EXPERIENCE, wrapper -> {
-            float experience = (float) wrapper.read(Type.BYTE);
-            final byte experienceLevel = wrapper.read(Type.BYTE);
-            final short experienceTotal = wrapper.read(Type.SHORT);
+            float experience = (float) wrapper.read(Types.BYTE);
+            final byte experienceLevel = wrapper.read(Types.BYTE);
+            final short experienceTotal = wrapper.read(Types.SHORT);
             experience = (experience - 1.0f) / (10 * experienceLevel);
-            wrapper.write(Type.FLOAT, experience); // experience bar
-            wrapper.write(Type.SHORT, (short) experienceLevel); // level
-            wrapper.write(Type.SHORT, experienceTotal); // total experience
+            wrapper.write(Types.FLOAT, experience); // experience bar
+            wrapper.write(Types.SHORT, (short) experienceLevel); // level
+            wrapper.write(Types.SHORT, experienceTotal); // total experience
         });
-        this.registerClientbound(ClientboundPacketsb1_8.SET_SLOT, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_8.CONTAINER_SET_SLOT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // window id
-                map(Type.SHORT); // slot
+                map(Types.BYTE); // window id
+                map(Types.SHORT); // slot
                 map(Types1_4_2.NBTLESS_ITEM, Types1_2_4.NBT_ITEM); // item
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_8.WINDOW_ITEMS, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_8.CONTAINER_SET_CONTENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // window id
+                map(Types.BYTE); // window id
                 map(Types1_4_2.NBTLESS_ITEM_ARRAY, Types1_2_4.NBT_ITEM_ARRAY); // item
             }
         });
 
-        this.registerServerbound(ServerboundPackets1_0.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
+        this.registerServerbound(ServerboundPackets1_0.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types1_7_6.POSITION_UBYTE); // position
-                map(Type.UNSIGNED_BYTE); // direction
+                map(Types.UNSIGNED_BYTE); // direction
                 map(Types1_2_4.NBT_ITEM, Types1_4_2.NBTLESS_ITEM);
             }
         });
-        this.registerServerbound(ServerboundPackets1_0.CLICK_WINDOW, new PacketHandlers() {
+        this.registerServerbound(ServerboundPackets1_0.CONTAINER_CLICK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // window id
-                map(Type.SHORT); // slot
-                map(Type.BYTE); // button
-                map(Type.SHORT); // action
-                map(Type.BYTE); // mode
+                map(Types.BYTE); // window id
+                map(Types.SHORT); // slot
+                map(Types.BYTE); // button
+                map(Types.SHORT); // action
+                map(Types.BYTE); // mode
                 map(Types1_2_4.NBT_ITEM, Types1_4_2.NBTLESS_ITEM); // item
             }
         });
-        this.cancelServerbound(ServerboundPackets1_0.CLICK_WINDOW_BUTTON);
+        this.cancelServerbound(ServerboundPackets1_0.CONTAINER_BUTTON_CLICK);
     }
 
     @Override
@@ -106,7 +105,7 @@ public class Protocol1_0_0_1tob1_8_0_1 extends StatelessProtocol<ClientboundPack
     }
 
     @Override
-    public LegacyItemRewriter<Protocol1_0_0_1tob1_8_0_1> getItemRewriter() {
+    public ItemRewriter getItemRewriter() {
         return this.itemRewriter;
     }
 

@@ -18,9 +18,9 @@
 package net.raphimc.vialegacy.protocols.beta.protocolb1_5_0_2tob1_4_0_1;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.beta.protocolb1_5_0_2tob1_4_0_1.types.Typesb1_4;
@@ -49,67 +49,67 @@ public class Protocolb1_5_0_2tob1_4_0_1 extends StatelessProtocol<ClientboundPac
                 map(Typesb1_7_0_3.STRING, Types1_6_4.STRING); // server hash
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_4.JOIN_GAME, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_4.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
+                map(Types.INT); // entity id
                 map(Typesb1_7_0_3.STRING, Types1_6_4.STRING); // username
                 read(Typesb1_7_0_3.STRING); // password
-                map(Type.LONG); // seed
-                map(Type.BYTE); // dimension id
+                map(Types.LONG); // seed
+                map(Types.BYTE); // dimension id
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_4.CHAT_MESSAGE, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_4.CHAT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Typesb1_7_0_3.STRING, Types1_6_4.STRING); // message
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_4.SPAWN_PLAYER, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_4.ADD_PLAYER, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
+                map(Types.INT); // entity id
                 map(Typesb1_7_0_3.STRING, Types1_6_4.STRING); // username
                 handler(wrapper -> {
                     String name = wrapper.get(Types1_6_4.STRING, 0);
                     name = name.substring(0, Math.min(name.length(), 16));
                     wrapper.set(Types1_6_4.STRING, 0, name);
                 });
-                map(Type.INT); // x
-                map(Type.INT); // y
-                map(Type.INT); // z
-                map(Type.BYTE); // yaw
-                map(Type.BYTE); // pitch
-                map(Type.UNSIGNED_SHORT); // item
+                map(Types.INT); // x
+                map(Types.INT); // y
+                map(Types.INT); // z
+                map(Types.BYTE); // yaw
+                map(Types.BYTE); // pitch
+                map(Types.UNSIGNED_SHORT); // item
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_4.SPAWN_MOB, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_4.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.UNSIGNED_BYTE); // type id
-                map(Type.INT); // x
-                map(Type.INT); // y
-                map(Type.INT); // z
-                map(Type.BYTE); // yaw
-                map(Type.BYTE); // pitch
+                map(Types.INT); // entity id
+                map(Types.UNSIGNED_BYTE); // type id
+                map(Types.INT); // x
+                map(Types.INT); // y
+                map(Types.INT); // z
+                map(Types.BYTE); // yaw
+                map(Types.BYTE); // pitch
                 map(Typesb1_4.METADATA_LIST, Types1_3_1.METADATA_LIST); // metadata
                 handler(wrapper -> rewriteMetadata(wrapper.get(Types1_3_1.METADATA_LIST, 0)));
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_4.SPAWN_PAINTING, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_4.ADD_PAINTING, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
+                map(Types.INT); // entity id
                 map(Typesb1_7_0_3.STRING, Types1_6_4.STRING); // motive
                 map(Types1_7_6.POSITION_INT); // position
-                map(Type.INT); // rotation
+                map(Types.INT); // rotation
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_4.ENTITY_METADATA, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_4.SET_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
+                map(Types.INT); // entity id
                 map(Typesb1_4.METADATA_LIST, Types1_3_1.METADATA_LIST); // metadata
                 handler(wrapper -> rewriteMetadata(wrapper.get(Types1_3_1.METADATA_LIST, 0)));
             }
@@ -140,31 +140,31 @@ public class Protocolb1_5_0_2tob1_4_0_1 extends StatelessProtocol<ClientboundPac
         this.registerServerbound(ServerboundPacketsb1_5.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // protocol id
+                map(Types.INT); // protocol id
                 map(Types1_6_4.STRING, Typesb1_7_0_3.STRING); // username
                 create(Typesb1_7_0_3.STRING, "Password"); // password
-                map(Type.LONG); // seed
-                map(Type.BYTE); // dimension id
+                map(Types.LONG); // seed
+                map(Types.BYTE); // dimension id
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_5.CHAT_MESSAGE, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsb1_5.CHAT, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types1_6_4.STRING, Typesb1_7_0_3.STRING); // message
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_5.CLICK_WINDOW, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsb1_5.CONTAINER_CLICK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // window id
-                map(Type.SHORT); // slot
-                map(Type.BYTE); // button
-                map(Type.SHORT); // action
-                read(Type.BYTE); // mode
+                map(Types.BYTE); // window id
+                map(Types.SHORT); // slot
+                map(Types.BYTE); // button
+                map(Types.SHORT); // action
+                read(Types.BYTE); // mode
                 map(Types1_4_2.NBTLESS_ITEM); // item
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_5.UPDATE_SIGN, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsb1_5.SIGN_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types1_7_6.POSITION_SHORT); // position
@@ -182,9 +182,9 @@ public class Protocolb1_5_0_2tob1_4_0_1 extends StatelessProtocol<ClientboundPac
         });
     }
 
-    private void rewriteMetadata(final List<Metadata> metadataList) {
-        for (Metadata metadata : metadataList) {
-            metadata.setMetaType(MetaType1_3_1.byId(metadata.metaType().typeId()));
+    private void rewriteMetadata(final List<EntityData> metadataList) {
+        for (EntityData metadata : metadataList) {
+            metadata.setDataType(MetaType1_3_1.byId(metadata.dataType().typeId()));
         }
     }
 

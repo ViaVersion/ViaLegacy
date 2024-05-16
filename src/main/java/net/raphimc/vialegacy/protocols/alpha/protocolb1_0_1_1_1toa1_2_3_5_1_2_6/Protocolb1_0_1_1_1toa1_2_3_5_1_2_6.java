@@ -17,6 +17,7 @@
  */
 package net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6;
 
+import com.viaversion.nbt.tag.*;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
@@ -25,8 +26,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.*;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
@@ -64,10 +64,10 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsa1_2_6.PLAYER_INVENTORY, ClientboundPacketsb1_1.WINDOW_ITEMS, wrapper -> {
+        this.registerClientbound(ClientboundPacketsa1_2_6.PLAYER_INVENTORY, ClientboundPacketsb1_1.CONTAINER_SET_CONTENT, wrapper -> {
             final InventoryStorage inventoryStorage = wrapper.user().get(InventoryStorage.class);
             final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
-            final int type = wrapper.read(Type.INT); // type
+            final int type = wrapper.read(Types.INT); // type
             Item[] items = wrapper.read(Types1_4_2.NBTLESS_ITEM_ARRAY); // items
 
             final Item[] windowItems = new Item[45];
@@ -94,13 +94,13 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
                     System.arraycopy(reverseArray(items), 0, windowItems, 5, 4);
             }
 
-            wrapper.write(Type.BYTE, (byte) 0); // window id
+            wrapper.write(Types.BYTE, (byte) 0); // window id
             wrapper.write(Types1_4_2.NBTLESS_ITEM_ARRAY, copyItems(windowItems)); // items
         });
-        this.registerClientbound(ClientboundPacketsa1_2_6.UPDATE_HEALTH, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsa1_2_6.SET_HEALTH, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE, Type.SHORT); // health
+                map(Types.BYTE, Types.SHORT); // health
             }
         });
         this.registerClientbound(ClientboundPacketsa1_2_6.RESPAWN, wrapper -> {
@@ -109,15 +109,15 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
             final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
             if (inventoryTracker != null) inventoryTracker.onRespawn();
         });
-        this.registerClientbound(ClientboundPacketsa1_2_6.HELD_ITEM_CHANGE, ClientboundPacketsb1_1.ENTITY_EQUIPMENT, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsa1_2_6.SET_CARRIED_ITEM, ClientboundPacketsb1_1.SET_EQUIPPED_ITEM, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                create(Type.SHORT, (short) 0); // slot (hand)
-                map(Type.SHORT); // item id
+                map(Types.INT); // entity id
+                create(Types.SHORT, (short) 0); // slot (hand)
+                map(Types.SHORT); // item id
                 handler(wrapper -> {
-                    if (wrapper.get(Type.SHORT, 1) == 0) {
-                        wrapper.set(Type.SHORT, 1, (short) -1);
+                    if (wrapper.get(Types.SHORT, 1) == 0) {
+                        wrapper.set(Types.SHORT, 1, (short) -1);
                     }
                 });
             }
@@ -130,41 +130,41 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
         this.registerClientbound(ClientboundPacketsa1_2_6.PRE_CHUNK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // chunkX
-                map(Type.INT); // chunkZ
-                map(Type.UNSIGNED_BYTE); // mode
-                handler(wrapper -> wrapper.user().get(InventoryStorage.class).unload(wrapper.get(Type.INT, 0), wrapper.get(Type.INT, 1)));
+                map(Types.INT); // chunkX
+                map(Types.INT); // chunkZ
+                map(Types.UNSIGNED_BYTE); // mode
+                handler(wrapper -> wrapper.user().get(InventoryStorage.class).unload(wrapper.get(Types.INT, 0), wrapper.get(Types.INT, 1)));
             }
         });
-        this.registerClientbound(ClientboundPacketsa1_2_6.COMPLEX_ENTITY, null, wrapper -> {
+        this.registerClientbound(ClientboundPacketsa1_2_6.BLOCK_ENTITY_DATA, null, wrapper -> {
             wrapper.cancel();
             final InventoryStorage tracker = wrapper.user().get(InventoryStorage.class);
             final Position pos = wrapper.read(Types1_7_6.POSITION_SHORT); // position
             final CompoundTag tag = wrapper.read(Types1_7_6.NBT); // data
 
-            if (tag.<IntTag>get("x").asInt() != pos.x() || tag.<IntTag>get("y").asInt() != pos.y() || tag.<IntTag>get("z").asInt() != pos.z()) {
+            if (tag.getInt("x") != pos.x() || tag.getInt("y") != pos.y() || tag.getInt("z") != pos.z()) {
                 return;
             }
 
             final IdAndData block = wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos);
-            final String blockName = tag.get("id") != null ? tag.<StringTag>get("id").getValue() : "";
+            final String blockName = tag.getString("id", "");
 
             if (block.getId() == BlockList1_6.signPost.blockID || block.getId() == BlockList1_6.signWall.blockID || blockName.equals("Sign")) {
                 final PacketWrapper updateSign = PacketWrapper.create(ClientboundPacketsb1_1.UPDATE_SIGN, wrapper.user());
                 updateSign.write(Types1_7_6.POSITION_SHORT, pos); // position
-                updateSign.write(Typesb1_7_0_3.STRING, tag.<StringTag>get("Text1").getValue()); // line 1
-                updateSign.write(Typesb1_7_0_3.STRING, tag.<StringTag>get("Text2").getValue()); // line 2
-                updateSign.write(Typesb1_7_0_3.STRING, tag.<StringTag>get("Text3").getValue()); // line 3
-                updateSign.write(Typesb1_7_0_3.STRING, tag.<StringTag>get("Text4").getValue()); // line 4
+                updateSign.write(Typesb1_7_0_3.STRING, tag.getString("Text1", "")); // line 1
+                updateSign.write(Typesb1_7_0_3.STRING, tag.getString("Text2", "")); // line 2
+                updateSign.write(Typesb1_7_0_3.STRING, tag.getString("Text3", "")); // line 3
+                updateSign.write(Typesb1_7_0_3.STRING, tag.getString("Text4", "")); // line 4
                 updateSign.send(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
             } else if (block.getId() == BlockList1_6.mobSpawner.blockID || blockName.equals("MobSpawner")) {
                 if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_2_1_3to1_1.class)) {
                     final PacketWrapper spawnerData = PacketWrapper.create(ClientboundPackets1_2_1.BLOCK_ENTITY_DATA, wrapper.user());
                     spawnerData.write(Types1_7_6.POSITION_SHORT, pos); // position
-                    spawnerData.write(Type.BYTE, (byte) 1); // type
-                    spawnerData.write(Type.INT, EntityList.getEntityId(tag.<StringTag>get("EntityId").getValue())); // entity id
-                    spawnerData.write(Type.INT, 0); // unused
-                    spawnerData.write(Type.INT, 0); // unused
+                    spawnerData.write(Types.BYTE, (byte) 1); // type
+                    spawnerData.write(Types.INT, EntityList.getEntityId(tag.getString("EntityId"))); // entity id
+                    spawnerData.write(Types.INT, 0); // unused
+                    spawnerData.write(Types.INT, 0); // unused
                     spawnerData.send(Protocol1_2_1_3to1_1.class);
                 }
             } else if (block.getId() == BlockList1_6.chest.blockID || blockName.equals("Chest")) {
@@ -178,8 +178,8 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
                 tracker.containers.put(pos, furnaceItems);
                 if (pos.equals(tracker.openContainerPos)) {
                     sendWindowItems(wrapper.user(), InventoryStorage.FURNACE_WID, furnaceItems);
-                    sendProgressUpdate(wrapper.user(), InventoryStorage.FURNACE_WID, (short) 0, tag.<ShortTag>get("CookTime").asShort()); // cook time
-                    sendProgressUpdate(wrapper.user(), InventoryStorage.FURNACE_WID, (short) 1, tag.<ShortTag>get("BurnTime").asShort()); // furnace burn time
+                    sendProgressUpdate(wrapper.user(), InventoryStorage.FURNACE_WID, (short) 0, tag.getShort("CookTime")); // cook time
+                    sendProgressUpdate(wrapper.user(), InventoryStorage.FURNACE_WID, (short) 1, tag.getShort("BurnTime")); // furnace burn time
                     sendProgressUpdate(wrapper.user(), InventoryStorage.FURNACE_WID, (short) 2, getBurningTime(furnaceItems[1])); // item burn time
                 }
             } else {
@@ -187,14 +187,14 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
             }
         });
 
-        this.registerServerbound(ServerboundPacketsb1_1.PLAYER_DIGGING, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsb1_1.PLAYER_ACTION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // status
+                map(Types.UNSIGNED_BYTE); // status
                 map(Types1_7_6.POSITION_UBYTE); // position
-                map(Type.UNSIGNED_BYTE); // direction
+                map(Types.UNSIGNED_BYTE); // direction
                 handler(wrapper -> {
-                    final short status = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                    final short status = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     if (status == 4) {
                         wrapper.cancel();
 
@@ -212,20 +212,20 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
                 });
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_1.PLAYER_BLOCK_PLACEMENT, wrapper -> {
+        this.registerServerbound(ServerboundPacketsb1_1.USE_ITEM_ON, wrapper -> {
             final InventoryStorage tracker = wrapper.user().get(InventoryStorage.class);
             final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
             final Position pos = wrapper.read(Types1_7_6.POSITION_UBYTE); // position
-            final short direction = wrapper.read(Type.UNSIGNED_BYTE); // direction
+            final short direction = wrapper.read(Types.UNSIGNED_BYTE); // direction
             Item item = fixItem(wrapper.read(Typesb1_1.NBTLESS_ITEM)); // item
 
             if (item == null && inventoryTracker != null) {
                 item = Via.getManager().getProviders().get(AlphaInventoryProvider.class).getHandItem(wrapper.user());
             }
 
-            wrapper.write(Type.SHORT, item == null ? (short) -1 : (short) item.identifier()); // item id
+            wrapper.write(Types.SHORT, item == null ? (short) -1 : (short) item.identifier()); // item id
             wrapper.write(Types1_7_6.POSITION_UBYTE, pos);
-            wrapper.write(Type.UNSIGNED_BYTE, direction);
+            wrapper.write(Types.UNSIGNED_BYTE, direction);
 
             if (inventoryTracker != null) inventoryTracker.onBlockPlace(pos, direction);
 
@@ -239,30 +239,30 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
             final Item[] containerItems = tracker.containers.get(tracker.openContainerPos = pos);
             if (containerItems == null && block.getId() != BlockList1_6.workbench.blockID) {
                 tracker.openContainerPos = null;
-                final PacketWrapper chatMessage = PacketWrapper.create(ClientboundPacketsb1_1.CHAT_MESSAGE, wrapper.user());
+                final PacketWrapper chatMessage = PacketWrapper.create(ClientboundPacketsb1_1.CHAT, wrapper.user());
                 chatMessage.write(Typesb1_7_0_3.STRING, "§cMissing Container"); // message
                 chatMessage.send(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
                 return;
             }
 
-            final PacketWrapper openWindow = PacketWrapper.create(ClientboundPacketsb1_1.OPEN_WINDOW, wrapper.user());
+            final PacketWrapper openWindow = PacketWrapper.create(ClientboundPacketsb1_1.OPEN_SCREEN, wrapper.user());
             if (block.getId() == BlockList1_6.chest.blockID) {
-                openWindow.write(Type.UNSIGNED_BYTE, (short) InventoryStorage.CHEST_WID); // window id
-                openWindow.write(Type.UNSIGNED_BYTE, (short) 0); // window type
+                openWindow.write(Types.UNSIGNED_BYTE, (short) InventoryStorage.CHEST_WID); // window id
+                openWindow.write(Types.UNSIGNED_BYTE, (short) 0); // window type
                 openWindow.write(Typesb1_7_0_3.STRING, "Chest"); // title
-                openWindow.write(Type.UNSIGNED_BYTE, (short) (3 * 9)); // slots
+                openWindow.write(Types.UNSIGNED_BYTE, (short) (3 * 9)); // slots
                 if (inventoryTracker != null) inventoryTracker.onWindowOpen(0, 3 * 9);
             } else if (block.getId() == BlockList1_6.workbench.blockID) {
-                openWindow.write(Type.UNSIGNED_BYTE, (short) InventoryStorage.WORKBENCH_WID); // window id
-                openWindow.write(Type.UNSIGNED_BYTE, (short) 1); // window type
+                openWindow.write(Types.UNSIGNED_BYTE, (short) InventoryStorage.WORKBENCH_WID); // window id
+                openWindow.write(Types.UNSIGNED_BYTE, (short) 1); // window type
                 openWindow.write(Typesb1_7_0_3.STRING, "Crafting Table"); // title
-                openWindow.write(Type.UNSIGNED_BYTE, (short) 9); // slots
+                openWindow.write(Types.UNSIGNED_BYTE, (short) 9); // slots
                 if (inventoryTracker != null) inventoryTracker.onWindowOpen(1, 10);
             } else { // furnace
-                openWindow.write(Type.UNSIGNED_BYTE, (short) InventoryStorage.FURNACE_WID); // window id
-                openWindow.write(Type.UNSIGNED_BYTE, (short) 2); // window type
+                openWindow.write(Types.UNSIGNED_BYTE, (short) InventoryStorage.FURNACE_WID); // window id
+                openWindow.write(Types.UNSIGNED_BYTE, (short) 2); // window type
                 openWindow.write(Typesb1_7_0_3.STRING, "Furnace"); // title
-                openWindow.write(Type.UNSIGNED_BYTE, (short) 3); // slots
+                openWindow.write(Types.UNSIGNED_BYTE, (short) 3); // slots
                 if (inventoryTracker != null) inventoryTracker.onWindowOpen(2, 3);
             }
             openWindow.send(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
@@ -271,9 +271,9 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
                 sendWindowItems(wrapper.user(), block.getId() == BlockList1_6.chest.blockID ? InventoryStorage.CHEST_WID : InventoryStorage.FURNACE_WID, containerItems);
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_1.HELD_ITEM_CHANGE, wrapper -> {
+        this.registerServerbound(ServerboundPacketsb1_1.SET_CARRIED_ITEM, wrapper -> {
             final InventoryStorage inventoryStorage = wrapper.user().get(InventoryStorage.class);
-            short slot = wrapper.read(Type.SHORT); // slot
+            short slot = wrapper.read(Types.SHORT); // slot
             if (slot < 0 || slot > 8) slot = 0;
             inventoryStorage.selectedHotbarSlot = slot;
             final Item selectedItem = fixItem(Via.getManager().getProviders().get(AlphaInventoryProvider.class).getHandItem(wrapper.user()));
@@ -283,23 +283,23 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
             }
             inventoryStorage.handItem = selectedItem;
 
-            wrapper.write(Type.INT, 0); // entity id (always 0)
-            wrapper.write(Type.SHORT, (short) (selectedItem == null ? 0 : selectedItem.identifier())); // item id
+            wrapper.write(Types.INT, 0); // entity id (always 0)
+            wrapper.write(Types.SHORT, (short) (selectedItem == null ? 0 : selectedItem.identifier())); // item id
         });
-        this.registerServerbound(ServerboundPacketsb1_1.CLOSE_WINDOW, null, wrapper -> {
+        this.registerServerbound(ServerboundPacketsb1_1.CONTAINER_CLOSE, null, wrapper -> {
             wrapper.cancel();
             wrapper.user().get(InventoryStorage.class).openContainerPos = null;
 
             final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
             if (inventoryTracker != null) inventoryTracker.onWindowClose();
         });
-        this.registerServerbound(ServerboundPacketsb1_1.CLICK_WINDOW, ServerboundPacketsa1_2_6.COMPLEX_ENTITY, wrapper -> {
+        this.registerServerbound(ServerboundPacketsb1_1.CONTAINER_CLICK, ServerboundPacketsa1_2_6.BLOCK_ENTITY_DATA, wrapper -> {
             final InventoryStorage tracker = wrapper.user().get(InventoryStorage.class);
             final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
-            final byte windowId = wrapper.read(Type.BYTE); // window id
-            final short slot = wrapper.read(Type.SHORT); // slot
-            final byte button = wrapper.read(Type.BYTE); // button
-            final short action = wrapper.read(Type.SHORT); // action
+            final byte windowId = wrapper.read(Types.BYTE); // window id
+            final short slot = wrapper.read(Types.SHORT); // slot
+            final byte button = wrapper.read(Types.BYTE); // button
+            final short action = wrapper.read(Types.SHORT); // action
             final Item item = fixItem(wrapper.read(Typesb1_1.NBTLESS_ITEM)); // item
 
             if (inventoryTracker != null) inventoryTracker.onWindowClick(windowId, slot, button, action, item);
@@ -322,12 +322,12 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
             tag.put("z", new IntTag(tracker.openContainerPos.z()));
             writeItemsToTag(tag, containerItems);
 
-            wrapper.write(Type.INT, tracker.openContainerPos.x());
-            wrapper.write(Type.SHORT, (short) tracker.openContainerPos.y());
-            wrapper.write(Type.INT, tracker.openContainerPos.z());
+            wrapper.write(Types.INT, tracker.openContainerPos.x());
+            wrapper.write(Types.SHORT, (short) tracker.openContainerPos.y());
+            wrapper.write(Types.INT, tracker.openContainerPos.z());
             wrapper.write(Types1_7_6.NBT, tag);
         });
-        this.registerServerbound(ServerboundPacketsb1_1.UPDATE_SIGN, ServerboundPacketsa1_2_6.COMPLEX_ENTITY, wrapper -> {
+        this.registerServerbound(ServerboundPacketsb1_1.SIGN_UPDATE, ServerboundPacketsa1_2_6.BLOCK_ENTITY_DATA, wrapper -> {
             final Position pos = wrapper.passthrough(Types1_7_6.POSITION_SHORT); // position
 
             final CompoundTag tag = new CompoundTag();
@@ -341,35 +341,34 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
             tag.put("Text4", new StringTag(wrapper.read(Typesb1_7_0_3.STRING))); // line 4
             wrapper.write(Types1_7_6.NBT, tag); // data
         });
-        this.cancelServerbound(ServerboundPacketsb1_1.WINDOW_CONFIRMATION);
+        this.cancelServerbound(ServerboundPacketsb1_1.CONTAINER_ACK);
     }
 
     private void writeItemsToTag(final CompoundTag tag, final Item[] items) {
-        final ListTag slotList = new ListTag();
+        final ListTag<CompoundTag> itemList = new ListTag<>(CompoundTag.class);
         for (int i = 0; i < items.length; i++) {
             final Item item = items[i];
             if (item == null) continue;
-            final CompoundTag slotTag = new CompoundTag();
-            slotTag.put("Slot", new ByteTag((byte) i));
-            slotTag.put("id", new ShortTag((short) item.identifier()));
-            slotTag.put("Count", new ByteTag((byte) item.amount()));
-            slotTag.put("Damage", new ShortTag(item.data()));
-            slotList.add(slotTag);
+            final CompoundTag itemTag = new CompoundTag();
+            itemTag.put("Slot", new ByteTag((byte) i));
+            itemTag.put("id", new ShortTag((short) item.identifier()));
+            itemTag.put("Count", new ByteTag((byte) item.amount()));
+            itemTag.put("Damage", new ShortTag(item.data()));
+            itemList.add(itemTag);
         }
-        tag.put("Items", slotList);
+        tag.put("Items", itemList);
     }
 
     private void readItemsFromTag(final CompoundTag tag, final Item[] items) {
-        final ListTag<?> slotList = tag.get("Items");
-        for (Tag itemTag : slotList) {
-            final CompoundTag slotTag = (CompoundTag) itemTag;
-            items[slotTag.<ByteTag>get("Slot").asByte() & 255] = new DataItem(slotTag.<ShortTag>get("id").asShort(), slotTag.<ByteTag>get("Count").asByte(), slotTag.<ShortTag>get("Damage").asShort(), null);
+        final ListTag<CompoundTag> itemList = tag.getListTag("Items", CompoundTag.class);
+        for (CompoundTag itemTag : itemList) {
+            items[itemTag.getByte("Slot") & 255] = new DataItem(itemTag.getShort("id"), itemTag.getByte("Count"), itemTag.getShort("Damage"), null);
         }
     }
 
-    private void sendWindowItems(final UserConnection user, final byte windowId, final Item[] items) throws Exception {
-        final PacketWrapper windowItems = PacketWrapper.create(ClientboundPacketsb1_1.WINDOW_ITEMS, user);
-        windowItems.write(Type.BYTE, windowId); // window id
+    private void sendWindowItems(final UserConnection user, final byte windowId, final Item[] items) {
+        final PacketWrapper windowItems = PacketWrapper.create(ClientboundPacketsb1_1.CONTAINER_SET_CONTENT, user);
+        windowItems.write(Types.BYTE, windowId); // window id
         windowItems.write(Types1_4_2.NBTLESS_ITEM_ARRAY, copyItems(items)); // items
         windowItems.send(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
 
@@ -377,11 +376,11 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
         if (inventoryTracker != null) inventoryTracker.setOpenContainerItems(copyItems(items));
     }
 
-    private void sendProgressUpdate(final UserConnection user, final short windowId, final short id, final short value) throws Exception {
-        final PacketWrapper windowProperty = PacketWrapper.create(ClientboundPacketsb1_1.WINDOW_PROPERTY, user);
-        windowProperty.write(Type.UNSIGNED_BYTE, windowId); // window id
-        windowProperty.write(Type.SHORT, id); // progress bar id
-        windowProperty.write(Type.SHORT, value); // progress bar value
+    private void sendProgressUpdate(final UserConnection user, final short windowId, final short id, final short value) {
+        final PacketWrapper windowProperty = PacketWrapper.create(ClientboundPacketsb1_1.CONTAINER_SET_DATA, user);
+        windowProperty.write(Types.UNSIGNED_BYTE, windowId); // window id
+        windowProperty.write(Types.SHORT, id); // progress bar id
+        windowProperty.write(Types.SHORT, value); // progress bar value
         windowProperty.send(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
     }
 
@@ -401,7 +400,7 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
         return 0;
     }
 
-    public static void dropItem(final UserConnection user, final Item item, final boolean flag) throws Exception {
+    public static void dropItem(final UserConnection user, final Item item, final boolean flag) {
         final PlayerInfoStorage playerInfoStorage = user.get(PlayerInfoStorage.class);
         final double itemX = playerInfoStorage.posX;
         final double itemY = playerInfoStorage.posY + 1.62F - 0.30000001192092896D + 0.12D;
@@ -427,15 +426,15 @@ public class Protocolb1_0_1_1_1toa1_2_3_5_1_2_6 extends StatelessProtocol<Client
         }
 
         final PacketWrapper spawnItem = PacketWrapper.create(ServerboundPacketsa1_2_6.SPAWN_ITEM, user);
-        spawnItem.write(Type.INT, 0); // entity id
-        spawnItem.write(Type.SHORT, (short) item.identifier()); // item id
-        spawnItem.write(Type.BYTE, (byte) item.amount()); // item count
-        spawnItem.write(Type.INT, (int) (itemX * 32)); // x
-        spawnItem.write(Type.INT, (int) (itemY * 32)); // y
-        spawnItem.write(Type.INT, (int) (itemZ * 32)); // z
-        spawnItem.write(Type.BYTE, (byte) (motionX * 128)); // velocity x
-        spawnItem.write(Type.BYTE, (byte) (motionY * 128)); // velocity y
-        spawnItem.write(Type.BYTE, (byte) (motionZ * 128)); // velocity z
+        spawnItem.write(Types.INT, 0); // entity id
+        spawnItem.write(Types.SHORT, (short) item.identifier()); // item id
+        spawnItem.write(Types.BYTE, (byte) item.amount()); // item count
+        spawnItem.write(Types.INT, (int) (itemX * 32)); // x
+        spawnItem.write(Types.INT, (int) (itemY * 32)); // y
+        spawnItem.write(Types.INT, (int) (itemZ * 32)); // z
+        spawnItem.write(Types.BYTE, (byte) (motionX * 128)); // velocity x
+        spawnItem.write(Types.BYTE, (byte) (motionY * 128)); // velocity y
+        spawnItem.write(Types.BYTE, (byte) (motionZ * 128)); // velocity z
         spawnItem.sendToServer(Protocolb1_0_1_1_1toa1_2_3_5_1_2_6.class);
     }
 

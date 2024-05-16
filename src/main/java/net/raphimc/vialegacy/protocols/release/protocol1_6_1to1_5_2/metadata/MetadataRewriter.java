@@ -19,7 +19,7 @@ package net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.metadata;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import net.raphimc.vialegacy.ViaLegacy;
 
 import java.util.ArrayList;
@@ -28,15 +28,15 @@ import java.util.logging.Level;
 
 public class MetadataRewriter {
 
-    public static void transform(final EntityTypes1_10.EntityType type, final List<Metadata> list) {
-        for (Metadata entry : new ArrayList<>(list)) {
+    public static void transform(final EntityTypes1_10.EntityType type, final List<EntityData> list) {
+        for (EntityData entry : new ArrayList<>(list)) {
             final MetaIndex1_6_1to1_5_2 metaIndex = MetaIndex1_6_1to1_5_2.searchIndex(type, entry.id());
             try {
                 if (metaIndex == null) continue;
 
                 final Object value = entry.getValue();
                 entry.setTypeAndValue(metaIndex.getOldType(), value); // check if metadata type is the expected type from metaindex entry
-                entry.setMetaTypeUnsafe(metaIndex.getNewType());
+                entry.setDataTypeUnsafe(metaIndex.getNewType());
                 entry.setId(metaIndex.getNewIndex());
 
                 switch (metaIndex.getNewType()) {

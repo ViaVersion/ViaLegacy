@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.protocols.classic.protocolc0_0_16a_02to0_0_15a_1;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.types.Typesc0_30;
@@ -35,31 +35,31 @@ public class Protocolc0_0_16a_02to0_0_15a_1 extends StatelessProtocol<Clientboun
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsc0_15a.JOIN_GAME, wrapper -> {
+        this.registerClientbound(ClientboundPacketsc0_15a.LOGIN, wrapper -> {
             final String username = wrapper.read(Typesc0_30.STRING); // username
 
-            wrapper.write(Type.BYTE, (byte) 0); // protocol id
+            wrapper.write(Types.BYTE, (byte) 0); // protocol id
             wrapper.write(Typesc0_30.STRING, "c0.0.15a Server"); // title
             wrapper.write(Typesc0_30.STRING, "Logged in as: " + username); // motd
         });
-        this.registerClientbound(ClientboundPacketsc0_15a.ENTITY_TELEPORT, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsc0_15a.TELEPORT_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // entity id
-                map(Type.SHORT); // x
-                map(Type.SHORT); // y
-                map(Type.SHORT); // z
-                map(Type.BYTE); // yaw
-                map(Type.BYTE); // pitch
+                map(Types.BYTE); // entity id
+                map(Types.SHORT); // x
+                map(Types.SHORT); // y
+                map(Types.SHORT); // z
+                map(Types.BYTE); // yaw
+                map(Types.BYTE); // pitch
                 handler(wrapper -> {
-                    final byte entityId = wrapper.get(Type.BYTE, 0);
-                    final byte yaw = wrapper.get(Type.BYTE, 1);
-                    final byte pitch = wrapper.get(Type.BYTE, 2);
+                    final byte entityId = wrapper.get(Types.BYTE, 0);
+                    final byte yaw = wrapper.get(Types.BYTE, 1);
+                    final byte pitch = wrapper.get(Types.BYTE, 2);
 
-                    final PacketWrapper entityRotation = PacketWrapper.create(ClientboundPacketsc0_19a.ENTITY_ROTATION, wrapper.user());
-                    entityRotation.write(Type.BYTE, entityId); // entity id
-                    entityRotation.write(Type.BYTE, yaw); // yaw
-                    entityRotation.write(Type.BYTE, pitch); // pitch
+                    final PacketWrapper entityRotation = PacketWrapper.create(ClientboundPacketsc0_19a.MOVE_ENTITY_ROT, wrapper.user());
+                    entityRotation.write(Types.BYTE, entityId); // entity id
+                    entityRotation.write(Types.BYTE, yaw); // yaw
+                    entityRotation.write(Types.BYTE, pitch); // pitch
 
                     wrapper.send(Protocolc0_0_16a_02to0_0_15a_1.class);
                     entityRotation.send(Protocolc0_0_16a_02to0_0_15a_1.class);
@@ -72,7 +72,7 @@ public class Protocolc0_0_16a_02to0_0_15a_1 extends StatelessProtocol<Clientboun
             wrapper.clearPacket();
             wrapper.write(Typesc0_30.STRING, wrapper.user().getProtocolInfo().getUsername()); // username
         });
-        this.cancelServerbound(ServerboundPacketsc0_19a.CHAT_MESSAGE);
+        this.cancelServerbound(ServerboundPacketsc0_19a.CHAT);
     }
 
     @Override

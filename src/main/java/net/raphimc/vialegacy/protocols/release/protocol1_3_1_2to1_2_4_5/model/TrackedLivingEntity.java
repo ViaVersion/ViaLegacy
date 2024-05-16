@@ -18,7 +18,7 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.model;
 
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import net.raphimc.vialegacy.api.model.Location;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.sound.SoundEmulation;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.sound.SoundType;
@@ -53,7 +53,7 @@ public class TrackedLivingEntity extends AbstractTrackedEntity {
             tracker.playSound(this.getEntityId(), SoundType.IDLE);
         }
 
-        if (this.getEntityType().isOrHasParent(EntityTypes1_10.EntityType.ENTITY_AGEABLE)) {
+        if (this.getEntityType().isOrHasParent(EntityTypes1_10.EntityType.ABSTRACT_AGEABLE)) {
             if (this.growingAge < 0) {
                 this.growingAge++;
             } else if (this.growingAge > 0) {
@@ -62,8 +62,8 @@ public class TrackedLivingEntity extends AbstractTrackedEntity {
         }
     }
 
-    public void updateMetadata(List<Metadata> metadataList) {
-        for (Metadata metadata : metadataList) {
+    public void updateMetadata(List<EntityData> metadataList) {
+        for (EntityData metadata : metadataList) {
             final MetaIndex1_6_1to1_5_2 index = MetaIndex1_6_1to1_5_2.searchIndex(this.getEntityType(), metadata.id());
             final MetaIndex1_8to1_7_6 index2 = MetaIndex1_8to1_7_6.searchIndex(this.getEntityType(), metadata.id());
 
@@ -84,7 +84,7 @@ public class TrackedLivingEntity extends AbstractTrackedEntity {
     public void applyPitch(EntityTracker tracker, ConfiguredSound sound) {
         float pitch;
 
-        if (this.getEntityType().isOrHasParent(EntityTypes1_10.EntityType.ENTITY_AGEABLE) && this.growingAge < 0) {
+        if (this.getEntityType().isOrHasParent(EntityTypes1_10.EntityType.ABSTRACT_AGEABLE) && this.growingAge < 0) {
             pitch = (tracker.RND.nextFloat() - tracker.RND.nextFloat()) * 0.2F + 1.5F;
         } else {
             pitch = (tracker.RND.nextFloat() - tracker.RND.nextFloat()) * 0.2F + 1.0F;

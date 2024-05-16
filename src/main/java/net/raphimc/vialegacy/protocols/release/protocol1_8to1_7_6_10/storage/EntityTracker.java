@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.storage;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
 import net.raphimc.vialegacy.api.model.Location;
@@ -65,7 +65,7 @@ public class EntityTracker extends StoredObject {
         return this.virtualHolograms;
     }
 
-    public void trackEntity(final int entityId, final EntityTypes1_10.EntityType entityType) throws Exception {
+    public void trackEntity(final int entityId, final EntityTypes1_10.EntityType entityType) {
         if (this.virtualHolograms.containsKey(entityId)) {
             final int newMappedEntityId = this.getNextMappedEntityId();
             final HologramPartEntity hologramPartEntity = this.virtualHolograms.remove(entityId);
@@ -83,7 +83,7 @@ public class EntityTracker extends StoredObject {
         }
     }
 
-    public void removeEntity(final int entityId) throws Exception {
+    public void removeEntity(final int entityId) {
         this.entityMap.remove(entityId);
         this.groundMap.remove(entityId);
         final HologramPartEntity removedEntity = this.hologramParts.remove(entityId);
@@ -98,7 +98,7 @@ public class EntityTracker extends StoredObject {
         }
     }
 
-    public void updateEntityLocation(final int entityId, final int x, final int y, final int z, final boolean relative) throws Exception {
+    public void updateEntityLocation(final int entityId, final int x, final int y, final int z, final boolean relative) {
         final HologramPartEntity entity = this.hologramParts.get(entityId);
         if (entity != null) {
             final Location oldLoc = entity.getLocation();
@@ -118,10 +118,10 @@ public class EntityTracker extends StoredObject {
         }
     }
 
-    public void updateEntityMetadata(final int entityId, final List<Metadata> metadataList) throws Exception {
+    public void updateEntityMetadata(final int entityId, final List<EntityData> metadataList) {
         final HologramPartEntity entity = this.hologramParts.get(entityId);
         if (entity != null) {
-            for (Metadata metadata : metadataList) {
+            for (EntityData metadata : metadataList) {
                 final MetaIndex1_8to1_7_6 metaIndex = MetaIndex1_8to1_7_6.searchIndex(entity.getEntityType(), metadata.id());
                 if (metaIndex != null) {
                     try {
@@ -136,14 +136,14 @@ public class EntityTracker extends StoredObject {
         }
     }
 
-    public void updateEntityAttachState(final int ridingId, final int vehicleId) throws Exception {
+    public void updateEntityAttachState(final int ridingId, final int vehicleId) {
         final HologramPartEntity ridingEntity = this.hologramParts.get(ridingId);
         if (ridingEntity != null) {
             ridingEntity.setVehicleEntity(this.hologramParts.get(vehicleId));
         }
     }
 
-    public void clear() throws Exception {
+    public void clear() {
         this.entityMap.clear();
         this.groundMap.clear();
         for (HologramPartEntity hologramPartEntity : this.hologramParts.values()) {

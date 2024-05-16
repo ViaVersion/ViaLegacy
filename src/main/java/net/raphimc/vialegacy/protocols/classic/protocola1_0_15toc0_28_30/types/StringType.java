@@ -21,7 +21,6 @@ import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.data.Cp437String;
 
-import java.io.IOException;
 import java.util.Arrays;
 
 public class StringType extends Type<String> {
@@ -30,13 +29,13 @@ public class StringType extends Type<String> {
         super(String.class);
     }
 
-    public String read(ByteBuf buffer) throws IOException {
+    public String read(ByteBuf buffer) {
         final byte[] stringBytes = new byte[64];
         buffer.readBytes(stringBytes);
         return Cp437String.fromBytes(stringBytes).trim();
     }
 
-    public void write(ByteBuf buffer, String s) throws IOException {
+    public void write(ByteBuf buffer, String s) {
         final byte[] bytes = new byte[64];
         final byte[] stringBytes = Cp437String.toBytes(s);
 

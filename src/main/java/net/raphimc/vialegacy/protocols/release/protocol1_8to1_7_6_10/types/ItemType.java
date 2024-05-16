@@ -29,7 +29,7 @@ public class ItemType extends Type<Item> {
     }
 
     @Override
-    public Item read(ByteBuf buffer) throws Exception {
+    public Item read(ByteBuf buffer) {
         final short id = buffer.readShort();
         if (id < 0) {
             return null;
@@ -44,7 +44,7 @@ public class ItemType extends Type<Item> {
     }
 
     @Override
-    public void write(ByteBuf buffer, Item item) throws Exception {
+    public void write(ByteBuf buffer, Item item) {
         if (item == null) {
             buffer.writeShort(-1);
         } else {

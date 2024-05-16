@@ -20,11 +20,11 @@ package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.version.Types1_8;
-import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import net.raphimc.vialegacy.api.model.Location;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata.MetaIndex1_8to1_7_6;
@@ -65,7 +65,7 @@ public class HologramPartEntity {
         }
     }
 
-    public void onChange() throws Exception {
+    public void onChange() {
         if (this.vehicleEntity == null && this.riderEntity != null) {
             this.riderEntity.setPositionFromVehicle();
         }
@@ -90,7 +90,7 @@ public class HologramPartEntity {
         }
     }
 
-    public void onRemove() throws Exception {
+    public void onRemove() {
         if (this.mappedEntityId != null) {
             this.entityTracker.getVirtualHolograms().remove(this.mappedEntityId.intValue());
             this.destroyArmorStand();
@@ -99,28 +99,28 @@ public class HologramPartEntity {
         }
     }
 
-    public void relocate(final int newMappedEntityId) throws Exception {
+    public void relocate(final int newMappedEntityId) {
         this.destroyArmorStand();
         this.mappedEntityId = newMappedEntityId;
         this.spawnArmorStand();
         this.updateArmorStand();
     }
 
-    private void spawnHologramPartEntities() throws Exception {
+    private void spawnHologramPartEntities() {
         {
-            final PacketWrapper spawnMob = PacketWrapper.create(ClientboundPackets1_8.SPAWN_MOB, this.user);
-            spawnMob.write(Type.VAR_INT, this.entityId); // entity id
-            spawnMob.write(Type.UNSIGNED_BYTE, (short) this.entityType.getId()); // type id
-            spawnMob.write(Type.INT, (int) (this.location.getX() * 32F)); // x
-            spawnMob.write(Type.INT, (int) (this.location.getY() * 32F)); // y
-            spawnMob.write(Type.INT, (int) (this.location.getZ() * 32F)); // z
-            spawnMob.write(Type.BYTE, (byte) 0); // yaw
-            spawnMob.write(Type.BYTE, (byte) 0); // pitch
-            spawnMob.write(Type.BYTE, (byte) 0); // head yaw
-            spawnMob.write(Type.SHORT, (short) 0); // velocity x
-            spawnMob.write(Type.SHORT, (short) 0); // velocity y
-            spawnMob.write(Type.SHORT, (short) 0); // velocity z
-            spawnMob.write(Types1_8.METADATA_LIST, this.get1_8Metadata()); // metadata
+            final PacketWrapper spawnMob = PacketWrapper.create(ClientboundPackets1_8.ADD_MOB, this.user);
+            spawnMob.write(Types.VAR_INT, this.entityId); // entity id
+            spawnMob.write(Types.UNSIGNED_BYTE, (short) this.entityType.getId()); // type id
+            spawnMob.write(Types.INT, (int) (this.location.getX() * 32F)); // x
+            spawnMob.write(Types.INT, (int) (this.location.getY() * 32F)); // y
+            spawnMob.write(Types.INT, (int) (this.location.getZ() * 32F)); // z
+            spawnMob.write(Types.BYTE, (byte) 0); // yaw
+            spawnMob.write(Types.BYTE, (byte) 0); // pitch
+            spawnMob.write(Types.BYTE, (byte) 0); // head yaw
+            spawnMob.write(Types.SHORT, (short) 0); // velocity x
+            spawnMob.write(Types.SHORT, (short) 0); // velocity y
+            spawnMob.write(Types.SHORT, (short) 0); // velocity z
+            spawnMob.write(Types1_8.ENTITY_DATA_LIST, this.get1_8Metadata()); // metadata
             spawnMob.send(Protocol1_8to1_7_6_10.class);
         }
         if (this.vehicleEntity != null) {
@@ -129,77 +129,77 @@ public class HologramPartEntity {
                 throw new IllegalStateException("Could not find object id for entity type " + this.vehicleEntity.entityType);
             }
 
-            final PacketWrapper spawnEntity = PacketWrapper.create(ClientboundPackets1_8.SPAWN_ENTITY, this.user);
-            spawnEntity.write(Type.VAR_INT, this.vehicleEntity.entityId); // entity id
-            spawnEntity.write(Type.BYTE, (byte) objectId); // type id
-            spawnEntity.write(Type.INT, (int) (this.vehicleEntity.location.getX() * 32F)); // x
-            spawnEntity.write(Type.INT, (int) (this.vehicleEntity.location.getY() * 32F)); // y
-            spawnEntity.write(Type.INT, (int) (this.vehicleEntity.location.getZ() * 32F)); // z
-            spawnEntity.write(Type.BYTE, (byte) 0); // yaw
-            spawnEntity.write(Type.BYTE, (byte) 0); // pitch
-            spawnEntity.write(Type.INT, 0); // data
+            final PacketWrapper spawnEntity = PacketWrapper.create(ClientboundPackets1_8.ADD_ENTITY, this.user);
+            spawnEntity.write(Types.VAR_INT, this.vehicleEntity.entityId); // entity id
+            spawnEntity.write(Types.BYTE, (byte) objectId); // type id
+            spawnEntity.write(Types.INT, (int) (this.vehicleEntity.location.getX() * 32F)); // x
+            spawnEntity.write(Types.INT, (int) (this.vehicleEntity.location.getY() * 32F)); // y
+            spawnEntity.write(Types.INT, (int) (this.vehicleEntity.location.getZ() * 32F)); // z
+            spawnEntity.write(Types.BYTE, (byte) 0); // yaw
+            spawnEntity.write(Types.BYTE, (byte) 0); // pitch
+            spawnEntity.write(Types.INT, 0); // data
             spawnEntity.send(Protocol1_8to1_7_6_10.class);
 
-            final PacketWrapper entityMetadata = PacketWrapper.create(ClientboundPackets1_8.ENTITY_METADATA, this.user);
-            entityMetadata.write(Type.VAR_INT, this.vehicleEntity.entityId); // entity id
-            entityMetadata.write(Types1_8.METADATA_LIST, this.vehicleEntity.get1_8Metadata()); // metadata
+            final PacketWrapper entityMetadata = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_DATA, this.user);
+            entityMetadata.write(Types.VAR_INT, this.vehicleEntity.entityId); // entity id
+            entityMetadata.write(Types1_8.ENTITY_DATA_LIST, this.vehicleEntity.get1_8Metadata()); // metadata
             entityMetadata.send(Protocol1_8to1_7_6_10.class);
 
-            final PacketWrapper attachEntity = PacketWrapper.create(ClientboundPackets1_8.ATTACH_ENTITY, this.user);
-            attachEntity.write(Type.INT, this.entityId); // entity id
-            attachEntity.write(Type.INT, this.vehicleEntity.entityId); // vehicle id
-            attachEntity.write(Type.UNSIGNED_BYTE, (short) 0); // leash state
+            final PacketWrapper attachEntity = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_LINK, this.user);
+            attachEntity.write(Types.INT, this.entityId); // entity id
+            attachEntity.write(Types.INT, this.vehicleEntity.entityId); // vehicle id
+            attachEntity.write(Types.UNSIGNED_BYTE, (short) 0); // leash state
             attachEntity.send(Protocol1_8to1_7_6_10.class);
         }
     }
 
-    private void destroyHologramPartEntities() throws Exception {
-        final PacketWrapper destroyEntities = PacketWrapper.create(ClientboundPackets1_8.DESTROY_ENTITIES, this.user);
-        destroyEntities.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{this.entityId, this.vehicleEntity.entityId}); // entity ids
+    private void destroyHologramPartEntities() {
+        final PacketWrapper destroyEntities = PacketWrapper.create(ClientboundPackets1_8.REMOVE_ENTITIES, this.user);
+        destroyEntities.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{this.entityId, this.vehicleEntity.entityId}); // entity ids
         destroyEntities.scheduleSend(Protocol1_8to1_7_6_10.class);
     }
 
-    private void spawnArmorStand() throws Exception {
-        final PacketWrapper spawnMob = PacketWrapper.create(ClientboundPackets1_8.SPAWN_MOB, this.user);
-        spawnMob.write(Type.VAR_INT, this.mappedEntityId); // entity id
-        spawnMob.write(Type.UNSIGNED_BYTE, (short) EntityTypes1_10.EntityType.ARMOR_STAND.getId()); // type id
-        spawnMob.write(Type.INT, (int) (this.location.getX() * 32F)); // x
-        spawnMob.write(Type.INT, (int) ((this.location.getY() + this.getHeight()) * 32F)); // y
-        spawnMob.write(Type.INT, (int) (this.location.getZ() * 32F)); // z
-        spawnMob.write(Type.BYTE, (byte) 0); // yaw
-        spawnMob.write(Type.BYTE, (byte) 0); // pitch
-        spawnMob.write(Type.BYTE, (byte) 0); // head yaw
-        spawnMob.write(Type.SHORT, (short) 0); // velocity x
-        spawnMob.write(Type.SHORT, (short) 0); // velocity y
-        spawnMob.write(Type.SHORT, (short) 0); // velocity z
-        spawnMob.write(Types1_8.METADATA_LIST, this.getArmorStandMetadata()); // metadata
+    private void spawnArmorStand() {
+        final PacketWrapper spawnMob = PacketWrapper.create(ClientboundPackets1_8.ADD_MOB, this.user);
+        spawnMob.write(Types.VAR_INT, this.mappedEntityId); // entity id
+        spawnMob.write(Types.UNSIGNED_BYTE, (short) EntityTypes1_10.EntityType.ARMOR_STAND.getId()); // type id
+        spawnMob.write(Types.INT, (int) (this.location.getX() * 32F)); // x
+        spawnMob.write(Types.INT, (int) ((this.location.getY() + this.getHeight()) * 32F)); // y
+        spawnMob.write(Types.INT, (int) (this.location.getZ() * 32F)); // z
+        spawnMob.write(Types.BYTE, (byte) 0); // yaw
+        spawnMob.write(Types.BYTE, (byte) 0); // pitch
+        spawnMob.write(Types.BYTE, (byte) 0); // head yaw
+        spawnMob.write(Types.SHORT, (short) 0); // velocity x
+        spawnMob.write(Types.SHORT, (short) 0); // velocity y
+        spawnMob.write(Types.SHORT, (short) 0); // velocity z
+        spawnMob.write(Types1_8.ENTITY_DATA_LIST, this.getArmorStandMetadata()); // metadata
         spawnMob.send(Protocol1_8to1_7_6_10.class);
     }
 
-    private void destroyArmorStand() throws Exception {
+    private void destroyArmorStand() {
         if (this.mappedEntityId == null) return;
 
-        final PacketWrapper destroyEntities = PacketWrapper.create(ClientboundPackets1_8.DESTROY_ENTITIES, this.user);
-        destroyEntities.write(Type.VAR_INT_ARRAY_PRIMITIVE, new int[]{this.mappedEntityId}); // entity ids
+        final PacketWrapper destroyEntities = PacketWrapper.create(ClientboundPackets1_8.REMOVE_ENTITIES, this.user);
+        destroyEntities.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{this.mappedEntityId}); // entity ids
         destroyEntities.send(Protocol1_8to1_7_6_10.class);
     }
 
-    private void updateArmorStand() throws Exception {
+    private void updateArmorStand() {
         if (this.mappedEntityId == null) return;
 
-        final PacketWrapper entityMetadata = PacketWrapper.create(ClientboundPackets1_8.ENTITY_METADATA, this.user);
-        entityMetadata.write(Type.VAR_INT, this.mappedEntityId); // entity id
-        entityMetadata.write(Types1_8.METADATA_LIST, this.getArmorStandMetadata()); // metadata
+        final PacketWrapper entityMetadata = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_DATA, this.user);
+        entityMetadata.write(Types.VAR_INT, this.mappedEntityId); // entity id
+        entityMetadata.write(Types1_8.ENTITY_DATA_LIST, this.getArmorStandMetadata()); // metadata
         entityMetadata.send(Protocol1_8to1_7_6_10.class);
 
-        final PacketWrapper entityTeleport = PacketWrapper.create(ClientboundPackets1_8.ENTITY_TELEPORT, this.user);
-        entityTeleport.write(Type.VAR_INT, this.mappedEntityId); // entity id
-        entityTeleport.write(Type.INT, (int) (this.location.getX() * 32F)); // x
-        entityTeleport.write(Type.INT, (int) ((this.location.getY() + this.getHeight()) * 32F)); // y
-        entityTeleport.write(Type.INT, (int) (this.location.getZ() * 32F)); // z
-        entityTeleport.write(Type.BYTE, (byte) 0); // yaw
-        entityTeleport.write(Type.BYTE, (byte) 0); // pitch
-        entityTeleport.write(Type.BOOLEAN, false); // onGround
+        final PacketWrapper entityTeleport = PacketWrapper.create(ClientboundPackets1_8.TELEPORT_ENTITY, this.user);
+        entityTeleport.write(Types.VAR_INT, this.mappedEntityId); // entity id
+        entityTeleport.write(Types.INT, (int) (this.location.getX() * 32F)); // x
+        entityTeleport.write(Types.INT, (int) ((this.location.getY() + this.getHeight()) * 32F)); // y
+        entityTeleport.write(Types.INT, (int) (this.location.getZ() * 32F)); // z
+        entityTeleport.write(Types.BYTE, (byte) 0); // yaw
+        entityTeleport.write(Types.BYTE, (byte) 0); // pitch
+        entityTeleport.write(Types.BOOLEAN, false); // onGround
         entityTeleport.send(Protocol1_8to1_7_6_10.class);
     }
 
@@ -247,7 +247,7 @@ public class HologramPartEntity {
         return this.entityType;
     }
 
-    public void setVehicleEntity(final HologramPartEntity vehicleEntity) throws Exception {
+    public void setVehicleEntity(final HologramPartEntity vehicleEntity) {
         if (vehicleEntity == null) {
             if (this.vehicleEntity != null) {
                 this.location = this.vehicleEntity.location;
@@ -283,7 +283,7 @@ public class HologramPartEntity {
         return this.riderEntity;
     }
 
-    public void setLocation(final Location location) throws Exception {
+    public void setLocation(final Location location) {
         this.location = location;
         this.onChange();
     }
@@ -301,22 +301,22 @@ public class HologramPartEntity {
         return this.metadata.get(index);
     }
 
-    private List<Metadata> get1_8Metadata() {
-        final List<Metadata> metadataList = new ArrayList<>();
+    private List<EntityData> get1_8Metadata() {
+        final List<EntityData> metadataList = new ArrayList<>();
         for (final Map.Entry<MetaIndex1_8to1_7_6, Object> entry : this.metadata.entrySet()) {
-            metadataList.add(new Metadata(entry.getKey().getOldIndex(), entry.getKey().getOldType(), entry.getValue()));
+            metadataList.add(new EntityData(entry.getKey().getOldIndex(), entry.getKey().getOldType(), entry.getValue()));
         }
         Via.getManager().getProtocolManager().getProtocol(Protocol1_8to1_7_6_10.class).getMetadataRewriter().transform(this.user, this.entityType, metadataList);
         return metadataList;
     }
 
-    private List<Metadata> getArmorStandMetadata() {
-        final List<Metadata> metadataList = new ArrayList<>();
+    private List<EntityData> getArmorStandMetadata() {
+        final List<EntityData> metadataList = new ArrayList<>();
         if (this.entityType == EntityTypes1_10.EntityType.HORSE) {
-            metadataList.add(new Metadata(MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG_VISIBILITY.getNewIndex(), MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG_VISIBILITY.getNewType(), this.getMetadata(MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG_VISIBILITY)));
-            metadataList.add(new Metadata(MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG.getNewIndex(), MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG.getNewType(), this.getMetadata(MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG)));
-            metadataList.add(new Metadata(MetaIndex1_8to1_7_6.ENTITY_FLAGS.getNewIndex(), MetaIndex1_8to1_7_6.ENTITY_FLAGS.getNewType(), (byte) (1 << 5)));
-            metadataList.add(new Metadata(MetaIndex1_8to1_7_6.ARMOR_STAND_FLAGS.getNewIndex(), MetaIndex1_8to1_7_6.ARMOR_STAND_FLAGS.getNewType(), (byte) (1 << 4)));
+            metadataList.add(new EntityData(MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG_VISIBILITY.getNewIndex(), MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG_VISIBILITY.getNewType(), this.getMetadata(MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG_VISIBILITY)));
+            metadataList.add(new EntityData(MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG.getNewIndex(), MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG.getNewType(), this.getMetadata(MetaIndex1_8to1_7_6.ENTITY_LIVING_NAME_TAG)));
+            metadataList.add(new EntityData(MetaIndex1_8to1_7_6.ENTITY_FLAGS.getNewIndex(), MetaIndex1_8to1_7_6.ENTITY_FLAGS.getNewType(), (byte) (1 << 5)));
+            metadataList.add(new EntityData(MetaIndex1_8to1_7_6.ARMOR_STAND_FLAGS.getNewIndex(), MetaIndex1_8to1_7_6.ARMOR_STAND_FLAGS.getNewType(), (byte) (1 << 4)));
         }
         return metadataList;
     }

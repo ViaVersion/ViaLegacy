@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.protocols.alpha.protocola1_0_17_1_0_17_4toa1_0_16_
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_17_1_0_17_4toa1_0_16_2.Protocola1_0_17_1_0_17_4toa1_0_16_2;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_17_1_0_17_4toa1_0_16_2.storage.TimeLockStorage;
@@ -47,13 +47,13 @@ public class TimeLockTask implements Runnable {
                             if (timeLockStorage.getTime() == 0) { // 0 always does the daylight cycle
                                 timeLockStorage.setTime(1); // Set it to 1 which is close enough
                             }
-                            final PacketWrapper updateTime = PacketWrapper.create(ClientboundPackets1_6_1.TIME_UPDATE, info);
-                            updateTime.write(Type.LONG, timeLockStorage.getTime()); // time
-                            updateTime.write(Type.LONG, -(timeLockStorage.getTime() % 24000)); // time of day
+                            final PacketWrapper updateTime = PacketWrapper.create(ClientboundPackets1_6_1.SET_TIME, info);
+                            updateTime.write(Types.LONG, timeLockStorage.getTime()); // time
+                            updateTime.write(Types.LONG, -(timeLockStorage.getTime() % 24000)); // time of day
                             updateTime.send(Protocol1_6_1to1_5_2.class);
                         } else {
-                            final PacketWrapper updateTime = PacketWrapper.create(ClientboundPacketsa1_0_17.TIME_UPDATE, info);
-                            updateTime.write(Type.LONG, timeLockStorage.getTime()); // time
+                            final PacketWrapper updateTime = PacketWrapper.create(ClientboundPacketsa1_0_17.SET_TIME, info);
+                            updateTime.write(Types.LONG, timeLockStorage.getTime()); // time
                             updateTime.send(Protocola1_0_17_1_0_17_4toa1_0_16_2.class);
                         }
                     } catch (Throwable e) {

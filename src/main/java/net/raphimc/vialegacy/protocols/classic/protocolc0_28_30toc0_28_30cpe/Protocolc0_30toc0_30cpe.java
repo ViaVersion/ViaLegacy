@@ -25,7 +25,7 @@ import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.FixedByteArrayType;
 import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.ViaLegacy;
@@ -68,14 +68,14 @@ public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacket
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsc0_30cpe.JOIN_GAME, wrapper -> {
+        this.registerClientbound(ClientboundPacketsc0_30cpe.LOGIN, wrapper -> {
             if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_6_2to1_6_1.class)) {
                 final ExtensionProtocolMetadataStorage protocolMetadataStorage = wrapper.user().get(ExtensionProtocolMetadataStorage.class);
-                final PacketWrapper brand = PacketWrapper.create(ClientboundPackets1_6_4.PLUGIN_MESSAGE, wrapper.user());
+                final PacketWrapper brand = PacketWrapper.create(ClientboundPackets1_6_4.CUSTOM_PAYLOAD, wrapper.user());
                 brand.write(Types1_6_4.STRING, "MC|Brand");
                 final byte[] brandBytes = protocolMetadataStorage.getServerSoftwareName().getBytes(StandardCharsets.UTF_8);
-                brand.write(Type.SHORT, (short) brandBytes.length); // length
-                brand.write(Type.REMAINING_BYTES, brandBytes); // data
+                brand.write(Types.SHORT, (short) brandBytes.length); // length
+                brand.write(Types.REMAINING_BYTES, brandBytes); // data
 
                 wrapper.send(Protocolc0_30toc0_30cpe.class);
                 brand.send(Protocol1_6_2to1_6_1.class);
@@ -86,7 +86,7 @@ public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacket
             wrapper.cancel();
             final ExtensionProtocolMetadataStorage protocolMetadataStorage = wrapper.user().get(ExtensionProtocolMetadataStorage.class);
             protocolMetadataStorage.setServerSoftwareName(wrapper.read(Typesc0_30.STRING)); // app name
-            protocolMetadataStorage.setExtensionCount(wrapper.read(Type.SHORT)); // extension count
+            protocolMetadataStorage.setExtensionCount(wrapper.read(Types.SHORT)); // extension count
 
             final ClassicProgressStorage classicProgressStorage = wrapper.user().get(ClassicProgressStorage.class);
             classicProgressStorage.progress = 0;
@@ -97,7 +97,7 @@ public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacket
             wrapper.cancel();
             final ExtensionProtocolMetadataStorage protocolMetadataStorage = wrapper.user().get(ExtensionProtocolMetadataStorage.class);
             final String extensionName = wrapper.read(Typesc0_30.STRING); // name
-            final int extensionVersion = wrapper.read(Type.INT); // version
+            final int extensionVersion = wrapper.read(Types.INT); // version
 
             final ClassicProtocolExtension extension = ClassicProtocolExtension.byName(extensionName);
             if (extension != null) {
@@ -128,45 +128,45 @@ public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacket
 
                 final PacketWrapper extensionProtocolInfo = PacketWrapper.create(ServerboundPacketsc0_30cpe.EXTENSION_PROTOCOL_INFO, wrapper.user());
                 extensionProtocolInfo.write(Typesc0_30.STRING, ViaLegacy.getPlatform().getCpeAppName()); // app name
-                extensionProtocolInfo.write(Type.SHORT, (short) supportedExtensions.size()); // extension count
+                extensionProtocolInfo.write(Types.SHORT, (short) supportedExtensions.size()); // extension count
                 extensionProtocolInfo.sendToServer(Protocolc0_30toc0_30cpe.class);
 
                 for (ClassicProtocolExtension protocolExtension : supportedExtensions) {
                     final PacketWrapper extensionProtocolEntry = PacketWrapper.create(ServerboundPacketsc0_30cpe.EXTENSION_PROTOCOL_ENTRY, wrapper.user());
                     extensionProtocolEntry.write(Typesc0_30.STRING, protocolExtension.getName()); // name
-                    extensionProtocolEntry.write(Type.INT, protocolExtension.getHighestSupportedVersion()); // version
+                    extensionProtocolEntry.write(Types.INT, protocolExtension.getHighestSupportedVersion()); // version
                     extensionProtocolEntry.sendToServer(Protocolc0_30toc0_30cpe.class);
                 }
             }
         });
         this.registerClientbound(ClientboundPacketsc0_30cpe.EXT_CUSTOM_BLOCKS_SUPPORT_LEVEL, null, wrapper -> {
             wrapper.cancel();
-            final byte level = wrapper.read(Type.BYTE); // support level
+            final byte level = wrapper.read(Types.BYTE); // support level
             if (level != 1) {
                 ViaLegacy.getPlatform().getLogger().info("Classic server supports CustomBlocks level " + level);
             }
             final PacketWrapper response = PacketWrapper.create(ServerboundPacketsc0_30cpe.EXT_CUSTOM_BLOCKS_SUPPORT_LEVEL, wrapper.user());
-            response.write(Type.BYTE, (byte) 1); // support level
+            response.write(Types.BYTE, (byte) 1); // support level
             response.sendToServer(Protocolc0_30toc0_30cpe.class);
         });
         this.registerClientbound(ClientboundPacketsc0_30cpe.EXT_HACK_CONTROL, null, wrapper -> {
             wrapper.cancel();
             final ClassicOpLevelStorage opLevelStorage = wrapper.user().get(ClassicOpLevelStorage.class);
-            final boolean flying = wrapper.read(Type.BOOLEAN); // flying
-            final boolean noClip = wrapper.read(Type.BOOLEAN); // no clip
-            final boolean speed = wrapper.read(Type.BOOLEAN); // speed
-            final boolean respawn = wrapper.read(Type.BOOLEAN); // respawn key
-            wrapper.read(Type.BOOLEAN); // third person view
-            wrapper.read(Type.SHORT); // jump height
+            final boolean flying = wrapper.read(Types.BOOLEAN); // flying
+            final boolean noClip = wrapper.read(Types.BOOLEAN); // no clip
+            final boolean speed = wrapper.read(Types.BOOLEAN); // speed
+            final boolean respawn = wrapper.read(Types.BOOLEAN); // respawn key
+            wrapper.read(Types.BOOLEAN); // third person view
+            wrapper.read(Types.SHORT); // jump height
 
             opLevelStorage.updateHax(flying, noClip, speed, respawn);
         });
         this.registerClientbound(ClientboundPacketsc0_30cpe.EXT_SET_BLOCK_PERMISSION, null, wrapper -> {
             wrapper.cancel();
             final ExtBlockPermissionsStorage blockPermissionsStorage = wrapper.user().get(ExtBlockPermissionsStorage.class);
-            final byte blockId = wrapper.read(Type.BYTE); // block id
-            final boolean canPlace = wrapper.read(Type.BOOLEAN); // can place
-            final boolean canDelete = wrapper.read(Type.BOOLEAN); // can delete
+            final byte blockId = wrapper.read(Types.BYTE); // block id
+            final boolean canPlace = wrapper.read(Types.BOOLEAN); // can place
+            final boolean canDelete = wrapper.read(Types.BOOLEAN); // can delete
 
             if (canPlace) {
                 blockPermissionsStorage.addPlaceable(blockId);
@@ -188,7 +188,7 @@ public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacket
             final ClassicBlockRemapper remapper = wrapper.user().get(ClassicBlockRemapper.class);
             final ClassicLevel level = levelStorage.getClassicLevel();
 
-            final int count = wrapper.read(Type.UNSIGNED_BYTE) + 1; // count
+            final int count = wrapper.read(Types.UNSIGNED_BYTE) + 1; // count
             final byte[] indices = wrapper.read(new FixedByteArrayType(1024)); // indices
             final byte[] blocks = wrapper.read(new FixedByteArrayType(256)); // blocks
 
@@ -205,22 +205,22 @@ public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacket
                 }
 
                 for (Map.Entry<ChunkCoord, List<BlockChangeRecord>> entry : records.entrySet()) {
-                    final PacketWrapper multiBlockChange = PacketWrapper.create(ClientboundPacketsa1_0_15.MULTI_BLOCK_CHANGE, wrapper.user());
-                    multiBlockChange.write(Type.INT, entry.getKey().chunkX); // chunkX
-                    multiBlockChange.write(Type.INT, entry.getKey().chunkZ); // chunkZ
+                    final PacketWrapper multiBlockChange = PacketWrapper.create(ClientboundPacketsa1_0_15.CHUNK_BLOCKS_UPDATE, wrapper.user());
+                    multiBlockChange.write(Types.INT, entry.getKey().chunkX); // chunkX
+                    multiBlockChange.write(Types.INT, entry.getKey().chunkZ); // chunkZ
                     multiBlockChange.write(Types1_1.BLOCK_CHANGE_RECORD_ARRAY, entry.getValue().toArray(new BlockChangeRecord[0])); // blockChangeRecords
                     multiBlockChange.send(Protocola1_0_16_2toa1_0_15.class);
                 }
             }
         });
         this.registerClientbound(ClientboundPacketsc0_30cpe.EXT_TWO_WAY_PING, ClientboundPacketsc0_28.KEEP_ALIVE, wrapper -> {
-            final byte direction = wrapper.read(Type.BYTE); // direction
-            final short data = wrapper.read(Type.SHORT); // data
+            final byte direction = wrapper.read(Types.BYTE); // direction
+            final short data = wrapper.read(Types.SHORT); // data
 
             if (direction == 1) {
                 final PacketWrapper pingResponse = PacketWrapper.create(ServerboundPacketsc0_30cpe.EXT_TWO_WAY_PING, wrapper.user());
-                pingResponse.write(Type.BYTE, direction); // direction
-                pingResponse.write(Type.SHORT, data); // data
+                pingResponse.write(Types.BYTE, direction); // direction
+                pingResponse.write(Types.SHORT, data); // data
                 pingResponse.sendToServer(Protocolc0_30toc0_30cpe.class);
             }
         });
@@ -228,19 +228,19 @@ public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacket
         this.registerServerbound(ServerboundPacketsc0_28.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // protocol id
+                map(Types.BYTE); // protocol id
                 map(Typesc0_30.STRING); // username
                 map(Typesc0_30.STRING); // mp pass
-                map(Type.BYTE); // op level
+                map(Types.BYTE); // op level
                 handler(wrapper -> {
-                    wrapper.set(Type.BYTE, 1, (byte) 0x42); // extension protocol magic number
+                    wrapper.set(Types.BYTE, 1, (byte) 0x42); // extension protocol magic number
                 });
             }
         });
-        this.registerServerbound(ServerboundPacketsc0_28.CHAT_MESSAGE, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsc0_28.CHAT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // sender id
+                map(Types.BYTE); // sender id
                 map(Typesc0_30.STRING); // message
                 handler(wrapper -> {
                     final ExtensionProtocolMetadataStorage protocolMetadata = wrapper.user().get(ExtensionProtocolMetadataStorage.class);
@@ -252,20 +252,20 @@ public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacket
                         final int pos = Math.min(message.length(), 64);
                         final String msg = message.substring(0, pos);
                         message = message.substring(pos);
-                        final PacketWrapper chatMessage = PacketWrapper.create(ServerboundPacketsc0_30cpe.CHAT_MESSAGE, wrapper.user());
-                        chatMessage.write(Type.BYTE, (byte) (!message.isEmpty() ? 1 : 0)); // 1 = more parts | 0 = last part
+                        final PacketWrapper chatMessage = PacketWrapper.create(ServerboundPacketsc0_30cpe.CHAT, wrapper.user());
+                        chatMessage.write(Types.BYTE, (byte) (!message.isEmpty() ? 1 : 0)); // 1 = more parts | 0 = last part
                         chatMessage.write(Typesc0_30.STRING, msg); // message
                         chatMessage.sendToServer(Protocolc0_30toc0_30cpe.class);
                     }
                 });
             }
         });
-        this.registerServerbound(ServerboundPacketsc0_28.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsc0_28.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
                 map(Typesc0_30.POSITION); // position
-                map(Type.BOOLEAN); // place block
-                map(Type.BYTE); // block id
+                map(Types.BOOLEAN); // place block
+                map(Types.BYTE); // block id
                 handler(wrapper -> {
                     if (!wrapper.user().has(ExtBlockPermissionsStorage.class)) return;
 
@@ -273,16 +273,16 @@ public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacket
                     final ClassicLevel level = wrapper.user().get(ClassicLevelStorage.class).getClassicLevel();
 
                     final Position position = wrapper.get(Typesc0_30.POSITION, 0);
-                    final boolean placeBlock = wrapper.get(Type.BOOLEAN, 0);
-                    final int blockId = wrapper.get(Type.BYTE, 0);
+                    final boolean placeBlock = wrapper.get(Types.BOOLEAN, 0);
+                    final int blockId = wrapper.get(Types.BYTE, 0);
 
                     int block = level.getBlock(position);
                     final boolean disallow = (placeBlock && blockPermissions.isPlacingDenied(blockId)) || (!placeBlock && blockPermissions.isBreakingDenied(block));
 
                     if (disallow) {
                         wrapper.cancel();
-                        final PacketWrapper chatMessage = PacketWrapper.create(ClientboundPacketsc0_30cpe.CHAT_MESSAGE, wrapper.user());
-                        chatMessage.write(Type.BYTE, (byte) 0); // sender id
+                        final PacketWrapper chatMessage = PacketWrapper.create(ClientboundPacketsc0_30cpe.CHAT, wrapper.user());
+                        chatMessage.write(Types.BYTE, (byte) 0); // sender id
                         chatMessage.write(Typesc0_30.STRING, "&cYou are not allowed to place/break this block"); // message
                         chatMessage.send(Protocolc0_30toc0_30cpe.class);
                     } else {
@@ -290,9 +290,9 @@ public class Protocolc0_30toc0_30cpe extends StatelessProtocol<ClientboundPacket
                         level.setBlock(position, block);
                     }
 
-                    final PacketWrapper blockChange = PacketWrapper.create(ClientboundPacketsc0_30cpe.BLOCK_CHANGE, wrapper.user());
+                    final PacketWrapper blockChange = PacketWrapper.create(ClientboundPacketsc0_30cpe.BLOCK_UPDATE, wrapper.user());
                     blockChange.write(Typesc0_30.POSITION, position); // position
-                    blockChange.write(Type.BYTE, (byte) block); // block id
+                    blockChange.write(Types.BYTE, (byte) block); // block id
                     blockChange.send(Protocolc0_30toc0_30cpe.class);
                 });
             }

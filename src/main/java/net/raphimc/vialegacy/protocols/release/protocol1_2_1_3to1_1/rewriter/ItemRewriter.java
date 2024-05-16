@@ -18,11 +18,12 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.rewriter;
 
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
+import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.ClientboundPackets1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.Protocol1_2_1_3to1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_4_5to1_2_1_3.ServerboundPackets1_2_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.types.Types1_2_4;
 
-public class ItemRewriter extends LegacyItemRewriter<Protocol1_2_1_3to1_1> {
+public class ItemRewriter extends LegacyItemRewriter<ClientboundPackets1_1, ServerboundPackets1_2_1, Protocol1_2_1_3to1_1> {
 
     public ItemRewriter(final Protocol1_2_1_3to1_1 protocol) {
         super(protocol, "1.1", Types1_2_4.NBT_ITEM, Types1_2_4.NBT_ITEM_ARRAY);
@@ -38,7 +39,7 @@ public class ItemRewriter extends LegacyItemRewriter<Protocol1_2_1_3to1_1> {
 
     @Override
     protected void registerPackets() {
-        this.registerCreativeInventoryAction(ServerboundPackets1_2_1.CREATIVE_INVENTORY_ACTION);
+        this.registerCreativeInventoryAction(ServerboundPackets1_2_1.SET_CREATIVE_MODE_SLOT);
     }
 
 }

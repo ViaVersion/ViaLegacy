@@ -17,13 +17,13 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_7_2_5to1_6_4.types;
 
-import com.viaversion.viaversion.api.minecraft.metadata.MetaType;
-import com.viaversion.viaversion.api.type.types.metadata.OldMetaType;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType;
+import com.viaversion.viaversion.api.type.types.entitydata.OldEntityDataType;
 
-public class MetadataType extends OldMetaType {
+public class MetadataType extends OldEntityDataType {
 
     @Override
-    protected MetaType getType(int index) {
+    protected EntityDataType getType(int index) {
         return MetaType1_6_4.byId(index);
     }
 

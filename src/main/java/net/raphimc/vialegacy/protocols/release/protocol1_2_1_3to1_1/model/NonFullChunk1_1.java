@@ -17,13 +17,13 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.model;
 
+import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord1_8;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
 
 import java.util.ArrayList;
 import java.util.List;

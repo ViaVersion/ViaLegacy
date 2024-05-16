@@ -30,48 +30,48 @@ public enum ClientboundPacketsa1_0_16 implements ClientboundPacketType, PreNetty
 
     KEEP_ALIVE(0, (user, buf) -> {
     }),
-    JOIN_GAME(1, (user, buf) -> {
+    LOGIN(1, (user, buf) -> {
         buf.skipBytes(4);
         readUTF(buf);
         readUTF(buf);
     }),
     HANDSHAKE(2, (user, buf) -> readUTF(buf)),
-    CHAT_MESSAGE(3, (user, buf) -> readUTF(buf)),
-    PLAYER_POSITION_ONLY_ONGROUND(10, (user, buf) -> buf.skipBytes(1)),
-    PLAYER_POSITION_ONLY_POSITION(11, (user, buf) -> buf.skipBytes(33)),
-    PLAYER_POSITION_ONLY_LOOK(12, (user, buf) -> buf.skipBytes(9)),
+    CHAT(3, (user, buf) -> readUTF(buf)),
+    MOVE_PLAYER_STATUS_ONLY(10, (user, buf) -> buf.skipBytes(1)),
+    MOVE_PLAYER_POS(11, (user, buf) -> buf.skipBytes(33)),
+    MOVE_PLAYER_ROT(12, (user, buf) -> buf.skipBytes(9)),
     PLAYER_POSITION(13, (user, buf) -> buf.skipBytes(41)),
-    HELD_ITEM_CHANGE(16, (user, buf) -> buf.skipBytes(6)),
+    SET_CARRIED_ITEM(16, (user, buf) -> buf.skipBytes(6)),
     ADD_TO_INVENTORY(17, (user, buf) -> buf.skipBytes(5)),
-    ENTITY_ANIMATION(18, (user, buf) -> buf.skipBytes(5)),
-    SPAWN_PLAYER(20, (user, buf) -> {
+    ANIMATE(18, (user, buf) -> buf.skipBytes(5)),
+    ADD_PLAYER(20, (user, buf) -> {
         buf.skipBytes(4);
         readUTF(buf);
         buf.skipBytes(16);
     }),
     SPAWN_ITEM(21, (user, buf) -> buf.skipBytes(22)),
-    COLLECT_ITEM(22, (user, buf) -> buf.skipBytes(8)),
-    SPAWN_ENTITY(23, (user, buf) -> buf.skipBytes(17)),
-    DESTROY_ENTITIES(29, (user, buf) -> buf.skipBytes(4)),
-    ENTITY_MOVEMENT(30, (user, buf) -> buf.skipBytes(4)),
-    ENTITY_POSITION(31, (user, buf) -> buf.skipBytes(7)),
-    ENTITY_ROTATION(32, (user, buf) -> buf.skipBytes(6)),
-    ENTITY_POSITION_AND_ROTATION(33, (user, buf) -> buf.skipBytes(9)),
-    ENTITY_TELEPORT(34, (user, buf) -> buf.skipBytes(18)),
+    TAKE_ITEM_ENTITY(22, (user, buf) -> buf.skipBytes(8)),
+    ADD_ENTITY(23, (user, buf) -> buf.skipBytes(17)),
+    REMOVE_ENTITIES(29, (user, buf) -> buf.skipBytes(4)),
+    MOVE_ENTITY(30, (user, buf) -> buf.skipBytes(4)),
+    MOVE_ENTITY_POS(31, (user, buf) -> buf.skipBytes(7)),
+    MOVE_ENTITY_ROT(32, (user, buf) -> buf.skipBytes(6)),
+    MOVE_ENTITY_POS_ROT(33, (user, buf) -> buf.skipBytes(9)),
+    TELEPORT_ENTITY(34, (user, buf) -> buf.skipBytes(18)),
     PRE_CHUNK(50, (user, buf) -> buf.skipBytes(9)),
-    CHUNK_DATA(51, (user, buf) -> {
+    LEVEL_CHUNK(51, (user, buf) -> {
         buf.skipBytes(13);
         int x = buf.readInt();
         for (int i = 0; i < x; i++) buf.readByte();
     }),
-    MULTI_BLOCK_CHANGE(52, (user, buf) -> {
+    CHUNK_BLOCKS_UPDATE(52, (user, buf) -> {
         buf.skipBytes(8);
         short x = buf.readShort();
         for (int i = 0; i < x; i++) buf.readShort();
         for (int i = 0; i < x; i++) buf.readByte();
         for (int i = 0; i < x; i++) buf.readByte();
     }),
-    BLOCK_CHANGE(53, (user, buf) -> buf.skipBytes(11)),
+    BLOCK_UPDATE(53, (user, buf) -> buf.skipBytes(11)),
     DISCONNECT(255, (user, buf) -> readUTF(buf));
 
     private static final ClientboundPacketsa1_0_16[] REGISTRY = new ClientboundPacketsa1_0_16[256];

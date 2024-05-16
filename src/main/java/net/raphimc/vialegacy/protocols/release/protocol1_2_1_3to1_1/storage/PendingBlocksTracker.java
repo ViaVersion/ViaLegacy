@@ -21,9 +21,8 @@ import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.IdAndData;
-import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.Protocol1_2_1_3to1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.model.PendingBlockEntry;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_4_5to1_2_1_3.ClientboundPackets1_2_1;
@@ -32,7 +31,6 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.logging.Level;
 
 public class PendingBlocksTracker extends StoredObject {
 
@@ -70,15 +68,11 @@ public class PendingBlocksTracker extends StoredObject {
             final PendingBlockEntry pendingBlockEntry = it.next();
             if (pendingBlockEntry.decrementAndCheckIsExpired()) {
                 it.remove();
-                try {
-                    final PacketWrapper blockChange = PacketWrapper.create(ClientboundPackets1_2_1.BLOCK_CHANGE, this.getUser());
-                    blockChange.write(Types1_7_6.POSITION_UBYTE, pendingBlockEntry.getPosition()); // position
-                    blockChange.write(Type.UNSIGNED_BYTE, (short) pendingBlockEntry.getBlock().getId()); // block id
-                    blockChange.write(Type.UNSIGNED_BYTE, (short) pendingBlockEntry.getBlock().getData()); // block data
-                    blockChange.send(Protocol1_2_1_3to1_1.class);
-                } catch (Throwable e) {
-                    ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Could not send block update for expired pending block", e);
-                }
+                final PacketWrapper blockChange = PacketWrapper.create(ClientboundPackets1_2_1.BLOCK_UPDATE, this.getUser());
+                blockChange.write(Types1_7_6.POSITION_UBYTE, pendingBlockEntry.getPosition()); // position
+                blockChange.write(Types.UNSIGNED_BYTE, (short) pendingBlockEntry.getBlock().getId()); // block id
+                blockChange.write(Types.UNSIGNED_BYTE, (short) pendingBlockEntry.getBlock().getData()); // block data
+                blockChange.send(Protocol1_2_1_3to1_1.class);
             }
         }
     }

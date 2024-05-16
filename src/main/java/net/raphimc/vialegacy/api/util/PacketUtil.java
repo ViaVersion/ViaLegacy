@@ -24,7 +24,7 @@ import io.netty.buffer.Unpooled;
 
 public class PacketUtil {
 
-    public static int calculateLength(final PacketWrapper wrapper) throws Exception {
+    public static int calculateLength(final PacketWrapper wrapper) {
         final PacketType packetType = wrapper.getPacketType();
         wrapper.setPacketType(null);
 

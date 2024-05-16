@@ -17,15 +17,17 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter;
 
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
 import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
+import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.ClientboundPackets1_7_2;
 import net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5.Protocol1_7_6_10to1_7_2_5;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.model.GameProfile;
@@ -34,10 +36,10 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 
 import java.util.UUID;
 
-public class ItemRewriter extends LegacyItemRewriter<Protocol1_8to1_7_6_10> {
+public class ItemRewriter extends LegacyItemRewriter<ClientboundPackets1_7_2, ServerboundPackets1_8, Protocol1_8to1_7_6_10> {
 
     public ItemRewriter(final Protocol1_8to1_7_6_10 protocol) {
-        super(protocol, "1.7.10", Types1_7_6.ITEM, Types1_7_6.ITEM_ARRAY, Type.ITEM1_8, Type.ITEM1_8_SHORT_ARRAY);
+        super(protocol, "1.7.10", Types1_7_6.ITEM, Types1_7_6.ITEM_ARRAY, Types.ITEM1_8, Types.ITEM1_8_SHORT_ARRAY);
 
         this.addRemappedItem(8, 326, "Water Block");
         this.addRemappedItem(9, 326, "Stationary Water Block");
@@ -74,14 +76,12 @@ public class ItemRewriter extends LegacyItemRewriter<Protocol1_8to1_7_6_10> {
             if (!item.tag().contains("SkullOwner")) return item;
 
             String skullOwnerName = null;
-            if (item.tag().get("SkullOwner") instanceof StringTag) {
-                final StringTag skullOwnerTag = item.tag().remove("SkullOwner");
+            if (!item.tag().getString("SkullOwner", "").isEmpty()) {
+                final StringTag skullOwnerTag = item.tag().removeUnchecked("SkullOwner");
                 item.tag().put("1_7_SkullOwner", skullOwnerTag);
                 skullOwnerName = skullOwnerTag.getValue();
-            } else if (item.tag().get("SkullOwner") instanceof CompoundTag) {
-                final CompoundTag skullOwnerTag = item.tag().get("SkullOwner");
-                if (skullOwnerTag.get("Name") instanceof StringTag && !skullOwnerTag.contains("Id")) {
-                    final StringTag skullOwnerNameTag = skullOwnerTag.get("Name");
+            } else if (item.tag().get("SkullOwner") instanceof CompoundTag skullOwnerTag) {
+                if (skullOwnerTag.get("Name") instanceof StringTag skullOwnerNameTag && !skullOwnerTag.contains("Id")) {
                     skullOwnerName = skullOwnerNameTag.getValue();
                 }
             }

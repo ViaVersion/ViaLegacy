@@ -28,12 +28,12 @@ public class PositionType extends Type<Position> {
     }
 
     @Override
-    public Position read(ByteBuf buffer) throws Exception {
+    public Position read(ByteBuf buffer) {
         return new Position(buffer.readShort(), (int) buffer.readShort(), buffer.readShort());
     }
 
     @Override
-    public void write(ByteBuf buffer, Position position) throws Exception {
+    public void write(ByteBuf buffer, Position position) {
         buffer.writeShort(position.x());
         buffer.writeShort(position.y());
         buffer.writeShort(position.z());

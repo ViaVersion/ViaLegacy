@@ -19,7 +19,7 @@ package net.raphimc.vialegacy.protocols.alpha.protocola1_2_3_5_1_2_6toa1_2_3_1_2
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.alpha.protocolb1_0_1_1_1toa1_2_3_5_1_2_6.ClientboundPacketsa1_2_6;
@@ -33,13 +33,13 @@ public class Protocola1_2_3_5_1_2_6toa1_2_3_1_2_3_4 extends StatelessProtocol<Cl
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsa1_2_3.ENTITY_VELOCITY, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsa1_2_3.SET_ENTITY_MOTION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.SHORT, Type.SHORT, v -> (short) (v / 4.0F)); // velocity x
-                map(Type.SHORT, Type.SHORT, v -> (short) (v / 4.0F)); // velocity y
-                map(Type.SHORT, Type.SHORT, v -> (short) (v / 4.0F)); // velocity z
+                map(Types.INT); // entity id
+                map(Types.SHORT, Types.SHORT, v -> (short) (v / 4.0F)); // velocity x
+                map(Types.SHORT, Types.SHORT, v -> (short) (v / 4.0F)); // velocity y
+                map(Types.SHORT, Types.SHORT, v -> (short) (v / 4.0F)); // velocity z
             }
         });
     }

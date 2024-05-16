@@ -27,9 +27,9 @@ import java.util.function.BiConsumer;
 public enum ServerboundPacketsc0_30cpe implements ServerboundPacketType, PreNettyPacketType {
 
     LOGIN(0, (user, buf) -> buf.skipBytes(130)),
-    PLAYER_BLOCK_PLACEMENT(5, (user, buf) -> buf.skipBytes(8)),
-    PLAYER_POSITION_AND_ROTATION(8, (user, buf) -> buf.skipBytes(9)),
-    CHAT_MESSAGE(13, (user, buf) -> buf.skipBytes(65)),
+    USE_ITEM_ON(5, (user, buf) -> buf.skipBytes(8)),
+    MOVE_PLAYER_POS_ROT(8, (user, buf) -> buf.skipBytes(9)),
+    CHAT(13, (user, buf) -> buf.skipBytes(65)),
     EXTENSION_PROTOCOL_INFO(16, (user, buf) -> buf.skipBytes(66)),
     EXTENSION_PROTOCOL_ENTRY(17, (user, buf) -> buf.skipBytes(68)),
     EXT_CUSTOM_BLOCKS_SUPPORT_LEVEL(19, (user, buf) -> buf.skipBytes(1)),

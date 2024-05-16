@@ -22,9 +22,8 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
-import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_5_0_1to1_4_6_7.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_6_1to1_5_2.ClientboundPackets1_5_2;
@@ -34,7 +33,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 
 public class Protocol1_5_0_1to1_4_6_7 extends StatelessProtocol<ClientboundPackets1_4_6, ClientboundPackets1_5_2, ServerboundPackets1_5_2, ServerboundPackets1_5_2> {
 
-    private final LegacyItemRewriter<Protocol1_5_0_1to1_4_6_7> itemRewriter = new ItemRewriter(this);
+    private final ItemRewriter itemRewriter = new ItemRewriter(this);
 
     public Protocol1_5_0_1to1_4_6_7() {
         super(ClientboundPackets1_4_6.class, ClientboundPackets1_5_2.class, ServerboundPackets1_5_2.class, ServerboundPackets1_5_2.class);
@@ -44,67 +43,67 @@ public class Protocol1_5_0_1to1_4_6_7 extends StatelessProtocol<ClientboundPacke
     protected void registerPackets() {
         this.itemRewriter.register();
 
-        this.registerClientbound(ClientboundPackets1_4_6.SPAWN_ENTITY, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_4_6.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.BYTE); // type id
-                map(Type.INT); // x
-                map(Type.INT); // y
-                map(Type.INT); // z
-                map(Type.BYTE); // yaw
-                map(Type.BYTE); // pitch
-                map(Type.INT); // data
+                map(Types.INT); // entity id
+                map(Types.BYTE); // type id
+                map(Types.INT); // x
+                map(Types.INT); // y
+                map(Types.INT); // z
+                map(Types.BYTE); // yaw
+                map(Types.BYTE); // pitch
+                map(Types.INT); // data
                 handler(wrapper -> {
-                    final byte typeId = wrapper.get(Type.BYTE, 0);
+                    final byte typeId = wrapper.get(Types.BYTE, 0);
                     if (typeId == 10 || typeId == 11 || typeId == 12) {
-                        wrapper.set(Type.BYTE, 0, (byte) EntityTypes1_10.ObjectType.MINECART.getId());
+                        wrapper.set(Types.BYTE, 0, (byte) EntityTypes1_10.ObjectType.MINECART.getId());
                     }
-                    int throwerEntityId = wrapper.get(Type.INT, 4);
+                    int throwerEntityId = wrapper.get(Types.INT, 4);
                     short speedX = 0;
                     short speedY = 0;
                     short speedZ = 0;
                     if (throwerEntityId > 0) {
-                        speedX = wrapper.read(Type.SHORT); // velocity x
-                        speedY = wrapper.read(Type.SHORT); // velocity y
-                        speedZ = wrapper.read(Type.SHORT); // velocity z
+                        speedX = wrapper.read(Types.SHORT); // velocity x
+                        speedY = wrapper.read(Types.SHORT); // velocity y
+                        speedZ = wrapper.read(Types.SHORT); // velocity z
                     }
                     if (typeId == 10) throwerEntityId = 0; // normal minecart
                     if (typeId == 11) throwerEntityId = 1; // chest minecart
                     if (typeId == 12) throwerEntityId = 2; // oven minecart
-                    wrapper.set(Type.INT, 4, throwerEntityId);
+                    wrapper.set(Types.INT, 4, throwerEntityId);
                     if (throwerEntityId > 0) {
-                        wrapper.write(Type.SHORT, speedX);
-                        wrapper.write(Type.SHORT, speedY);
-                        wrapper.write(Type.SHORT, speedZ);
+                        wrapper.write(Types.SHORT, speedX);
+                        wrapper.write(Types.SHORT, speedY);
+                        wrapper.write(Types.SHORT, speedZ);
                     }
                 });
             }
         });
-        this.registerClientbound(ClientboundPackets1_4_6.OPEN_WINDOW, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_4_6.OPEN_SCREEN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.UNSIGNED_BYTE); // window id
-                map(Type.UNSIGNED_BYTE); // window type
+                map(Types.UNSIGNED_BYTE); // window id
+                map(Types.UNSIGNED_BYTE); // window type
                 map(Types1_6_4.STRING); // title
-                map(Type.UNSIGNED_BYTE); // slots
-                create(Type.BOOLEAN, false); // use provided title
+                map(Types.UNSIGNED_BYTE); // slots
+                create(Types.BOOLEAN, false); // use provided title
             }
         });
 
-        this.registerServerbound(ServerboundPackets1_5_2.CLICK_WINDOW, new PacketHandlers() {
+        this.registerServerbound(ServerboundPackets1_5_2.CONTAINER_CLICK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // window id
-                map(Type.SHORT); // slot
-                map(Type.BYTE); // button
-                map(Type.SHORT); // action
-                map(Type.BYTE); // mode
+                map(Types.BYTE); // window id
+                map(Types.SHORT); // slot
+                map(Types.BYTE); // button
+                map(Types.SHORT); // action
+                map(Types.BYTE); // mode
                 map(Types1_7_6.ITEM); // item
                 handler(wrapper -> {
-                    final short slot = wrapper.get(Type.SHORT, 0);
-                    final byte button = wrapper.get(Type.BYTE, 1);
-                    final byte mode = wrapper.get(Type.BYTE, 2);
+                    final short slot = wrapper.get(Types.SHORT, 0);
+                    final byte button = wrapper.get(Types.BYTE, 1);
+                    final byte mode = wrapper.get(Types.BYTE, 2);
 
                     if (mode > 3) {
                         boolean startDragging = false;
@@ -128,8 +127,8 @@ public class Protocol1_5_0_1to1_4_6_7 extends StatelessProtocol<ClientboundPacke
                         final int mouseClick = leftClick ? 0 : 1;
 
                         if (droppingUsingQ) {
-                            final PacketWrapper closeWindow = PacketWrapper.create(ClientboundPackets1_5_2.CLOSE_WINDOW, wrapper.user());
-                            closeWindow.write(Type.BYTE, (byte) 0); // window id
+                            final PacketWrapper closeWindow = PacketWrapper.create(ClientboundPackets1_5_2.CONTAINER_CLOSE, wrapper.user());
+                            closeWindow.write(Types.BYTE, (byte) 0); // window id
                             closeWindow.send(Protocol1_5_0_1to1_4_6_7.class);
                             wrapper.cancel();
                             return;
@@ -139,8 +138,8 @@ public class Protocol1_5_0_1to1_4_6_7 extends StatelessProtocol<ClientboundPacke
                             return;
                         }
 
-                        wrapper.set(Type.BYTE, 1, (byte) mouseClick);
-                        wrapper.set(Type.BYTE, 2, (byte) 0);
+                        wrapper.set(Types.BYTE, 1, (byte) mouseClick);
+                        wrapper.set(Types.BYTE, 2, (byte) 0);
                         wrapper.set(Types1_7_6.ITEM, 0, new DataItem(34, (byte) 0, (short) 0, null));
                     }
                 });
@@ -154,7 +153,7 @@ public class Protocol1_5_0_1to1_4_6_7 extends StatelessProtocol<ClientboundPacke
     }
 
     @Override
-    public LegacyItemRewriter<Protocol1_5_0_1to1_4_6_7> getItemRewriter() {
+    public ItemRewriter getItemRewriter() {
         return this.itemRewriter;
     }
 

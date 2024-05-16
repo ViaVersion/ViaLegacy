@@ -19,11 +19,11 @@ package net.raphimc.vialegacy.protocols.beta.protocolb1_2_0_2tob1_1_2;
 
 import com.google.common.collect.Lists;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
@@ -49,23 +49,23 @@ public class Protocolb1_2_0_2tob1_1_2 extends StatelessProtocol<ClientboundPacke
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsb1_1.ENTITY_EQUIPMENT, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_1.SET_EQUIPPED_ITEM, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.SHORT); // slot
-                map(Type.SHORT); // item id
-                create(Type.SHORT, (short) 0); // item damage
+                map(Types.INT); // entity id
+                map(Types.SHORT); // slot
+                map(Types.SHORT); // item id
+                create(Types.SHORT, (short) 0); // item damage
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_1.ENTITY_ANIMATION, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_1.ANIMATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.BYTE); // animation id
+                map(Types.INT); // entity id
+                map(Types.BYTE); // animation id
                 handler(wrapper -> {
-                    final int entityId = wrapper.get(Type.INT, 0);
-                    final byte animationId = wrapper.get(Type.BYTE, 0);
+                    final int entityId = wrapper.get(Types.INT, 0);
+                    final byte animationId = wrapper.get(Types.BYTE, 0);
                     if (animationId <= 2) return; // 1 - Swing | 2 - Hurt
 
                     wrapper.cancel();
@@ -93,9 +93,9 @@ public class Protocolb1_2_0_2tob1_1_2 extends StatelessProtocol<ClientboundPacke
                     }
 
                     if (oldMask != entityFlagStorage.getFlagMask(entityId)) {
-                        final PacketWrapper metadata = PacketWrapper.create(ClientboundPacketsb1_2.ENTITY_METADATA, wrapper.user());
-                        metadata.write(Type.INT, wrapper.get(Type.INT, 0)); // entity id
-                        metadata.write(Typesb1_2.METADATA_LIST, Lists.newArrayList(new Metadata(0, MetaTypeb1_2.Byte, (byte) entityFlagStorage.getFlagMask(entityId)))); // metadata
+                        final PacketWrapper metadata = PacketWrapper.create(ClientboundPacketsb1_2.SET_ENTITY_DATA, wrapper.user());
+                        metadata.write(Types.INT, wrapper.get(Types.INT, 0)); // entity id
+                        metadata.write(Typesb1_2.METADATA_LIST, Lists.newArrayList(new EntityData(0, MetaTypeb1_2.Byte, (byte) entityFlagStorage.getFlagMask(entityId)))); // metadata
                         metadata.send(Protocolb1_2_0_2tob1_1_2.class);
                     }
                 });
@@ -104,93 +104,93 @@ public class Protocolb1_2_0_2tob1_1_2 extends StatelessProtocol<ClientboundPacke
         this.registerClientbound(ClientboundPacketsb1_1.SPAWN_ITEM, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
+                map(Types.INT); // entity id
                 handler(wrapper -> {
-                    final short itemId = wrapper.read(Type.SHORT); // item id
-                    final byte itemCount = wrapper.read(Type.BYTE); // item count
+                    final short itemId = wrapper.read(Types.SHORT); // item id
+                    final byte itemCount = wrapper.read(Types.BYTE); // item count
                     wrapper.write(Types1_3_1.NBTLESS_ITEM, new DataItem(itemId, itemCount, (short) 0, null)); // item
                 });
-                map(Type.INT); // x
-                map(Type.INT); // y
-                map(Type.INT); // z
-                map(Type.BYTE); // velocity x
-                map(Type.BYTE); // velocity y
-                map(Type.BYTE); // velocity z
+                map(Types.INT); // x
+                map(Types.INT); // y
+                map(Types.INT); // z
+                map(Types.BYTE); // velocity x
+                map(Types.BYTE); // velocity y
+                map(Types.BYTE); // velocity z
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_1.SPAWN_MOB, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_1.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.UNSIGNED_BYTE); // type id
-                map(Type.INT); // x
-                map(Type.INT); // y
-                map(Type.INT); // z
-                map(Type.BYTE); // yaw
-                map(Type.BYTE); // pitch
-                handler(wrapper -> wrapper.write(Typesb1_2.METADATA_LIST, Lists.newArrayList(new Metadata(0, MetaTypeb1_2.Byte, (byte) 0)))); // metadata
+                map(Types.INT); // entity id
+                map(Types.UNSIGNED_BYTE); // type id
+                map(Types.INT); // x
+                map(Types.INT); // y
+                map(Types.INT); // z
+                map(Types.BYTE); // yaw
+                map(Types.BYTE); // pitch
+                handler(wrapper -> wrapper.write(Typesb1_2.METADATA_LIST, Lists.newArrayList(new EntityData(0, MetaTypeb1_2.Byte, (byte) 0)))); // metadata
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_1.CHUNK_DATA, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_1.LEVEL_CHUNK, new PacketHandlers() {
             @Override
             public void register() {
                 handler(wrapper -> BLOCK_DATA_REWRITER.remapChunk(wrapper.passthrough(Types1_1.CHUNK))); // chunk
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_1.MULTI_BLOCK_CHANGE, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_1.CHUNK_BLOCKS_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // chunkX
-                map(Type.INT); // chunkZ
+                map(Types.INT); // chunkX
+                map(Types.INT); // chunkZ
                 map(Types1_1.BLOCK_CHANGE_RECORD_ARRAY); // blockChangeRecords
                 handler(wrapper -> BLOCK_DATA_REWRITER.remapBlockChangeRecords(wrapper.get(Types1_1.BLOCK_CHANGE_RECORD_ARRAY, 0)));
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_1.BLOCK_CHANGE, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_1.BLOCK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types1_7_6.POSITION_UBYTE); // position
-                map(Type.UNSIGNED_BYTE); // block id
-                map(Type.UNSIGNED_BYTE); // block data
+                map(Types.UNSIGNED_BYTE); // block id
+                map(Types.UNSIGNED_BYTE); // block data
                 handler(wrapper -> {
-                    final IdAndData block = new IdAndData(wrapper.get(Type.UNSIGNED_BYTE, 0), wrapper.get(Type.UNSIGNED_BYTE, 1));
+                    final IdAndData block = new IdAndData(wrapper.get(Types.UNSIGNED_BYTE, 0), wrapper.get(Types.UNSIGNED_BYTE, 1));
                     BLOCK_DATA_REWRITER.remapBlock(block);
-                    wrapper.set(Type.UNSIGNED_BYTE, 0, (short) block.getId());
-                    wrapper.set(Type.UNSIGNED_BYTE, 1, (short) block.getData());
+                    wrapper.set(Types.UNSIGNED_BYTE, 0, (short) block.getId());
+                    wrapper.set(Types.UNSIGNED_BYTE, 1, (short) block.getData());
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_1.SET_SLOT, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_1.CONTAINER_SET_SLOT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // window id
-                map(Type.SHORT); // slot
+                map(Types.BYTE); // window id
+                map(Types.SHORT); // slot
                 map(Typesb1_1.NBTLESS_ITEM, Types1_4_2.NBTLESS_ITEM); // item
             }
         });
 
-        this.registerServerbound(ServerboundPacketsb1_2.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsb1_2.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types1_7_6.POSITION_UBYTE); // position
-                map(Type.UNSIGNED_BYTE); // direction
+                map(Types.UNSIGNED_BYTE); // direction
                 map(Types1_4_2.NBTLESS_ITEM, Typesb1_1.NBTLESS_ITEM); // item
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_2.ENTITY_ACTION, ServerboundPacketsb1_1.ANIMATION, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsb1_2.PLAYER_COMMAND, ServerboundPacketsb1_1.SWING, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.BYTE, Type.UNSIGNED_BYTE, i -> (short) (i + 103)); // action id | start/stop sneaking (1/2) -> 104/105
+                map(Types.INT); // entity id
+                map(Types.BYTE, Types.UNSIGNED_BYTE, i -> (short) (i + 103)); // action id | start/stop sneaking (1/2) -> 104/105
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_2.CLICK_WINDOW, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsb1_2.CONTAINER_CLICK, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // window id
-                map(Type.SHORT); // slot
-                map(Type.BYTE); // button
-                map(Type.SHORT); // action
+                map(Types.BYTE); // window id
+                map(Types.SHORT); // slot
+                map(Types.BYTE); // button
+                map(Types.SHORT); // action
                 map(Types1_4_2.NBTLESS_ITEM, Typesb1_1.NBTLESS_ITEM); // item
             }
         });

@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.protocols.classic.protocola1_0_15toc0_28_30.storag
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.api.model.ChunkCoord;
 
 public class ClassicPositionTracker implements StorableObject {
@@ -40,12 +40,12 @@ public class ClassicPositionTracker implements StorableObject {
         final int yaw = (int) (this.yaw * 256.0F / 360.0F) & 255;
         final int pitch = (int) (this.pitch * 256.0F / 360.0F) & 255;
 
-        wrapper.write(Type.BYTE, (byte) -1); // entity id
-        wrapper.write(Type.SHORT, (short) x); // x
-        wrapper.write(Type.SHORT, (short) y); // y
-        wrapper.write(Type.SHORT, (short) z); // z
-        wrapper.write(Type.BYTE, (byte) (yaw - 128)); // yaw
-        wrapper.write(Type.BYTE, (byte) pitch); // pitch
+        wrapper.write(Types.BYTE, (byte) -1); // entity id
+        wrapper.write(Types.SHORT, (short) x); // x
+        wrapper.write(Types.SHORT, (short) y); // y
+        wrapper.write(Types.SHORT, (short) z); // z
+        wrapper.write(Types.BYTE, (byte) (yaw - 128)); // yaw
+        wrapper.write(Types.BYTE, (byte) pitch); // pitch
     }
 
     public Position getBlockPosition() {

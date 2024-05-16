@@ -24,7 +24,6 @@ import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
@@ -56,7 +55,7 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
     }
 
     @Override
-    public Chunk[] read(ByteBuf byteBuf) throws Exception {
+    public Chunk[] read(ByteBuf byteBuf) {
         final short chunkCount = byteBuf.readShort();
         final int compressedSize = byteBuf.readInt();
         final boolean hasSkyLight = this.readHasSkyLight(byteBuf);
@@ -79,7 +78,7 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
             inflater.setInput(data, 0, compressedSize);
             inflater.inflate(uncompressedData);
         } catch (DataFormatException ex) {
-            throw new IOException("Bad compressed data format");
+            throw new RuntimeException("Bad compressed data format");
         } finally {
             inflater.end();
         }
@@ -97,7 +96,7 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
     }
 
     @Override
-    public void write(ByteBuf byteBuf, Chunk[] chunks) throws Exception {
+    public void write(ByteBuf byteBuf, Chunk[] chunks) {
         final int chunkCount = chunks.length;
         final ByteArrayOutputStream output = new ByteArrayOutputStream();
         final int[] chunkX = new int[chunkCount];
@@ -108,7 +107,7 @@ public class BulkChunkType1_7_6 extends Type<Chunk[]> {
         for (int i = 0; i < chunkCount; i++) {
             final Chunk chunk = chunks[i];
             final Pair<byte[], Short> chunkData = ChunkType1_7_6.serialize(chunk);
-            output.write(chunkData.key());
+            output.writeBytes(chunkData.key());
             chunkX[i] = chunk.getX();
             chunkZ[i] = chunk.getZ();
             primaryBitMask[i] = (short) chunk.getBitmask();

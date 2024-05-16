@@ -31,64 +31,64 @@ public enum ClientboundPacketsa1_2_3 implements ClientboundPacketType, PreNettyP
 
     KEEP_ALIVE(0, (user, buf) -> {
     }),
-    JOIN_GAME(1, (user, buf) -> {
+    LOGIN(1, (user, buf) -> {
         buf.skipBytes(4);
         readUTF(buf);
         readUTF(buf);
         buf.skipBytes(9);
     }),
     HANDSHAKE(2, (user, buf) -> readUTF(buf)),
-    CHAT_MESSAGE(3, (user, buf) -> readUTF(buf)),
-    TIME_UPDATE(4, (user, buf) -> buf.skipBytes(8)),
+    CHAT(3, (user, buf) -> readUTF(buf)),
+    SET_TIME(4, (user, buf) -> buf.skipBytes(8)),
     PLAYER_INVENTORY(5, (user, buf) -> {
         buf.skipBytes(4);
         int x = buf.readShort();
         for (int i = 0; i < x; i++) readItemStackb1_2(buf);
     }),
-    SPAWN_POSITION(6, (user, buf) -> buf.skipBytes(12)),
-    UPDATE_HEALTH(8, (user, buf) -> buf.skipBytes(1)),
+    SET_DEFAULT_SPAWN_POSITION(6, (user, buf) -> buf.skipBytes(12)),
+    SET_HEALTH(8, (user, buf) -> buf.skipBytes(1)),
     RESPAWN(9, (user, buf) -> {
     }),
-    PLAYER_POSITION_ONLY_ONGROUND(10, (user, buf) -> buf.skipBytes(1)),
-    PLAYER_POSITION_ONLY_POSITION(11, (user, buf) -> buf.skipBytes(33)),
-    PLAYER_POSITION_ONLY_LOOK(12, (user, buf) -> buf.skipBytes(9)),
+    MOVE_PLAYER_STATUS_ONLY(10, (user, buf) -> buf.skipBytes(1)),
+    MOVE_PLAYER_POS(11, (user, buf) -> buf.skipBytes(33)),
+    MOVE_PLAYER_ROT(12, (user, buf) -> buf.skipBytes(9)),
     PLAYER_POSITION(13, (user, buf) -> buf.skipBytes(41)),
-    HELD_ITEM_CHANGE(16, (user, buf) -> buf.skipBytes(6)),
+    SET_CARRIED_ITEM(16, (user, buf) -> buf.skipBytes(6)),
     ADD_TO_INVENTORY(17, (user, buf) -> buf.skipBytes(5)),
-    ENTITY_ANIMATION(18, (user, buf) -> buf.skipBytes(5)),
-    SPAWN_PLAYER(20, (user, buf) -> {
+    ANIMATE(18, (user, buf) -> buf.skipBytes(5)),
+    ADD_PLAYER(20, (user, buf) -> {
         buf.skipBytes(4);
         readUTF(buf);
         buf.skipBytes(16);
     }),
     SPAWN_ITEM(21, (user, buf) -> buf.skipBytes(22)),
-    COLLECT_ITEM(22, (user, buf) -> buf.skipBytes(8)),
-    SPAWN_ENTITY(23, (user, buf) -> buf.skipBytes(17)),
-    SPAWN_MOB(24, (user, buf) -> buf.skipBytes(19)),
-    ENTITY_VELOCITY(28, (user, buf) -> buf.skipBytes(10)),
-    DESTROY_ENTITIES(29, (user, buf) -> buf.skipBytes(4)),
-    ENTITY_MOVEMENT(30, (user, buf) -> buf.skipBytes(4)),
-    ENTITY_POSITION(31, (user, buf) -> buf.skipBytes(7)),
-    ENTITY_ROTATION(32, (user, buf) -> buf.skipBytes(6)),
-    ENTITY_POSITION_AND_ROTATION(33, (user, buf) -> buf.skipBytes(9)),
-    ENTITY_TELEPORT(34, (user, buf) -> buf.skipBytes(18)),
-    ENTITY_STATUS(38, (user, buf) -> buf.skipBytes(5)),
-    ATTACH_ENTITY(39, (user, buf) -> buf.skipBytes(8)),
+    TAKE_ITEM_ENTITY(22, (user, buf) -> buf.skipBytes(8)),
+    ADD_ENTITY(23, (user, buf) -> buf.skipBytes(17)),
+    ADD_MOB(24, (user, buf) -> buf.skipBytes(19)),
+    SET_ENTITY_MOTION(28, (user, buf) -> buf.skipBytes(10)),
+    REMOVE_ENTITIES(29, (user, buf) -> buf.skipBytes(4)),
+    MOVE_ENTITY(30, (user, buf) -> buf.skipBytes(4)),
+    MOVE_ENTITY_POS(31, (user, buf) -> buf.skipBytes(7)),
+    MOVE_ENTITY_ROT(32, (user, buf) -> buf.skipBytes(6)),
+    MOVE_ENTITY_POS_ROT(33, (user, buf) -> buf.skipBytes(9)),
+    TELEPORT_ENTITY(34, (user, buf) -> buf.skipBytes(18)),
+    ENTITY_EVENT(38, (user, buf) -> buf.skipBytes(5)),
+    SET_ENTITY_LINK(39, (user, buf) -> buf.skipBytes(8)),
     PRE_CHUNK(50, (user, buf) -> buf.skipBytes(9)),
-    CHUNK_DATA(51, (user, buf) -> {
+    LEVEL_CHUNK(51, (user, buf) -> {
         buf.skipBytes(13);
         int x = buf.readInt();
         for (int i = 0; i < x; i++) buf.readByte();
     }),
-    MULTI_BLOCK_CHANGE(52, (user, buf) -> {
+    CHUNK_BLOCKS_UPDATE(52, (user, buf) -> {
         buf.skipBytes(8);
         short x = buf.readShort();
         for (int i = 0; i < x; i++) buf.readShort();
         for (int i = 0; i < x; i++) buf.readByte();
         for (int i = 0; i < x; i++) buf.readByte();
     }),
-    BLOCK_CHANGE(53, (user, buf) -> buf.skipBytes(11)),
-    COMPLEX_ENTITY(59, (user, buf) -> {
+    BLOCK_UPDATE(53, (user, buf) -> buf.skipBytes(11)),
+    BLOCK_ENTITY_DATA(59, (user, buf) -> {
         buf.skipBytes(10);
         int x = buf.readUnsignedShort();
         for (int i = 0; i < x; i++) buf.readByte();

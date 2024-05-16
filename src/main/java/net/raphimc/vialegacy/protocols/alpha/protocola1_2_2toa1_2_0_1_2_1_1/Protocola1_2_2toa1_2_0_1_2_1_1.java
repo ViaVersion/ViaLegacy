@@ -19,7 +19,7 @@ package net.raphimc.vialegacy.protocols.alpha.protocola1_2_2toa1_2_0_1_2_1_1;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_2_3_1_2_3_4toa1_2_2.ClientboundPacketsa1_2_2;
@@ -33,25 +33,25 @@ public class Protocola1_2_2toa1_2_0_1_2_1_1 extends StatelessProtocol<Clientboun
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsa1_2_0.SPAWN_MOB, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsa1_2_0.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.UNSIGNED_BYTE); // type id
-                map(Type.INT); // x
-                map(Type.INT); // y
-                map(Type.INT); // z
-                map(Type.BYTE); // yaw
-                map(Type.BYTE); // pitch
+                map(Types.INT); // entity id
+                map(Types.UNSIGNED_BYTE); // type id
+                map(Types.INT); // x
+                map(Types.INT); // y
+                map(Types.INT); // z
+                map(Types.BYTE); // yaw
+                map(Types.BYTE); // pitch
                 handler(wrapper -> {
-                    if (wrapper.get(Type.UNSIGNED_BYTE, 0) == 91) {
-                        wrapper.set(Type.UNSIGNED_BYTE, 0, (short) 93);
+                    if (wrapper.get(Types.UNSIGNED_BYTE, 0) == 91) {
+                        wrapper.set(Types.UNSIGNED_BYTE, 0, (short) 93);
                     }
                 });
             }
         });
 
-        this.cancelServerbound(ServerboundPacketsa1_2_2.INTERACT_ENTITY);
+        this.cancelServerbound(ServerboundPacketsa1_2_2.INTERACT);
     }
 
     @Override

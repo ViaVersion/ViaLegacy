@@ -20,9 +20,9 @@ package net.raphimc.vialegacy.protocols.beta.protocol1_0_0_1tob1_8_0_1.task;
 import com.google.common.collect.Lists;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
@@ -68,10 +68,10 @@ public class PlayerAirTimeUpdateTask implements Runnable {
         }
     }
 
-    private void sendAirTime(final PlayerInfoStorage playerInfoStorage, final PlayerAirTimeStorage playerAirTimeStorage, final UserConnection userConnection) throws Exception {
-        final PacketWrapper updateAirTime = PacketWrapper.create(ClientboundPackets1_0.ENTITY_METADATA, userConnection);
-        updateAirTime.write(Type.INT, playerInfoStorage.entityId); // entity id
-        updateAirTime.write(Types1_3_1.METADATA_LIST, Lists.newArrayList(new Metadata(1, MetaType1_3_1.Short, Integer.valueOf(playerAirTimeStorage.air).shortValue()))); // metadata
+    private void sendAirTime(final PlayerInfoStorage playerInfoStorage, final PlayerAirTimeStorage playerAirTimeStorage, final UserConnection userConnection) {
+        final PacketWrapper updateAirTime = PacketWrapper.create(ClientboundPackets1_0.SET_ENTITY_DATA, userConnection);
+        updateAirTime.write(Types.INT, playerInfoStorage.entityId); // entity id
+        updateAirTime.write(Types1_3_1.METADATA_LIST, Lists.newArrayList(new EntityData(1, MetaType1_3_1.Short, Integer.valueOf(playerAirTimeStorage.air).shortValue()))); // metadata
         updateAirTime.send(Protocol1_0_0_1tob1_8_0_1.class);
     }
 

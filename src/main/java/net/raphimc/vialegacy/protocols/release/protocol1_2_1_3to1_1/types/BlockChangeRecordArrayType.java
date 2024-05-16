@@ -30,7 +30,7 @@ public class BlockChangeRecordArrayType extends Type<BlockChangeRecord[]> {
     }
 
     @Override
-    public BlockChangeRecord[] read(ByteBuf buffer) throws Exception {
+    public BlockChangeRecord[] read(ByteBuf buffer) {
         final int length = buffer.readUnsignedShort();
         final short[] positions = new short[length];
         final short[] blocks = new short[length];
@@ -53,7 +53,7 @@ public class BlockChangeRecordArrayType extends Type<BlockChangeRecord[]> {
     }
 
     @Override
-    public void write(ByteBuf buffer, BlockChangeRecord[] records) throws Exception {
+    public void write(ByteBuf buffer, BlockChangeRecord[] records) {
         buffer.writeShort(records.length);
         for (BlockChangeRecord record : records) {
             buffer.writeShort(record.getSectionX() << 12 | record.getSectionZ() << 8 | record.getY(-1));

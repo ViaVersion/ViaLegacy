@@ -34,15 +34,15 @@ public enum ServerboundPacketsa1_0_15 implements ServerboundPacketType, PreNetty
         PreNettyTypes.readUTF(buf);
         PreNettyTypes.readUTF(buf);
     }),
-    CHAT_MESSAGE(3, (user, buf) -> PreNettyTypes.readUTF(buf)),
-    PLAYER_MOVEMENT(10, (user, buf) -> buf.skipBytes(1)),
-    PLAYER_POSITION(11, (user, buf) -> buf.skipBytes(33)),
-    PLAYER_ROTATION(12, (user, buf) -> buf.skipBytes(9)),
-    PLAYER_POSITION_AND_ROTATION(13, (user, buf) -> buf.skipBytes(41)),
-    PLAYER_DIGGING(14, (user, buf) -> buf.skipBytes(11)),
-    PLAYER_BLOCK_PLACEMENT(15, (user, buf) -> buf.skipBytes(12)),
-    HELD_ITEM_CHANGE(16, (user, buf) -> buf.skipBytes(6)),
-    ANIMATION(18, (user, buf) -> buf.skipBytes(5)),
+    CHAT(3, (user, buf) -> PreNettyTypes.readUTF(buf)),
+    MOVE_PLAYER_STATUS_ONLY(10, (user, buf) -> buf.skipBytes(1)),
+    MOVE_PLAYER_POS(11, (user, buf) -> buf.skipBytes(33)),
+    MOVE_PLAYER_ROT(12, (user, buf) -> buf.skipBytes(9)),
+    MOVE_PLAYER_POS_ROT(13, (user, buf) -> buf.skipBytes(41)),
+    PLAYER_ACTION(14, (user, buf) -> buf.skipBytes(11)),
+    USE_ITEM_ON(15, (user, buf) -> buf.skipBytes(12)),
+    SET_CARRIED_ITEM(16, (user, buf) -> buf.skipBytes(6)),
+    SWING(18, (user, buf) -> buf.skipBytes(5)),
     SPAWN_ITEM(21, (user, buf) -> buf.skipBytes(22)),
     DISCONNECT(255, (user, buf) -> PreNettyTypes.readUTF(buf));
 

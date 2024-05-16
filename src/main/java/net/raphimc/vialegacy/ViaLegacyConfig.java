@@ -24,6 +24,7 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.platform.ViaLegacyConfig {
 
@@ -37,8 +38,8 @@ public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.pla
     private int classicChunkRange;
     private boolean enableClassicFly;
 
-    public ViaLegacyConfig(final File configFile) {
-        super(configFile);
+    public ViaLegacyConfig(final File configFile, final Logger logger) {
+        super(configFile, logger);
     }
 
     @Override

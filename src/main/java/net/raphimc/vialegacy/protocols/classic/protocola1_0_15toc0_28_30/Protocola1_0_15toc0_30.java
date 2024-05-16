@@ -24,8 +24,8 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.protocols.protocol1_8.ClientboundPackets1_8;
+import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
@@ -67,18 +67,18 @@ public class Protocola1_0_15toc0_30 extends StatelessProtocol<ClientboundPackets
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsc0_28.JOIN_GAME, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsc0_28.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                read(Type.BYTE); // protocol id
+                read(Types.BYTE); // protocol id
                 handler(wrapper -> {
                     final String title = wrapper.read(Typesc0_30.STRING).replace("&", "§"); // title
                     final String motd = wrapper.read(Typesc0_30.STRING).replace("&", "§"); // motd
-                    final byte opLevel = wrapper.read(Type.BYTE); // op level
+                    final byte opLevel = wrapper.read(Types.BYTE); // op level
                     wrapper.user().put(new ClassicServerTitleStorage(wrapper.user(), title, motd));
                     wrapper.user().get(ClassicOpLevelStorage.class).setOpLevel(opLevel);
 
-                    wrapper.write(Type.INT, wrapper.user().getProtocolInfo().getUsername().hashCode()); // entity id
+                    wrapper.write(Types.INT, wrapper.user().getProtocolInfo().getUsername().hashCode()); // entity id
                     wrapper.write(Typesb1_7_0_3.STRING, wrapper.user().getProtocolInfo().getUsername()); // username
                     wrapper.write(Typesb1_7_0_3.STRING, ""); // password
 
@@ -88,8 +88,8 @@ public class Protocola1_0_15toc0_30 extends StatelessProtocol<ClientboundPackets
 
                     if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_8to1_7_6_10.class)) {
                         final PacketWrapper tabList = PacketWrapper.create(ClientboundPackets1_8.TAB_LIST, wrapper.user());
-                        tabList.write(Type.STRING, Protocol1_8to1_7_6_10.LEGACY_TO_JSON.transform(wrapper, "§6" + title + "\n")); // header
-                        tabList.write(Type.STRING, Protocol1_8to1_7_6_10.LEGACY_TO_JSON.transform(wrapper, "\n§b" + motd)); // footer
+                        tabList.write(Types.STRING, Protocol1_8to1_7_6_10.LEGACY_TO_JSON.transform(wrapper, "§6" + title + "\n")); // header
+                        tabList.write(Types.STRING, Protocol1_8to1_7_6_10.LEGACY_TO_JSON.transform(wrapper, "\n§b" + motd)); // footer
                         tabList.send(Protocol1_8to1_7_6_10.class);
                     }
 
@@ -106,18 +106,18 @@ public class Protocola1_0_15toc0_30 extends StatelessProtocol<ClientboundPackets
             if (wrapper.user().has(ClassicLevelStorage.class)) { // Switch world
                 if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocolb1_6_0_6tob1_5_0_2.class)) {
                     final PacketWrapper fakeRespawn = PacketWrapper.create(ClientboundPacketsb1_7.RESPAWN, wrapper.user());
-                    fakeRespawn.write(Type.BYTE, (byte) -1); // dimension id
+                    fakeRespawn.write(Types.BYTE, (byte) -1); // dimension id
                     fakeRespawn.send(Protocolb1_6_0_6tob1_5_0_2.class);
                     final PacketWrapper respawn = PacketWrapper.create(ClientboundPacketsb1_7.RESPAWN, wrapper.user());
-                    respawn.write(Type.BYTE, (byte) 0); // dimension id
+                    respawn.write(Types.BYTE, (byte) 0); // dimension id
                     respawn.send(Protocolb1_6_0_6tob1_5_0_2.class);
                     wrapper.user().get(ClassicPositionTracker.class).spawned = false;
                 }
             }
             if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocolb1_8_0_1tob1_7_0_3.class)) {
                 final PacketWrapper gameEvent = PacketWrapper.create(ClientboundPacketsb1_8.GAME_EVENT, wrapper.user());
-                gameEvent.write(Type.BYTE, (byte) 3); // reason (game mode)
-                gameEvent.write(Type.BYTE, (byte) 1); // value (creative)
+                gameEvent.write(Types.BYTE, (byte) 3); // reason (game mode)
+                gameEvent.write(Types.BYTE, (byte) 1); // value (creative)
                 gameEvent.send(Protocolb1_8_0_1tob1_7_0_3.class);
             }
             wrapper.user().get(ClassicOpLevelStorage.class).updateAbilities();
@@ -131,9 +131,9 @@ public class Protocola1_0_15toc0_30 extends StatelessProtocol<ClientboundPackets
         });
         this.registerClientbound(ClientboundPacketsc0_28.LEVEL_DATA, null, wrapper -> {
             wrapper.cancel();
-            final short partSize = wrapper.read(Type.SHORT); // part size
+            final short partSize = wrapper.read(Types.SHORT); // part size
             final byte[] data = wrapper.read(Typesc0_30.BYTE_ARRAY); // data
-            final byte progress = wrapper.read(Type.BYTE); // progress
+            final byte progress = wrapper.read(Types.BYTE); // progress
 
             wrapper.user().get(ClassicLevelStorage.class).addDataPart(data, partSize);
 
@@ -144,9 +144,9 @@ public class Protocola1_0_15toc0_30 extends StatelessProtocol<ClientboundPackets
         });
         this.registerClientbound(ClientboundPacketsc0_28.LEVEL_FINALIZE, null, wrapper -> {
             wrapper.cancel();
-            final short sizeX = wrapper.read(Type.SHORT);
-            final short sizeY = wrapper.read(Type.SHORT);
-            final short sizeZ = wrapper.read(Type.SHORT);
+            final short sizeX = wrapper.read(Types.SHORT);
+            final short sizeY = wrapper.read(Types.SHORT);
+            final short sizeZ = wrapper.read(Types.SHORT);
 
             final ClassicProgressStorage classicProgressStorage = wrapper.user().get(ClassicProgressStorage.class);
             final ClassicLevelStorage levelStorage = wrapper.user().get(ClassicLevelStorage.class);
@@ -159,16 +159,16 @@ public class Protocola1_0_15toc0_30 extends StatelessProtocol<ClientboundPackets
             levelStorage.sendChunk(new ChunkCoord(0, 0));
 
             if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocol1_8to1_7_6_10.class)) {
-                final PacketWrapper worldBorder = PacketWrapper.create(ClientboundPackets1_8.WORLD_BORDER, wrapper.user());
-                worldBorder.write(Type.VAR_INT, 3); // action (INITIALIZE)
-                worldBorder.write(Type.DOUBLE, sizeX / 2D); // centerX
-                worldBorder.write(Type.DOUBLE, sizeZ / 2D); // centerZ
-                worldBorder.write(Type.DOUBLE, 0.0D); // diameter
-                worldBorder.write(Type.DOUBLE, (double) Math.max(sizeX, sizeZ)); // target size
-                worldBorder.write(Type.VAR_LONG, 0L); // time until target size
-                worldBorder.write(Type.VAR_INT, Math.max(sizeX, sizeZ)); // size
-                worldBorder.write(Type.VAR_INT, 0); // warning distance
-                worldBorder.write(Type.VAR_INT, 0); // warning time
+                final PacketWrapper worldBorder = PacketWrapper.create(ClientboundPackets1_8.SET_BORDER, wrapper.user());
+                worldBorder.write(Types.VAR_INT, 3); // action (INITIALIZE)
+                worldBorder.write(Types.DOUBLE, sizeX / 2D); // centerX
+                worldBorder.write(Types.DOUBLE, sizeZ / 2D); // centerZ
+                worldBorder.write(Types.DOUBLE, 0.0D); // diameter
+                worldBorder.write(Types.DOUBLE, (double) Math.max(sizeX, sizeZ)); // target size
+                worldBorder.write(Types.VAR_LONG, 0L); // time until target size
+                worldBorder.write(Types.VAR_INT, Math.max(sizeX, sizeZ)); // size
+                worldBorder.write(Types.VAR_INT, 0); // warning distance
+                worldBorder.write(Types.VAR_INT, 0); // warning time
                 worldBorder.send(Protocol1_8to1_7_6_10.class);
             }
 
@@ -180,7 +180,7 @@ public class Protocola1_0_15toc0_30 extends StatelessProtocol<ClientboundPackets
             classicProgressStorage.progress = 1;
             classicProgressStorage.status = "Finishing level... §7Waiting for server";
         });
-        this.registerClientbound(ClientboundPacketsc0_28.BLOCK_CHANGE, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsc0_28.BLOCK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Typesc0_30.POSITION, Types1_7_6.POSITION_UBYTE); // position
@@ -192,37 +192,37 @@ public class Protocola1_0_15toc0_30 extends StatelessProtocol<ClientboundPackets
                     }
                     final ClassicBlockRemapper remapper = wrapper.user().get(ClassicBlockRemapper.class);
                     final Position pos = wrapper.get(Types1_7_6.POSITION_UBYTE, 0);
-                    final byte blockId = wrapper.read(Type.BYTE); // block id
+                    final byte blockId = wrapper.read(Types.BYTE); // block id
                     levelStorage.getClassicLevel().setBlock(pos, blockId);
                     if (!levelStorage.isChunkLoaded(pos)) {
                         wrapper.cancel();
                         return;
                     }
                     final IdAndData mappedBlock = remapper.getMapper().get(blockId);
-                    wrapper.write(Type.UNSIGNED_BYTE, (short) mappedBlock.getId()); // block id
-                    wrapper.write(Type.UNSIGNED_BYTE, (short) mappedBlock.getData()); // block data
+                    wrapper.write(Types.UNSIGNED_BYTE, (short) mappedBlock.getId()); // block id
+                    wrapper.write(Types.UNSIGNED_BYTE, (short) mappedBlock.getData()); // block data
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsc0_28.SPAWN_PLAYER, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsc0_28.ADD_PLAYER, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE, Type.INT); // entity id
+                map(Types.BYTE, Types.INT); // entity id
                 map(Typesc0_30.STRING, Typesb1_7_0_3.STRING, n -> n.replace("&", "§")); // username
-                map(Type.SHORT, Type.INT); // x
-                map(Type.SHORT, Type.INT); // y
-                map(Type.SHORT, Type.INT); // z
-                map(Type.BYTE, Type.BYTE, yaw -> (byte) (yaw + 128)); // yaw
-                map(Type.BYTE); // pitch
-                create(Type.UNSIGNED_SHORT, 0); // item
+                map(Types.SHORT, Types.INT); // x
+                map(Types.SHORT, Types.INT); // y
+                map(Types.SHORT, Types.INT); // z
+                map(Types.BYTE, Types.BYTE, yaw -> (byte) (yaw + 128)); // yaw
+                map(Types.BYTE); // pitch
+                create(Types.UNSIGNED_SHORT, 0); // item
                 handler(wrapper -> {
-                    if (wrapper.get(Type.INT, 0) < 0) { // client player
+                    if (wrapper.get(Types.INT, 0) < 0) { // client player
                         wrapper.cancel();
-                        final int x = wrapper.get(Type.INT, 1);
-                        final int y = wrapper.get(Type.INT, 2);
-                        final int z = wrapper.get(Type.INT, 3);
-                        final byte yaw = wrapper.get(Type.BYTE, 0);
-                        final byte pitch = wrapper.get(Type.BYTE, 1);
+                        final int x = wrapper.get(Types.INT, 1);
+                        final int y = wrapper.get(Types.INT, 2);
+                        final int z = wrapper.get(Types.INT, 3);
+                        final byte yaw = wrapper.get(Types.BYTE, 0);
+                        final byte pitch = wrapper.get(Types.BYTE, 1);
 
                         final ClassicProgressStorage classicProgressStorage = wrapper.user().get(ClassicProgressStorage.class);
                         classicProgressStorage.progress = 2;
@@ -237,85 +237,85 @@ public class Protocola1_0_15toc0_30 extends StatelessProtocol<ClientboundPackets
                         wrapper.user().get(ClassicLevelStorage.class).sendChunks(classicPositionTracker.getChunkPosition(), 1);
 
                         if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocola1_1_0_1_1_2_1toa1_0_17_1_0_17_4.class)) {
-                            final PacketWrapper spawnPosition = PacketWrapper.create(ClientboundPacketsa1_1_0.SPAWN_POSITION, wrapper.user());
+                            final PacketWrapper spawnPosition = PacketWrapper.create(ClientboundPacketsa1_1_0.SET_DEFAULT_SPAWN_POSITION, wrapper.user());
                             spawnPosition.write(Types1_7_6.POSITION_INT, new Position((int) classicPositionTracker.posX, (int) (classicPositionTracker.stance), (int) classicPositionTracker.posZ));
                             spawnPosition.send(Protocola1_1_0_1_1_2_1toa1_0_17_1_0_17_4.class);
                         }
 
                         final PacketWrapper playerPosition = PacketWrapper.create(ClientboundPacketsa1_0_15.PLAYER_POSITION, wrapper.user());
-                        playerPosition.write(Type.DOUBLE, classicPositionTracker.posX); // x
-                        playerPosition.write(Type.DOUBLE, classicPositionTracker.stance); // stance
-                        playerPosition.write(Type.DOUBLE, classicPositionTracker.stance - 1.62F); // y
-                        playerPosition.write(Type.DOUBLE, classicPositionTracker.posZ); // z
-                        playerPosition.write(Type.FLOAT, classicPositionTracker.yaw); // yaw
-                        playerPosition.write(Type.FLOAT, classicPositionTracker.pitch); // pitch
-                        playerPosition.write(Type.BOOLEAN, true); // onGround
+                        playerPosition.write(Types.DOUBLE, classicPositionTracker.posX); // x
+                        playerPosition.write(Types.DOUBLE, classicPositionTracker.stance); // stance
+                        playerPosition.write(Types.DOUBLE, classicPositionTracker.stance - 1.62F); // y
+                        playerPosition.write(Types.DOUBLE, classicPositionTracker.posZ); // z
+                        playerPosition.write(Types.FLOAT, classicPositionTracker.yaw); // yaw
+                        playerPosition.write(Types.FLOAT, classicPositionTracker.pitch); // pitch
+                        playerPosition.write(Types.BOOLEAN, true); // onGround
                         playerPosition.send(Protocola1_0_15toc0_30.class);
                         classicPositionTracker.spawned = true;
                     } else {
-                        wrapper.set(Type.INT, 2, wrapper.get(Type.INT, 2) - Float.valueOf(1.62F * 32).intValue());
+                        wrapper.set(Types.INT, 2, wrapper.get(Types.INT, 2) - Float.valueOf(1.62F * 32).intValue());
                     }
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsc0_28.ENTITY_TELEPORT, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsc0_28.TELEPORT_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE, Type.INT); // entity id
-                map(Type.SHORT, Type.INT); // x
-                map(Type.SHORT, Type.INT); // y
-                map(Type.SHORT, Type.INT); // z
-                map(Type.BYTE, Type.BYTE, yaw -> (byte) (yaw + 128)); // yaw
-                map(Type.BYTE); // pitch
+                map(Types.BYTE, Types.INT); // entity id
+                map(Types.SHORT, Types.INT); // x
+                map(Types.SHORT, Types.INT); // y
+                map(Types.SHORT, Types.INT); // z
+                map(Types.BYTE, Types.BYTE, yaw -> (byte) (yaw + 128)); // yaw
+                map(Types.BYTE); // pitch
                 handler(wrapper -> {
-                    if (wrapper.get(Type.INT, 0) < 0) { // client player
-                        wrapper.set(Type.INT, 2, wrapper.get(Type.INT, 2) - 29);
-                        wrapper.set(Type.INT, 0, wrapper.user().getProtocolInfo().getUsername().hashCode());
+                    if (wrapper.get(Types.INT, 0) < 0) { // client player
+                        wrapper.set(Types.INT, 2, wrapper.get(Types.INT, 2) - 29);
+                        wrapper.set(Types.INT, 0, wrapper.user().getProtocolInfo().getUsername().hashCode());
                     } else {
-                        wrapper.set(Type.INT, 2, wrapper.get(Type.INT, 2) - Float.valueOf(1.62F * 32).intValue());
+                        wrapper.set(Types.INT, 2, wrapper.get(Types.INT, 2) - Float.valueOf(1.62F * 32).intValue());
                     }
                 });
             }
         });
-        this.registerClientbound(ClientboundPacketsc0_28.ENTITY_POSITION_AND_ROTATION, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsc0_28.MOVE_ENTITY_POS_ROT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE, Type.INT); // entity id
-                map(Type.BYTE); // x
-                map(Type.BYTE); // y
-                map(Type.BYTE); // z
-                map(Type.BYTE, Type.BYTE, yaw -> (byte) (yaw + 128)); // yaw
-                map(Type.BYTE); // pitch
+                map(Types.BYTE, Types.INT); // entity id
+                map(Types.BYTE); // x
+                map(Types.BYTE); // y
+                map(Types.BYTE); // z
+                map(Types.BYTE, Types.BYTE, yaw -> (byte) (yaw + 128)); // yaw
+                map(Types.BYTE); // pitch
             }
         });
-        this.registerClientbound(ClientboundPacketsc0_28.ENTITY_POSITION, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsc0_28.MOVE_ENTITY_POS, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE, Type.INT); // entity id
-                map(Type.BYTE); // x
-                map(Type.BYTE); // y
-                map(Type.BYTE); // z
+                map(Types.BYTE, Types.INT); // entity id
+                map(Types.BYTE); // x
+                map(Types.BYTE); // y
+                map(Types.BYTE); // z
             }
         });
-        this.registerClientbound(ClientboundPacketsc0_28.ENTITY_ROTATION, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsc0_28.MOVE_ENTITY_ROT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE, Type.INT); // entity id
-                map(Type.BYTE, Type.BYTE, yaw -> (byte) (yaw + 128)); // yaw
-                map(Type.BYTE); // pitch
+                map(Types.BYTE, Types.INT); // entity id
+                map(Types.BYTE, Types.BYTE, yaw -> (byte) (yaw + 128)); // yaw
+                map(Types.BYTE); // pitch
             }
         });
-        this.registerClientbound(ClientboundPacketsc0_28.DESTROY_ENTITIES, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsc0_28.REMOVE_ENTITIES, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE, Type.INT); // entity id
+                map(Types.BYTE, Types.INT); // entity id
             }
         });
-        this.registerClientbound(ClientboundPacketsc0_28.CHAT_MESSAGE, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsc0_28.CHAT, new PacketHandlers() {
             @Override
             public void register() {
                 handler(packetWrapper -> {
-                    final byte senderId = packetWrapper.read(Type.BYTE); // sender id
+                    final byte senderId = packetWrapper.read(Types.BYTE); // sender id
                     String message = packetWrapper.read(Typesc0_30.STRING).replace("&", "§"); // message
                     if (senderId < 0) {
                         message = "§e" + message;
@@ -333,19 +333,19 @@ public class Protocola1_0_15toc0_30 extends StatelessProtocol<ClientboundPackets
         this.registerClientbound(ClientboundPacketsc0_28.OP_LEVEL_UPDATE, null, wrapper -> {
             wrapper.cancel();
             final ClassicOpLevelStorage opLevelStorage = wrapper.user().get(ClassicOpLevelStorage.class);
-            final byte opLevel = wrapper.read(Type.BYTE); // op level
+            final byte opLevel = wrapper.read(Types.BYTE); // op level
             opLevelStorage.setOpLevel(opLevel);
         });
 
         this.registerServerbound(ServerboundPacketsa1_0_15.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT, Type.BYTE); // protocol id
+                map(Types.INT, Types.BYTE); // protocol id
                 map(Typesb1_7_0_3.STRING, Typesc0_30.STRING); // username
                 read(Typesb1_7_0_3.STRING); // password
                 handler(wrapper -> {
                     wrapper.write(Typesc0_30.STRING, Via.getManager().getProviders().get(ClassicMPPassProvider.class).getMpPass(wrapper.user())); // mp pass
-                    wrapper.write(Type.BYTE, (byte) 0); // op level
+                    wrapper.write(Types.BYTE, (byte) 0); // op level
 
                     final ClassicProgressStorage classicProgressStorage = wrapper.user().get(ClassicProgressStorage.class);
                     classicProgressStorage.upperBound = 2;
@@ -353,60 +353,60 @@ public class Protocola1_0_15toc0_30 extends StatelessProtocol<ClientboundPackets
                 });
             }
         });
-        this.registerServerbound(ServerboundPacketsa1_0_15.CHAT_MESSAGE, wrapper -> {
+        this.registerServerbound(ServerboundPacketsa1_0_15.CHAT, wrapper -> {
             final String message = wrapper.read(Typesb1_7_0_3.STRING); // message
-            wrapper.write(Type.BYTE, (byte) 0); // sender id
+            wrapper.write(Types.BYTE, (byte) 0); // sender id
             wrapper.write(Typesc0_30.STRING, message); // message
             if (Via.getManager().getProviders().get(ClassicCustomCommandProvider.class).handleChatMessage(wrapper.user(), message)) {
                 wrapper.cancel();
             }
         });
-        this.registerServerbound(ServerboundPacketsa1_0_15.PLAYER_MOVEMENT, ServerboundPacketsc0_28.PLAYER_POSITION_AND_ROTATION, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsa1_0_15.MOVE_PLAYER_STATUS_ONLY, ServerboundPacketsc0_28.MOVE_PLAYER_POS_ROT, new PacketHandlers() {
             @Override
             public void register() {
-                read(Type.BOOLEAN); // onGround
+                read(Types.BOOLEAN); // onGround
                 handler(wrapper -> wrapper.user().get(ClassicPositionTracker.class).writeToPacket(wrapper));
             }
         });
-        this.registerServerbound(ServerboundPacketsa1_0_15.PLAYER_POSITION, ServerboundPacketsc0_28.PLAYER_POSITION_AND_ROTATION, wrapper -> {
+        this.registerServerbound(ServerboundPacketsa1_0_15.MOVE_PLAYER_POS, ServerboundPacketsc0_28.MOVE_PLAYER_POS_ROT, wrapper -> {
             final ClassicPositionTracker positionTracker = wrapper.user().get(ClassicPositionTracker.class);
-            positionTracker.posX = wrapper.read(Type.DOUBLE); // x
-            wrapper.read(Type.DOUBLE); // y
-            positionTracker.stance = wrapper.read(Type.DOUBLE); // stance
-            positionTracker.posZ = wrapper.read(Type.DOUBLE); // z
-            wrapper.read(Type.BOOLEAN); // onGround
+            positionTracker.posX = wrapper.read(Types.DOUBLE); // x
+            wrapper.read(Types.DOUBLE); // y
+            positionTracker.stance = wrapper.read(Types.DOUBLE); // stance
+            positionTracker.posZ = wrapper.read(Types.DOUBLE); // z
+            wrapper.read(Types.BOOLEAN); // onGround
 
             positionTracker.writeToPacket(wrapper);
         });
-        this.registerServerbound(ServerboundPacketsa1_0_15.PLAYER_ROTATION, ServerboundPacketsc0_28.PLAYER_POSITION_AND_ROTATION, wrapper -> {
+        this.registerServerbound(ServerboundPacketsa1_0_15.MOVE_PLAYER_ROT, ServerboundPacketsc0_28.MOVE_PLAYER_POS_ROT, wrapper -> {
             final ClassicPositionTracker positionTracker = wrapper.user().get(ClassicPositionTracker.class);
-            positionTracker.yaw = wrapper.read(Type.FLOAT); // yaw
-            positionTracker.pitch = wrapper.read(Type.FLOAT); // pitch
-            wrapper.read(Type.BOOLEAN); // onGround
+            positionTracker.yaw = wrapper.read(Types.FLOAT); // yaw
+            positionTracker.pitch = wrapper.read(Types.FLOAT); // pitch
+            wrapper.read(Types.BOOLEAN); // onGround
 
             positionTracker.writeToPacket(wrapper);
         });
-        this.registerServerbound(ServerboundPacketsa1_0_15.PLAYER_POSITION_AND_ROTATION, wrapper -> {
+        this.registerServerbound(ServerboundPacketsa1_0_15.MOVE_PLAYER_POS_ROT, wrapper -> {
             final ClassicPositionTracker positionTracker = wrapper.user().get(ClassicPositionTracker.class);
-            positionTracker.posX = wrapper.read(Type.DOUBLE); // x
-            wrapper.read(Type.DOUBLE); // y
-            positionTracker.stance = wrapper.read(Type.DOUBLE); // stance
-            positionTracker.posZ = wrapper.read(Type.DOUBLE); // z
-            positionTracker.yaw = wrapper.read(Type.FLOAT); // yaw
-            positionTracker.pitch = wrapper.read(Type.FLOAT); // pitch
-            wrapper.read(Type.BOOLEAN); // onGround
+            positionTracker.posX = wrapper.read(Types.DOUBLE); // x
+            wrapper.read(Types.DOUBLE); // y
+            positionTracker.stance = wrapper.read(Types.DOUBLE); // stance
+            positionTracker.posZ = wrapper.read(Types.DOUBLE); // z
+            positionTracker.yaw = wrapper.read(Types.FLOAT); // yaw
+            positionTracker.pitch = wrapper.read(Types.FLOAT); // pitch
+            wrapper.read(Types.BOOLEAN); // onGround
 
             positionTracker.writeToPacket(wrapper);
         });
-        this.registerServerbound(ServerboundPacketsa1_0_15.PLAYER_DIGGING, ServerboundPacketsc0_28.PLAYER_BLOCK_PLACEMENT, wrapper -> {
+        this.registerServerbound(ServerboundPacketsa1_0_15.PLAYER_ACTION, ServerboundPacketsc0_28.USE_ITEM_ON, wrapper -> {
             wrapper.user().getStoredObjects().remove(BlockDigStorage.class);
             final ClassicLevel level = wrapper.user().get(ClassicLevelStorage.class).getClassicLevel();
             final ClassicOpLevelStorage opTracker = wrapper.user().get(ClassicOpLevelStorage.class);
             final boolean extendedVerification = wrapper.user().has(ExtBlockPermissionsStorage.class);
 
-            final short status = wrapper.read(Type.UNSIGNED_BYTE); // status
+            final short status = wrapper.read(Types.UNSIGNED_BYTE); // status
             final Position pos = wrapper.read(Types1_7_6.POSITION_UBYTE); // position
-            wrapper.read(Type.UNSIGNED_BYTE); // direction
+            wrapper.read(Types.UNSIGNED_BYTE); // direction
             final int blockId = level.getBlock(pos);
 
             final boolean hasCreative = wrapper.user().getProtocolInfo().getPipeline().contains(Protocolb1_8_0_1tob1_7_0_3.class);
@@ -423,20 +423,20 @@ public class Protocola1_0_15toc0_30 extends StatelessProtocol<ClientboundPackets
                 }
 
                 wrapper.write(Typesc0_30.POSITION, pos); // position
-                wrapper.write(Type.BOOLEAN, false); // place block
-                wrapper.write(Type.BYTE, (byte) ClassicBlocks.STONE); // block id
+                wrapper.write(Types.BOOLEAN, false); // place block
+                wrapper.write(Types.BYTE, (byte) ClassicBlocks.STONE); // block id
             } else {
                 wrapper.cancel();
             }
         });
-        this.registerServerbound(ServerboundPacketsa1_0_15.PLAYER_BLOCK_PLACEMENT, wrapper -> {
+        this.registerServerbound(ServerboundPacketsa1_0_15.USE_ITEM_ON, wrapper -> {
             final ClassicLevel level = wrapper.user().get(ClassicLevelStorage.class).getClassicLevel();
             final ClassicBlockRemapper remapper = wrapper.user().get(ClassicBlockRemapper.class);
             final boolean extendedVerification = wrapper.user().has(ExtBlockPermissionsStorage.class);
 
-            wrapper.read(Type.SHORT); // item id (is useless because it has no item damage)
+            wrapper.read(Types.SHORT); // item id (is useless because it has no item damage)
             Position pos = wrapper.read(Types1_7_6.POSITION_UBYTE); // position
-            final short direction = wrapper.read(Type.UNSIGNED_BYTE); // direction
+            final short direction = wrapper.read(Types.UNSIGNED_BYTE); // direction
 
             final Item item = Via.getManager().getProviders().get(AlphaInventoryProvider.class).getHandItem(wrapper.user());
             if (item == null || direction == 255) {
@@ -460,27 +460,27 @@ public class Protocola1_0_15toc0_30 extends StatelessProtocol<ClientboundPackets
             }
 
             wrapper.write(Typesc0_30.POSITION, pos); // position
-            wrapper.write(Type.BOOLEAN, true); // place block
-            wrapper.write(Type.BYTE, classicBlock); // block id
+            wrapper.write(Types.BOOLEAN, true); // place block
+            wrapper.write(Types.BYTE, classicBlock); // block id
         });
         this.cancelServerbound(ServerboundPacketsa1_0_15.KEEP_ALIVE);
-        this.cancelServerbound(ServerboundPacketsa1_0_15.HELD_ITEM_CHANGE);
-        this.cancelServerbound(ServerboundPacketsa1_0_15.ANIMATION);
+        this.cancelServerbound(ServerboundPacketsa1_0_15.SET_CARRIED_ITEM);
+        this.cancelServerbound(ServerboundPacketsa1_0_15.SWING);
         this.cancelServerbound(ServerboundPacketsa1_0_15.SPAWN_ITEM);
         this.cancelServerbound(ServerboundPacketsa1_0_15.DISCONNECT);
     }
 
-    private void sendChatMessage(final UserConnection user, final String msg) throws Exception {
-        final PacketWrapper message = PacketWrapper.create(ClientboundPacketsa1_0_15.CHAT_MESSAGE, user);
+    private void sendChatMessage(final UserConnection user, final String msg) {
+        final PacketWrapper message = PacketWrapper.create(ClientboundPacketsa1_0_15.CHAT, user);
         message.write(Typesb1_7_0_3.STRING, msg); // message
         message.send(Protocola1_0_15toc0_30.class);
     }
 
-    private void sendBlockChange(final UserConnection user, final Position pos, final IdAndData block) throws Exception {
-        final PacketWrapper blockChange = PacketWrapper.create(ClientboundPacketsa1_0_15.BLOCK_CHANGE, user);
+    private void sendBlockChange(final UserConnection user, final Position pos, final IdAndData block) {
+        final PacketWrapper blockChange = PacketWrapper.create(ClientboundPacketsa1_0_15.BLOCK_UPDATE, user);
         blockChange.write(Types1_7_6.POSITION_UBYTE, pos); // position
-        blockChange.write(Type.UNSIGNED_BYTE, (short) block.getId()); // block id
-        blockChange.write(Type.UNSIGNED_BYTE, (short) block.getData()); // block data
+        blockChange.write(Types.UNSIGNED_BYTE, (short) block.getId()); // block id
+        blockChange.write(Types.UNSIGNED_BYTE, (short) block.getData()); // block data
         blockChange.send(Protocola1_0_15toc0_30.class);
     }
 

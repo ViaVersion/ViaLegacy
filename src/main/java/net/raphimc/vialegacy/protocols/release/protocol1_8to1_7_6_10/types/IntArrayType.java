@@ -27,7 +27,7 @@ public class IntArrayType extends Type<int[]> {
     }
 
     @Override
-    public int[] read(ByteBuf buffer) throws Exception {
+    public int[] read(ByteBuf buffer) {
         final byte length = buffer.readByte();
         final int[] array = new int[length];
 
@@ -38,7 +38,7 @@ public class IntArrayType extends Type<int[]> {
     }
 
     @Override
-    public void write(ByteBuf buffer, int[] array) throws Exception {
+    public void write(ByteBuf buffer, int[] array) {
         buffer.writeByte(array.length);
         for (int i : array) buffer.writeInt(i);
     }

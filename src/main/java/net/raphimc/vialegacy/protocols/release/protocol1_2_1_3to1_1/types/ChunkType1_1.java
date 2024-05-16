@@ -25,7 +25,6 @@ import io.netty.buffer.ByteBuf;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.chunks.NibbleArray1_1;
 import net.raphimc.vialegacy.protocols.release.protocol1_2_1_3to1_1.model.NonFullChunk1_1;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.zip.DataFormatException;
 import java.util.zip.Inflater;
@@ -37,7 +36,7 @@ public class ChunkType1_1 extends Type<Chunk> {
     }
 
     @Override
-    public Chunk read(ByteBuf byteBuf) throws Exception {
+    public Chunk read(ByteBuf byteBuf) {
         final int xPosition = byteBuf.readInt();
         final int yPosition = byteBuf.readShort();
         final int zPosition = byteBuf.readInt();
@@ -53,7 +52,7 @@ public class ChunkType1_1 extends Type<Chunk> {
         try {
             inflater.inflate(uncompressedData);
         } catch (DataFormatException dataformatexception) {
-            throw new IOException("Bad compressed data format");
+            throw new RuntimeException("Bad compressed data format");
         } finally {
             inflater.end();
         }
@@ -62,7 +61,7 @@ public class ChunkType1_1 extends Type<Chunk> {
     }
 
     @Override
-    public void write(ByteBuf byteBuf, Chunk chunk) throws Exception {
+    public void write(ByteBuf byteBuf, Chunk chunk) {
         throw new UnsupportedOperationException();
     }
 

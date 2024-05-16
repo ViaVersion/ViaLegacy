@@ -18,11 +18,10 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
-import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocols.release.protocol1_4_4_5to1_4_2.types.Types1_4_2;
@@ -35,7 +34,7 @@ import java.util.List;
 
 public class Protocol1_4_4_5to1_4_2 extends StatelessProtocol<ClientboundPackets1_4_2, ClientboundPackets1_4_4, ServerboundPackets1_5_2, ServerboundPackets1_5_2> {
 
-    private final LegacyItemRewriter<Protocol1_4_4_5to1_4_2> itemRewriter = new ItemRewriter(this);
+    private final ItemRewriter itemRewriter = new ItemRewriter(this);
 
     public Protocol1_4_4_5to1_4_2() {
         super(ClientboundPackets1_4_2.class, ClientboundPackets1_4_4.class, ServerboundPackets1_5_2.class, ServerboundPackets1_5_2.class);
@@ -45,60 +44,60 @@ public class Protocol1_4_4_5to1_4_2 extends StatelessProtocol<ClientboundPackets
     protected void registerPackets() {
         this.itemRewriter.register();
 
-        this.registerClientbound(ClientboundPackets1_4_2.MAP_DATA, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_4_2.MAP_ITEM_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.SHORT); // item id
-                map(Type.SHORT); // map id
-                map(Types1_4_2.UNSIGNED_BYTE_BYTE_ARRAY, Type.SHORT_BYTE_ARRAY); // data
+                map(Types.SHORT); // item id
+                map(Types.SHORT); // map id
+                map(Types1_4_2.UNSIGNED_BYTE_BYTE_ARRAY, Types.SHORT_BYTE_ARRAY); // data
             }
         });
-        this.registerClientbound(ClientboundPackets1_4_2.SPAWN_PLAYER, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_4_2.ADD_PLAYER, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
+                map(Types.INT); // entity id
                 map(Types1_6_4.STRING); // name
-                map(Type.INT); // x
-                map(Type.INT); // y
-                map(Type.INT); // z
-                map(Type.BYTE); // yaw
-                map(Type.BYTE); // pitch
-                map(Type.UNSIGNED_SHORT); // item
+                map(Types.INT); // x
+                map(Types.INT); // y
+                map(Types.INT); // z
+                map(Types.BYTE); // yaw
+                map(Types.BYTE); // pitch
+                map(Types.UNSIGNED_SHORT); // item
                 map(Types1_4_2.METADATA_LIST, Types1_6_4.METADATA_LIST); // metadata
                 handler(wrapper -> rewriteMetadata(wrapper.get(Types1_6_4.METADATA_LIST, 0)));
             }
         });
-        this.registerClientbound(ClientboundPackets1_4_2.SPAWN_MOB, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_4_2.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.UNSIGNED_BYTE); // type id
-                map(Type.INT); // x
-                map(Type.INT); // y
-                map(Type.INT); // z
-                map(Type.BYTE); // yaw
-                map(Type.BYTE); // pitch
-                map(Type.BYTE); // head yaw
-                map(Type.SHORT); // velocity x
-                map(Type.SHORT); // velocity y
-                map(Type.SHORT); // velocity z
+                map(Types.INT); // entity id
+                map(Types.UNSIGNED_BYTE); // type id
+                map(Types.INT); // x
+                map(Types.INT); // y
+                map(Types.INT); // z
+                map(Types.BYTE); // yaw
+                map(Types.BYTE); // pitch
+                map(Types.BYTE); // head yaw
+                map(Types.SHORT); // velocity x
+                map(Types.SHORT); // velocity y
+                map(Types.SHORT); // velocity z
                 map(Types1_4_2.METADATA_LIST, Types1_6_4.METADATA_LIST); // metadata
                 handler(wrapper -> rewriteMetadata(wrapper.get(Types1_6_4.METADATA_LIST, 0)));
             }
         });
-        this.registerClientbound(ClientboundPackets1_4_2.ENTITY_METADATA, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_4_2.SET_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
+                map(Types.INT); // entity id
                 map(Types1_4_2.METADATA_LIST, Types1_6_4.METADATA_LIST); // metadata
                 handler(wrapper -> rewriteMetadata(wrapper.get(Types1_6_4.METADATA_LIST, 0)));
             }
         });
     }
 
-    private void rewriteMetadata(final List<Metadata> metadataList) {
-        for (Metadata metadata : metadataList) {
-            metadata.setMetaType(MetaType1_6_4.byId(metadata.metaType().typeId()));
+    private void rewriteMetadata(final List<EntityData> metadataList) {
+        for (EntityData metadata : metadataList) {
+            metadata.setDataType(MetaType1_6_4.byId(metadata.dataType().typeId()));
         }
     }
 
@@ -108,7 +107,7 @@ public class Protocol1_4_4_5to1_4_2 extends StatelessProtocol<ClientboundPackets
     }
 
     @Override
-    public LegacyItemRewriter<Protocol1_4_4_5to1_4_2> getItemRewriter() {
+    public ItemRewriter getItemRewriter() {
         return this.itemRewriter;
     }
 

@@ -30,14 +30,22 @@ public class StringType extends Type<String> {
         super(String.class);
     }
 
-    public String read(ByteBuf buffer) throws IOException {
+    public String read(ByteBuf buffer) {
         final ByteBufInputStream dis = new ByteBufInputStream(buffer);
-        return dis.readUTF();
+        try {
+            return dis.readUTF();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    public void write(ByteBuf buffer, String s) throws IOException {
+    public void write(ByteBuf buffer, String s) {
         final ByteBufOutputStream dos = new ByteBufOutputStream(buffer);
-        dos.writeUTF(s);
+        try {
+            dos.writeUTF(s);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

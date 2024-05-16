@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
 import net.raphimc.vialegacy.protocols.alpha.protocola1_0_17_1_0_17_4toa1_0_16_2.storage.TimeLockStorage;
@@ -38,14 +38,14 @@ public class Protocola1_0_17_1_0_17_4toa1_0_16_2 extends StatelessProtocol<Clien
 
     @Override
     protected void registerPackets() {
-        this.registerServerbound(ServerboundPacketsa1_0_17.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsa1_0_17.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.SHORT); // item id
+                map(Types.SHORT); // item id
                 map(Types1_7_6.POSITION_UBYTE); // position
-                map(Type.UNSIGNED_BYTE); // direction
+                map(Types.UNSIGNED_BYTE); // direction
                 handler(wrapper -> {
-                    if (wrapper.get(Type.SHORT, 0) < 0) {
+                    if (wrapper.get(Types.SHORT, 0) < 0) {
                         wrapper.cancel();
                     }
                 });

@@ -20,8 +20,8 @@ package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.metadata;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_10;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.item.Item;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
 import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.Protocol1_8to1_7_6_10;
@@ -39,8 +39,8 @@ public class MetadataRewriter {
         this.protocol = protocol;
     }
 
-    public void transform(final UserConnection user, final EntityTypes1_10.EntityType type, final List<Metadata> list) {
-        for (Metadata entry : new ArrayList<>(list)) {
+    public void transform(final UserConnection user, final EntityTypes1_10.EntityType type, final List<EntityData> list) {
+        for (EntityData entry : new ArrayList<>(list)) {
             final MetaIndex1_8to1_7_6 metaIndex = MetaIndex1_8to1_7_6.searchIndex(type, entry.id());
             try {
                 if (metaIndex == null) {
@@ -53,7 +53,7 @@ public class MetadataRewriter {
 
                 final Object value = entry.getValue();
                 entry.setTypeAndValue(metaIndex.getOldType(), value); // check if metadata type is the expected type from metaindex entry
-                entry.setMetaTypeUnsafe(metaIndex.getNewType());
+                entry.setDataTypeUnsafe(metaIndex.getNewType());
                 entry.setId(metaIndex.getNewIndex());
 
                 if (metaIndex == MetaIndex1_8to1_7_6.ENTITY_AGEABLE_AGE) {
@@ -64,8 +64,8 @@ public class MetadataRewriter {
                     continue;
                 } else if (metaIndex == MetaIndex1_8to1_7_6.ENDERMAN_CARRIED_BLOCK) {
                     final byte id = (byte) value;
-                    Metadata blockDataMeta = null;
-                    for (Metadata metadata : list) {
+                    EntityData blockDataMeta = null;
+                    for (EntityData metadata : list) {
                         if (metadata.id() == MetaIndex1_8to1_7_6.ENDERMAN_CARRIED_BLOCK_DATA.getOldIndex()) {
                             blockDataMeta = metadata;
                             list.remove(blockDataMeta);
@@ -86,24 +86,24 @@ public class MetadataRewriter {
                 }
 
                 switch (metaIndex.getNewType()) {
-                    case Byte:
+                    case BYTE:
                         entry.setValue(((Number) value).byteValue());
                         break;
-                    case Short:
+                    case SHORT:
                         entry.setValue(((Number) value).shortValue());
                         break;
-                    case Int:
+                    case INT:
                         entry.setValue(((Number) value).intValue());
                         break;
-                    case Float:
+                    case FLOAT:
                         entry.setValue(((Number) value).floatValue());
                         break;
-                    case Slot:
+                    case ITEM:
                         this.protocol.getItemRewriter().handleItemToClient(user, (Item) value);
                         break;
-                    case String:
-                    case Position:
-                    case Rotation:
+                    case STRING:
+                    case BLOCK_POSITION:
+                    case ROTATIONS:
                         break;
                     default:
                         if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {

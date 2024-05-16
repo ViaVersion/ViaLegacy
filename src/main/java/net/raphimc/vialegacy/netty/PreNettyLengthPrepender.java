@@ -19,7 +19,7 @@ package net.raphimc.vialegacy.netty;
 
 import com.google.common.collect.EvictingQueue;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
 import io.netty.channel.ChannelHandlerContext;
@@ -77,8 +77,8 @@ public class PreNettyLengthPrepender extends ByteToMessageDecoder {
                 }
 
                 final ByteBuf buf = ctx.alloc().buffer();
-                Type.VAR_INT.writePrimitive(buf, totalLength); // length
-                Type.VAR_INT.writePrimitive(buf, packetId); // id
+                Types.VAR_INT.writePrimitive(buf, totalLength); // length
+                Types.VAR_INT.writePrimitive(buf, packetId); // id
                 buf.writeBytes(in.readSlice(length)); // content
                 out.add(buf);
             } catch (IndexOutOfBoundsException e) { // Not enough data

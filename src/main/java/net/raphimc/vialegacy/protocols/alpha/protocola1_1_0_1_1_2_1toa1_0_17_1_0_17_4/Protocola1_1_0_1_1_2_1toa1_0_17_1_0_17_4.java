@@ -31,7 +31,7 @@ public class Protocola1_1_0_1_1_2_1toa1_0_17_1_0_17_4 extends StatelessProtocol<
 
     @Override
     protected void registerPackets() {
-        this.cancelServerbound(ServerboundPacketsa1_1_0.COMPLEX_ENTITY);
+        this.cancelServerbound(ServerboundPacketsa1_1_0.BLOCK_ENTITY_DATA);
         this.cancelServerbound(ServerboundPacketsa1_1_0.PLAYER_INVENTORY);
     }
 

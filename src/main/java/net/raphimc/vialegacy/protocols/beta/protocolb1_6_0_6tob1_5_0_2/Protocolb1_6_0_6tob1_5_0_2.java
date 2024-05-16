@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
@@ -48,42 +48,42 @@ public class Protocolb1_6_0_6tob1_5_0_2 extends StatelessProtocol<ClientboundPac
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsb1_5.TIME_UPDATE, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_5.SET_TIME, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.LONG); // time
-                handler(wrapper -> wrapper.user().get(WorldTimeStorage.class).time = wrapper.get(Type.LONG, 0));
+                map(Types.LONG); // time
+                handler(wrapper -> wrapper.user().get(WorldTimeStorage.class).time = wrapper.get(Types.LONG, 0));
             }
         });
         this.registerClientbound(ClientboundPacketsb1_5.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                create(Type.BYTE, (byte) 0); // dimension id
+                create(Types.BYTE, (byte) 0); // dimension id
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_5.SPAWN_ENTITY, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_5.ADD_ENTITY, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.BYTE); // type id
-                map(Type.INT); // x
-                map(Type.INT); // y
-                map(Type.INT); // z
-                create(Type.INT, 0); // data
+                map(Types.INT); // entity id
+                map(Types.BYTE); // type id
+                map(Types.INT); // x
+                map(Types.INT); // y
+                map(Types.INT); // z
+                create(Types.INT, 0); // data
             }
         });
 
         this.registerServerbound(ServerboundPacketsb1_7.RESPAWN, new PacketHandlers() {
             @Override
             public void register() {
-                read(Type.BYTE); // dimension id
+                read(Types.BYTE); // dimension id
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_7.PLAYER_BLOCK_PLACEMENT, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsb1_7.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types1_7_6.POSITION_UBYTE); // position
-                map(Type.UNSIGNED_BYTE); // direction
+                map(Types.UNSIGNED_BYTE); // direction
                 map(Types1_4_2.NBTLESS_ITEM); // item
                 handler(wrapper -> {
                     final PlayerInfoStorage playerInfoStorage = wrapper.user().get(PlayerInfoStorage.class);
@@ -102,7 +102,7 @@ public class Protocolb1_6_0_6tob1_5_0_2 extends StatelessProtocol<ClientboundPac
 
                         final boolean isOccupied = (block.getData() & 4) != 0;
                         if (isOccupied) {
-                            final PacketWrapper chat = PacketWrapper.create(ClientboundPacketsb1_7.CHAT_MESSAGE, wrapper.user());
+                            final PacketWrapper chat = PacketWrapper.create(ClientboundPacketsb1_7.CHAT, wrapper.user());
                             chat.write(Types1_6_4.STRING, "This bed is occupied");
                             chat.send(Protocolb1_6_0_6tob1_5_0_2.class);
                             return;
@@ -123,7 +123,7 @@ public class Protocolb1_6_0_6tob1_5_0_2 extends StatelessProtocol<ClientboundPac
                         final boolean isDayTime = (int) (skyRotation * 11F) < 4;
 
                         if (isDayTime) {
-                            final PacketWrapper chat = PacketWrapper.create(ClientboundPacketsb1_7.CHAT_MESSAGE, wrapper.user());
+                            final PacketWrapper chat = PacketWrapper.create(ClientboundPacketsb1_7.CHAT, wrapper.user());
                             chat.write(Types1_6_4.STRING, "You can only sleep at night");
                             chat.send(Protocolb1_6_0_6tob1_5_0_2.class);
                             return;
@@ -133,23 +133,23 @@ public class Protocolb1_6_0_6tob1_5_0_2 extends StatelessProtocol<ClientboundPac
                             return;
                         }
 
-                        final PacketWrapper useBed = PacketWrapper.create(ClientboundPacketsb1_7.USE_BED, wrapper.user());
-                        useBed.write(Type.INT, playerInfoStorage.entityId); // entity id
-                        useBed.write(Type.BYTE, (byte) 0); // magic value (always 0)
+                        final PacketWrapper useBed = PacketWrapper.create(ClientboundPacketsb1_7.PLAYER_SLEEP, wrapper.user());
+                        useBed.write(Types.INT, playerInfoStorage.entityId); // entity id
+                        useBed.write(Types.BYTE, (byte) 0); // magic value (always 0)
                         useBed.write(Types1_7_6.POSITION_BYTE, pos); // position
                         useBed.send(Protocolb1_6_0_6tob1_5_0_2.class);
                     } else if (block.getId() == BlockList1_6.jukebox.blockID) {
                         if (block.getData() > 0) {
-                            final PacketWrapper effect = PacketWrapper.create(ClientboundPacketsb1_7.EFFECT, wrapper.user());
-                            effect.write(Type.INT, 1005); // effect id
+                            final PacketWrapper effect = PacketWrapper.create(ClientboundPacketsb1_7.LEVEL_EVENT, wrapper.user());
+                            effect.write(Types.INT, 1005); // effect id
                             effect.write(Types1_7_6.POSITION_UBYTE, pos); // position
-                            effect.write(Type.INT, 0); // data
+                            effect.write(Types.INT, 0); // data
                             effect.send(Protocolb1_6_0_6tob1_5_0_2.class);
                         } else if (item != null && (item.identifier() == ItemList1_6.record13.itemID || item.identifier() == ItemList1_6.recordCat.itemID)) {
-                            final PacketWrapper effect = PacketWrapper.create(ClientboundPacketsb1_7.EFFECT, wrapper.user());
-                            effect.write(Type.INT, 1005); // effect id
+                            final PacketWrapper effect = PacketWrapper.create(ClientboundPacketsb1_7.LEVEL_EVENT, wrapper.user());
+                            effect.write(Types.INT, 1005); // effect id
                             effect.write(Types1_7_6.POSITION_UBYTE, pos); // position
-                            effect.write(Type.INT, item.identifier()); // data
+                            effect.write(Types.INT, item.identifier()); // data
                             effect.send(Protocolb1_6_0_6tob1_5_0_2.class);
                         }
                     }

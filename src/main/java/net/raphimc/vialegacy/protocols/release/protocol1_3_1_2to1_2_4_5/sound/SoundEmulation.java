@@ -67,7 +67,7 @@ public class SoundEmulation {
                 Sound.MOB_GHAST_HURT,
                 Sound.MOB_GHAST_DEATH
         };
-        ENTITY_SOUNDS[EntityTypes1_10.EntityType.PIG_ZOMBIE.getId()] = new Sound[]{
+        ENTITY_SOUNDS[EntityTypes1_10.EntityType.ZOMBIE_PIGMEN.getId()] = new Sound[]{
                 Sound.MOB_PIG_ZOMBIE,
                 Sound.MOB_PIG_ZOMBIE_HURT,
                 Sound.MOB_PIG_ZOMBIE_DEATH
@@ -132,12 +132,12 @@ public class SoundEmulation {
                 Sound.MOB_WOLF_HURT,
                 Sound.MOB_WOLF_DEATH
         };
-        ENTITY_SOUNDS[EntityTypes1_10.EntityType.MUSHROOM_COW.getId()] = new Sound[]{
+        ENTITY_SOUNDS[EntityTypes1_10.EntityType.MOOSHROOM.getId()] = new Sound[]{
                 Sound.MOB_COW,
                 Sound.MOB_COW_HURT,
                 Sound.MOB_COW_HURT
         };
-        ENTITY_SOUNDS[EntityTypes1_10.EntityType.SNOWMAN.getId()] = new Sound[]{
+        ENTITY_SOUNDS[EntityTypes1_10.EntityType.SNOW_GOLEM.getId()] = new Sound[]{
                 Sound.NO_SOUND,
                 Sound.NO_SOUND,
                 Sound.NO_SOUND
@@ -164,15 +164,15 @@ public class SoundEmulation {
         VOL_ADJUST[EntityTypes1_10.EntityType.COW.getId()] = 0.4F;
         VOL_ADJUST[EntityTypes1_10.EntityType.WOLF.getId()] = 0.4F;
         VOL_ADJUST[EntityTypes1_10.EntityType.SQUID.getId()] = 0.4F;
-        VOL_ADJUST[EntityTypes1_10.EntityType.MUSHROOM_COW.getId()] = 0.4F;
+        VOL_ADJUST[EntityTypes1_10.EntityType.MOOSHROOM.getId()] = 0.4F;
         VOL_ADJUST[EntityTypes1_10.EntityType.OCELOT.getId()] = 0.4F;
 
         INTERVAL_ADJUST[EntityTypes1_10.EntityType.PIG.getId()] = 120;
         INTERVAL_ADJUST[EntityTypes1_10.EntityType.SHEEP.getId()] = 120;
         INTERVAL_ADJUST[EntityTypes1_10.EntityType.WOLF.getId()] = 120;
-        INTERVAL_ADJUST[EntityTypes1_10.EntityType.SNOWMAN.getId()] = 120;
+        INTERVAL_ADJUST[EntityTypes1_10.EntityType.SNOW_GOLEM.getId()] = 120;
         INTERVAL_ADJUST[EntityTypes1_10.EntityType.IRON_GOLEM.getId()] = 120;
-        INTERVAL_ADJUST[EntityTypes1_10.EntityType.MUSHROOM_COW.getId()] = 120;
+        INTERVAL_ADJUST[EntityTypes1_10.EntityType.MOOSHROOM.getId()] = 120;
         INTERVAL_ADJUST[EntityTypes1_10.EntityType.COW.getId()] = 120;
         INTERVAL_ADJUST[EntityTypes1_10.EntityType.CHICKEN.getId()] = 120;
         INTERVAL_ADJUST[EntityTypes1_10.EntityType.SQUID.getId()] = 120;

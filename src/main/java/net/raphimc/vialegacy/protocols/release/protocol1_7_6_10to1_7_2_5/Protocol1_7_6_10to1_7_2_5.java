@@ -17,17 +17,16 @@
  */
 package net.raphimc.vialegacy.protocols.release.protocol1_7_6_10to1_7_2_5;
 
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.ListTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.ByteTag;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.ListTag;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.base.BaseProtocol1_7;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import net.raphimc.vialegacy.ViaLegacy;
@@ -40,6 +39,7 @@ import net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.types.Types
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.logging.Level;
 
 public class Protocol1_7_6_10to1_7_2_5 extends AbstractProtocol<ClientboundPackets1_7_2, ClientboundPackets1_7_2, ServerboundPackets1_7_2, ServerboundPackets1_7_2> {
 
@@ -54,54 +54,55 @@ public class Protocol1_7_6_10to1_7_2_5 extends AbstractProtocol<ClientboundPacke
         this.registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING); // uuid
-                map(Type.STRING); // name
-                handler(wrapper -> wrapper.set(Type.STRING, 0, fixGameProfileUuid(wrapper.get(Type.STRING, 0), wrapper.get(Type.STRING, 1))));
+                map(Types.STRING); // uuid
+                map(Types.STRING); // name
+                handler(wrapper -> wrapper.set(Types.STRING, 0, fixGameProfileUuid(wrapper.get(Types.STRING, 0), wrapper.get(Types.STRING, 1))));
             }
         });
-        this.registerClientbound(ClientboundPackets1_7_2.SPAWN_PLAYER, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_7_2.ADD_PLAYER, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.VAR_INT); // entity id
-                map(Type.STRING); // uuid
-                map(Type.STRING); // name
-                create(Type.VAR_INT, 0); // properties count
-                map(Type.INT); // x
-                map(Type.INT); // y
-                map(Type.INT); // z
-                map(Type.BYTE); // yaw
-                map(Type.BYTE); // pitch
-                map(Type.SHORT); // item in hand
+                map(Types.VAR_INT); // entity id
+                map(Types.STRING); // uuid
+                map(Types.STRING); // name
+                create(Types.VAR_INT, 0); // properties count
+                map(Types.INT); // x
+                map(Types.INT); // y
+                map(Types.INT); // z
+                map(Types.BYTE); // yaw
+                map(Types.BYTE); // pitch
+                map(Types.SHORT); // item in hand
                 map(Types1_7_6.METADATA_LIST); // metadata
-                handler(wrapper -> wrapper.set(Type.STRING, 0, fixGameProfileUuid(wrapper.get(Type.STRING, 0), wrapper.get(Type.STRING, 1))));
+                handler(wrapper -> wrapper.set(Types.STRING, 0, fixGameProfileUuid(wrapper.get(Types.STRING, 0), wrapper.get(Types.STRING, 1))));
             }
         });
-        this.registerClientbound(ClientboundPackets1_7_2.CHAT_MESSAGE, new PacketHandlers() {
+        this.registerClientbound(ClientboundPackets1_7_2.CHAT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.STRING, Type.STRING, ChatComponentRewriter::toClient); // message
+                map(Types.STRING, Types.STRING, ChatComponentRewriter::toClient); // message
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types1_7_6.POSITION_SHORT); // position
-                map(Type.UNSIGNED_BYTE); // type
+                map(Types.UNSIGNED_BYTE); // type
                 map(Types1_7_6.NBT); // data
                 handler(wrapper -> {
                     final Position pos = wrapper.get(Types1_7_6.POSITION_SHORT, 0);
-                    final short type = wrapper.get(Type.UNSIGNED_BYTE, 0);
+                    final short type = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     final CompoundTag tag = wrapper.get(Types1_7_6.NBT, 0);
                     if (type != 4/*skull*/) return;
-                    final ByteTag skullType = tag.get("SkullType");
-                    if (skullType == null || skullType.asByte() != 3/*player_skull*/) return;
+                    final byte skullType = tag.getByte("SkullType");
+                    if (skullType != 3 /*player_skull*/) return;
 
-                    final StringTag extraType = tag.remove("ExtraType");
+                    final StringTag extraType = tag.removeUnchecked("ExtraType");
+                    if (extraType == null || extraType.getValue().isEmpty()) return;
 
                     if (ViaLegacy.getConfig().isLegacySkullLoading()) {
                         final GameProfileFetcher gameProfileFetcher = Via.getManager().getProviders().get(GameProfileFetcher.class);
 
-                        final String skullName = extraType == null ? "" : extraType.getValue();
+                        final String skullName = extraType.getValue();
                         final CompoundTag newTag = tag.copy();
 
                         if (gameProfileFetcher.isUUIDLoaded(skullName)) { // short cut if skull is already loaded
@@ -124,11 +125,11 @@ public class Protocol1_7_6_10to1_7_2_5 extends AbstractProtocol<ClientboundPacke
                             try {
                                 final PacketWrapper updateSkull = PacketWrapper.create(ClientboundPackets1_7_2.BLOCK_ENTITY_DATA, wrapper.user());
                                 updateSkull.write(Types1_7_6.POSITION_SHORT, pos);
-                                updateSkull.write(Type.UNSIGNED_BYTE, type);
+                                updateSkull.write(Types.UNSIGNED_BYTE, type);
                                 updateSkull.write(Types1_7_6.NBT, newTag);
                                 updateSkull.send(Protocol1_7_6_10to1_7_2_5.class);
                             } catch (Throwable e) {
-                                e.printStackTrace();
+                                ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Failed to update skull block entity data for " + skullName, e);
                             }
                         });
                     }

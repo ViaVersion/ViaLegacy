@@ -18,6 +18,9 @@
 package net.raphimc.vialegacy.protocols.release.protocol1_8to1_7_6_10.rewriter;
 
 
+import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.ShortTag;
+import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
@@ -34,9 +37,7 @@ import com.viaversion.viaversion.libs.mcstructs.text.events.hover.HoverEventActi
 import com.viaversion.viaversion.libs.mcstructs.text.events.hover.impl.TextHoverEvent;
 import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSerializer;
 import com.viaversion.viaversion.libs.mcstructs.text.utils.TextUtils;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.CompoundTag;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.ShortTag;
-import com.viaversion.viaversion.libs.opennbt.tag.builtin.StringTag;
+import com.viaversion.viaversion.util.Key;
 import net.raphimc.vialegacy.ViaLegacy;
 
 import java.util.logging.Level;
@@ -448,13 +449,12 @@ public class ChatComponentRewriter {
                 if (textHoverEvent.getAction().equals(HoverEventAction.SHOW_ITEM)) {
                     try {
                         final CompoundTag tag = (CompoundTag) SNbtSerializer.V1_7.deserialize(textHoverEvent.getText().asUnformattedString());
-                        final ShortTag idTag = tag.get("id");
-                        final ShortTag damageTag = tag.get("Damage");
-                        final CompoundTag itemTag = tag.get("tag");
+                        final short id = tag.getShort("id");
+                        final short damage = tag.getShort("Damage");
+                        final CompoundTag itemTag = tag.getCompoundTag("tag");
 
-                        final short damage = damageTag != null ? damageTag.asShort() : 0;
                         Item item = new DataItem();
-                        item.setIdentifier(idTag.asShort());
+                        item.setIdentifier(id);
                         item.setData(damage);
                         item.setTag(itemTag);
                         item = this.protocol.getItemRewriter().handleItemToClient(user, item);
@@ -462,7 +462,7 @@ public class ChatComponentRewriter {
                         if (!ID_TO_NAME.containsKey(item.identifier())) {
                             throw new IllegalArgumentException("Invalid item ID: " + item.identifier());
                         }
-                        tag.put("id", new StringTag("minecraft:" + ID_TO_NAME.get(item.identifier())));
+                        tag.put("id", new StringTag(Key.namespaced(ID_TO_NAME.get(item.identifier()))));
                         if (damage != item.data()) {
                             tag.put("Damage", new ShortTag(item.data()));
                         }

@@ -19,7 +19,7 @@ package net.raphimc.vialegacy.protocols.classic.protocolc0_0_20a_27toc0_0_19a_06
 
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
@@ -37,23 +37,23 @@ public class Protocolc0_27toc0_0_19a_06 extends StatelessProtocol<ClientboundPac
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsc0_19a.JOIN_GAME, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsc0_19a.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // protocol id
+                map(Types.BYTE); // protocol id
                 map(Typesc0_30.STRING); // title
                 map(Typesc0_30.STRING); // motd
-                create(Type.BYTE, (byte) 0); // op level
+                create(Types.BYTE, (byte) 0); // op level
             }
         });
 
         this.registerServerbound(ServerboundPacketsc0_28.LOGIN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.BYTE); // protocol id
+                map(Types.BYTE); // protocol id
                 map(Typesc0_30.STRING); // username
                 map(Typesc0_30.STRING); // mp pass
-                read(Type.BYTE); // op level
+                read(Types.BYTE); // op level
             }
         });
     }

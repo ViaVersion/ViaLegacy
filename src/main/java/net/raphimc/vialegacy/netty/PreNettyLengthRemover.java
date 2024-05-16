@@ -18,7 +18,7 @@
 package net.raphimc.vialegacy.netty;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
@@ -33,8 +33,8 @@ public class PreNettyLengthRemover extends MessageToByteEncoder<ByteBuf> {
 
     @Override
     protected void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) {
-        Type.VAR_INT.readPrimitive(in); // length
-        out.writeByte(Type.VAR_INT.readPrimitive(in) & 255); // id
+        Types.VAR_INT.readPrimitive(in); // length
+        out.writeByte(Types.VAR_INT.readPrimitive(in) & 255); // id
         out.writeBytes(in); // content
     }
 

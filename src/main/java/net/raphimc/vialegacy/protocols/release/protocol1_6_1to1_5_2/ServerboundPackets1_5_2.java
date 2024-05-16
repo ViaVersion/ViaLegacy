@@ -40,37 +40,37 @@ public enum ServerboundPackets1_5_2 implements ServerboundPacketType, PreNettyPa
         readString(buf);
         buf.skipBytes(4);
     }),
-    CHAT_MESSAGE(3, (user, buf) -> readString(buf)),
-    INTERACT_ENTITY(7, (user, buf) -> buf.skipBytes(9)),
+    CHAT(3, (user, buf) -> readString(buf)),
+    INTERACT(7, (user, buf) -> buf.skipBytes(9)),
     RESPAWN(9, (user, buf) -> {
         buf.skipBytes(8);
         readString(buf);
     }),
-    PLAYER_MOVEMENT(10, (user, buf) -> buf.skipBytes(1)),
-    PLAYER_POSITION(11, (user, buf) -> buf.skipBytes(33)),
-    PLAYER_ROTATION(12, (user, buf) -> buf.skipBytes(9)),
-    PLAYER_POSITION_AND_ROTATION(13, (user, buf) -> buf.skipBytes(41)),
-    PLAYER_DIGGING(14, (user, buf) -> buf.skipBytes(11)),
-    PLAYER_BLOCK_PLACEMENT(15, (user, buf) -> {
+    MOVE_PLAYER_STATUS_ONLY(10, (user, buf) -> buf.skipBytes(1)),
+    MOVE_PLAYER_POS(11, (user, buf) -> buf.skipBytes(33)),
+    MOVE_PLAYER_ROT(12, (user, buf) -> buf.skipBytes(9)),
+    MOVE_PLAYER_POS_ROT(13, (user, buf) -> buf.skipBytes(41)),
+    PLAYER_ACTION(14, (user, buf) -> buf.skipBytes(11)),
+    USE_ITEM_ON(15, (user, buf) -> {
         buf.skipBytes(10);
         readItemStack1_3_1(buf);
         buf.skipBytes(3);
     }),
-    HELD_ITEM_CHANGE(16, (user, buf) -> buf.skipBytes(2)),
-    ANIMATION(18, (user, buf) -> buf.skipBytes(5)),
-    ENTITY_ACTION(19, (user, buf) -> buf.skipBytes(5)),
-    CLOSE_WINDOW(101, (user, buf) -> buf.skipBytes(1)),
-    CLICK_WINDOW(102, (user, buf) -> {
+    SET_CARRIED_ITEM(16, (user, buf) -> buf.skipBytes(2)),
+    SWING(18, (user, buf) -> buf.skipBytes(5)),
+    PLAYER_COMMAND(19, (user, buf) -> buf.skipBytes(5)),
+    CONTAINER_CLOSE(101, (user, buf) -> buf.skipBytes(1)),
+    CONTAINER_CLICK(102, (user, buf) -> {
         buf.skipBytes(7);
         readItemStack1_3_1(buf);
     }),
-    WINDOW_CONFIRMATION(106, (user, buf) -> buf.skipBytes(4)),
-    CREATIVE_INVENTORY_ACTION(107, (user, buf) -> {
+    CONTAINER_ACK(106, (user, buf) -> buf.skipBytes(4)),
+    SET_CREATIVE_MODE_SLOT(107, (user, buf) -> {
         buf.skipBytes(2);
         readItemStack1_3_1(buf);
     }),
-    CLICK_WINDOW_BUTTON(108, (user, buf) -> buf.skipBytes(2)),
-    UPDATE_SIGN(130, (user, buf) -> {
+    CONTAINER_BUTTON_CLICK(108, (user, buf) -> buf.skipBytes(2)),
+    SIGN_UPDATE(130, (user, buf) -> {
         buf.skipBytes(10);
         readString(buf);
         readString(buf);
@@ -78,13 +78,13 @@ public enum ServerboundPackets1_5_2 implements ServerboundPacketType, PreNettyPa
         readString(buf);
     }),
     PLAYER_ABILITIES(202, (user, buf) -> buf.skipBytes(3)),
-    TAB_COMPLETE(203, (user, buf) -> readString(buf)),
-    CLIENT_SETTINGS(204, (user, buf) -> {
+    COMMAND_SUGGESTION(203, (user, buf) -> readString(buf)),
+    CLIENT_INFORMATION(204, (user, buf) -> {
         readString(buf);
         buf.skipBytes(4);
     }),
-    CLIENT_STATUS(205, (user, buf) -> buf.skipBytes(1)),
-    PLUGIN_MESSAGE(250, (user, buf) -> {
+    CLIENT_COMMAND(205, (user, buf) -> buf.skipBytes(1)),
+    CUSTOM_PAYLOAD(250, (user, buf) -> {
         readString(buf);
         short s = buf.readShort();
         for (int i = 0; i < s; i++) buf.readByte();

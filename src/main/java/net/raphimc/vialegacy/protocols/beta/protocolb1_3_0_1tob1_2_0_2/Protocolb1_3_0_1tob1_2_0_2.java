@@ -20,11 +20,11 @@ package net.raphimc.vialegacy.protocols.beta.protocolb1_3_0_1tob1_2_0_2;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.Position;
-import com.viaversion.viaversion.api.minecraft.metadata.Metadata;
+import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
-import com.viaversion.viaversion.api.type.Type;
+import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
@@ -49,34 +49,34 @@ public class Protocolb1_3_0_1tob1_2_0_2 extends StatelessProtocol<ClientboundPac
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(ClientboundPacketsb1_2.SPAWN_MOB, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_2.ADD_MOB, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.UNSIGNED_BYTE); // type id
-                map(Type.INT); // x
-                map(Type.INT); // y
-                map(Type.INT); // z
-                map(Type.BYTE); // yaw
-                map(Type.BYTE); // pitch
+                map(Types.INT); // entity id
+                map(Types.UNSIGNED_BYTE); // type id
+                map(Types.INT); // x
+                map(Types.INT); // y
+                map(Types.INT); // z
+                map(Types.BYTE); // yaw
+                map(Types.BYTE); // pitch
                 map(Typesb1_2.METADATA_LIST, Typesb1_4.METADATA_LIST); // metadata
                 handler(wrapper -> rewriteMetadata(wrapper.get(Typesb1_4.METADATA_LIST, 0)));
             }
         });
-        this.registerClientbound(ClientboundPacketsb1_2.ENTITY_METADATA, new PacketHandlers() {
+        this.registerClientbound(ClientboundPacketsb1_2.SET_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
+                map(Types.INT); // entity id
                 map(Typesb1_2.METADATA_LIST, Typesb1_4.METADATA_LIST); // metadata
                 handler(wrapper -> rewriteMetadata(wrapper.get(Typesb1_4.METADATA_LIST, 0)));
             }
         });
 
-        this.registerServerbound(ServerboundPacketsb1_4.PLAYER_DIGGING, wrapper -> {
+        this.registerServerbound(ServerboundPacketsb1_4.PLAYER_ACTION, wrapper -> {
             wrapper.cancel();
-            final short status = wrapper.read(Type.UNSIGNED_BYTE); // status
+            final short status = wrapper.read(Types.UNSIGNED_BYTE); // status
             final Position pos = wrapper.read(Types1_7_6.POSITION_UBYTE); // position
-            final short facing = wrapper.read(Type.UNSIGNED_BYTE); // direction
+            final short facing = wrapper.read(Types.UNSIGNED_BYTE); // direction
 
             if (status != 4) {
                 wrapper.user().getStoredObjects().remove(BlockDigStorage.class);
@@ -109,22 +109,22 @@ public class Protocolb1_3_0_1tob1_2_0_2 extends StatelessProtocol<ClientboundPac
                     break;
             }
         });
-        this.registerServerbound(ServerboundPacketsb1_4.ENTITY_ACTION, new PacketHandlers() {
+        this.registerServerbound(ServerboundPacketsb1_4.PLAYER_COMMAND, new PacketHandlers() {
             @Override
             public void register() {
-                map(Type.INT); // entity id
-                map(Type.BYTE); // action id
+                map(Types.INT); // entity id
+                map(Types.BYTE); // action id
                 handler(wrapper -> {
-                    if (wrapper.get(Type.BYTE, 0) > 2) wrapper.cancel();
+                    if (wrapper.get(Types.BYTE, 0) > 2) wrapper.cancel();
                 });
             }
         });
         this.cancelServerbound(ServerboundPacketsb1_4.POSITION);
     }
 
-    private void rewriteMetadata(final List<Metadata> metadataList) {
-        for (Metadata metadata : metadataList) {
-            metadata.setMetaType(MetaTypeb1_4.byId(metadata.metaType().typeId()));
+    private void rewriteMetadata(final List<EntityData> metadataList) {
+        for (EntityData metadata : metadataList) {
+            metadata.setDataType(MetaTypeb1_4.byId(metadata.dataType().typeId()));
         }
     }
 
@@ -139,11 +139,11 @@ public class Protocolb1_3_0_1tob1_2_0_2 extends StatelessProtocol<ClientboundPac
     }
 
 
-    public static void sendBlockDigPacket(final UserConnection userConnection, final short status, final Position position, final short facing) throws Exception {
-        final PacketWrapper blockDig = PacketWrapper.create(ServerboundPacketsb1_2.PLAYER_DIGGING, userConnection);
-        blockDig.write(Type.UNSIGNED_BYTE, status); // status
+    public static void sendBlockDigPacket(final UserConnection userConnection, final short status, final Position position, final short facing) {
+        final PacketWrapper blockDig = PacketWrapper.create(ServerboundPacketsb1_2.PLAYER_ACTION, userConnection);
+        blockDig.write(Types.UNSIGNED_BYTE, status); // status
         blockDig.write(Types1_7_6.POSITION_UBYTE, position); // position
-        blockDig.write(Type.UNSIGNED_BYTE, facing); // direction
+        blockDig.write(Types.UNSIGNED_BYTE, facing); // direction
         blockDig.sendToServer(Protocolb1_3_0_1tob1_2_0_2.class);
     }
 
