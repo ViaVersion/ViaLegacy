@@ -49,7 +49,7 @@ public class ChunkCoordSpiral implements Iterable<ChunkCoord> {
 
     @Override
     public Iterator<ChunkCoord> iterator() {
-        return new Iterator<ChunkCoord>() {
+        return new Iterator<>() {
             int x = center.chunkX;
             int z = center.chunkZ;
 

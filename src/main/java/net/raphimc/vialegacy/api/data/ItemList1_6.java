@@ -221,7 +221,7 @@ public class ItemList1_6 {
 
     public static Item1_6 getByID(final int itemID) {
         for (Item1_6 item : itemList) {
-            if (item.itemID == itemID) {
+            if (item.itemId() == itemID) {
                 return item;
             }
         }
@@ -230,22 +230,17 @@ public class ItemList1_6 {
 
     public static Item1_6 getByName(final String name) {
         for (Item1_6 item : itemList) {
-            if (item.name.equalsIgnoreCase(name)) {
+            if (item.name().equalsIgnoreCase(name)) {
                 return item;
             }
         }
         return null;
     }
 
-    public static class Item1_6 {
+    public record Item1_6(int itemId, String name, int maxDamage, boolean hasSubTypes) {
 
-        public final int itemID;
-        public final int maxDamage;
-        public final boolean hasSubTypes;
-        public final String name;
-
-        public Item1_6(final int itemID, final String name, final int maxDamage, final boolean hasSubTypes) {
-            this.itemID = itemID;
+        public Item1_6(final int itemId, final String name, final int maxDamage, final boolean hasSubTypes) {
+            this.itemId = itemId;
             this.name = name;
             this.maxDamage = maxDamage;
             this.hasSubTypes = hasSubTypes;
@@ -254,7 +249,7 @@ public class ItemList1_6 {
         }
 
         public boolean isDamageable() {
-            return maxDamage > 0 && !hasSubTypes;
+            return this.maxDamage > 0 && !this.hasSubTypes;
         }
 
     }

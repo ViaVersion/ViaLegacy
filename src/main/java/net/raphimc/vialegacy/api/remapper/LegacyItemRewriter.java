@@ -232,21 +232,7 @@ public abstract class LegacyItemRewriter<C extends ClientboundPacketType, S exte
     }
 
 
-    private static class RewriteEntry {
-
-        private final int oldItemID;
-        private final short oldItemMeta;
-        private final int newItemID;
-        private final short newItemMeta;
-        private final String newItemName;
-
-        public RewriteEntry(final int oldItemID, final short oldItemMeta, final int newItemID, final short newItemMeta, final String newItemName) {
-            this.oldItemID = oldItemID;
-            this.oldItemMeta = oldItemMeta;
-            this.newItemID = newItemID;
-            this.newItemMeta = newItemMeta;
-            this.newItemName = newItemName;
-        }
+    private record RewriteEntry(int oldItemID, short oldItemMeta, int newItemID, short newItemMeta, String newItemName) {
 
         public boolean rewrites(final Item item) {
             return item.identifier() == this.oldItemID && (this.oldItemMeta == -1 || this.oldItemMeta == item.data());
@@ -254,15 +240,7 @@ public abstract class LegacyItemRewriter<C extends ClientboundPacketType, S exte
 
     }
 
-    private static class NonExistentEntry {
-
-        private final int itemId;
-        private final short itemMeta;
-
-        public NonExistentEntry(final int itemId, final short itemMeta) {
-            this.itemId = itemId;
-            this.itemMeta = itemMeta;
-        }
+    private record NonExistentEntry(int itemId, short itemMeta) {
 
         public boolean rewrites(final Item item) {
             return item.identifier() == this.itemId && (this.itemMeta == -1 || this.itemMeta == item.data());

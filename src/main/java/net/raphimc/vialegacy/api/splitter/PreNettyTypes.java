@@ -18,7 +18,7 @@
 package net.raphimc.vialegacy.api.splitter;
 
 import io.netty.buffer.ByteBuf;
-import net.raphimc.vialegacy.protocols.release.protocol1_3_1_2to1_2_4_5.data.NbtItemList;
+import net.raphimc.vialegacy.protocol.release.r1_2_4_5tor1_3_1_2.data.NbtItemList1_2_4;
 
 public class PreNettyTypes {
 
@@ -50,7 +50,7 @@ public class PreNettyTypes {
         if (s >= 0) {
             buffer.readByte();
             buffer.readShort();
-            if (NbtItemList.hasNbt(s)) {
+            if (NbtItemList1_2_4.hasNbt(s)) {
                 readTag(buffer);
             }
         }
@@ -86,7 +86,7 @@ public class PreNettyTypes {
         for (int i = 0; i < s; i++) buffer.readByte();
     }
 
-    public static void readEntityMetadata1_4_4(final ByteBuf buffer) {
+    public static void readEntityDataList1_4_4(final ByteBuf buffer) {
         for (byte b = buffer.readByte(); b != 127; b = buffer.readByte()) {
             int i = (b & 224) >> 5;
             switch (i) {
@@ -116,7 +116,7 @@ public class PreNettyTypes {
         }
     }
 
-    public static void readEntityMetadata1_4_2(final ByteBuf buffer) {
+    public static void readEntityDataList1_4_2(final ByteBuf buffer) {
         for (byte b = buffer.readByte(); b != 127; b = buffer.readByte()) {
             int i = (b & 224) >> 5;
             switch (i) {
@@ -150,7 +150,7 @@ public class PreNettyTypes {
         }
     }
 
-    public static void readEntityMetadatab1_5(final ByteBuf buffer) {
+    public static void readEntityDataListb1_5(final ByteBuf buffer) {
         for (byte b = buffer.readByte(); b != 127; b = buffer.readByte()) {
             int i = (b & 224) >> 5;
             switch (i) {
@@ -182,7 +182,7 @@ public class PreNettyTypes {
         }
     }
 
-    public static void readEntityMetadatab1_3(final ByteBuf buffer) {
+    public static void readEntityDataListb1_3(final ByteBuf buffer) {
         for (byte b = buffer.readByte(); b != 127; b = buffer.readByte()) {
             int i = (b & 224) >> 5;
             switch (i) {
@@ -214,7 +214,7 @@ public class PreNettyTypes {
         }
     }
 
-    public static void readEntityMetadatab1_2(final ByteBuf buffer) {
+    public static void readEntityDataListb1_2(final ByteBuf buffer) {
         for (byte b = buffer.readByte(); b != 127; b = buffer.readByte()) {
             int i = (b & 224) >> 5;
             switch (i) {

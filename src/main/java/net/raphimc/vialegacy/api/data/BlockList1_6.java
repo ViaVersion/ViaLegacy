@@ -191,7 +191,7 @@ public class BlockList1_6 {
 
     public static Block1_6 getByID(final int id) {
         for (Block1_6 block : blockList) {
-            if (block.blockID == id) {
+            if (block.blockId == id) {
                 return block;
             }
         }
@@ -207,13 +207,10 @@ public class BlockList1_6 {
         return null;
     }
 
-    public static class Block1_6 {
+    public record Block1_6(int blockId, String name) {
 
-        public final int blockID;
-        public final String name;
-
-        public Block1_6(final int blockID, final String name) {
-            this.blockID = blockID;
+        public Block1_6(final int blockId, final String name) {
+            this.blockId = blockId;
             this.name = name;
 
             blockList.add(this);
