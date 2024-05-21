@@ -22,7 +22,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
@@ -262,7 +262,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 handler(wrapper -> {
                     if (wrapper.read(Types.BYTE) != 0) wrapper.cancel();
                 });
-                map(Types1_7_6.POSITION_BYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_BYTE); // position
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.ANIMATE, new PacketHandlers() {
@@ -351,7 +351,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             public void register() {
                 map(Types.INT, Types.VAR_INT); // entity id
                 map(Types1_6_4.STRING, Types.STRING); // motive
-                map(Types1_7_6.POSITION_INT); // position
+                map(Types1_7_6.BLOCK_POSITION_INT); // position
                 map(Types.INT); // rotation
             }
         });
@@ -411,7 +411,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                         final int targetY = record.getY(-1);
                         final int targetZ = record.getSectionZ() + (chunkZ << 4);
                         final IdAndData block = IdAndData.fromRawData(record.getBlockId());
-                        final Position pos = new Position(targetX, targetY, targetZ);
+                        final BlockPosition pos = new BlockPosition(targetX, targetY, targetZ);
                         wrapper.user().get(ChunkTracker.class).trackAndRemap(pos, block);
                         record.setBlockId(block.toRawData());
                     }
@@ -421,11 +421,11 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
         this.registerClientbound(ClientboundPackets1_6_4.BLOCK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_SHORT, Types.VAR_INT); // block id
                 map(Types.UNSIGNED_BYTE); // block data
                 handler(wrapper -> {
-                    final Position pos = wrapper.get(Types1_7_6.POSITION_UBYTE, 0); // position
+                    final BlockPosition pos = wrapper.get(Types1_7_6.BLOCK_POSITION_UBYTE, 0); // position
                     final int blockId = wrapper.get(Types.VAR_INT, 0); // block id
                     final int data = wrapper.get(Types.UNSIGNED_BYTE, 0); // block data
                     final IdAndData block = new IdAndData(blockId, data);
@@ -438,7 +438,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
         this.registerClientbound(ClientboundPackets1_6_4.BLOCK_EVENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT); // position
+                map(Types1_7_6.BLOCK_POSITION_SHORT); // position
                 map(Types.BYTE, Types.UNSIGNED_BYTE); // type
                 map(Types.BYTE, Types.UNSIGNED_BYTE); // data
                 map(Types.SHORT, Types.VAR_INT); // block id
@@ -448,7 +448,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             @Override
             public void register() {
                 map(Types.INT, Types.VAR_INT); // entity id
-                map(Types1_7_6.POSITION_INT); // position
+                map(Types1_7_6.BLOCK_POSITION_INT); // position
                 map(Types.BYTE); // progress
             }
         });
@@ -473,7 +473,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                     final int recordCount = wrapper.get(Types.INT, 0);
                     final ChunkTracker chunkTracker = wrapper.user().get(ChunkTracker.class);
                     for (int i = 0; i < recordCount; i++) {
-                        final Position pos = new Position(x + wrapper.passthrough(Types.BYTE), y + wrapper.passthrough(Types.BYTE), z + wrapper.passthrough(Types.BYTE));
+                        final BlockPosition pos = new BlockPosition(x + wrapper.passthrough(Types.BYTE), y + wrapper.passthrough(Types.BYTE), z + wrapper.passthrough(Types.BYTE));
                         chunkTracker.trackAndRemap(pos, new IdAndData(0, 0));
                     }
                 });
@@ -512,7 +512,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             @Override
             public void register() {
                 map(Types.INT); // effect id
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.INT); // data
                 map(Types.BOOLEAN); // server wide
                 handler(wrapper -> {
@@ -641,7 +641,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
         this.registerClientbound(ClientboundPackets1_6_4.UPDATE_SIGN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT); // position
+                map(Types1_7_6.BLOCK_POSITION_SHORT); // position
                 map(Types1_6_4.STRING, Types.STRING); // line 1
                 map(Types1_6_4.STRING, Types.STRING); // line 2
                 map(Types1_6_4.STRING, Types.STRING); // line 3
@@ -659,7 +659,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
         this.registerClientbound(ClientboundPackets1_6_4.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT); // position
+                map(Types1_7_6.BLOCK_POSITION_SHORT); // position
                 map(Types.BYTE, Types.UNSIGNED_BYTE); // type
                 map(Types1_7_6.NBT); // data
             }
@@ -668,7 +668,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             @Override
             public void register() {
                 read(Types.BYTE); // always 0
-                map(Types1_7_6.POSITION_INT); // position
+                map(Types1_7_6.BLOCK_POSITION_INT); // position
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.AWARD_STATS, wrapper -> {
@@ -974,7 +974,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
         this.registerServerbound(ServerboundPackets1_7_2.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE); // direction
                 map(Types1_7_6.ITEM); // item
                 handler(wrapper -> itemRewriter.handleItemToServer(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
@@ -998,7 +998,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
         this.registerServerbound(ServerboundPackets1_7_2.SIGN_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT); // position
+                map(Types1_7_6.BLOCK_POSITION_SHORT); // position
                 map(Types.STRING, Types1_6_4.STRING); // line 1
                 map(Types.STRING, Types1_6_4.STRING); // line 2
                 map(Types.STRING, Types1_6_4.STRING); // line 3

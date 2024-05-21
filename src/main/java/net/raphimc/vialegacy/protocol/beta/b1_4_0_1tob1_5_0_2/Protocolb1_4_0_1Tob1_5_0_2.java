@@ -104,7 +104,7 @@ public class Protocolb1_4_0_1Tob1_5_0_2 extends StatelessProtocol<ClientboundPac
             public void register() {
                 map(Types.INT); // entity id
                 map(Typesb1_7_0_3.STRING, Types1_6_4.STRING); // motive
-                map(Types1_7_6.POSITION_INT); // position
+                map(Types1_7_6.BLOCK_POSITION_INT); // position
                 map(Types.INT); // rotation
             }
         });
@@ -119,7 +119,7 @@ public class Protocolb1_4_0_1Tob1_5_0_2 extends StatelessProtocol<ClientboundPac
         this.registerClientbound(ClientboundPacketsb1_4.UPDATE_SIGN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT); // position
+                map(Types1_7_6.BLOCK_POSITION_SHORT); // position
                 map(Typesb1_7_0_3.STRING, Types1_6_4.STRING); // line 1
                 map(Typesb1_7_0_3.STRING, Types1_6_4.STRING); // line 2
                 map(Typesb1_7_0_3.STRING, Types1_6_4.STRING); // line 3
@@ -169,7 +169,7 @@ public class Protocolb1_4_0_1Tob1_5_0_2 extends StatelessProtocol<ClientboundPac
         this.registerServerbound(ServerboundPacketsb1_5.SIGN_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT); // position
+                map(Types1_7_6.BLOCK_POSITION_SHORT); // position
                 map(Types1_6_4.STRING, Typesb1_7_0_3.STRING); // line 1
                 map(Types1_6_4.STRING, Typesb1_7_0_3.STRING); // line 2
                 map(Types1_6_4.STRING, Typesb1_7_0_3.STRING); // line 3

@@ -17,7 +17,7 @@
  */
 package net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.model;
 
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.data.ClassicBlocks;
 
 public class ClassicLevel {
@@ -70,7 +70,7 @@ public class ClassicLevel {
         return this.sizeZ;
     }
 
-    public int getBlock(Position position) {
+    public int getBlock(BlockPosition position) {
         return this.getBlock(position.x(), position.y(), position.z());
     }
 
@@ -78,7 +78,7 @@ public class ClassicLevel {
         return this.isInBounds(x, y, z) ? this.blocks[(y * this.sizeZ + z) * this.sizeX + x] & 255 : 0;
     }
 
-    public void setBlock(Position position, int block) {
+    public void setBlock(BlockPosition position, int block) {
         this.setBlock(position.x(), position.y(), position.z(), block);
     }
 
@@ -89,7 +89,7 @@ public class ClassicLevel {
         }
     }
 
-    public boolean isLightBlocking(Position position) {
+    public boolean isLightBlocking(BlockPosition position) {
         return this.isLightBlocking(position.x(), position.y(), position.z());
     }
 
@@ -101,7 +101,7 @@ public class ClassicLevel {
         };
     }
 
-    public boolean isLit(Position position) {
+    public boolean isLit(BlockPosition position) {
         return this.isLit(position.x(), position.y(), position.z());
     }
 

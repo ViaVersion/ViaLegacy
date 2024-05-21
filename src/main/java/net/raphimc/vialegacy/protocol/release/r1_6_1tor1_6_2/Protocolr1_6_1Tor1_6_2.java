@@ -18,7 +18,7 @@
 package net.raphimc.vialegacy.protocol.release.r1_6_1tor1_6_2;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -72,21 +72,21 @@ public class Protocolr1_6_1Tor1_6_2 extends StatelessProtocol<ClientboundPackets
         this.registerServerbound(ServerboundPackets1_6_4.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE); // direction
                 map(Types1_7_6.ITEM); // item
                 map(Types.UNSIGNED_BYTE); // offset x
                 map(Types.UNSIGNED_BYTE); // offset y
                 map(Types.UNSIGNED_BYTE); // offset z
                 handler(wrapper -> {
-                    final Position pos = wrapper.get(Types1_7_6.POSITION_UBYTE, 0);
+                    final BlockPosition pos = wrapper.get(Types1_7_6.BLOCK_POSITION_UBYTE, 0);
                     final short direction = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     final Item item = wrapper.get(Types1_7_6.ITEM, 0);
 
                     if (item != null && item.identifier() == ItemList1_6.sign.itemId() && direction != 255 && direction != 0) { // If placed item is a sign then cancel and send a OPEN_SIGN_EDITOR packet
                         final PacketWrapper openSignEditor = PacketWrapper.create(ClientboundPackets1_6_4.OPEN_SIGN_EDITOR, wrapper.user());
                         openSignEditor.write(Types.BYTE, (byte) 0); // magic value
-                        openSignEditor.write(Types1_7_6.POSITION_INT, pos.getRelative(BlockFaceUtil.getFace(direction)));
+                        openSignEditor.write(Types1_7_6.BLOCK_POSITION_INT, pos.getRelative(BlockFaceUtil.getFace(direction)));
                         openSignEditor.send(Protocolr1_6_1Tor1_6_2.class);
                     }
                 });

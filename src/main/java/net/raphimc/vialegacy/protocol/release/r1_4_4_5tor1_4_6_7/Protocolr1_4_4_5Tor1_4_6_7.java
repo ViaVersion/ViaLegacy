@@ -110,7 +110,7 @@ public class Protocolr1_4_4_5Tor1_4_6_7 extends StatelessProtocol<ClientboundPac
                         wrapper.set(Types.UNSIGNED_BYTE, 0, (short) 4);
                     }
                 });
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE); // direction
             }
         });

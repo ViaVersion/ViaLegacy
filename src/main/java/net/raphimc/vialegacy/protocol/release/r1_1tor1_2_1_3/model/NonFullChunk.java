@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.model;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord1_8;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
@@ -30,21 +30,21 @@ import java.util.List;
 
 public class NonFullChunk extends BaseChunk {
 
-    private final Position startPos;
-    private final Position endPos;
+    private final BlockPosition startPos;
+    private final BlockPosition endPos;
 
-    public NonFullChunk(int x, int z, int bitmask, ChunkSection[] sections, Position startPos, Position endPos) {
+    public NonFullChunk(int x, int z, int bitmask, ChunkSection[] sections, BlockPosition startPos, BlockPosition endPos) {
         super(x, z, false, false, bitmask, sections, null, new CompoundTag(), new ArrayList<>());
 
         this.startPos = startPos;
         this.endPos = endPos;
     }
 
-    public Position getStartPos() {
+    public BlockPosition getStartPos() {
         return this.startPos;
     }
 
-    public Position getEndPos() {
+    public BlockPosition getEndPos() {
         return this.endPos;
     }
 

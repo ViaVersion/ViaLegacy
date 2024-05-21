@@ -43,7 +43,7 @@ public class Protocola1_0_16_2Toa1_0_17_1_0_17_4 extends StatelessProtocol<Clien
             @Override
             public void register() {
                 map(Types.SHORT); // item id
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE); // direction
                 handler(wrapper -> {
                     if (wrapper.get(Types.SHORT, 0) < 0) {

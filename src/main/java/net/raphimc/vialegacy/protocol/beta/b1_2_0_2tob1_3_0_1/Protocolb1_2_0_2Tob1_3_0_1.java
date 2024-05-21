@@ -19,7 +19,7 @@ package net.raphimc.vialegacy.protocol.beta.b1_2_0_2tob1_3_0_1;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -77,7 +77,7 @@ public class Protocolb1_2_0_2Tob1_3_0_1 extends StatelessProtocol<ClientboundPac
         this.registerServerbound(ServerboundPacketsb1_4.PLAYER_ACTION, wrapper -> {
             wrapper.cancel();
             final short status = wrapper.read(Types.UNSIGNED_BYTE); // status
-            final Position pos = wrapper.read(Types1_7_6.POSITION_UBYTE); // position
+            final BlockPosition pos = wrapper.read(Types1_7_6.BLOCK_POSITION_UBYTE); // position
             final short facing = wrapper.read(Types.UNSIGNED_BYTE); // direction
 
             if (status != 4) {
@@ -141,10 +141,10 @@ public class Protocolb1_2_0_2Tob1_3_0_1 extends StatelessProtocol<ClientboundPac
     }
 
 
-    public static void sendBlockDigPacket(final UserConnection userConnection, final short status, final Position position, final short facing) {
+    public static void sendBlockDigPacket(final UserConnection userConnection, final short status, final BlockPosition position, final short facing) {
         final PacketWrapper blockDig = PacketWrapper.create(ServerboundPacketsb1_2.PLAYER_ACTION, userConnection);
         blockDig.write(Types.UNSIGNED_BYTE, status); // status
-        blockDig.write(Types1_7_6.POSITION_UBYTE, position); // position
+        blockDig.write(Types1_7_6.BLOCK_POSITION_UBYTE, position); // position
         blockDig.write(Types.UNSIGNED_BYTE, facing); // direction
         blockDig.sendToServer(Protocolb1_2_0_2Tob1_3_0_1.class);
     }

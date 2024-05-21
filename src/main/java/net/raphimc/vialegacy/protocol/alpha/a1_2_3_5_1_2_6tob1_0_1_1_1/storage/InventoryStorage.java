@@ -18,7 +18,7 @@
 package net.raphimc.vialegacy.protocol.alpha.a1_2_3_5_1_2_6tob1_0_1_1_1.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 
 import java.util.HashMap;
@@ -36,9 +36,9 @@ public class InventoryStorage implements StorableObject {
     public Item[] craftingInventory = null;
     public Item[] armorInventory = null;
 
-    public final Map<Position, Item[]> containers = new HashMap<>();
+    public final Map<BlockPosition, Item[]> containers = new HashMap<>();
 
-    public Position openContainerPos = null;
+    public BlockPosition openContainerPos = null;
     public short selectedHotbarSlot = 0;
 
     public InventoryStorage() {
@@ -46,9 +46,9 @@ public class InventoryStorage implements StorableObject {
     }
 
     public void unload(final int chunkX, final int chunkZ) {
-        final Iterator<Position> it = this.containers.keySet().iterator();
+        final Iterator<BlockPosition> it = this.containers.keySet().iterator();
         while (it.hasNext()) {
-            final Position entry = it.next();
+            final BlockPosition entry = it.next();
             final int x = entry.x() >> 4;
             final int z = entry.z() >> 4;
 

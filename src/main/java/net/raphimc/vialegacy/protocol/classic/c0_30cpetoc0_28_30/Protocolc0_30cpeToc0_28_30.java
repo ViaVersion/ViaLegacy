@@ -21,7 +21,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord1_8;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
@@ -198,7 +198,7 @@ public class Protocolc0_30cpeToc0_28_30 extends StatelessProtocol<ClientboundPac
                 final Map<ChunkCoord, List<BlockChangeRecord>> records = new HashMap<>();
                 for (int i = 0; i < count; i++) {
                     final int index = (indices[i * 4] & 255) << 24 | (indices[i * 4 + 1] & 255) << 16 | (indices[i * 4 + 2] & 255) << 8 | (indices[i * 4 + 3] & 255);
-                    final Position pos = new Position(index % level.getSizeX(), (index / level.getSizeX()) / level.getSizeZ(), (index / level.getSizeX()) % level.getSizeZ());
+                    final BlockPosition pos = new BlockPosition(index % level.getSizeX(), (index / level.getSizeX()) / level.getSizeZ(), (index / level.getSizeX()) % level.getSizeZ());
                     final byte blockId = blocks[i];
                     level.setBlock(pos, blockId);
                     if (!levelStorage.isChunkLoaded(pos)) continue;
@@ -265,7 +265,7 @@ public class Protocolc0_30cpeToc0_28_30 extends StatelessProtocol<ClientboundPac
         this.registerServerbound(ServerboundPacketsc0_28.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
-                map(Typesc0_30.POSITION); // position
+                map(Typesc0_30.BLOCK_POSITION); // position
                 map(Types.BOOLEAN); // place block
                 map(Types.BYTE); // block id
                 handler(wrapper -> {
@@ -274,7 +274,7 @@ public class Protocolc0_30cpeToc0_28_30 extends StatelessProtocol<ClientboundPac
                     final ExtBlockPermissionsStorage blockPermissions = wrapper.user().get(ExtBlockPermissionsStorage.class);
                     final ClassicLevel level = wrapper.user().get(ClassicLevelStorage.class).getClassicLevel();
 
-                    final Position position = wrapper.get(Typesc0_30.POSITION, 0);
+                    final BlockPosition position = wrapper.get(Typesc0_30.BLOCK_POSITION, 0);
                     final boolean placeBlock = wrapper.get(Types.BOOLEAN, 0);
                     final int blockId = wrapper.get(Types.BYTE, 0);
 
@@ -293,7 +293,7 @@ public class Protocolc0_30cpeToc0_28_30 extends StatelessProtocol<ClientboundPac
                     }
 
                     final PacketWrapper blockChange = PacketWrapper.create(ClientboundPacketsc0_30cpe.BLOCK_UPDATE, wrapper.user());
-                    blockChange.write(Typesc0_30.POSITION, position); // position
+                    blockChange.write(Typesc0_30.BLOCK_POSITION, position); // position
                     blockChange.write(Types.BYTE, (byte) block); // block id
                     blockChange.send(Protocolc0_30cpeToc0_28_30.class);
                 });

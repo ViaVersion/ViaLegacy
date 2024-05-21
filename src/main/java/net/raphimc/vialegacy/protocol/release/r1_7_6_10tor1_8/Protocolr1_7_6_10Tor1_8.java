@@ -22,8 +22,8 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.Environment;
-import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
@@ -169,7 +169,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
         this.registerClientbound(ClientboundPackets1_7_2.SET_DEFAULT_SPAWN_POSITION, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_INT, Types.BLOCK_POSITION1_8); // position
+                map(Types1_7_6.BLOCK_POSITION_INT, Types.BLOCK_POSITION1_8); // position
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.SET_HEALTH, new PacketHandlers() {
@@ -215,7 +215,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             @Override
             public void register() {
                 map(Types.INT, Types.VAR_INT); // entity id
-                map(Types1_7_6.POSITION_BYTE, Types.BLOCK_POSITION1_8); // position
+                map(Types1_7_6.BLOCK_POSITION_BYTE, Types.BLOCK_POSITION1_8); // position
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.ADD_PLAYER, wrapper -> {
@@ -361,11 +361,11 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             public void register() {
                 map(Types.VAR_INT); // entity id
                 map(Types.STRING); // motive
-                map(Types1_7_6.POSITION_INT, Types.BLOCK_POSITION1_8); // position
+                map(Types1_7_6.BLOCK_POSITION_INT, Types.BLOCK_POSITION1_8); // position
                 map(Types.INT, Types.BYTE); // rotation
                 handler(wrapper -> {
                     final short rotation = wrapper.get(Types.BYTE, 0);
-                    final Position pos = wrapper.get(Types.BLOCK_POSITION1_8, 0);
+                    final BlockPosition pos = wrapper.get(Types.BLOCK_POSITION1_8, 0);
                     int modX = 0;
                     int modZ = 0;
                     switch (rotation) {
@@ -382,7 +382,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                             modX = 1;
                             break;
                     }
-                    wrapper.set(Types.BLOCK_POSITION1_8, 0, new Position(pos.x() + modX, pos.y(), pos.z() + modZ));
+                    wrapper.set(Types.BLOCK_POSITION1_8, 0, new BlockPosition(pos.x() + modX, pos.y(), pos.z() + modZ));
 
                     final int entityID = wrapper.get(Types.VAR_INT, 0);
                     wrapper.user().get(EntityTracker.class).trackEntity(entityID, EntityTypes1_8.EntityType.PAINTING);
@@ -633,7 +633,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                         final int targetY = record.getY(-1);
                         final int targetZ = record.getSectionZ() + (chunkZ << 4);
                         final IdAndData block = IdAndData.fromRawData(record.getBlockId());
-                        final Position pos = new Position(targetX, targetY, targetZ);
+                        final BlockPosition pos = new BlockPosition(targetX, targetY, targetZ);
                         wrapper.user().get(ChunkTracker.class).trackAndRemap(pos, block);
                         record.setBlockId(block.toRawData());
                     }
@@ -643,11 +643,11 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
         this.registerClientbound(ClientboundPackets1_7_2.BLOCK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_UBYTE, Types.BLOCK_POSITION1_8); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE, Types.BLOCK_POSITION1_8); // position
                 handler(wrapper -> {
                     final int blockId = wrapper.read(Types.VAR_INT); // block id
                     final int data = wrapper.read(Types.UNSIGNED_BYTE); // block data
-                    final Position pos = wrapper.get(Types.BLOCK_POSITION1_8, 0); // position
+                    final BlockPosition pos = wrapper.get(Types.BLOCK_POSITION1_8, 0); // position
                     final IdAndData block = new IdAndData(blockId, data);
                     wrapper.user().get(ChunkTracker.class).trackAndRemap(pos, block);
                     wrapper.write(Types.VAR_INT, block.toRawData());
@@ -657,7 +657,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
         this.registerClientbound(ClientboundPackets1_7_2.BLOCK_EVENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT, Types.BLOCK_POSITION1_8); // position
+                map(Types1_7_6.BLOCK_POSITION_SHORT, Types.BLOCK_POSITION1_8); // position
                 map(Types.UNSIGNED_BYTE); // type
                 map(Types.UNSIGNED_BYTE); // data
                 map(Types.VAR_INT); // block id
@@ -667,7 +667,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             @Override
             public void register() {
                 map(Types.VAR_INT); // entity id
-                map(Types1_7_6.POSITION_INT, Types.BLOCK_POSITION1_8); // position
+                map(Types1_7_6.BLOCK_POSITION_INT, Types.BLOCK_POSITION1_8); // position
                 map(Types.BYTE); // progress
             }
         });
@@ -693,7 +693,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     final int recordCount = wrapper.get(Types.INT, 0);
                     final ChunkTracker chunkTracker = wrapper.user().get(ChunkTracker.class);
                     for (int i = 0; i < recordCount; i++) {
-                        final Position pos = new Position(x + wrapper.passthrough(Types.BYTE), y + wrapper.passthrough(Types.BYTE), z + wrapper.passthrough(Types.BYTE));
+                        final BlockPosition pos = new BlockPosition(x + wrapper.passthrough(Types.BYTE), y + wrapper.passthrough(Types.BYTE), z + wrapper.passthrough(Types.BYTE));
                         chunkTracker.trackAndRemap(pos, new IdAndData(0, 0));
                     }
                 });
@@ -704,7 +704,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
         });
         this.registerClientbound(ClientboundPackets1_7_2.LEVEL_EVENT, wrapper -> {
             int effectId = wrapper.read(Types.INT); // effect id
-            final Position pos = wrapper.read(Types1_7_6.POSITION_UBYTE); // position
+            final BlockPosition pos = wrapper.read(Types1_7_6.BLOCK_POSITION_UBYTE); // position
             int data = wrapper.read(Types.INT); // data
             final boolean disableRelativeVolume = wrapper.read(Types.BOOLEAN); // server wide
 
@@ -955,7 +955,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
         this.registerClientbound(ClientboundPackets1_7_2.UPDATE_SIGN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT, Types.BLOCK_POSITION1_8); // position
+                map(Types1_7_6.BLOCK_POSITION_SHORT, Types.BLOCK_POSITION1_8); // position
                 map(LEGACY_TO_JSON); // line 1
                 map(LEGACY_TO_JSON); // line 2
                 map(LEGACY_TO_JSON); // line 3
@@ -1008,7 +1008,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
         this.registerClientbound(ClientboundPackets1_7_2.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT, Types.BLOCK_POSITION1_8); // position
+                map(Types1_7_6.BLOCK_POSITION_SHORT, Types.BLOCK_POSITION1_8); // position
                 map(Types.UNSIGNED_BYTE); // type
                 map(Types1_7_6.NBT, Types.NAMED_COMPOUND_TAG); // data
             }
@@ -1016,7 +1016,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
         this.registerClientbound(ClientboundPackets1_7_2.OPEN_SIGN_EDITOR, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_INT, Types.BLOCK_POSITION1_8); // position
+                map(Types1_7_6.BLOCK_POSITION_INT, Types.BLOCK_POSITION1_8); // position
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.PLAYER_INFO, wrapper -> {
@@ -1234,7 +1234,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             @Override
             public void register() {
                 map(Types.VAR_INT, Types.UNSIGNED_BYTE); // status
-                map(Types.BLOCK_POSITION1_8, Types1_7_6.POSITION_UBYTE); // position
+                map(Types.BLOCK_POSITION1_8, Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE); // direction
                 handler(wrapper -> {
                     final short status = wrapper.get(Types.UNSIGNED_BYTE, 0);
@@ -1247,7 +1247,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
         this.registerServerbound(ServerboundPackets1_8.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types.BLOCK_POSITION1_8, Types1_7_6.POSITION_UBYTE); // position
+                map(Types.BLOCK_POSITION1_8, Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE); // direction
                 map(Types.ITEM1_8, Types1_7_6.ITEM); // item
                 map(Types.UNSIGNED_BYTE); // offset x
@@ -1337,7 +1337,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
         this.registerServerbound(ServerboundPackets1_8.SIGN_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types.BLOCK_POSITION1_8, Types1_7_6.POSITION_SHORT); // position
+                map(Types.BLOCK_POSITION1_8, Types1_7_6.BLOCK_POSITION_SHORT); // position
                 handler(wrapper -> {
                     for (int i = 0; i < 4; i++) {
                         final JsonElement component = wrapper.read(Types.COMPONENT); // line

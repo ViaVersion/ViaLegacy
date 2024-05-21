@@ -21,7 +21,7 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
@@ -87,11 +87,11 @@ public class Protocolr1_7_2_5Tor1_7_6_10 extends AbstractProtocol<ClientboundPac
         this.registerClientbound(ClientboundPackets1_7_2.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT); // position
+                map(Types1_7_6.BLOCK_POSITION_SHORT); // position
                 map(Types.UNSIGNED_BYTE); // type
                 map(Types1_7_6.NBT); // data
                 handler(wrapper -> {
-                    final Position pos = wrapper.get(Types1_7_6.POSITION_SHORT, 0);
+                    final BlockPosition pos = wrapper.get(Types1_7_6.BLOCK_POSITION_SHORT, 0);
                     final short type = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     final CompoundTag tag = wrapper.get(Types1_7_6.NBT, 0);
                     if (type != 4/*skull*/) return;
@@ -126,7 +126,7 @@ public class Protocolr1_7_2_5Tor1_7_6_10 extends AbstractProtocol<ClientboundPac
                             newTag.put("Owner", writeGameProfileToTag(skullProfile));
                             try {
                                 final PacketWrapper updateSkull = PacketWrapper.create(ClientboundPackets1_7_2.BLOCK_ENTITY_DATA, wrapper.user());
-                                updateSkull.write(Types1_7_6.POSITION_SHORT, pos);
+                                updateSkull.write(Types1_7_6.BLOCK_POSITION_SHORT, pos);
                                 updateSkull.write(Types.UNSIGNED_BYTE, type);
                                 updateSkull.write(Types1_7_6.NBT, newTag);
                                 updateSkull.send(Protocolr1_7_2_5Tor1_7_6_10.class);

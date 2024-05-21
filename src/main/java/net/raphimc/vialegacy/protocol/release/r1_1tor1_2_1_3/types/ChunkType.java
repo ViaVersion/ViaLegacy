@@ -17,7 +17,7 @@
  */
 package net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.types;
 
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.IdAndData;
@@ -161,7 +161,7 @@ public class ChunkType extends Type<Chunk> {
         if (fullChunk) {
             return new BaseChunk(chunkX, chunkZ, true, false, 255, modernSections, new int[256], new ArrayList<>());
         } else {
-            return new NonFullChunk(chunkX, chunkZ, bitmask, modernSections, new Position(startX, startY, startZ), new Position(endX, endY, endZ));
+            return new NonFullChunk(chunkX, chunkZ, bitmask, modernSections, new BlockPosition(startX, startY, startZ), new BlockPosition(endX, endY, endZ));
         }
     }
 

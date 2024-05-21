@@ -75,7 +75,7 @@ public class Protocolb1_8_0_1tor1_0_0_1 extends StatelessProtocol<ClientboundPac
         this.registerServerbound(ServerboundPackets1_0_0.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE); // direction
                 map(Types1_2_4.NBT_ITEM, Types1_4_2.NBTLESS_ITEM);
             }

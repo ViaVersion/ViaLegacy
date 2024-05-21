@@ -19,7 +19,7 @@ package net.raphimc.vialegacy.protocol.alpha.a1_2_3_5_1_2_6tob1_0_1_1_1.storage;
 
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -247,7 +247,7 @@ public class AlphaInventoryTracker extends StoredObject {
         this.updateCursorItem();
     }
 
-    public void onBlockPlace(final Position position, final short direction) {
+    public void onBlockPlace(final BlockPosition position, final short direction) {
         if (this.creativeMode) return;
 
         final Item handItem = this.mainInventory[this.inventoryStorage.selectedHotbarSlot];

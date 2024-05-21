@@ -19,7 +19,7 @@ package net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -185,7 +185,7 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
         this.registerClientbound(ClientboundPacketsc0_28.BLOCK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Typesc0_30.POSITION, Types1_7_6.POSITION_UBYTE); // position
+                map(Typesc0_30.BLOCK_POSITION, Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 handler(wrapper -> {
                     final ClassicLevelStorage levelStorage = wrapper.user().get(ClassicLevelStorage.class);
                     if (levelStorage == null || !levelStorage.hasReceivedLevel()) {
@@ -193,7 +193,7 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
                         return;
                     }
                     final ClassicBlockRemapper remapper = wrapper.user().get(ClassicBlockRemapper.class);
-                    final Position pos = wrapper.get(Types1_7_6.POSITION_UBYTE, 0);
+                    final BlockPosition pos = wrapper.get(Types1_7_6.BLOCK_POSITION_UBYTE, 0);
                     final byte blockId = wrapper.read(Types.BYTE); // block id
                     levelStorage.getClassicLevel().setBlock(pos, blockId);
                     if (!levelStorage.isChunkLoaded(pos)) {
@@ -240,7 +240,7 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
 
                         if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocola1_0_17_1_0_17_4Toa1_1_0_1_1_2_1.class)) {
                             final PacketWrapper spawnPosition = PacketWrapper.create(ClientboundPacketsa1_1_0.SET_DEFAULT_SPAWN_POSITION, wrapper.user());
-                            spawnPosition.write(Types1_7_6.POSITION_INT, new Position((int) classicPositionTracker.posX, (int) (classicPositionTracker.stance), (int) classicPositionTracker.posZ));
+                            spawnPosition.write(Types1_7_6.BLOCK_POSITION_INT, new BlockPosition((int) classicPositionTracker.posX, (int) (classicPositionTracker.stance), (int) classicPositionTracker.posZ));
                             spawnPosition.send(Protocola1_0_17_1_0_17_4Toa1_1_0_1_1_2_1.class);
                         }
 
@@ -407,7 +407,7 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
             final boolean extendedVerification = wrapper.user().has(ExtBlockPermissionsStorage.class);
 
             final short status = wrapper.read(Types.UNSIGNED_BYTE); // status
-            final Position pos = wrapper.read(Types1_7_6.POSITION_UBYTE); // position
+            final BlockPosition pos = wrapper.read(Types1_7_6.BLOCK_POSITION_UBYTE); // position
             wrapper.read(Types.UNSIGNED_BYTE); // direction
             final int blockId = level.getBlock(pos);
 
@@ -424,7 +424,7 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
                     sendBlockChange(wrapper.user(), pos, new IdAndData(0, 0));
                 }
 
-                wrapper.write(Typesc0_30.POSITION, pos); // position
+                wrapper.write(Typesc0_30.BLOCK_POSITION, pos); // position
                 wrapper.write(Types.BOOLEAN, false); // place block
                 wrapper.write(Types.BYTE, (byte) ClassicBlocks.STONE); // block id
             } else {
@@ -437,7 +437,7 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
             final boolean extendedVerification = wrapper.user().has(ExtBlockPermissionsStorage.class);
 
             wrapper.read(Types.SHORT); // item id (is useless because it has no item damage)
-            Position pos = wrapper.read(Types1_7_6.POSITION_UBYTE); // position
+            BlockPosition pos = wrapper.read(Types1_7_6.BLOCK_POSITION_UBYTE); // position
             final short direction = wrapper.read(Types.UNSIGNED_BYTE); // direction
 
             final Item item = Via.getManager().getProviders().get(AlphaInventoryProvider.class).getHandItem(wrapper.user());
@@ -461,7 +461,7 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
                 sendBlockChange(wrapper.user(), pos, remapper.mapper().get(classicBlock));
             }
 
-            wrapper.write(Typesc0_30.POSITION, pos); // position
+            wrapper.write(Typesc0_30.BLOCK_POSITION, pos); // position
             wrapper.write(Types.BOOLEAN, true); // place block
             wrapper.write(Types.BYTE, classicBlock); // block id
         });
@@ -478,9 +478,9 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
         message.send(Protocolc0_28_30Toa1_0_15.class);
     }
 
-    private void sendBlockChange(final UserConnection user, final Position pos, final IdAndData block) {
+    private void sendBlockChange(final UserConnection user, final BlockPosition pos, final IdAndData block) {
         final PacketWrapper blockChange = PacketWrapper.create(ClientboundPacketsa1_0_15.BLOCK_UPDATE, user);
-        blockChange.write(Types1_7_6.POSITION_UBYTE, pos); // position
+        blockChange.write(Types1_7_6.BLOCK_POSITION_UBYTE, pos); // position
         blockChange.write(Types.UNSIGNED_BYTE, (short) block.getId()); // block id
         blockChange.write(Types.UNSIGNED_BYTE, (short) block.getData()); // block data
         blockChange.send(Protocolc0_28_30Toa1_0_15.class);

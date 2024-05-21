@@ -17,21 +17,21 @@
  */
 package net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.model;
 
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.util.IdAndData;
 
 public class PendingBlockEntry {
 
-    private final Position position;
+    private final BlockPosition position;
     private final IdAndData block;
     private int countdown = 80;
 
-    public PendingBlockEntry(final Position position, final IdAndData block) {
+    public PendingBlockEntry(final BlockPosition position, final IdAndData block) {
         this.position = position;
         this.block = block;
     }
 
-    public Position getPosition() {
+    public BlockPosition getPosition() {
         return this.position;
     }
 

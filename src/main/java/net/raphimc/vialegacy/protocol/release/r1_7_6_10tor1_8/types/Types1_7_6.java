@@ -19,8 +19,8 @@ package net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.types;
 
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.Environment;
-import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.minecraft.item.Item;
@@ -44,10 +44,10 @@ public class Types1_7_6 {
 
     public static final Type<BlockChangeRecord[]> BLOCK_CHANGE_RECORD_ARRAY = new BlockChangeRecordArrayType();
 
-    public static final Type<Position> POSITION_BYTE = new PositionVarYType<>(Types.BYTE, i -> (byte) i);
-    public static final Type<Position> POSITION_UBYTE = new PositionVarYType<>(Types.UNSIGNED_BYTE, i -> (short) i);
-    public static final Type<Position> POSITION_SHORT = new PositionVarYType<>(Types.SHORT, i -> (short) i);
-    public static final Type<Position> POSITION_INT = new PositionVarYType<>(Types.INT, i -> i);
+    public static final Type<BlockPosition> BLOCK_POSITION_BYTE = new BlockPositionVarYType<>(Types.BYTE, i -> (byte) i);
+    public static final Type<BlockPosition> BLOCK_POSITION_UBYTE = new BlockPositionVarYType<>(Types.UNSIGNED_BYTE, i -> (short) i);
+    public static final Type<BlockPosition> BLOCK_POSITION_SHORT = new BlockPositionVarYType<>(Types.SHORT, i -> (short) i);
+    public static final Type<BlockPosition> BLOCK_POSITION_INT = new BlockPositionVarYType<>(Types.INT, i -> i);
 
     public static final Type<Chunk> CHUNK_WITH_SKYLIGHT = new ChunkType(true);
     public static final Type<Chunk> CHUNK_WITHOUT_SKYLIGHT = new ChunkType(false);

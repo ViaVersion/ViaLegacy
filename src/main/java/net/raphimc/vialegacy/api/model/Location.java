@@ -17,7 +17,7 @@
  */
 package net.raphimc.vialegacy.api.model;
 
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 
 import java.util.Objects;
 
@@ -27,7 +27,7 @@ public class Location {
     private double y;
     private double z;
 
-    public Location(final Position position) {
+    public Location(final BlockPosition position) {
         this(position.x(), position.y(), position.z());
     }
 

@@ -189,7 +189,7 @@ public class Protocolr1_3_1_2Tor1_4_2 extends StatelessProtocol<ClientboundPacke
             public void register() {
                 map(Types.INT); // entity id
                 map(Types1_6_4.STRING); // motive
-                map(Types1_7_6.POSITION_INT); // position
+                map(Types1_7_6.BLOCK_POSITION_INT); // position
                 map(Types.INT); // rotation
                 handler(wrapper -> {
                     int direction = wrapper.get(Types.INT, 1);
@@ -214,7 +214,7 @@ public class Protocolr1_3_1_2Tor1_4_2 extends StatelessProtocol<ClientboundPacke
             @Override
             public void register() {
                 map(Types.INT); // effect id
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.INT); // data
                 create(Types.BOOLEAN, false); // server wide
             }

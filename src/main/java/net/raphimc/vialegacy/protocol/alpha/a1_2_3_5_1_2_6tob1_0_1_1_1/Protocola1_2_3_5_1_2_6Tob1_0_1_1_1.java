@@ -21,7 +21,7 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
@@ -142,7 +142,7 @@ public class Protocola1_2_3_5_1_2_6Tob1_0_1_1_1 extends StatelessProtocol<Client
         this.registerClientbound(ClientboundPacketsa1_2_6.BLOCK_ENTITY_DATA, null, wrapper -> {
             wrapper.cancel();
             final InventoryStorage tracker = wrapper.user().get(InventoryStorage.class);
-            final Position pos = wrapper.read(Types1_7_6.POSITION_SHORT); // position
+            final BlockPosition pos = wrapper.read(Types1_7_6.BLOCK_POSITION_SHORT); // position
             final CompoundTag tag = wrapper.read(Types1_7_6.NBT); // data
 
             if (tag.getInt("x") != pos.x() || tag.getInt("y") != pos.y() || tag.getInt("z") != pos.z()) {
@@ -154,7 +154,7 @@ public class Protocola1_2_3_5_1_2_6Tob1_0_1_1_1 extends StatelessProtocol<Client
 
             if (block.getId() == BlockList1_6.signPost.blockId() || block.getId() == BlockList1_6.signWall.blockId() || blockName.equals("Sign")) {
                 final PacketWrapper updateSign = PacketWrapper.create(ClientboundPacketsb1_1.UPDATE_SIGN, wrapper.user());
-                updateSign.write(Types1_7_6.POSITION_SHORT, pos); // position
+                updateSign.write(Types1_7_6.BLOCK_POSITION_SHORT, pos); // position
                 updateSign.write(Typesb1_7_0_3.STRING, tag.getString("Text1", "")); // line 1
                 updateSign.write(Typesb1_7_0_3.STRING, tag.getString("Text2", "")); // line 2
                 updateSign.write(Typesb1_7_0_3.STRING, tag.getString("Text3", "")); // line 3
@@ -163,7 +163,7 @@ public class Protocola1_2_3_5_1_2_6Tob1_0_1_1_1 extends StatelessProtocol<Client
             } else if (block.getId() == BlockList1_6.mobSpawner.blockId() || blockName.equals("MobSpawner")) {
                 if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocolr1_1Tor1_2_1_3.class)) {
                     final PacketWrapper spawnerData = PacketWrapper.create(ClientboundPackets1_2_1.BLOCK_ENTITY_DATA, wrapper.user());
-                    spawnerData.write(Types1_7_6.POSITION_SHORT, pos); // position
+                    spawnerData.write(Types1_7_6.BLOCK_POSITION_SHORT, pos); // position
                     spawnerData.write(Types.BYTE, (byte) 1); // type
                     spawnerData.write(Types.INT, EntityList1_2_4.getEntityId(tag.getString("EntityId"))); // entity id
                     spawnerData.write(Types.INT, 0); // unused
@@ -194,7 +194,7 @@ public class Protocola1_2_3_5_1_2_6Tob1_0_1_1_1 extends StatelessProtocol<Client
             @Override
             public void register() {
                 map(Types.UNSIGNED_BYTE); // status
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE); // direction
                 handler(wrapper -> {
                     final short status = wrapper.get(Types.UNSIGNED_BYTE, 0);
@@ -218,7 +218,7 @@ public class Protocola1_2_3_5_1_2_6Tob1_0_1_1_1 extends StatelessProtocol<Client
         this.registerServerbound(ServerboundPacketsb1_1.USE_ITEM_ON, wrapper -> {
             final InventoryStorage tracker = wrapper.user().get(InventoryStorage.class);
             final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
-            final Position pos = wrapper.read(Types1_7_6.POSITION_UBYTE); // position
+            final BlockPosition pos = wrapper.read(Types1_7_6.BLOCK_POSITION_UBYTE); // position
             final short direction = wrapper.read(Types.UNSIGNED_BYTE); // direction
             Item item = fixItem(wrapper.read(Typesb1_1.NBTLESS_ITEM)); // item
 
@@ -227,7 +227,7 @@ public class Protocola1_2_3_5_1_2_6Tob1_0_1_1_1 extends StatelessProtocol<Client
             }
 
             wrapper.write(Types.SHORT, item == null ? (short) -1 : (short) item.identifier()); // item id
-            wrapper.write(Types1_7_6.POSITION_UBYTE, pos);
+            wrapper.write(Types1_7_6.BLOCK_POSITION_UBYTE, pos);
             wrapper.write(Types.UNSIGNED_BYTE, direction);
 
             if (inventoryTracker != null) inventoryTracker.onBlockPlace(pos, direction);
@@ -331,7 +331,7 @@ public class Protocola1_2_3_5_1_2_6Tob1_0_1_1_1 extends StatelessProtocol<Client
             wrapper.write(Types1_7_6.NBT, tag);
         });
         this.registerServerbound(ServerboundPacketsb1_1.SIGN_UPDATE, ServerboundPacketsa1_2_6.BLOCK_ENTITY_DATA, wrapper -> {
-            final Position pos = wrapper.passthrough(Types1_7_6.POSITION_SHORT); // position
+            final BlockPosition pos = wrapper.passthrough(Types1_7_6.BLOCK_POSITION_SHORT); // position
 
             final CompoundTag tag = new CompoundTag();
             tag.putString("id", "Sign");

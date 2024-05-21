@@ -18,7 +18,7 @@
 package net.raphimc.vialegacy.protocol.release.r1_2_4_5tor1_3_1_2.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -26,17 +26,17 @@ import java.util.Set;
 
 public class ChestStateTracker implements StorableObject {
 
-    private final Set<Position> openChests = new HashSet<>();
+    private final Set<BlockPosition> openChests = new HashSet<>();
 
-    public void openChest(final Position position) {
+    public void openChest(final BlockPosition position) {
         this.openChests.add(position);
     }
 
-    public void closeChest(final Position position) {
+    public void closeChest(final BlockPosition position) {
         this.openChests.remove(position);
     }
 
-    public boolean isChestOpen(final Position position) {
+    public boolean isChestOpen(final BlockPosition position) {
         return this.openChests.contains(position);
     }
 
@@ -45,9 +45,9 @@ public class ChestStateTracker implements StorableObject {
     }
 
     public void unload(final int chunkX, final int chunkZ) {
-        final Iterator<Position> it = this.openChests.iterator();
+        final Iterator<BlockPosition> it = this.openChests.iterator();
         while (it.hasNext()) {
-            final Position entry = it.next();
+            final BlockPosition entry = it.next();
             final int x = entry.x() >> 4;
             final int z = entry.z() >> 4;
 

@@ -18,7 +18,7 @@
 package net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.storage;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import net.raphimc.vialegacy.api.model.ChunkCoord;
@@ -48,12 +48,12 @@ public class ClassicPositionTracker implements StorableObject {
         wrapper.write(Types.BYTE, (byte) pitch); // pitch
     }
 
-    public Position getBlockPosition() {
-        return new Position(floor(this.posX), floor(this.stance), floor(this.posZ));
+    public BlockPosition getBlockPosition() {
+        return new BlockPosition(floor(this.posX), floor(this.stance), floor(this.posZ));
     }
 
     public ChunkCoord getChunkPosition() {
-        final Position pos = this.getBlockPosition();
+        final BlockPosition pos = this.getBlockPosition();
         return new ChunkCoord(pos.x() >> 4, pos.z() >> 4);
     }
 

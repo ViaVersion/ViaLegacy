@@ -19,7 +19,7 @@ package net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.storage;
 
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.util.IdAndData;
@@ -44,18 +44,18 @@ public class PendingBlocksTracker extends StoredObject {
         this.pendingBlockEntries.clear();
     }
 
-    public void addPending(final Position position, final IdAndData block) {
+    public void addPending(final BlockPosition position, final IdAndData block) {
         this.pendingBlockEntries.add(new PendingBlockEntry(position, block));
     }
 
-    public void markReceived(final Position position) {
+    public void markReceived(final BlockPosition position) {
         this.markReceived(position, position);
     }
 
-    public void markReceived(final Position startPos, final Position endPos) {
+    public void markReceived(final BlockPosition startPos, final BlockPosition endPos) {
         final Iterator<PendingBlockEntry> it = this.pendingBlockEntries.iterator();
         while (it.hasNext()) {
-            final Position pendingBlockPos = it.next().getPosition();
+            final BlockPosition pendingBlockPos = it.next().getPosition();
             if (pendingBlockPos.x() >= startPos.x() && pendingBlockPos.y() >= startPos.y() && pendingBlockPos.z() >= startPos.z() && pendingBlockPos.x() <= endPos.x() && pendingBlockPos.y() <= endPos.y() && pendingBlockPos.z() <= endPos.z()) {
                 it.remove();
             }
@@ -69,7 +69,7 @@ public class PendingBlocksTracker extends StoredObject {
             if (pendingBlockEntry.decrementAndCheckIsExpired()) {
                 it.remove();
                 final PacketWrapper blockChange = PacketWrapper.create(ClientboundPackets1_2_1.BLOCK_UPDATE, this.getUser());
-                blockChange.write(Types1_7_6.POSITION_UBYTE, pendingBlockEntry.getPosition()); // position
+                blockChange.write(Types1_7_6.BLOCK_POSITION_UBYTE, pendingBlockEntry.getPosition()); // position
                 blockChange.write(Types.UNSIGNED_BYTE, (short) pendingBlockEntry.getBlock().getId()); // block id
                 blockChange.write(Types.UNSIGNED_BYTE, (short) pendingBlockEntry.getBlock().getData()); // block data
                 blockChange.send(Protocolr1_1Tor1_2_1_3.class);

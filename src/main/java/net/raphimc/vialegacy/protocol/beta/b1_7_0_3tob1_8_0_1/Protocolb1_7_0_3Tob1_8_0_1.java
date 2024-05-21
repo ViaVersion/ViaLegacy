@@ -18,7 +18,7 @@
 package net.raphimc.vialegacy.protocol.beta.b1_7_0_3tob1_8_0_1;
 
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
@@ -277,14 +277,14 @@ public class Protocolb1_7_0_3Tob1_8_0_1 extends StatelessProtocol<ClientboundPac
                     final short status = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     if (status == 5) wrapper.cancel(); // Stop using item
                 });
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE); // direction
             }
         });
         this.registerServerbound(ServerboundPacketsb1_8.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE); // direction
                 map(Types1_4_2.NBTLESS_ITEM); // item
                 handler(wrapper -> {
@@ -298,7 +298,7 @@ public class Protocolb1_7_0_3Tob1_8_0_1 extends StatelessProtocol<ClientboundPac
                             entityStatus.send(Protocolb1_7_0_3Tob1_8_0_1.class);
                         }
                     } else {
-                        final Position pos = wrapper.get(Types1_7_6.POSITION_UBYTE, 0);
+                        final BlockPosition pos = wrapper.get(Types1_7_6.BLOCK_POSITION_UBYTE, 0);
                         if (wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos).getId() == BlockList1_6.cake.blockId()) {
                             final PacketWrapper updateHealth = PacketWrapper.create(ClientboundPacketsb1_7.SET_HEALTH, wrapper.user());
                             updateHealth.write(Types.SHORT, wrapper.user().get(PlayerHealthTracker.class).getHealth()); // health

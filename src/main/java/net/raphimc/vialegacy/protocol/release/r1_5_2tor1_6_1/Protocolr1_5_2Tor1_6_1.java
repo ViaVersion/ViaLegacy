@@ -171,7 +171,7 @@ public class Protocolr1_5_2Tor1_6_1 extends StatelessProtocol<ClientboundPackets
             public void register() {
                 map(Types.INT); // entity id
                 map(Types1_6_4.STRING); // motive
-                map(Types1_7_6.POSITION_INT); // position
+                map(Types1_7_6.BLOCK_POSITION_INT); // position
                 map(Types.INT); // rotation
                 handler(wrapper -> {
                     final int entityID = wrapper.get(Types.INT, 0);

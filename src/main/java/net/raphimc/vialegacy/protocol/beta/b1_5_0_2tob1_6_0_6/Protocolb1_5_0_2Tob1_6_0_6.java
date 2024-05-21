@@ -19,7 +19,7 @@ package net.raphimc.vialegacy.protocol.beta.b1_5_0_2tob1_6_0_6;
 
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
@@ -84,12 +84,12 @@ public class Protocolb1_5_0_2Tob1_6_0_6 extends StatelessProtocol<ClientboundPac
         this.registerServerbound(ServerboundPacketsb1_7.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE); // direction
                 map(Types1_4_2.NBTLESS_ITEM); // item
                 handler(wrapper -> {
                     final PlayerInfoStorage playerInfoStorage = wrapper.user().get(PlayerInfoStorage.class);
-                    Position pos = wrapper.get(Types1_7_6.POSITION_UBYTE, 0);
+                    BlockPosition pos = wrapper.get(Types1_7_6.BLOCK_POSITION_UBYTE, 0);
                     IdAndData block = wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos);
                     final Item item = wrapper.get(Types1_4_2.NBTLESS_ITEM, 0);
                     if (block.getId() == BlockList1_6.bed.blockId()) {
@@ -97,7 +97,7 @@ public class Protocolb1_5_0_2Tob1_6_0_6 extends StatelessProtocol<ClientboundPac
                         final boolean isFoot = (block.getData() & 8) != 0;
                         if (!isFoot) {
                             final int bedDirection = block.getData() & 3;
-                            pos = new Position(pos.x() + headBlockToFootBlock[bedDirection][0], pos.y(), pos.z() + headBlockToFootBlock[bedDirection][1]);
+                            pos = new BlockPosition(pos.x() + headBlockToFootBlock[bedDirection][0], pos.y(), pos.z() + headBlockToFootBlock[bedDirection][1]);
                             block = wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos);
                             if (block.getId() != BlockList1_6.bed.blockId()) return;
                         }
@@ -138,19 +138,19 @@ public class Protocolb1_5_0_2Tob1_6_0_6 extends StatelessProtocol<ClientboundPac
                         final PacketWrapper useBed = PacketWrapper.create(ClientboundPacketsb1_7.PLAYER_SLEEP, wrapper.user());
                         useBed.write(Types.INT, playerInfoStorage.entityId); // entity id
                         useBed.write(Types.BYTE, (byte) 0); // magic value (always 0)
-                        useBed.write(Types1_7_6.POSITION_BYTE, pos); // position
+                        useBed.write(Types1_7_6.BLOCK_POSITION_BYTE, pos); // position
                         useBed.send(Protocolb1_5_0_2Tob1_6_0_6.class);
                     } else if (block.getId() == BlockList1_6.jukebox.blockId()) {
                         if (block.getData() > 0) {
                             final PacketWrapper effect = PacketWrapper.create(ClientboundPacketsb1_7.LEVEL_EVENT, wrapper.user());
                             effect.write(Types.INT, 1005); // effect id
-                            effect.write(Types1_7_6.POSITION_UBYTE, pos); // position
+                            effect.write(Types1_7_6.BLOCK_POSITION_UBYTE, pos); // position
                             effect.write(Types.INT, 0); // data
                             effect.send(Protocolb1_5_0_2Tob1_6_0_6.class);
                         } else if (item != null && (item.identifier() == ItemList1_6.record13.itemId() || item.identifier() == ItemList1_6.recordCat.itemId())) {
                             final PacketWrapper effect = PacketWrapper.create(ClientboundPacketsb1_7.LEVEL_EVENT, wrapper.user());
                             effect.write(Types.INT, 1005); // effect id
-                            effect.write(Types1_7_6.POSITION_UBYTE, pos); // position
+                            effect.write(Types1_7_6.BLOCK_POSITION_UBYTE, pos); // position
                             effect.write(Types.INT, item.identifier()); // data
                             effect.send(Protocolb1_5_0_2Tob1_6_0_6.class);
                         }

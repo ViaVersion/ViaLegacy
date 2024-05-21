@@ -110,7 +110,7 @@ public class Protocolr1_0_0_1Tor1_1 extends StatelessProtocol<ClientboundPackets
         this.registerClientbound(ClientboundPackets1_0_0.UPDATE_SIGN, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT); // position
+                map(Types1_7_6.BLOCK_POSITION_SHORT); // position
                 map(Types1_6_4.STRING, Types1_6_4.STRING, msg -> msg.replace("\u00C2", "")); // line 1
                 map(Types1_6_4.STRING, Types1_6_4.STRING, msg -> msg.replace("\u00C2", "")); // line 2
                 map(Types1_6_4.STRING, Types1_6_4.STRING, msg -> msg.replace("\u00C2", "")); // line 3

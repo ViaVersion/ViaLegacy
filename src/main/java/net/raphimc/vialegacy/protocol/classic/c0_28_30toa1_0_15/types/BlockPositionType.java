@@ -15,35 +15,28 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.types;
+package net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.types;
 
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 
-import java.util.function.IntFunction;
+public class BlockPositionType extends Type<BlockPosition> {
 
-public class PositionVarYType<T extends Number> extends Type<Position> {
-
-    private final Type<T> yType;
-    private final IntFunction<T> yConverter;
-
-    public PositionVarYType(final Type<T> yType, final IntFunction<T> yConverter) {
-        super(Position.class);
-        this.yType = yType;
-        this.yConverter = yConverter;
+    public BlockPositionType() {
+        super(BlockPosition.class);
     }
 
     @Override
-    public Position read(ByteBuf buffer) {
-        return new Position(buffer.readInt(), this.yType.read(buffer).intValue(), buffer.readInt());
+    public BlockPosition read(ByteBuf buffer) {
+        return new BlockPosition(buffer.readShort(), (int) buffer.readShort(), buffer.readShort());
     }
 
     @Override
-    public void write(ByteBuf buffer, Position position) {
-        buffer.writeInt(position.x());
-        this.yType.write(buffer, this.yConverter.apply(position.y()));
-        buffer.writeInt(position.z());
+    public void write(ByteBuf buffer, BlockPosition position) {
+        buffer.writeShort(position.x());
+        buffer.writeShort(position.y());
+        buffer.writeShort(position.z());
     }
 
 }

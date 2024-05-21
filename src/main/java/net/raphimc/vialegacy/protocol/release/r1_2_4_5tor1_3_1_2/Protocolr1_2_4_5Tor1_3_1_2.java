@@ -22,8 +22,8 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.Environment;
-import com.viaversion.viaversion.api.minecraft.Position;
 import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
@@ -474,7 +474,7 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
         this.registerClientbound(ClientboundPackets1_2_4.BLOCK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE, Types.UNSIGNED_SHORT); // block id
                 map(Types.UNSIGNED_BYTE); // block data
             }
@@ -482,15 +482,15 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
         this.registerClientbound(ClientboundPackets1_2_4.BLOCK_EVENT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT); // position
+                map(Types1_7_6.BLOCK_POSITION_SHORT); // position
                 map(Types.BYTE); // type
                 map(Types.BYTE); // data
                 handler(wrapper -> {
-                    final IdAndData block = wrapper.user().get(ChunkTracker.class).getBlockNotNull(wrapper.get(Types1_7_6.POSITION_SHORT, 0));
+                    final IdAndData block = wrapper.user().get(ChunkTracker.class).getBlockNotNull(wrapper.get(Types1_7_6.BLOCK_POSITION_SHORT, 0));
                     wrapper.write(Types.SHORT, (short) block.getId()); // block id
 
                     final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
-                    final Position pos = wrapper.get(Types1_7_6.POSITION_SHORT, 0);
+                    final BlockPosition pos = wrapper.get(Types1_7_6.BLOCK_POSITION_SHORT, 0);
                     final byte type = wrapper.get(Types.BYTE, 0);
                     final short data = wrapper.get(Types.BYTE, 1);
                     final short blockId = wrapper.get(Types.SHORT, 0);
@@ -581,7 +581,7 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
         this.registerClientbound(ClientboundPackets1_2_4.BLOCK_ENTITY_DATA, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_SHORT); // position
+                map(Types1_7_6.BLOCK_POSITION_SHORT); // position
                 map(Types.BYTE); // type
                 handler(wrapper -> {
                     final int entityId = wrapper.read(Types.INT); // entity id
@@ -591,7 +591,7 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
                         wrapper.cancel();
                         return;
                     }
-                    final Position pos = wrapper.get(Types1_7_6.POSITION_SHORT, 0);
+                    final BlockPosition pos = wrapper.get(Types1_7_6.BLOCK_POSITION_SHORT, 0);
 
                     final CompoundTag tag = new CompoundTag();
                     tag.putString("EntityId", EntityList1_2_4.getEntityName(entityId));
@@ -677,7 +677,7 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
         this.registerServerbound(ServerboundPackets1_3_1.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE); // direction
                 map(Types1_7_6.ITEM, Types1_2_4.NBT_ITEM); // item
                 read(Types.UNSIGNED_BYTE); // offset x

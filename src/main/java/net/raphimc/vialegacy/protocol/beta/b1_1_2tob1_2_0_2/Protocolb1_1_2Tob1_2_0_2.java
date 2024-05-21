@@ -151,7 +151,7 @@ public class Protocolb1_1_2Tob1_2_0_2 extends StatelessProtocol<ClientboundPacke
         this.registerClientbound(ClientboundPacketsb1_1.BLOCK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE); // block id
                 map(Types.UNSIGNED_BYTE); // block data
                 handler(wrapper -> {
@@ -174,7 +174,7 @@ public class Protocolb1_1_2Tob1_2_0_2 extends StatelessProtocol<ClientboundPacke
         this.registerServerbound(ServerboundPacketsb1_2.USE_ITEM_ON, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE); // direction
                 map(Types1_4_2.NBTLESS_ITEM, Typesb1_1.NBTLESS_ITEM); // item
             }

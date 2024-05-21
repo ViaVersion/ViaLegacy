@@ -18,7 +18,7 @@
 package net.raphimc.vialegacy.api.remapper;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2IntMap;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2IntOpenHashMap;
@@ -122,7 +122,7 @@ public abstract class AbstractChunkTracker implements StorableObject {
         }
     }
 
-    public void trackAndRemap(final Position position, final IdAndData block) {
+    public void trackAndRemap(final BlockPosition position, final IdAndData block) {
         final int x = position.x();
         final int y = position.y();
         final int z = position.z();
@@ -170,7 +170,7 @@ public abstract class AbstractChunkTracker implements StorableObject {
         return this.chunks.containsKey(new ChunkCoord(chunkX, chunkZ));
     }
 
-    public IdAndData getBlockNotNull(final Position position) {
+    public IdAndData getBlockNotNull(final BlockPosition position) {
         return this.getBlockNotNull(position.x(), position.y(), position.z());
     }
 
@@ -180,7 +180,7 @@ public abstract class AbstractChunkTracker implements StorableObject {
         return block;
     }
 
-    public IdAndData getBlock(final Position position) {
+    public IdAndData getBlock(final BlockPosition position) {
         return this.getBlock(position.x(), position.y(), position.z());
     }
 

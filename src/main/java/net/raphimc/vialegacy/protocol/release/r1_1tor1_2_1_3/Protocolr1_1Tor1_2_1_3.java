@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
@@ -161,10 +161,10 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
                 wrapper.write(Types.INT, nonFullChunk.getZ());
                 wrapper.write(Types1_7_6.BLOCK_CHANGE_RECORD_ARRAY, nonFullChunk.asBlockChangeRecords().toArray(new BlockChangeRecord[0]));
 
-                pendingBlocksTracker.markReceived(new Position((nonFullChunk.getX() << 4) + nonFullChunk.getStartPos().x(), nonFullChunk.getStartPos().y(), (nonFullChunk.getZ() << 4) + nonFullChunk.getStartPos().z()), new Position((nonFullChunk.getX() << 4) + nonFullChunk.getEndPos().x() - 1, nonFullChunk.getEndPos().y() - 1, (nonFullChunk.getZ() << 4) + nonFullChunk.getEndPos().z() - 1));
+                pendingBlocksTracker.markReceived(new BlockPosition((nonFullChunk.getX() << 4) + nonFullChunk.getStartPos().x(), nonFullChunk.getStartPos().y(), (nonFullChunk.getZ() << 4) + nonFullChunk.getStartPos().z()), new BlockPosition((nonFullChunk.getX() << 4) + nonFullChunk.getEndPos().x() - 1, nonFullChunk.getEndPos().y() - 1, (nonFullChunk.getZ() << 4) + nonFullChunk.getEndPos().z() - 1));
                 return;
             }
-            pendingBlocksTracker.markReceived(new Position(chunk.getX() << 4, 0, chunk.getZ() << 4), new Position((chunk.getX() << 4) + 15, chunk.getSections().length * 16, (chunk.getZ() << 4) + 15));
+            pendingBlocksTracker.markReceived(new BlockPosition(chunk.getX() << 4, 0, chunk.getZ() << 4), new BlockPosition((chunk.getX() << 4) + 15, chunk.getSections().length * 16, (chunk.getZ() << 4) + 15));
 
             int[] newBiomeData;
             if (seedStorage.worldChunkManager != null) {
@@ -221,7 +221,7 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
                         final int targetX = record.getSectionX() + (chunkX << 4);
                         final int targetY = record.getY(-1);
                         final int targetZ = record.getSectionZ() + (chunkZ << 4);
-                        pendingBlocksTracker.markReceived(new Position(targetX, targetY, targetZ));
+                        pendingBlocksTracker.markReceived(new BlockPosition(targetX, targetY, targetZ));
                     }
                 });
             }
@@ -229,10 +229,10 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
         this.registerClientbound(ClientboundPackets1_1.BLOCK_UPDATE, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE); // block id
                 map(Types.UNSIGNED_BYTE); // block data
-                handler(wrapper -> wrapper.user().get(PendingBlocksTracker.class).markReceived(wrapper.get(Types1_7_6.POSITION_UBYTE, 0)));
+                handler(wrapper -> wrapper.user().get(PendingBlocksTracker.class).markReceived(wrapper.get(Types1_7_6.BLOCK_POSITION_UBYTE, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_1.EXPLODE, new PacketHandlers() {
@@ -251,7 +251,7 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
                     final int z = wrapper.get(Types.DOUBLE, 2).intValue();
                     final int recordCount = wrapper.get(Types.INT, 0);
                     for (int i = 0; i < recordCount; i++) {
-                        final Position pos = new Position(x + wrapper.passthrough(Types.BYTE), y + wrapper.passthrough(Types.BYTE), z + wrapper.passthrough(Types.BYTE));
+                        final BlockPosition pos = new BlockPosition(x + wrapper.passthrough(Types.BYTE), y + wrapper.passthrough(Types.BYTE), z + wrapper.passthrough(Types.BYTE));
                         final IdAndData block = chunkTracker.getBlockNotNull(pos);
                         if (block.getId() != 0) {
                             pendingBlocksTracker.addPending(pos, block);
@@ -264,7 +264,7 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
             @Override
             public void register() {
                 map(Types.INT); // effect id
-                map(Types1_7_6.POSITION_UBYTE); // position
+                map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.INT); // data
                 handler(wrapper -> {
                     final int sfxId = wrapper.get(Types.INT, 0);

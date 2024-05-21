@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.storage;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Position;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
 import com.viaversion.viaversion.api.minecraft.chunks.*;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.util.ChunkUtil;
@@ -194,7 +194,7 @@ public class ClassicLevelStorage extends StoredObject {
         return this.loadedChunks.contains(coord);
     }
 
-    public boolean isChunkLoaded(final Position position) {
+    public boolean isChunkLoaded(final BlockPosition position) {
         return this.isChunkLoaded(new ChunkCoord(position.x() >> 4, position.z() >> 4));
     }
 
