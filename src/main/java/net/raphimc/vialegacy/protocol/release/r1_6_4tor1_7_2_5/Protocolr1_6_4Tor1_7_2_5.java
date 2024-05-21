@@ -1069,33 +1069,25 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                     final String channel = wrapper.read(Types.STRING); // channel
                     short length = wrapper.read(Types.SHORT); // length
 
-                    try {
-                        switch (channel) {
-                            case "MC|BEdit":
-                            case "MC|BSign":
-                                itemRewriter.handleItemToServer(wrapper.user(), wrapper.passthrough(Types1_7_6.ITEM));
-                                length = (short) PacketUtil.calculateLength(wrapper);
-                                break;
-                            case "MC|AdvCdm":
-                                final byte type = wrapper.read(Types.BYTE); // command block type
-                                if (type == 0) {
-                                    wrapper.passthrough(Types.INT); // x
-                                    wrapper.passthrough(Types.INT); // y
-                                    wrapper.passthrough(Types.INT); // z
-                                    wrapper.passthrough(Types.STRING); // command
-                                } else {
-                                    wrapper.cancel();
-                                    return;
-                                }
-                                length = (short) PacketUtil.calculateLength(wrapper);
-                                break;
-                        }
-                    } catch (Exception e) {
-                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to handle packet", e);
-                        }
-                        wrapper.cancel();
-                        return;
+                    switch (channel) {
+                        case "MC|BEdit":
+                        case "MC|BSign":
+                            itemRewriter.handleItemToServer(wrapper.user(), wrapper.passthrough(Types1_7_6.ITEM));
+                            length = (short) PacketUtil.calculateLength(wrapper);
+                            break;
+                        case "MC|AdvCdm":
+                            final byte type = wrapper.read(Types.BYTE); // command block type
+                            if (type == 0) {
+                                wrapper.passthrough(Types.INT); // x
+                                wrapper.passthrough(Types.INT); // y
+                                wrapper.passthrough(Types.INT); // z
+                                wrapper.passthrough(Types.STRING); // command
+                            } else {
+                                wrapper.cancel();
+                                return;
+                            }
+                            length = (short) PacketUtil.calculateLength(wrapper);
+                            break;
                     }
 
                     wrapper.resetReader();

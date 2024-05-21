@@ -66,7 +66,6 @@ import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.types.Types1_7_6;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.logging.Level;
 
 public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets1_7_2, ClientboundPackets1_8, ServerboundPackets1_7_2, ServerboundPackets1_8> {
 
@@ -1378,69 +1377,61 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                         return;
                     }
 
-                    try {
-                        switch (channel) {
-                            case "MC|BEdit":
-                            case "MC|BSign":
-                                final Item item = wrapper.read(Types.ITEM1_8); // book
-                                itemRewriter.handleItemToServer(wrapper.user(), item);
-                                wrapper.write(Types1_7_6.ITEM, item); // book
-                                break;
-                            case "MC|Brand":
-                            case "MC|ItemName":
-                                final String content = wrapper.read(Types.STRING); // client brand or item name
-                                wrapper.write(Types.REMAINING_BYTES, content.getBytes(StandardCharsets.UTF_8)); // client brand or item name
-                                break;
-                            case "MC|AdvCdm":
-                                final byte type = wrapper.passthrough(Types.BYTE); // command block type (0 = Block, 1 = Minecart)
-                                if (type == 0) {
-                                    wrapper.passthrough(Types.INT); // x
-                                    wrapper.passthrough(Types.INT); // y
-                                    wrapper.passthrough(Types.INT); // z
-                                } else if (type == 1) {
-                                    wrapper.passthrough(Types.INT); // entity id
-                                } else {
-                                    if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                        ViaLegacy.getPlatform().getLogger().warning("Unknown 1.8 command block type: " + type);
+                    switch (channel) {
+                        case "MC|BEdit":
+                        case "MC|BSign":
+                            final Item item = wrapper.read(Types.ITEM1_8); // book
+                            itemRewriter.handleItemToServer(wrapper.user(), item);
+                            wrapper.write(Types1_7_6.ITEM, item); // book
+                            break;
+                        case "MC|Brand":
+                        case "MC|ItemName":
+                            final String content = wrapper.read(Types.STRING); // client brand or item name
+                            wrapper.write(Types.REMAINING_BYTES, content.getBytes(StandardCharsets.UTF_8)); // client brand or item name
+                            break;
+                        case "MC|AdvCdm":
+                            final byte type = wrapper.passthrough(Types.BYTE); // command block type (0 = Block, 1 = Minecart)
+                            if (type == 0) {
+                                wrapper.passthrough(Types.INT); // x
+                                wrapper.passthrough(Types.INT); // y
+                                wrapper.passthrough(Types.INT); // z
+                            } else if (type == 1) {
+                                wrapper.passthrough(Types.INT); // entity id
+                            } else {
+                                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                                    ViaLegacy.getPlatform().getLogger().warning("Unknown 1.8 command block type: " + type);
+                                }
+                                wrapper.cancel();
+                                return;
+                            }
+                            wrapper.passthrough(Types.STRING); // command
+                            wrapper.read(Types.BOOLEAN); // track output
+                            break;
+                        case "REGISTER":
+                        case "UNREGISTER":
+                            byte[] channels = wrapper.read(Types.REMAINING_BYTES);
+
+                            if (ViaLegacy.getConfig().isIgnoreLong1_8ChannelNames()) {
+                                final String[] registeredChannels = new String(channels, StandardCharsets.UTF_8).split("\0");
+                                final List<String> validChannels = new ArrayList<>(registeredChannels.length);
+                                for (String registeredChannel : registeredChannels) {
+                                    if (registeredChannel.length() > 16) {
+                                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                                            ViaLegacy.getPlatform().getLogger().warning("Ignoring serverbound plugin channel register of '" + registeredChannel + "', as it is longer than 16 characters");
+                                        }
+                                        continue;
                                     }
+                                    validChannels.add(registeredChannel);
+                                }
+                                if (validChannels.isEmpty()) {
                                     wrapper.cancel();
                                     return;
                                 }
-                                wrapper.passthrough(Types.STRING); // command
-                                wrapper.read(Types.BOOLEAN); // track output
-                                break;
-                            case "REGISTER":
-                            case "UNREGISTER":
-                                byte[] channels = wrapper.read(Types.REMAINING_BYTES);
+                                channels = Joiner.on('\0').join(validChannels).getBytes(StandardCharsets.UTF_8);
+                            }
 
-                                if (ViaLegacy.getConfig().isIgnoreLong1_8ChannelNames()) {
-                                    final String[] registeredChannels = new String(channels, StandardCharsets.UTF_8).split("\0");
-                                    final List<String> validChannels = new ArrayList<>(registeredChannels.length);
-                                    for (String registeredChannel : registeredChannels) {
-                                        if (registeredChannel.length() > 16) {
-                                            if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                                                ViaLegacy.getPlatform().getLogger().warning("Ignoring serverbound plugin channel register of '" + registeredChannel + "', as it is longer than 16 characters");
-                                            }
-                                            continue;
-                                        }
-                                        validChannels.add(registeredChannel);
-                                    }
-                                    if (validChannels.isEmpty()) {
-                                        wrapper.cancel();
-                                        return;
-                                    }
-                                    channels = Joiner.on('\0').join(validChannels).getBytes(StandardCharsets.UTF_8);
-                                }
-
-                                wrapper.write(Types.REMAINING_BYTES, channels); // data
-                                break;
-                        }
-                    } catch (Exception e) {
-                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
-                            Via.getPlatform().getLogger().log(Level.WARNING, "Failed to handle packet", e);
-                        }
-                        wrapper.cancel();
-                        return;
+                            wrapper.write(Types.REMAINING_BYTES, channels); // data
+                            break;
                     }
 
                     final short length = (short) PacketUtil.calculateLength(wrapper);
