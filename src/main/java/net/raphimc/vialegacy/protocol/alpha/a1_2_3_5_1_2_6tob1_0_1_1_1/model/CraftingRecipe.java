@@ -17,7 +17,6 @@
  */
 package net.raphimc.vialegacy.protocol.alpha.a1_2_3_5_1_2_6tob1_0_1_1_1.model;
 
-import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 
 public class CraftingRecipe {
@@ -72,7 +71,7 @@ public class CraftingRecipe {
     }
 
     public Item createResult() {
-        return new DataItem(this.resultItem);
+        return this.resultItem.copy();
     }
 
     public int getRecipeSize() {

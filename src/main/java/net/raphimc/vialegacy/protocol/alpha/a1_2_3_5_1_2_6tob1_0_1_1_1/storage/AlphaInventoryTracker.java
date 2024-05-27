@@ -20,7 +20,6 @@ package net.raphimc.vialegacy.protocol.alpha.a1_2_3_5_1_2_6tob1_0_1_1_1.storage;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
-import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
@@ -431,7 +430,7 @@ public class AlphaInventoryTracker extends StoredObject {
 
     private Item splitStack(final Item item, final int size) {
         item.setAmount(item.amount() - size);
-        final Item newItem = new DataItem(item);
+        final Item newItem = item.copy();
         newItem.setAmount(size);
         return newItem;
     }

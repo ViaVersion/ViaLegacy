@@ -454,7 +454,7 @@ public class Protocola1_2_3_5_1_2_6Tob1_0_1_1_1 extends StatelessProtocol<Client
     }
 
     public static Item copyItem(final Item item) {
-        return item == null ? null : new DataItem(item);
+        return item == null ? null : item.copy();
     }
 
     public static Item[] copyItems(final Item[] items) {
