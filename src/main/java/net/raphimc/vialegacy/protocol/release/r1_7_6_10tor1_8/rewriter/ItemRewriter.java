@@ -18,11 +18,14 @@
 package net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.rewriter;
 
 import com.viaversion.nbt.tag.CompoundTag;
+import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.libs.mcstructs.text.components.StringComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSerializer;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
@@ -101,6 +104,14 @@ public class ItemRewriter extends LegacyItemRewriter<ClientboundPackets1_7_2, Se
 
                 gameProfileFetcher.getMojangUUIDAsync(skullOwnerName).thenAccept(gameProfileFetcher::getGameProfile);
             }
+        } else if ((item.identifier() == ItemList1_6.writtenBook.itemId() || item.identifier() == ItemList1_6.writableBook.itemId()) && item.tag() != null) {
+            final ListTag<StringTag> pages = item.tag().getListTag("pages", StringTag.class);
+            if (pages == null) return item;
+
+            for (int i = 0; i < pages.size(); i++) {
+                final String text = pages.get(i).getValue();
+                pages.set(i, new StringTag(TextComponentSerializer.V1_8.serialize(new StringComponent(text))));
+            }
         }
 
         return item;
@@ -115,6 +126,14 @@ public class ItemRewriter extends LegacyItemRewriter<ClientboundPackets1_7_2, Se
             if (!item.tag().contains("1_7_SkullOwner")) break NOT_VALID;
             if (item.tag().get("1_7_SkullOwner") instanceof StringTag) {
                 item.tag().put("SkullOwner", item.tag().remove("1_7_SkullOwner"));
+            }
+        } else if ((item.identifier() == ItemList1_6.writtenBook.itemId() || item.identifier() == ItemList1_6.writableBook.itemId()) && item.tag() != null) {
+            final ListTag<StringTag> pages = item.tag().getListTag("pages", StringTag.class);
+            if (pages == null) break NOT_VALID;
+
+            for (int i = 0; i < pages.size(); i++) {
+                final String text = pages.get(i).getValue();
+                pages.set(i, new StringTag(TextComponentSerializer.V1_8.deserialize(text).asLegacyFormatString()));
             }
         }
 
