@@ -41,28 +41,18 @@ public class EntityDataRewriter {
                 entry.setId(entityDataIndex.getNewIndex());
 
                 switch (entityDataIndex.getNewType()) {
-                    case BYTE:
-                        entry.setValue(((Number) value).byteValue());
-                        break;
-                    case SHORT:
-                        entry.setValue(((Number) value).shortValue());
-                        break;
-                    case INT:
-                        entry.setValue(((Number) value).intValue());
-                        break;
-                    case FLOAT:
-                        entry.setValue(((Number) value).floatValue());
-                        break;
-                    case ITEM:
-                    case STRING:
-                    case BLOCK_POSITION:
-                        break;
-                    default:
+                    case BYTE -> entry.setValue(((Number) value).byteValue());
+                    case SHORT -> entry.setValue(((Number) value).shortValue());
+                    case INT -> entry.setValue(((Number) value).intValue());
+                    case FLOAT -> entry.setValue(((Number) value).floatValue());
+                    case ITEM, STRING, BLOCK_POSITION -> {
+                    }
+                    default -> {
                         if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                             ViaLegacy.getPlatform().getLogger().warning("1.5.2 EntityDataRewriter: Unhandled Type: " + entityDataIndex.getNewType() + " " + entry);
                         }
                         list.remove(entry);
-                        break;
+                    }
                 }
             } catch (Throwable e) {
                 if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {

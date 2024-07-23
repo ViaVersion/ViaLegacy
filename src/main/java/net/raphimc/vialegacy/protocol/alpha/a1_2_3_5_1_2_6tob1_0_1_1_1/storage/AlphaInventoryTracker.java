@@ -110,7 +110,7 @@ public class AlphaInventoryTracker extends StoredObject {
             int slotStackLimit = 64;
             boolean isCraftingResultSlot = false;
             switch (windowId) {
-                case 0:
+                case 0 -> {
                     slots = new Item[45];
                     System.arraycopy(this.mainInventory, 0, slots, 36, 9);
                     System.arraycopy(this.mainInventory, 9, slots, 9, 36 - 9);
@@ -122,8 +122,8 @@ public class AlphaInventoryTracker extends StoredObject {
                     if (isCraftingResultSlot) {
                         slots[0] = CraftingManager.getResult(this.craftingInventory);
                     }
-                    break;
-                case InventoryStorage.WORKBENCH_WID:
+                }
+                case InventoryStorage.WORKBENCH_WID -> {
                     slots = new Item[46];
                     System.arraycopy(this.openContainerItems, 0, slots, 0, 10);
                     System.arraycopy(this.mainInventory, 0, slots, 37, 9);
@@ -134,19 +134,19 @@ public class AlphaInventoryTracker extends StoredObject {
                         final Item[] craftingGrid = Arrays.copyOfRange(this.openContainerItems, 1, 10);
                         slots[0] = CraftingManager.getResult(craftingGrid);
                     }
-                    break;
-                case InventoryStorage.FURNACE_WID:
+                }
+                case InventoryStorage.FURNACE_WID -> {
                     slots = new Item[39];
                     System.arraycopy(this.openContainerItems, 0, slots, 0, 3);
                     System.arraycopy(this.mainInventory, 0, slots, 30, 9);
                     System.arraycopy(this.mainInventory, 9, slots, 3, 36 - 9);
-                    break;
-                case InventoryStorage.CHEST_WID:
+                }
+                case InventoryStorage.CHEST_WID -> {
                     slots = new Item[63];
                     System.arraycopy(this.openContainerItems, 0, slots, 0, 3 * 9);
                     System.arraycopy(this.mainInventory, 0, slots, 54, 9);
                     System.arraycopy(this.mainInventory, 9, slots, 27, 36 - 9);
-                    break;
+                }
             }
 
             if (slots != null) {
@@ -192,46 +192,46 @@ public class AlphaInventoryTracker extends StoredObject {
                 }
 
                 switch (windowId) {
-                    case 0:
+                    case 0 -> {
                         System.arraycopy(slots, 36, this.mainInventory, 0, 9);
                         System.arraycopy(slots, 9, this.mainInventory, 9, 36 - 9);
                         System.arraycopy(slots, 1, this.craftingInventory, 0, 4);
                         System.arraycopy(slots, 5, this.armorInventory, 0, 4);
                         this.armorInventory = reverseArray(this.armorInventory);
-                        break;
-                    case InventoryStorage.WORKBENCH_WID:
+                    }
+                    case InventoryStorage.WORKBENCH_WID -> {
                         System.arraycopy(slots, 0, this.openContainerItems, 0, 10);
                         System.arraycopy(slots, 37, this.mainInventory, 0, 9);
                         System.arraycopy(slots, 10, this.mainInventory, 9, 36 - 9);
-                        break;
-                    case InventoryStorage.FURNACE_WID:
+                    }
+                    case InventoryStorage.FURNACE_WID -> {
                         System.arraycopy(slots, 0, this.openContainerItems, 0, 3);
                         System.arraycopy(slots, 30, this.mainInventory, 0, 9);
                         System.arraycopy(slots, 3, this.mainInventory, 9, 36 - 9);
-                        break;
-                    case InventoryStorage.CHEST_WID:
+                    }
+                    case InventoryStorage.CHEST_WID -> {
                         System.arraycopy(slots, 0, this.openContainerItems, 0, 3 * 9);
                         System.arraycopy(slots, 54, this.mainInventory, 0, 9);
                         System.arraycopy(slots, 27, this.mainInventory, 9, 36 - 9);
-                        break;
+                    }
                 }
                 this.updateInventory(windowId, slots);
 
                 boolean updateCraftResultSlot = false;
                 switch (windowId) {
-                    case 0:
+                    case 0 -> {
                         updateCraftResultSlot = !this.isEmpty(this.craftingInventory);
                         if (updateCraftResultSlot) {
                             slots[0] = CraftingManager.getResult(this.craftingInventory);
                         }
-                        break;
-                    case InventoryStorage.WORKBENCH_WID:
+                    }
+                    case InventoryStorage.WORKBENCH_WID -> {
                         final Item[] craftingGrid = Arrays.copyOfRange(this.openContainerItems, 1, 10);
                         updateCraftResultSlot = !this.isEmpty(craftingGrid);
                         if (updateCraftResultSlot) {
                             slots[0] = CraftingManager.getResult(craftingGrid);
                         }
-                        break;
+                    }
                 }
 
                 if (updateCraftResultSlot) this.updateInventorySlot(windowId, (short) 0, slots[0]);

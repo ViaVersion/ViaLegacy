@@ -368,18 +368,10 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     int modX = 0;
                     int modZ = 0;
                     switch (rotation) {
-                        case 0:
-                            modZ = 1;
-                            break;
-                        case 1:
-                            modX = -1;
-                            break;
-                        case 2:
-                            modZ = -1;
-                            break;
-                        case 3:
-                            modX = 1;
-                            break;
+                        case 0 -> modZ = 1;
+                        case 1 -> modX = -1;
+                        case 2 -> modZ = -1;
+                        case 3 -> modX = 1;
                     }
                     wrapper.set(Types.BLOCK_POSITION1_8, 0, new BlockPosition(pos.x() + modX, pos.y(), pos.z() + modZ));
 
@@ -821,48 +813,25 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
 
             final String inventoryName;
             switch (windowType) {
-                case 0:
-                    inventoryName = "minecraft:chest";
-                    break;
-                case 1:
-                    inventoryName = "minecraft:crafting_table";
-                    break;
-                case 2:
-                    inventoryName = "minecraft:furnace";
-                    break;
-                case 3:
-                    inventoryName = "minecraft:dispenser";
-                    break;
-                case 4:
-                    inventoryName = "minecraft:enchanting_table";
-                    break;
-                case 5:
-                    inventoryName = "minecraft:brewing_stand";
-                    break;
-                case 6:
+                case 0 -> inventoryName = "minecraft:chest";
+                case 1 -> inventoryName = "minecraft:crafting_table";
+                case 2 -> inventoryName = "minecraft:furnace";
+                case 3 -> inventoryName = "minecraft:dispenser";
+                case 4 -> inventoryName = "minecraft:enchanting_table";
+                case 5 -> inventoryName = "minecraft:brewing_stand";
+                case 6 -> {
                     inventoryName = "minecraft:villager";
                     if (!useProvidedWindowTitle || title.isEmpty()) {
                         title = "entity.Villager.name";
                         useProvidedWindowTitle = false;
                     }
-                    break;
-                case 7:
-                    inventoryName = "minecraft:beacon";
-                    break;
-                case 8:
-                    inventoryName = "minecraft:anvil";
-                    break;
-                case 9:
-                    inventoryName = "minecraft:hopper";
-                    break;
-                case 10:
-                    inventoryName = "minecraft:dropper";
-                    break;
-                case 11:
-                    inventoryName = "EntityHorse";
-                    break;
-                default:
-                    throw new IllegalArgumentException("Unknown window type: " + windowType);
+                }
+                case 7 -> inventoryName = "minecraft:beacon";
+                case 8 -> inventoryName = "minecraft:anvil";
+                case 9 -> inventoryName = "minecraft:hopper";
+                case 10 -> inventoryName = "minecraft:dropper";
+                case 11 -> inventoryName = "EntityHorse";
+                default -> throw new IllegalArgumentException("Unknown window type: " + windowType);
             }
 
             if (windowType == 1/*crafting_table*/ || windowType == 4/*enchanting_table*/ || windowType == 8/*anvil*/) {
@@ -928,23 +897,16 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     final short windowType = wrapper.user().get(WindowTracker.class).get(windowId);
                     if (windowType == 2) { // furnace
                         switch (progressBar) {
-                            case 0: { // cookTime
+                            case 0 /* cookTime */ -> {
                                 progressBar = 2;
                                 final PacketWrapper windowProperty = PacketWrapper.create(ClientboundPackets1_8.CONTAINER_SET_DATA, wrapper.user());
                                 windowProperty.write(Types.UNSIGNED_BYTE, windowId);
                                 windowProperty.write(Types.SHORT, (short) 3);
                                 windowProperty.write(Types.SHORT, (short) 200);
                                 windowProperty.send(Protocolr1_7_6_10Tor1_8.class);
-                                break;
                             }
-                            case 1: { // furnaceBurnTime
-                                progressBar = 0;
-                                break;
-                            }
-                            case 2: { // currentItemBurnTime
-                                progressBar = 1;
-                                break;
-                            }
+                            case 1 /* furnaceBurnTime */ -> progressBar = 0;
+                            case 2 /* currentItemBurnTime */ -> progressBar = 1;
                         }
                         wrapper.set(Types.SHORT, 0, progressBar);
                     }
@@ -1115,11 +1077,8 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 handlerSoftFail(wrapper -> {
                     final String channel = wrapper.get(Types.STRING, 0);
                     switch (channel) {
-                        case "MC|Brand": {
-                            wrapper.write(Types.STRING, new String(wrapper.read(Types.REMAINING_BYTES), StandardCharsets.UTF_8)); // brand
-                            break;
-                        }
-                        case "MC|TrList":
+                        case "MC|Brand" -> wrapper.write(Types.STRING, new String(wrapper.read(Types.REMAINING_BYTES), StandardCharsets.UTF_8)); // brand
+                        case "MC|TrList" -> {
                             wrapper.passthrough(Types.INT); // window id
                             final int count = wrapper.passthrough(Types.UNSIGNED_BYTE); // count
                             for (int i = 0; i < count; i++) {
@@ -1142,14 +1101,13 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                                 wrapper.write(Types.INT, 0); // uses
                                 wrapper.write(Types.INT, Integer.MAX_VALUE); // max uses
                             }
-                            break;
-                        case "MC|RPack": {
+                        }
+                        case "MC|RPack" -> {
                             final String url = new String(wrapper.read(Types.REMAINING_BYTES), StandardCharsets.UTF_8); // url
                             wrapper.clearPacket();
                             wrapper.setPacketType(ClientboundPackets1_8.RESOURCE_PACK);
                             wrapper.write(Types.STRING, url); // url
                             wrapper.write(Types.STRING, "legacy"); // hash
-                            break;
                         }
                     }
                 });
@@ -1378,18 +1336,16 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     }
 
                     switch (channel) {
-                        case "MC|BEdit":
-                        case "MC|BSign":
+                        case "MC|BEdit", "MC|BSign" -> {
                             final Item item = wrapper.read(Types.ITEM1_8); // book
                             itemRewriter.handleItemToServer(wrapper.user(), item);
                             wrapper.write(Types1_7_6.ITEM, item); // book
-                            break;
-                        case "MC|Brand":
-                        case "MC|ItemName":
+                        }
+                        case "MC|Brand", "MC|ItemName" -> {
                             final String content = wrapper.read(Types.STRING); // client brand or item name
                             wrapper.write(Types.REMAINING_BYTES, content.getBytes(StandardCharsets.UTF_8)); // client brand or item name
-                            break;
-                        case "MC|AdvCdm":
+                        }
+                        case "MC|AdvCdm" -> {
                             final byte type = wrapper.passthrough(Types.BYTE); // command block type (0 = Block, 1 = Minecart)
                             if (type == 0) {
                                 wrapper.passthrough(Types.INT); // x
@@ -1406,9 +1362,8 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                             }
                             wrapper.passthrough(Types.STRING); // command
                             wrapper.read(Types.BOOLEAN); // track output
-                            break;
-                        case "REGISTER":
-                        case "UNREGISTER":
+                        }
+                        case "REGISTER", "UNREGISTER" -> {
                             byte[] channels = wrapper.read(Types.REMAINING_BYTES);
 
                             if (ViaLegacy.getConfig().isIgnoreLong1_8ChannelNames()) {
@@ -1431,7 +1386,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                             }
 
                             wrapper.write(Types.REMAINING_BYTES, channels); // data
-                            break;
+                        }
                     }
 
                     final short length = (short) PacketUtil.calculateLength(wrapper);

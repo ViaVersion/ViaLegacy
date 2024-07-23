@@ -87,31 +87,19 @@ public class EntityDataRewriter {
                 }
 
                 switch (entityDataIndex.getNewType()) {
-                    case BYTE:
-                        entry.setValue(((Number) value).byteValue());
-                        break;
-                    case SHORT:
-                        entry.setValue(((Number) value).shortValue());
-                        break;
-                    case INT:
-                        entry.setValue(((Number) value).intValue());
-                        break;
-                    case FLOAT:
-                        entry.setValue(((Number) value).floatValue());
-                        break;
-                    case ITEM:
-                        this.protocol.getItemRewriter().handleItemToClient(user, (Item) value);
-                        break;
-                    case STRING:
-                    case BLOCK_POSITION:
-                    case ROTATIONS:
-                        break;
-                    default:
+                    case BYTE -> entry.setValue(((Number) value).byteValue());
+                    case SHORT -> entry.setValue(((Number) value).shortValue());
+                    case INT -> entry.setValue(((Number) value).intValue());
+                    case FLOAT -> entry.setValue(((Number) value).floatValue());
+                    case ITEM -> this.protocol.getItemRewriter().handleItemToClient(user, (Item) value);
+                    case STRING, BLOCK_POSITION, ROTATIONS -> {
+                    }
+                    default -> {
                         if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
                             ViaLegacy.getPlatform().getLogger().warning("1.7.10 EntityDataRewriter: Unhandled Type: " + entityDataIndex.getNewType() + " " + entry);
                         }
                         list.remove(entry);
-                        break;
+                    }
                 }
             } catch (Throwable e) {
                 if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {

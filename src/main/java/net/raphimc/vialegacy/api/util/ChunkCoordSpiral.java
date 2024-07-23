@@ -73,18 +73,10 @@ public class ChunkCoordSpiral implements Iterable<ChunkCoord> {
                 floorN = (int) Math.floor(n);
                 if (j < floorN) {
                     switch (i % 4) {
-                        case 0:
-                            z += step;
-                            break;
-                        case 1:
-                            x += step;
-                            break;
-                        case 2:
-                            z -= step;
-                            break;
-                        case 3:
-                            x -= step;
-                            break;
+                        case 0 -> z += step;
+                        case 1 -> x += step;
+                        case 2 -> z -= step;
+                        case 3 -> x -= step;
                     }
                     j++;
                     return new ChunkCoord(x, z);

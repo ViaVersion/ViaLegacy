@@ -113,14 +113,12 @@ public class Protocolr1_4_6_7Tor1_5_0_1 extends StatelessProtocol<ClientboundPac
                         boolean addSlot = false;
 
                         switch (mode) {
-                            case 4:
-                                droppingUsingQ = button + (slot != -999 ? 2 : 0) == 2;
-                                break;
-                            case 5:
+                            case 4 -> droppingUsingQ = button + (slot != -999 ? 2 : 0) == 2;
+                            case 5 -> {
                                 startDragging = button == 0;
                                 endDragging = button == 2;
                                 addSlot = button == 1;
-                                break;
+                            }
                         }
 
                         final boolean leftClick = startDragging || addSlot || endDragging;

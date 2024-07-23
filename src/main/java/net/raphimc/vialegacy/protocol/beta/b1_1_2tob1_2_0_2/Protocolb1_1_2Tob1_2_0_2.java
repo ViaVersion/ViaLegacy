@@ -74,24 +74,12 @@ public class Protocolb1_1_2Tob1_2_0_2 extends StatelessProtocol<ClientboundPacke
                     final EntityFlagStorage entityFlagStorage = wrapper.user().get(EntityFlagStorage.class);
                     final int oldMask = entityFlagStorage.getFlagMask(entityId);
                     switch (animationId) {
-                        case 100: // start riding
-                            entityFlagStorage.setFlag(entityId, 2, true);
-                            break;
-                        case 101: // stop riding
-                            entityFlagStorage.setFlag(entityId, 2, false);
-                            break;
-                        case 102: // start burning
-                            entityFlagStorage.setFlag(entityId, 0, true);
-                            break;
-                        case 103: // stop burning
-                            entityFlagStorage.setFlag(entityId, 0, false);
-                            break;
-                        case 104: // start sneaking
-                            entityFlagStorage.setFlag(entityId, 1, true);
-                            break;
-                        case 105: // stop sneaking
-                            entityFlagStorage.setFlag(entityId, 1, false);
-                            break;
+                        case 100 /* start riding */ -> entityFlagStorage.setFlag(entityId, 2, true);
+                        case 101 /* stop riding */ -> entityFlagStorage.setFlag(entityId, 2, false);
+                        case 102 /* start burning */ -> entityFlagStorage.setFlag(entityId, 0, true);
+                        case 103 /* stop burning */ -> entityFlagStorage.setFlag(entityId, 0, false);
+                        case 104 /* start sneaking */ -> entityFlagStorage.setFlag(entityId, 1, true);
+                        case 105 /* stop sneaking */ -> entityFlagStorage.setFlag(entityId, 1, false);
                     }
 
                     if (oldMask != entityFlagStorage.getFlagMask(entityId)) {

@@ -80,21 +80,22 @@ public class Protocola1_2_3_5_1_2_6Tob1_0_1_1_1 extends StatelessProtocol<Client
             System.arraycopy(inventoryStorage.armorInventory, 0, windowItems, 5, 4);
 
             switch (type) {
-                case -1: // main
+                case -1 /* maim */ -> {
                     inventoryStorage.mainInventory = items;
                     if (inventoryTracker != null) inventoryTracker.setMainInventory(copyItems(items));
                     System.arraycopy(items, 0, windowItems, 36, 9);
-                    System.arraycopy(items, 9, windowItems, 9, 36 - 9);
-                    break;
-                case -2: // crafting
+                    System.arraycopy(items, 9, windowItems, 9, 36 - 9); // main
+                }
+                case -2 /* crafting */ -> {
                     inventoryStorage.craftingInventory = items;
                     if (inventoryTracker != null) inventoryTracker.setCraftingInventory(copyItems(items));
-                    System.arraycopy(items, 0, windowItems, 1, 4);
-                    break;
-                case -3: // armor
+                    System.arraycopy(items, 0, windowItems, 1, 4); // crafting
+                }
+                case -3 /* armor */ -> {
                     inventoryStorage.armorInventory = items;
                     if (inventoryTracker != null) inventoryTracker.setArmorInventory(copyItems(items));
-                    System.arraycopy(reverseArray(items), 0, windowItems, 5, 4);
+                    System.arraycopy(reverseArray(items), 0, windowItems, 5, 4); // armor
+                }
             }
 
             wrapper.write(Types.BYTE, (byte) 0); // window id

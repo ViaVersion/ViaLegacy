@@ -90,28 +90,17 @@ public class PreNettyTypes {
         for (byte b = buffer.readByte(); b != 127; b = buffer.readByte()) {
             int i = (b & 224) >> 5;
             switch (i) {
-                case 0:
-                    buffer.readByte();
-                    break;
-                case 1:
-                    buffer.readShort();
-                    break;
-                case 2:
-                    buffer.readInt();
-                    break;
-                case 3:
-                    buffer.readFloat();
-                    break;
-                case 4:
-                    readString(buffer);
-                    break;
-                case 5:
-                    readItemStack1_3_1(buffer);
-                    break;
-                case 6:
+                case 0 -> buffer.readByte();
+                case 1 -> buffer.readShort();
+                case 2 -> buffer.readInt();
+                case 3 -> buffer.readFloat();
+                case 4 -> readString(buffer);
+                case 5 -> readItemStack1_3_1(buffer);
+                case 6 -> {
                     buffer.readInt();
                     buffer.readInt();
                     buffer.readInt();
+                }
             }
         }
     }
@@ -120,32 +109,23 @@ public class PreNettyTypes {
         for (byte b = buffer.readByte(); b != 127; b = buffer.readByte()) {
             int i = (b & 224) >> 5;
             switch (i) {
-                case 0:
-                    buffer.readByte();
-                    break;
-                case 1:
-                    buffer.readShort();
-                    break;
-                case 2:
-                    buffer.readInt();
-                    break;
-                case 3:
-                    buffer.readFloat();
-                    break;
-                case 4:
-                    readString(buffer);
-                    break;
-                case 5:
+                case 0 -> buffer.readByte();
+                case 1 -> buffer.readShort();
+                case 2 -> buffer.readInt();
+                case 3 -> buffer.readFloat();
+                case 4 -> readString(buffer);
+                case 5 -> {
                     short x = buffer.readShort();
                     if (x > -1) {
                         buffer.readByte();
                         buffer.readShort();
                     }
-                    break;
-                case 6:
+                }
+                case 6 -> {
                     buffer.readInt();
                     buffer.readInt();
                     buffer.readInt();
+                }
             }
         }
     }
@@ -154,30 +134,21 @@ public class PreNettyTypes {
         for (byte b = buffer.readByte(); b != 127; b = buffer.readByte()) {
             int i = (b & 224) >> 5;
             switch (i) {
-                case 0:
-                    buffer.readByte();
-                    break;
-                case 1:
-                    buffer.readShort();
-                    break;
-                case 2:
-                    buffer.readInt();
-                    break;
-                case 3:
-                    buffer.readFloat();
-                    break;
-                case 4:
-                    readString(buffer);
-                    break;
-                case 5:
+                case 0 -> buffer.readByte();
+                case 1 -> buffer.readShort();
+                case 2 -> buffer.readInt();
+                case 3 -> buffer.readFloat();
+                case 4 -> readString(buffer);
+                case 5 -> {
                     buffer.readShort();
                     buffer.readByte();
                     buffer.readShort();
-                    break;
-                case 6:
+                }
+                case 6 -> {
                     buffer.readInt();
                     buffer.readInt();
                     buffer.readInt();
+                }
             }
         }
     }
@@ -186,30 +157,21 @@ public class PreNettyTypes {
         for (byte b = buffer.readByte(); b != 127; b = buffer.readByte()) {
             int i = (b & 224) >> 5;
             switch (i) {
-                case 0:
-                    buffer.readByte();
-                    break;
-                case 1:
-                    buffer.readShort();
-                    break;
-                case 2:
-                    buffer.readInt();
-                    break;
-                case 3:
-                    buffer.readFloat();
-                    break;
-                case 4:
-                    readUTF(buffer);
-                    break;
-                case 5:
+                case 0 -> buffer.readByte();
+                case 1 -> buffer.readShort();
+                case 2 -> buffer.readInt();
+                case 3 -> buffer.readFloat();
+                case 4 -> readUTF(buffer);
+                case 5 -> {
                     buffer.readShort();
                     buffer.readByte();
                     buffer.readShort();
-                    break;
-                case 6:
+                }
+                case 6 -> {
                     buffer.readInt();
                     buffer.readInt();
                     buffer.readInt();
+                }
             }
         }
     }
@@ -218,25 +180,16 @@ public class PreNettyTypes {
         for (byte b = buffer.readByte(); b != 127; b = buffer.readByte()) {
             int i = (b & 224) >> 5;
             switch (i) {
-                case 0:
-                    buffer.readByte();
-                    break;
-                case 1:
-                    buffer.readShort();
-                    break;
-                case 2:
-                    buffer.readInt();
-                    break;
-                case 3:
-                    buffer.readFloat();
-                    break;
-                case 4:
-                    readUTF(buffer);
-                    break;
-                case 5:
+                case 0 -> buffer.readByte();
+                case 1 -> buffer.readShort();
+                case 2 -> buffer.readInt();
+                case 3 -> buffer.readFloat();
+                case 4 -> readUTF(buffer);
+                case 5 -> {
                     buffer.readShort();
                     buffer.readByte();
                     buffer.readShort();
+                }
             }
         }
     }

@@ -276,23 +276,15 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
 
                     float pitch;
                     switch (objectType) {
-                        case TNT_PRIMED:
-                            entityTracker.playSoundAt(location, Sound.RANDOM_FUSE, 1.0F, 1.0F);
-                            break;
-                        case TIPPED_ARROW:
+                        case TNT_PRIMED -> entityTracker.playSoundAt(location, Sound.RANDOM_FUSE, 1.0F, 1.0F);
+                        case TIPPED_ARROW -> {
                             pitch = 1.0F / (entityTracker.RND.nextFloat() * 0.4F + 1.2F) + 0.5F;
                             entityTracker.playSoundAt(location, Sound.RANDOM_BOW, 1.0F, pitch);
-                            break;
-                        case SNOWBALL:
-                        case EGG:
-                        case ENDER_PEARL:
-                        case EYE_OF_ENDER:
-                        case POTION:
-                        case EXPERIENCE_BOTTLE:
-                        case FISHIHNG_HOOK:
+                        }
+                        case SNOWBALL, EGG, ENDER_PEARL, EYE_OF_ENDER, POTION, EXPERIENCE_BOTTLE, FISHIHNG_HOOK -> {
                             pitch = 0.4F / (entityTracker.RND.nextFloat() * 0.4F + 0.8F);
                             entityTracker.playSoundAt(location, Sound.RANDOM_BOW, 0.5F, pitch);
-                            break;
+                        }
                     }
                 });
             }

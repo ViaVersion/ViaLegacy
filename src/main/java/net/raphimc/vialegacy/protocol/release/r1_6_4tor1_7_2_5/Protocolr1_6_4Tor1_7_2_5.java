@@ -1070,12 +1070,11 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                     short length = wrapper.read(Types.SHORT); // length
 
                     switch (channel) {
-                        case "MC|BEdit":
-                        case "MC|BSign":
+                        case "MC|BEdit", "MC|BSign" -> {
                             itemRewriter.handleItemToServer(wrapper.user(), wrapper.passthrough(Types1_7_6.ITEM));
                             length = (short) PacketUtil.calculateLength(wrapper);
-                            break;
-                        case "MC|AdvCdm":
+                        }
+                        case "MC|AdvCdm" -> {
                             final byte type = wrapper.read(Types.BYTE); // command block type
                             if (type == 0) {
                                 wrapper.passthrough(Types.INT); // x
@@ -1087,7 +1086,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                                 return;
                             }
                             length = (short) PacketUtil.calculateLength(wrapper);
-                            break;
+                        }
                     }
 
                     wrapper.resetReader();
