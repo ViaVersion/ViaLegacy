@@ -27,6 +27,7 @@ import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
+import com.viaversion.viaversion.api.minecraft.entitydata.types.EntityDataTypes1_8;
 import com.viaversion.viaversion.api.minecraft.item.DataItem;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.platform.providers.ViaProviders;
@@ -52,6 +53,7 @@ import net.raphimc.vialegacy.api.data.ItemList1_6;
 import net.raphimc.vialegacy.api.util.PacketUtil;
 import net.raphimc.vialegacy.protocol.release.r1_7_2_5tor1_7_6_10.packet.ClientboundPackets1_7_2;
 import net.raphimc.vialegacy.protocol.release.r1_7_2_5tor1_7_6_10.packet.ServerboundPackets1_7_2;
+import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.data.EntityDataIndex1_7_6;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.data.Particle1_7_6;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.model.GameProfile;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.model.MapData;
@@ -187,14 +189,34 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 map(Types.UNSIGNED_BYTE); // gamemode
                 map(Types.STRING); // worldType
                 handler(wrapper -> {
+                    final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                     if (wrapper.user().get(DimensionTracker.class).changeDimension(wrapper.get(Types.INT, 0))) {
                         wrapper.user().get(ChunkTracker.class).clear();
-                        wrapper.user().get(EntityTracker.class).clear();
+                        entityTracker.clear();
+                        entityTracker.trackEntity(entityTracker.getPlayerID(), EntityTypes1_8.EntityType.PLAYER);
                     }
 
                     final ProtocolInfo protocolInfo = wrapper.user().getProtocolInfo();
                     final TablistStorage tablistStorage = wrapper.user().get(TablistStorage.class);
                     tablistStorage.sendTempEntry(new TabListEntry(protocolInfo.getUsername(), protocolInfo.getUuid())); // load own skin
+
+                    wrapper.send(Protocolr1_7_6_10Tor1_8.class);
+                    wrapper.cancel();
+
+                    // 1.7 doesn't keep entity data after respawn, but 1.8 does
+                    final List<EntityData> defaultEntityData = new ArrayList<>();
+                    defaultEntityData.add(new EntityData(EntityDataIndex1_7_6.ENTITY_FLAGS.getNewIndex(), EntityDataTypes1_8.BYTE, (byte) 0));
+                    defaultEntityData.add(new EntityData(EntityDataIndex1_7_6.ENTITY_AIR.getNewIndex(), EntityDataTypes1_8.SHORT, (short) 300));
+                    defaultEntityData.add(new EntityData(EntityDataIndex1_7_6.ENTITY_LIVING_POTION_EFFECT_COLOR.getNewIndex(), EntityDataTypes1_8.INT, 0));
+                    defaultEntityData.add(new EntityData(EntityDataIndex1_7_6.ENTITY_LIVING_IS_POTION_EFFECT_AMBIENT.getNewIndex(), EntityDataTypes1_8.BYTE, (byte) 0));
+                    defaultEntityData.add(new EntityData(EntityDataIndex1_7_6.ENTITY_LIVING_ARROWS.getNewIndex(), EntityDataTypes1_8.BYTE, (byte) 0));
+                    defaultEntityData.add(new EntityData(EntityDataIndex1_7_6.HUMAN_SKIN_FLAGS.getNewIndex(), EntityDataTypes1_8.BYTE, (byte) 0));
+                    defaultEntityData.add(new EntityData(EntityDataIndex1_7_6.HUMAN_ABSORPTION_HEARTS.getNewIndex(), EntityDataTypes1_8.FLOAT, 0F));
+                    defaultEntityData.add(new EntityData(EntityDataIndex1_7_6.HUMAN_SCORE.getNewIndex(), EntityDataTypes1_8.INT, 0));
+                    final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_DATA, wrapper.user());
+                    setEntityData.write(Types.VAR_INT, entityTracker.getPlayerID()); // entity id
+                    setEntityData.write(Types1_8.ENTITY_DATA_LIST, defaultEntityData); // entity data
+                    setEntityData.send(Protocolr1_7_6_10Tor1_8.class);
                 });
             }
         });
