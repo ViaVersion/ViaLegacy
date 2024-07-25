@@ -468,7 +468,7 @@ public class TextRewriter {
 
                         c.getStyle().setHoverEvent(new TextHoverEvent(textHoverEvent.getAction(), new StringComponent(SNbtSerializer.V1_8.serialize(tag))));
                     } catch (Throwable e) {
-                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                        if (!Via.getConfig().isSuppressConversionWarnings()) {
                             ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error remapping NBT in show_item:" + textHoverEvent.getText().asUnformattedString(), e);
                         }
                         c.getStyle().setHoverEvent(new TextHoverEvent(textHoverEvent.getAction(), new StringComponent())); // Invalid item

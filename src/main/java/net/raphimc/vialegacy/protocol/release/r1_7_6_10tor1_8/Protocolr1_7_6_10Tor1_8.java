@@ -776,7 +776,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             Particle1_7_6 particle = Particle1_7_6.find(parts[0]);
             if (particle == null) {
                 particle = Particle1_7_6.BARRIER;
-                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                if (!Via.getConfig().isSuppressConversionWarnings()) {
                     ViaLegacy.getPlatform().getLogger().warning("Could not find 1.8 particle for " + Arrays.toString(parts));
                 }
             }
@@ -1350,7 +1350,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     final String channel = wrapper.read(Types.STRING); // channel
 
                     if (ViaLegacy.getConfig().isIgnoreLong1_8ChannelNames() && channel.length() > 16) {
-                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                        if (!Via.getConfig().isSuppressConversionWarnings()) {
                             ViaLegacy.getPlatform().getLogger().warning("Ignoring serverbound plugin channel, as it is longer than 16 characters: '" + channel + "'");
                         }
                         wrapper.cancel();
@@ -1376,7 +1376,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                             } else if (type == 1) {
                                 wrapper.passthrough(Types.INT); // entity id
                             } else {
-                                if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                                if (!Via.getConfig().isSuppressConversionWarnings()) {
                                     ViaLegacy.getPlatform().getLogger().warning("Unknown 1.8 command block type: " + type);
                                 }
                                 wrapper.cancel();
@@ -1393,7 +1393,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                                 final List<String> validChannels = new ArrayList<>(registeredChannels.length);
                                 for (String registeredChannel : registeredChannels) {
                                     if (registeredChannel.length() > 16) {
-                                        if (!Via.getConfig().isSuppressConversionWarnings() || Via.getManager().isDebug()) {
+                                        if (!Via.getConfig().isSuppressConversionWarnings()) {
                                             ViaLegacy.getPlatform().getLogger().warning("Ignoring serverbound plugin channel register of '" + registeredChannel + "', as it is longer than 16 characters");
                                         }
                                         continue;
