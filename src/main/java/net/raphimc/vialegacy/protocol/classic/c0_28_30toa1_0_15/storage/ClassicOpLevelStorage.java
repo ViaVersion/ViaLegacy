@@ -83,14 +83,12 @@ public class ClassicOpLevelStorage extends StoredObject {
     }
 
     public void setOpLevel(final byte opLevel) {
-        final boolean changed = this.opLevel != opLevel;
         this.opLevel = opLevel;
 
         if (this.haxEnabled) {
             final ClassicServerTitleStorage serverTitleStorage = this.getUser().get(ClassicServerTitleStorage.class);
-            this.updateHax(serverTitleStorage.isFlyEffectivelyEnabled(), serverTitleStorage.isNoclipEffectivelyEnabled(), serverTitleStorage.isSpeedEffectivelyEnabled(), serverTitleStorage.isRespawnEffectivelyEnabled());
-            if (changed) {
-                this.updateAbilities();
+            if (serverTitleStorage != null) { // Some servers update the op level before sending the login packet. Just ignore that because the op level is resent in the login packet.
+                this.updateHax(serverTitleStorage.isFlyEffectivelyEnabled(), serverTitleStorage.isNoclipEffectivelyEnabled(), serverTitleStorage.isSpeedEffectivelyEnabled(), serverTitleStorage.isRespawnEffectivelyEnabled());
             }
         }
     }
