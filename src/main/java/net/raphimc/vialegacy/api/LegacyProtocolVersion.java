@@ -39,7 +39,7 @@ public class LegacyProtocolVersion {
     public static final ProtocolVersion c0_28toc0_30 = registerLegacy(CLASSIC, 7, "c0.28-c0.30");
     public static final ProtocolVersion a1_0_15 = registerLegacy(ALPHA_INITIAL, 13, "a1.0.15");
     public static final ProtocolVersion a1_0_16toa1_0_16_2 = registerLegacy(ALPHA_INITIAL, 14, "a1.0.16-a1.0.16.2", new SubVersionRange("a1.0.16", 0, 2));
-    public static final ProtocolVersion a1_0_17toa1_0_17_4 = registerLegacy(ALPHA_INITIAL, 27, "a1.0.17-a1.0.17.4", new SubVersionRange("a1.0.17", 0, 4));
+    public static final ProtocolVersion a1_0_17toa1_0_17_4 = registerLegacy(ALPHA_LATER, 1, "a1.0.17-a1.0.17.4", new SubVersionRange("a1.0.17", 0, 4));
     public static final ProtocolVersion a1_1_0toa1_1_2_1 = registerLegacy(ALPHA_LATER, 2, "a1.1.0-a1.1.2.1", new SubVersionRange("a1.1", 0, 2));
     public static final ProtocolVersion a1_2_0toa1_2_1_1 = registerLegacy(ALPHA_LATER, 3, "a1.2.0-a1.2.1.1", new SubVersionRange("a1.2", 0, 1));
     public static final ProtocolVersion a1_2_2 = registerLegacy(ALPHA_LATER, 4, "a1.2.2");
