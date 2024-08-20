@@ -1440,7 +1440,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
         else if (type == EntityTypes1_8.ObjectType.BOAT.getType())
             yOffset = 0.6F / 2F;
         else if (type == EntityTypes1_8.ObjectType.ITEM.getType())
-            yOffset = 0.25F / 2F;
+            yOffset = 0.24F / 2F; // Should be 0.25F but that causes items to fall through the ground on modern client versions
         else if (type == EntityTypes1_8.ObjectType.LEASH.getType())
             yOffset = 0.5F;
         else if (type == EntityTypes1_8.EntityType.EXPERIENCE_ORB)
