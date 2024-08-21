@@ -27,8 +27,8 @@ import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.protocol.remapper.PacketHandlers;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.protocols.base.BaseProtocol1_7;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
+import com.viaversion.viaversion.protocols.base.v1_7.ClientboundBaseProtocol1_7;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.util.UuidUtil;
 import net.raphimc.vialegacy.protocol.release.r1_7_2_5tor1_7_6_10.packet.ClientboundPackets1_7_2;
@@ -173,7 +173,7 @@ public class Protocolr1_7_2_5Tor1_7_6_10 extends AbstractProtocol<ClientboundPac
         if (uuid.matches(UUID_PATTERN)) {
             return uuid;
         } else if (uuid.length() == 32) {
-            final String dashedUuid = BaseProtocol1_7.addDashes(uuid);
+            final String dashedUuid = ClientboundBaseProtocol1_7.addDashes(uuid);
             if (dashedUuid.matches(UUID_PATTERN)) {
                 return dashedUuid;
             }

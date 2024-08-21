@@ -17,17 +17,15 @@
  */
 package net.raphimc.vialegacy.api.protocol;
 
-import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.protocol.AbstractSimpleProtocol;
 import com.viaversion.viaversion.api.protocol.packet.State;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.base.ServerboundHandshakePackets;
-import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
+import com.viaversion.viaversion.protocols.base.v1_7.ServerboundBaseProtocol1_7;
 import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.storage.HandshakeStorage;
 import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.storage.ProtocolMetadataStorage;
 
-public class PreNettyBaseProtocol extends AbstractSimpleProtocol {
+public class PreNettyBaseProtocol extends ServerboundBaseProtocol1_7 {
 
     public static final PreNettyBaseProtocol INSTANCE = new PreNettyBaseProtocol();
 
@@ -37,6 +35,7 @@ public class PreNettyBaseProtocol extends AbstractSimpleProtocol {
 
     @Override
     protected void registerPackets() {
+        super.registerPackets();
         this.registerServerbound(State.HANDSHAKE, ServerboundHandshakePackets.CLIENT_INTENTION.getId(), ServerboundHandshakePackets.CLIENT_INTENTION.getId(), wrapper -> {
             wrapper.cancel();
             wrapper.read(Types.VAR_INT); // protocolVersion
@@ -44,22 +43,12 @@ public class PreNettyBaseProtocol extends AbstractSimpleProtocol {
             final int port = wrapper.read(Types.UNSIGNED_SHORT); // port
             wrapper.user().put(new HandshakeStorage(hostname, port));
         });
-
-        // Copied from BaseProtocol1_7
-        this.registerServerbound(State.LOGIN, ServerboundLoginPackets.LOGIN_ACKNOWLEDGED.getId(), ServerboundLoginPackets.LOGIN_ACKNOWLEDGED.getId(), wrapper -> {
-            final ProtocolInfo info = wrapper.user().getProtocolInfo();
-            info.setState(State.CONFIGURATION);
-        });
     }
 
     @Override
-    public void init(UserConnection userConnection) {
-        userConnection.put(new ProtocolMetadataStorage());
-    }
-
-    @Override
-    public boolean isBaseProtocol() {
-        return true;
+    public void init(final UserConnection user) {
+        super.init(user);
+        user.put(new ProtocolMetadataStorage());
     }
 
 }

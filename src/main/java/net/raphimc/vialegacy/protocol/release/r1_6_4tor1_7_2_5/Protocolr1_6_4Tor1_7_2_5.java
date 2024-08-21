@@ -17,7 +17,6 @@
  */
 package net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5;
 
-import com.google.common.base.Joiner;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -43,6 +42,7 @@ import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ClientboundStatusPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.ServerboundStatusPackets;
+import com.viaversion.viaversion.protocols.base.v1_7.ClientboundBaseProtocol1_7;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.util.IdAndData;
 import io.netty.channel.ChannelHandlerContext;
@@ -792,18 +792,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             if (!protocolMetadata.skipEncryption) {
                 Via.getManager().getProviders().get(EncryptionProvider.class).enableDecryption(wrapper.user());
             }
-
-            // Parts of BaseProtocol1_7 GAME_PROFILE handler
-            if (info.protocolVersion().olderThan(ProtocolVersion.v1_20_2)) {
-                info.setState(State.PLAY);
-            }
-            Via.getManager().getConnectionManager().onLoginSuccess(wrapper.user());
-            if (!info.getPipeline().hasNonBaseProtocols()) {
-                wrapper.user().setActive(false);
-            }
-            if (Via.getManager().isDebug()) {
-                ViaLegacy.getPlatform().getLogger().log(Level.INFO, "{0} logged in with protocol {1}, Route: {2}", new Object[]{info.getUsername(), info.protocolVersion().getName(), Joiner.on(", ").join(info.getPipeline().pipes(), ", ")});
-            }
+            ClientboundBaseProtocol1_7.onLoginSuccess(wrapper.user());
 
             final PacketWrapper respawn = PacketWrapper.create(ServerboundPackets1_6_4.CLIENT_COMMAND, wrapper.user());
             respawn.write(Types.BYTE, (byte) 0); // force respawn
