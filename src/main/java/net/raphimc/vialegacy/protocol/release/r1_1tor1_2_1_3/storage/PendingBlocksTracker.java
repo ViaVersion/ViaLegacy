@@ -68,7 +68,7 @@ public class PendingBlocksTracker extends StoredObject {
             final PendingBlockEntry pendingBlockEntry = it.next();
             if (pendingBlockEntry.decrementAndCheckIsExpired()) {
                 it.remove();
-                final PacketWrapper blockChange = PacketWrapper.create(ClientboundPackets1_2_1.BLOCK_UPDATE, this.getUser());
+                final PacketWrapper blockChange = PacketWrapper.create(ClientboundPackets1_2_1.BLOCK_UPDATE, this.user());
                 blockChange.write(Types1_7_6.BLOCK_POSITION_UBYTE, pendingBlockEntry.getPosition()); // position
                 blockChange.write(Types.UNSIGNED_BYTE, (short) pendingBlockEntry.getBlock().getId()); // block id
                 blockChange.write(Types.UNSIGNED_BYTE, (short) pendingBlockEntry.getBlock().getData()); // block data

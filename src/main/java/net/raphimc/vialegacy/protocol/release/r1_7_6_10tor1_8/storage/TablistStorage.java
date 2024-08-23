@@ -48,7 +48,7 @@ public class TablistStorage extends StoredObject {
     public void sendAddEntry(final TabListEntry entry) {
         final List<GameProfile.Property> gameProfileProperties = entry.gameProfile.getAllProperties();
 
-        final PacketWrapper addPlayerListItemPacket = PacketWrapper.create(ClientboundPackets1_8.PLAYER_INFO, this.getUser());
+        final PacketWrapper addPlayerListItemPacket = PacketWrapper.create(ClientboundPackets1_8.PLAYER_INFO, this.user());
         addPlayerListItemPacket.write(Types.VAR_INT, 0); // action
         addPlayerListItemPacket.write(Types.VAR_INT, 1); // count
         addPlayerListItemPacket.write(Types.UUID, entry.gameProfile.uuid); // uuid
@@ -68,7 +68,7 @@ public class TablistStorage extends StoredObject {
     }
 
     public void sendRemoveEntry(final TabListEntry entry) {
-        final PacketWrapper removePlayerListItemPacket = PacketWrapper.create(ClientboundPackets1_8.PLAYER_INFO, this.getUser());
+        final PacketWrapper removePlayerListItemPacket = PacketWrapper.create(ClientboundPackets1_8.PLAYER_INFO, this.user());
         removePlayerListItemPacket.write(Types.VAR_INT, 4); // action
         removePlayerListItemPacket.write(Types.VAR_INT, 1); // count
         removePlayerListItemPacket.write(Types.UUID, entry.gameProfile.uuid); // uuid

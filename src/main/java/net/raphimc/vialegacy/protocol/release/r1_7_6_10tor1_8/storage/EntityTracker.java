@@ -79,7 +79,7 @@ public class EntityTracker extends StoredObject {
         this.entityMap.put(entityId, entityType);
 
         if (entityType == EntityTypes1_8.EntityType.HORSE || entityType == EntityTypes1_8.EntityType.WITHER_SKULL) {
-            this.hologramParts.put(entityId, new HologramPartEntity(this.getUser(), entityId, entityType));
+            this.hologramParts.put(entityId, new HologramPartEntity(this.user(), entityId, entityType));
         }
     }
 

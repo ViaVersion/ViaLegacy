@@ -106,8 +106,6 @@ ViaLegacy needs to have custom netty handlers in the pipeline which handle <= 1.
 To implement the changes you should add something similar to the following lines to your netty pipeline (After the ViaVersion handlers are added):
 ```java
 if (serverTargetVersion.olderThanOrEqualTo(LegacyProtocolVersion.r1_6_4)) { // Only add those handlers if the server version is <= 1.6.4
-    user.getProtocolInfo().getPipeline().add(PreNettyBaseProtocol.INSTANCE); // Allow to intercept the handshake packet
-    
     // You can either add a codec (if your pipeline is built for that)
     channel.pipeline().addBefore("length-codec", "vialegacy-pre-netty-length-codec", new PreNettyLengthCodec(user));
     // or two seperate netty handlers

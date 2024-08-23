@@ -56,7 +56,7 @@ public class ClassicServerTitleStorage extends StoredObject {
     }
 
     public boolean isFlyEffectivelyEnabled() {
-        final boolean isOp = this.getUser().get(ClassicOpLevelStorage.class).getOpLevel() >= 100;
+        final boolean isOp = this.user().get(ClassicOpLevelStorage.class).getOpLevel() >= 100;
         return (this.isHaxDisabled() ? this.isFlyEnabled() : !this.isFlyDisabled()) || (isOp && this.isOphaxEnabled());
     }
 
@@ -69,7 +69,7 @@ public class ClassicServerTitleStorage extends StoredObject {
     }
 
     public boolean isNoclipEffectivelyEnabled() {
-        final boolean isOp = this.getUser().get(ClassicOpLevelStorage.class).getOpLevel() >= 100;
+        final boolean isOp = this.user().get(ClassicOpLevelStorage.class).getOpLevel() >= 100;
         return (this.isHaxDisabled() ? this.isNoclipEnabled() : !this.isNoclipDisabled()) || (isOp && this.isOphaxEnabled());
     }
 
@@ -82,7 +82,7 @@ public class ClassicServerTitleStorage extends StoredObject {
     }
 
     public boolean isRespawnEffectivelyEnabled() {
-        final boolean isOp = this.getUser().get(ClassicOpLevelStorage.class).getOpLevel() >= 100;
+        final boolean isOp = this.user().get(ClassicOpLevelStorage.class).getOpLevel() >= 100;
         return (this.isHaxDisabled() ? this.isRespawnEnabled() : !this.isRespawnDisabled()) || (isOp && this.isOphaxEnabled());
     }
 
@@ -95,7 +95,7 @@ public class ClassicServerTitleStorage extends StoredObject {
     }
 
     public boolean isSpeedEffectivelyEnabled() {
-        final boolean isOp = this.getUser().get(ClassicOpLevelStorage.class).getOpLevel() >= 100;
+        final boolean isOp = this.user().get(ClassicOpLevelStorage.class).getOpLevel() >= 100;
         return (this.isHaxDisabled() ? this.isSpeedEnabled() : !this.isSpeedDisabled()) || (isOp && this.isOphaxEnabled());
     }
 

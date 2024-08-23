@@ -82,7 +82,7 @@ public class ClassicLevelStorage extends StoredObject {
             throw new IllegalStateException("Failed to load level", e);
         }
 
-        final short maxChunkSectionCount = Via.getManager().getProviders().get(ClassicWorldHeightProvider.class).getMaxChunkSectionCount(this.getUser());
+        final short maxChunkSectionCount = Via.getManager().getProviders().get(ClassicWorldHeightProvider.class).getMaxChunkSectionCount(this.user());
 
         this.chunkXCount = sizeX >> 4;
         if (sizeX % 16 != 0) this.chunkXCount++;
@@ -103,7 +103,7 @@ public class ClassicLevelStorage extends StoredObject {
                     if (chunkX < 0 || chunkX >= this.chunkXCount || chunkZ < 0 || chunkZ >= this.chunkZCount) {
                         final Chunk chunk = ChunkUtil.createEmptyChunk(chunkX, chunkZ, Math.max(8, this.sectionYCount), this.sectionBitmask);
                         ChunkUtil.setDummySkylight(chunk, true);
-                        final PacketWrapper chunkData = PacketWrapper.create(ClientboundPacketsa1_0_15.LEVEL_CHUNK, this.getUser());
+                        final PacketWrapper chunkData = PacketWrapper.create(ClientboundPacketsa1_0_15.LEVEL_CHUNK, this.user());
                         chunkData.write(Types1_1.CHUNK, chunk);
                         chunkData.send(Protocolc0_28_30Toa1_0_15.class);
                     }
@@ -113,11 +113,11 @@ public class ClassicLevelStorage extends StoredObject {
     }
 
     public void tick() {
-        final ClassicPositionTracker positionTracker = this.getUser().get(ClassicPositionTracker.class);
+        final ClassicPositionTracker positionTracker = this.user().get(ClassicPositionTracker.class);
         if (!positionTracker.spawned) return;
 
         final long start = System.currentTimeMillis();
-        this.getUser().getChannel().eventLoop().submit(() -> {
+        this.user().getChannel().eventLoop().submit(() -> {
             ClassicLevelStorage.this.eventLoopPing = System.currentTimeMillis() - start;
         });
 
@@ -151,7 +151,7 @@ public class ClassicLevelStorage extends StoredObject {
 
     public void sendChunk(final ChunkCoord coord) {
         if (!this.shouldSend(coord)) return;
-        final ClassicBlockRemapper remapper = this.getUser().get(ClassicBlockRemapper.class);
+        final ClassicBlockRemapper remapper = this.user().get(ClassicBlockRemapper.class);
 
         this.classicLevel.calculateLight(coord.chunkX * 16, coord.chunkZ * 16, this.subChunkXLength, this.subChunkZLength);
 
@@ -179,7 +179,7 @@ public class ClassicLevelStorage extends StoredObject {
         this.loadedChunks.add(coord);
 
         final Chunk viaChunk = new BaseChunk(coord.chunkX, coord.chunkZ, true, false, this.sectionBitmask, modernSections, new int[256], new ArrayList<>());
-        final PacketWrapper chunkData = PacketWrapper.create(ClientboundPacketsa1_0_15.LEVEL_CHUNK, this.getUser());
+        final PacketWrapper chunkData = PacketWrapper.create(ClientboundPacketsa1_0_15.LEVEL_CHUNK, this.user());
         chunkData.write(Types1_1.CHUNK, viaChunk);
         chunkData.send(Protocolc0_28_30Toa1_0_15.class);
     }

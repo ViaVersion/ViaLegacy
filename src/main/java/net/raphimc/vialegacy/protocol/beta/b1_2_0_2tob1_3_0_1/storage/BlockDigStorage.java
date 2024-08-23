@@ -36,12 +36,12 @@ public class BlockDigStorage extends StoredObject {
 
     public void tick() {
         if (this.tick >= 5) {
-            Protocolb1_2_0_2Tob1_3_0_1.sendBlockDigPacket(this.getUser(), (byte) 0, this.position, this.facing);
+            Protocolb1_2_0_2Tob1_3_0_1.sendBlockDigPacket(this.user(), (byte) 0, this.position, this.facing);
             this.tick = 0;
         } else {
             this.tick++;
         }
-        Protocolb1_2_0_2Tob1_3_0_1.sendBlockDigPacket(this.getUser(), (byte) 1, this.position, this.facing);
+        Protocolb1_2_0_2Tob1_3_0_1.sendBlockDigPacket(this.user(), (byte) 1, this.position, this.facing);
     }
 
 }

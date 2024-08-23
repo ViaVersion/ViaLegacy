@@ -157,7 +157,7 @@ public class EntityTracker extends StoredObject {
             return;
         }
 
-        final PacketWrapper entitySound = PacketWrapper.create(ClientboundPackets1_3_1.CUSTOM_SOUND, this.getUser());
+        final PacketWrapper entitySound = PacketWrapper.create(ClientboundPackets1_3_1.CUSTOM_SOUND, this.user());
         entitySound.write(Types1_6_4.STRING, sound.getSound().getSoundName()); // sound
         entitySound.write(Types.INT, ((int) sourceLocation.getX()) * 8); // x
         entitySound.write(Types.INT, ((int) sourceLocation.getY()) * 8); // y

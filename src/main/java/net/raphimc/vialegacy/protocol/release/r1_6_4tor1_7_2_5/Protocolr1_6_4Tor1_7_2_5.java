@@ -38,10 +38,7 @@ import com.viaversion.viaversion.libs.fastutil.ints.Int2IntMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2IntMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2IntOpenHashMap;
 import com.viaversion.viaversion.libs.gson.JsonObject;
-import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
-import com.viaversion.viaversion.protocols.base.ClientboundStatusPackets;
-import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
-import com.viaversion.viaversion.protocols.base.ServerboundStatusPackets;
+import com.viaversion.viaversion.protocols.base.*;
 import com.viaversion.viaversion.protocols.base.v1_7.ClientboundBaseProtocol1_7;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.util.IdAndData;
@@ -849,6 +846,13 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
         );
         this.cancelClientbound(ClientboundPackets1_6_4.SET_CREATIVE_MODE_SLOT);
 
+        this.registerServerboundTransition(ServerboundHandshakePackets.CLIENT_INTENTION, null, wrapper -> {
+            wrapper.cancel();
+            wrapper.read(Types.VAR_INT); // protocol version
+            final String hostname = wrapper.read(Types.STRING); // hostname
+            final int port = wrapper.read(Types.UNSIGNED_SHORT); // port
+            wrapper.user().put(new HandshakeStorage(hostname, port));
+        });
         this.registerServerboundTransition(ServerboundStatusPackets.STATUS_REQUEST, ServerboundPackets1_6_4.SERVER_PING, wrapper -> {
             final HandshakeStorage handshakeStorage = wrapper.user().get(HandshakeStorage.class);
             final String ip = handshakeStorage.getHostname();
@@ -1104,6 +1108,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
     public void init(UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolr1_6_4Tor1_7_2_5.class, ClientboundPackets1_6_4::getPacket));
 
+        userConnection.put(new ProtocolMetadataStorage());
         userConnection.put(new PlayerInfoStorage());
         userConnection.put(new StatisticsStorage());
         userConnection.put(new DimensionTracker());

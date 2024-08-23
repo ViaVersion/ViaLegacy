@@ -71,19 +71,19 @@ public class AlphaInventoryTracker extends StoredObject {
             for (int i = 1; i <= 9; i++) {
                 final Item item = this.openContainerItems[i];
                 if (item == null) continue;
-                dropItem(this.getUser(), item, false);
+                dropItem(this.user(), item, false);
                 this.openContainerItems[i] = null;
             }
         }
         for (int i = 0; i < 4; i++) {
             final Item item = this.craftingInventory[i];
             if (item == null) continue;
-            dropItem(this.getUser(), item, false);
+            dropItem(this.user(), item, false);
             this.craftingInventory[i] = null;
         }
 
         if (this.cursorItem != null) {
-            dropItem(this.getUser(), this.cursorItem, false);
+            dropItem(this.user(), this.cursorItem, false);
             this.cursorItem = null;
         }
         this.openWindowType = -1;
@@ -98,10 +98,10 @@ public class AlphaInventoryTracker extends StoredObject {
         if (slot == -999) {
             if (this.cursorItem != null) {
                 if (leftClick) {
-                    dropItem(this.getUser(), this.cursorItem, false);
+                    dropItem(this.user(), this.cursorItem, false);
                     this.cursorItem = null;
                 } else {
-                    dropItem(this.getUser(), this.splitStack(this.cursorItem, 1), false);
+                    dropItem(this.user(), this.splitStack(this.cursorItem, 1), false);
                 }
             }
         } else {
@@ -255,8 +255,8 @@ public class AlphaInventoryTracker extends StoredObject {
         if (direction == 255) { // interact
             AlphaItems.doInteract(handItem);
         } else { // place
-            final IdAndData placedAgainst = this.getUser().get(ChunkTracker.class).getBlockNotNull(position);
-            final IdAndData targetBlock = this.getUser().get(ChunkTracker.class).getBlockNotNull(position.getRelative(BlockFaceUtil.getFace(direction)));
+            final IdAndData placedAgainst = this.user().get(ChunkTracker.class).getBlockNotNull(position);
+            final IdAndData targetBlock = this.user().get(ChunkTracker.class).getBlockNotNull(position.getRelative(BlockFaceUtil.getFace(direction)));
             AlphaItems.doPlace(handItem, direction, placedAgainst);
 
             if (handItem.identifier() < 256 || handItem.identifier() == ItemList1_6.reed.itemId()) { // block item
@@ -339,7 +339,7 @@ public class AlphaInventoryTracker extends StoredObject {
 
     // Add support for cheating items and classic block placement
     public void handleCreativeSetSlot(short slot, Item item) {
-        if (!this.getUser().getProtocolInfo().serverProtocolVersion().equals(LegacyProtocolVersion.c0_30cpe)) item = fixItem(item);
+        if (!this.user().getProtocolInfo().serverProtocolVersion().equals(LegacyProtocolVersion.c0_30cpe)) item = fixItem(item);
         if (slot <= 0) return;
 
         if (slot <= 4) {
@@ -404,7 +404,7 @@ public class AlphaInventoryTracker extends StoredObject {
     }
 
     private void updateInventorySlot(final byte windowId, final short slot, final Item item) {
-        final PacketWrapper setSlot = PacketWrapper.create(ClientboundPacketsb1_1.CONTAINER_SET_SLOT, this.getUser());
+        final PacketWrapper setSlot = PacketWrapper.create(ClientboundPacketsb1_1.CONTAINER_SET_SLOT, this.user());
         setSlot.write(Types.BYTE, windowId); // window id
         setSlot.write(Types.SHORT, slot); // slot
         setSlot.write(Typesb1_1.NBTLESS_ITEM, copyItem(item)); // item
@@ -422,7 +422,7 @@ public class AlphaInventoryTracker extends StoredObject {
     }
 
     private void updateInventory(final byte windowId, final Item[] items) {
-        final PacketWrapper windowItems = PacketWrapper.create(ClientboundPacketsb1_1.CONTAINER_SET_CONTENT, this.getUser());
+        final PacketWrapper windowItems = PacketWrapper.create(ClientboundPacketsb1_1.CONTAINER_SET_CONTENT, this.user());
         windowItems.write(Types.BYTE, windowId); // window id
         windowItems.write(Types1_4_2.NBTLESS_ITEM_ARRAY, copyItems(items)); // items
         windowItems.send(Protocola1_2_3_5_1_2_6Tob1_0_1_1_1.class);

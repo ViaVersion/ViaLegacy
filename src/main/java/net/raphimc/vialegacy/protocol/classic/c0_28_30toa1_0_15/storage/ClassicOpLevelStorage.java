@@ -76,7 +76,7 @@ public class ClassicOpLevelStorage extends StoredObject {
             statusMessage += " ";
             statusMessage += this.respawn ? "§aRespawn" : "§cRespawn";
 
-            final PacketWrapper chatMessage = PacketWrapper.create(ClientboundPacketsa1_0_15.CHAT, this.getUser());
+            final PacketWrapper chatMessage = PacketWrapper.create(ClientboundPacketsa1_0_15.CHAT, this.user());
             chatMessage.write(Typesb1_7_0_3.STRING, statusMessage); // message
             chatMessage.send(Protocolc0_28_30Toa1_0_15.class);
         }
@@ -86,7 +86,7 @@ public class ClassicOpLevelStorage extends StoredObject {
         this.opLevel = opLevel;
 
         if (this.haxEnabled) {
-            final ClassicServerTitleStorage serverTitleStorage = this.getUser().get(ClassicServerTitleStorage.class);
+            final ClassicServerTitleStorage serverTitleStorage = this.user().get(ClassicServerTitleStorage.class);
             if (serverTitleStorage != null) { // Some servers update the op level before sending the login packet. Just ignore that because the op level is resent in the login packet.
                 this.updateHax(serverTitleStorage.isFlyEffectivelyEnabled(), serverTitleStorage.isNoclipEffectivelyEnabled(), serverTitleStorage.isSpeedEffectivelyEnabled(), serverTitleStorage.isRespawnEffectivelyEnabled());
             }
@@ -98,8 +98,8 @@ public class ClassicOpLevelStorage extends StoredObject {
     }
 
     public void updateAbilities() {
-        if (this.getUser().getProtocolInfo().getPipeline().contains(Protocolr1_2_1_3Tor1_2_4_5.class)) {
-            final PacketWrapper playerAbilities = PacketWrapper.create(ClientboundPackets1_2_4.PLAYER_ABILITIES, this.getUser());
+        if (this.user().getProtocolInfo().getPipeline().contains(Protocolr1_2_1_3Tor1_2_4_5.class)) {
+            final PacketWrapper playerAbilities = PacketWrapper.create(ClientboundPackets1_2_4.PLAYER_ABILITIES, this.user());
             playerAbilities.write(Types.BOOLEAN, true); // invulnerable
             playerAbilities.write(Types.BOOLEAN, false); // flying
             playerAbilities.write(Types.BOOLEAN, this.flying); // allow flying
