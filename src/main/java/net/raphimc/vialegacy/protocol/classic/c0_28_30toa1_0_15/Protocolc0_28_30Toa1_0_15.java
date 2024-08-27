@@ -357,7 +357,7 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
         });
         this.registerServerbound(ServerboundPacketsa1_0_15.CHAT, wrapper -> {
             final String message = wrapper.read(Typesb1_7_0_3.STRING); // message
-            wrapper.write(Types.BYTE, (byte) 0); // sender id
+            wrapper.write(Types.BYTE, (byte) -1); // sender id
             wrapper.write(Typesc0_30.STRING, message); // message
             if (Via.getManager().getProviders().get(ClassicCustomCommandProvider.class).handleChatMessage(wrapper.user(), message)) {
                 wrapper.cancel();
