@@ -19,6 +19,7 @@ package net.raphimc.vialegacy.api.util;
 
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
+import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
@@ -29,7 +30,13 @@ public class PacketUtil {
         wrapper.setPacketType(null);
 
         final ByteBuf lengthBuffer = Unpooled.buffer();
+        if (wrapper instanceof PacketWrapperImpl impl && impl.getInputBuffer() != null) {
+            impl.getInputBuffer().markReaderIndex();
+        }
         wrapper.writeToBuffer(lengthBuffer);
+        if (wrapper instanceof PacketWrapperImpl impl && impl.getInputBuffer() != null) {
+            impl.getInputBuffer().resetReaderIndex();
+        }
         final int length = lengthBuffer.readableBytes();
         lengthBuffer.release();
 
