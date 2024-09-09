@@ -836,11 +836,35 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             final String inventoryName;
             switch (windowType) {
                 case 0 -> inventoryName = "minecraft:chest";
-                case 1 -> inventoryName = "minecraft:crafting_table";
-                case 2 -> inventoryName = "minecraft:furnace";
-                case 3 -> inventoryName = "minecraft:dispenser";
-                case 4 -> inventoryName = "minecraft:enchanting_table";
-                case 5 -> inventoryName = "minecraft:brewing_stand";
+                case 1 -> {
+                    inventoryName = "minecraft:crafting_table";
+                    title = "container.crafting";
+                    useProvidedWindowTitle = false;
+                }
+                case 2 -> {
+                    inventoryName = "minecraft:furnace";
+                    if (!useProvidedWindowTitle) {
+                        title = "container.furnace";
+                    }
+                }
+                case 3 -> {
+                    inventoryName = "minecraft:dispenser";
+                    if (!useProvidedWindowTitle) {
+                        title = "container.dispenser";
+                    }
+                }
+                case 4 -> {
+                    inventoryName = "minecraft:enchanting_table";
+                    if (!useProvidedWindowTitle) {
+                        title = "container.enchant";
+                    }
+                }
+                case 5 -> {
+                    inventoryName = "minecraft:brewing_stand";
+                    if (!useProvidedWindowTitle) {
+                        title = "container.brewing";
+                    }
+                }
                 case 6 -> {
                     inventoryName = "minecraft:villager";
                     if (!useProvidedWindowTitle || title.isEmpty()) {
@@ -848,10 +872,29 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                         useProvidedWindowTitle = false;
                     }
                 }
-                case 7 -> inventoryName = "minecraft:beacon";
-                case 8 -> inventoryName = "minecraft:anvil";
-                case 9 -> inventoryName = "minecraft:hopper";
-                case 10 -> inventoryName = "minecraft:dropper";
+                case 7 -> {
+                    inventoryName = "minecraft:beacon";
+                    if (!useProvidedWindowTitle) {
+                        title = "container.beacon";
+                    }
+                }
+                case 8 -> {
+                    inventoryName = "minecraft:anvil";
+                    title = "container.repair";
+                    useProvidedWindowTitle = false;
+                }
+                case 9 -> {
+                    inventoryName = "minecraft:hopper";
+                    if (!useProvidedWindowTitle) {
+                        title = "container.hopper";
+                    }
+                }
+                case 10 -> {
+                    inventoryName = "minecraft:dropper";
+                    if (!useProvidedWindowTitle) {
+                        title = "container.dropper";
+                    }
+                }
                 case 11 -> inventoryName = "EntityHorse";
                 default -> throw new IllegalArgumentException("Unknown window type: " + windowType);
             }
@@ -1285,12 +1328,12 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                             final PacketWrapper resetHandItem = PacketWrapper.create(ClientboundPackets1_8.CONTAINER_SET_SLOT, wrapper.user());
                             resetHandItem.write(Types.UNSIGNED_BYTE, (short) -1); // window id
                             resetHandItem.write(Types.SHORT, (short) 0); // slot
-                            resetHandItem.write(Types.ITEM1_8, new DataItem(-1, (byte) 0, (short) 0, null));
+                            resetHandItem.write(Types.ITEM1_8, null); // item
                             resetHandItem.send(Protocolr1_7_6_10Tor1_8.class);
                             final PacketWrapper setLapisSlot = PacketWrapper.create(ClientboundPackets1_8.CONTAINER_SET_SLOT, wrapper.user());
-                            setLapisSlot.write(Types.UNSIGNED_BYTE, windowId);
-                            setLapisSlot.write(Types.SHORT, slot);
-                            setLapisSlot.write(Types.ITEM1_8, new DataItem(351/*lapis_lazuli*/, (byte) 3, (short) 4, null));
+                            setLapisSlot.write(Types.UNSIGNED_BYTE, windowId); // window id
+                            setLapisSlot.write(Types.SHORT, slot); // slot
+                            setLapisSlot.write(Types.ITEM1_8, new DataItem(351/*lapis_lazuli*/, (byte) 3, (short) 4, null)); // item
                             setLapisSlot.send(Protocolr1_7_6_10Tor1_8.class);
                             wrapper.cancel();
                         } else if (slot > 1) {
