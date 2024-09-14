@@ -53,7 +53,7 @@ public class Protocolr1_7_2_5Tor1_7_6_10 extends AbstractProtocol<ClientboundPac
 
     @Override
     protected void registerPackets() {
-        this.registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE.getId(), ClientboundLoginPackets.GAME_PROFILE.getId(), new PacketHandlers() {
+        this.registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.STRING); // uuid
