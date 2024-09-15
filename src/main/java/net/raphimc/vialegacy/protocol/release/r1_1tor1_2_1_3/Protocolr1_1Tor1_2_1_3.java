@@ -21,6 +21,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
 import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
@@ -43,7 +44,6 @@ import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.model.NonFullChunk;
 import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.packet.ClientboundPackets1_1;
 import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.packet.ServerboundPackets1_1;
 import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.rewriter.ItemRewriter;
-import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.storage.DimensionTracker;
 import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.storage.PendingBlocksTracker;
 import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.storage.SeedStorage;
 import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.task.BlockReceiveInvalidatorTask;
@@ -314,7 +314,7 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
     }
 
     private void handleRespawn(final int dimensionId, final UserConnection user) {
-        if (user.get(DimensionTracker.class).changeDimension(dimensionId)) {
+        if (user.getClientWorld(Protocolr1_1Tor1_2_1_3.class).setEnvironment(dimensionId)) {
             user.get(PendingBlocksTracker.class).clear();
         }
 
@@ -357,10 +357,10 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
     @Override
     public void init(UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolr1_1Tor1_2_1_3.class, ClientboundPackets1_1::getPacket));
+        userConnection.addClientWorld(Protocolr1_1Tor1_2_1_3.class, new ClientWorld());
 
         userConnection.put(new SeedStorage());
         userConnection.put(new PendingBlocksTracker(userConnection));
-        userConnection.put(new DimensionTracker());
     }
 
     @Override

@@ -23,6 +23,7 @@ import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.Environment;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
@@ -147,7 +148,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                     tracker.trackEntity(entityId, EntityTypes1_8.EntityType.PLAYER);
                     tracker.setPlayerID(entityId);
-                    wrapper.user().get(DimensionTracker.class).changeDimension(dimensionId);
+                    wrapper.user().getClientWorld(Protocolr1_7_6_10Tor1_8.class).setEnvironment(dimensionId);
                 });
             }
         });
@@ -190,7 +191,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 map(Types.STRING); // worldType
                 handler(wrapper -> {
                     final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
-                    if (wrapper.user().get(DimensionTracker.class).changeDimension(wrapper.get(Types.INT, 0))) {
+                    if (wrapper.user().getClientWorld(Protocolr1_7_6_10Tor1_8.class).setEnvironment(wrapper.get(Types.INT, 0))) {
                         wrapper.user().get(ChunkTracker.class).clear();
                         entityTracker.clear();
                         entityTracker.trackEntity(entityTracker.getPlayerID(), EntityTypes1_8.EntityType.PLAYER);
@@ -625,7 +626,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.LEVEL_CHUNK, wrapper -> {
-            final Environment dimension = wrapper.user().get(DimensionTracker.class).getDimension();
+            final Environment dimension = wrapper.user().getClientWorld(Protocolr1_7_6_10Tor1_8.class).getEnvironment();
 
             final Chunk chunk = wrapper.read(Types1_7_6.getChunk(dimension));
             wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
@@ -1498,11 +1499,11 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
 
     @Override
     public void init(UserConnection userConnection) {
+        userConnection.addClientWorld(Protocolr1_7_6_10Tor1_8.class, new ClientWorld());
         userConnection.put(new TablistStorage(userConnection));
         userConnection.put(new WindowTracker());
         userConnection.put(new EntityTracker(userConnection));
         userConnection.put(new MapStorage());
-        userConnection.put(new DimensionTracker());
         userConnection.put(new ChunkTracker());
     }
 

@@ -22,6 +22,7 @@ import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
@@ -104,7 +105,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                         });
                         handler(wrapper -> {
                             final byte dimensionId = wrapper.get(Types.BYTE, 0);
-                            wrapper.user().get(DimensionTracker.class).changeDimension(dimensionId);
+                            wrapper.user().getClientWorld(Protocolr1_6_4Tor1_7_2_5.class).setEnvironment(dimensionId);
 
                             wrapper.user().put(new ChunkTracker(wrapper.user()));
                         });
@@ -147,7 +148,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 read(Types.SHORT); // world height
                 map(Types1_6_4.STRING, Types.STRING); // worldType
                 handler(wrapper -> {
-                    if (wrapper.user().get(DimensionTracker.class).changeDimension(wrapper.get(Types.INT, 0))) {
+                    if (wrapper.user().getClientWorld(Protocolr1_6_4Tor1_7_2_5.class).setEnvironment(wrapper.get(Types.INT, 0))) {
                         wrapper.user().get(ChunkTracker.class).clear();
                     }
                 });
@@ -390,7 +391,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.LEVEL_CHUNK, wrapper -> {
-            final Chunk chunk = wrapper.passthrough(Types1_7_6.getChunk(wrapper.user().get(DimensionTracker.class).getDimension()));
+            final Chunk chunk = wrapper.passthrough(Types1_7_6.getChunk(wrapper.user().getClientWorld(Protocolr1_6_4Tor1_7_2_5.class).getEnvironment()));
             wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
         });
         this.registerClientbound(ClientboundPackets1_6_4.CHUNK_BLOCKS_UPDATE, new PacketHandlers() {
@@ -1107,11 +1108,11 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
     @Override
     public void init(UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolr1_6_4Tor1_7_2_5.class, ClientboundPackets1_6_4::getPacket));
+        userConnection.addClientWorld(Protocolr1_6_4Tor1_7_2_5.class, new ClientWorld());
 
         userConnection.put(new ProtocolMetadataStorage());
         userConnection.put(new PlayerInfoStorage());
         userConnection.put(new StatisticsStorage());
-        userConnection.put(new DimensionTracker());
         userConnection.put(new ChunkTracker(userConnection)); // Set again in JOIN_GAME handler for version comparisons to work
 
         if (userConnection.getChannel() != null) {
