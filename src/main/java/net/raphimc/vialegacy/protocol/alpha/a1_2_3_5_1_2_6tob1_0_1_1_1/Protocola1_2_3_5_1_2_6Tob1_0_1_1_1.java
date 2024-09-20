@@ -136,7 +136,7 @@ public class Protocola1_2_3_5_1_2_6Tob1_0_1_1_1 extends StatelessProtocol<Client
             public void register() {
                 map(Types.INT); // chunkX
                 map(Types.INT); // chunkZ
-                map(Types.UNSIGNED_BYTE); // mode
+                map(Types.BOOLEAN); // mode
                 handler(wrapper -> wrapper.user().get(InventoryStorage.class).unload(wrapper.get(Types.INT, 0), wrapper.get(Types.INT, 1)));
             }
         });

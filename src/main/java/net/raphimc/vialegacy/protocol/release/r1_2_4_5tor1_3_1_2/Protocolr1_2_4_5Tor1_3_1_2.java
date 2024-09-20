@@ -426,17 +426,17 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
         this.registerClientbound(ClientboundPackets1_2_4.PRE_CHUNK, ClientboundPackets1_3_1.LEVEL_CHUNK, wrapper -> {
             final int chunkX = wrapper.read(Types.INT); // x
             final int chunkZ = wrapper.read(Types.INT); // z
-            final short mode = wrapper.read(Types.UNSIGNED_BYTE); // mode
-            final boolean load = mode != 0;
+            final boolean load = wrapper.read(Types.BOOLEAN); // mode
 
             wrapper.user().get(ChestStateTracker.class).unload(chunkX, chunkZ);
 
-            if (!load) {
-                final Chunk chunk = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>());
-                wrapper.write(Types1_7_6.getChunk(wrapper.user().getClientWorld(Protocolr1_2_4_5Tor1_3_1_2.class).getEnvironment()), chunk);
+            final Chunk chunk;
+            if (load) {
+                chunk = ChunkUtil.createEmptyChunk(chunkX, chunkZ);
             } else {
-                wrapper.cancel();
+                chunk = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>());
             }
+            wrapper.write(Types1_7_6.getChunk(wrapper.user().getClientWorld(Protocolr1_2_4_5Tor1_3_1_2.class).getEnvironment()), chunk);
         });
         this.registerClientbound(ClientboundPackets1_2_4.LEVEL_CHUNK, wrapper -> {
             final Environment dimension = wrapper.user().getClientWorld(Protocolr1_2_4_5Tor1_3_1_2.class).getEnvironment();
