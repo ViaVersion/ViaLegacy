@@ -1364,7 +1364,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 handler(wrapper -> {
                     for (int i = 0; i < 4; i++) {
                         final JsonElement component = wrapper.read(Types.COMPONENT); // line
-                        String text = TextComponentSerializer.V1_8.deserialize(component).asLegacyFormatString();
+                        String text = TextComponentSerializer.V1_8.deserialize(component).asUnformattedString();
                         if (text.length() > 15) text = text.substring(0, 15);
                         wrapper.write(Types.STRING, text);
                     }

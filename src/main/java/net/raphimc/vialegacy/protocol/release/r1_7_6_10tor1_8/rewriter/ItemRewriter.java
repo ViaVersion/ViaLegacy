@@ -133,7 +133,7 @@ public class ItemRewriter extends LegacyItemRewriter<ClientboundPackets1_7_2, Se
 
             for (int i = 0; i < pages.size(); i++) {
                 final String text = pages.get(i).getValue();
-                pages.set(i, new StringTag(TextComponentSerializer.V1_8.deserialize(text).asLegacyFormatString()));
+                pages.set(i, new StringTag(TextComponentSerializer.V1_8.deserialize(text).asUnformattedString()));
             }
         }
 
