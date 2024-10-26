@@ -21,7 +21,6 @@ import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.Particle;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
@@ -135,11 +134,6 @@ public abstract class LegacyItemRewriter<C extends ClientboundPacketType, S exte
         this.setRemappedTagWrite(item);
 
         return item;
-    }
-
-    @Override
-    public void rewriteParticle(final UserConnection userConnection, final Particle particle) {
-        // Rewriting particles in the item rewriter? VV moment
     }
 
     @Override
