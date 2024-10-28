@@ -779,7 +779,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                     }
                 }, State.LOGIN, (PacketHandler) PacketWrapper::cancel
         );
-        this.registerClientboundTransition(ClientboundPackets1_6_4.SHARED_KEY, ClientboundLoginPackets.GAME_PROFILE, (PacketHandler) wrapper -> {
+        this.registerClientboundTransition(ClientboundPackets1_6_4.SHARED_KEY, ClientboundLoginPackets.LOGIN_FINISHED, (PacketHandler) wrapper -> {
             final ProtocolInfo info = wrapper.user().getProtocolInfo();
             final ProtocolMetadataStorage protocolMetadata = wrapper.user().get(ProtocolMetadataStorage.class);
             wrapper.read(Types.SHORT_BYTE_ARRAY); // shared secret

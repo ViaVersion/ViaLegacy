@@ -110,7 +110,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 map(Types.SHORT_BYTE_ARRAY, Types.BYTE_ARRAY_PRIMITIVE); // verify token
             }
         });
-        this.registerClientbound(State.LOGIN, ClientboundLoginPackets.GAME_PROFILE, new PacketHandlers() {
+        this.registerClientbound(State.LOGIN, ClientboundLoginPackets.LOGIN_FINISHED, new PacketHandlers() {
             @Override
             public void register() {
                 read(Types.STRING); // uuid
