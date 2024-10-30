@@ -111,6 +111,7 @@ tasks.register("runViaProxy", JavaExec) {
     mainClass = "net.raphimc.viaproxy.ViaProxy"
     classpath = viaProxyConfiguration
     workingDir = file("run")
+    jvmArgs = ["-DskipUpdateCheck"]
 
     doFirst {
         def jarsDir = file("$workingDir/jars")

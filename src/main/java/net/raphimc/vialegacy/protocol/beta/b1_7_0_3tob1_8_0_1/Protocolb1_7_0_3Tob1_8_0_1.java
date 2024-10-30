@@ -243,7 +243,7 @@ public class Protocolb1_7_0_3Tob1_8_0_1 extends StatelessProtocol<ClientboundPac
                 wrapper.cancel();
             }
             final PacketWrapper pingResponse = PacketWrapper.create(ClientboundPacketsb1_8.DISCONNECT, wrapper.user());
-            pingResponse.write(Types1_6_4.STRING, "The server seems to be running!\nWait 5 seconds between each connection§0§1");
+            pingResponse.write(Types1_6_4.STRING, ViaLegacy.getConfig().getB1_7_3Motd() + "§0§1");
             pingResponse.send(Protocolb1_7_0_3Tob1_8_0_1.class);
         });
         this.registerServerbound(ServerboundPacketsb1_8.LOGIN, new PacketHandlers() {

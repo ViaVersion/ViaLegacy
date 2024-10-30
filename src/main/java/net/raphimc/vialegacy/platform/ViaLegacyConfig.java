@@ -35,6 +35,8 @@ public interface ViaLegacyConfig extends Config {
 
     boolean enableB1_7_3Sprinting();
 
+    String getB1_7_3Motd();
+
     int getClassicChunkRange();
 
     boolean enableClassicFly();

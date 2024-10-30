@@ -21,6 +21,11 @@ old-biomes: true
 # Enables sprinting for versions below beta 1.8. !THIS CAN CAUSE ISSUES WITH ANTI-CHEAT PLUGINS!
 enable-b1_7_3-sprinting: false
 #
+# The MOTD to use for <= beta 1.7.3 servers. Supports newlines. Doesn't support color codes.
+b1_7_3-motd: |
+  The server seems to be running!
+  Wait 5 seconds between each connection
+#
 # Classic chunk loading range
 classic-chunk-range: 10
 #
