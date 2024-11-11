@@ -1409,7 +1409,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                         }
                         case "MC|Brand", "MC|ItemName" -> {
                             final String content = wrapper.read(Types.STRING); // client brand or item name
-                            wrapper.write(Types.REMAINING_BYTES, content.getBytes(StandardCharsets.UTF_8)); // client brand or item name
+                            wrapper.write(Types.SERVERBOUND_CUSTOM_PAYLOAD_DATA, content.getBytes(StandardCharsets.UTF_8)); // client brand or item name
                         }
                         case "MC|AdvCdm" -> {
                             final byte type = wrapper.passthrough(Types.BYTE); // command block type (0 = Block, 1 = Minecart)
@@ -1430,7 +1430,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                             wrapper.read(Types.BOOLEAN); // track output
                         }
                         case "REGISTER", "UNREGISTER" -> {
-                            byte[] channels = wrapper.read(Types.REMAINING_BYTES);
+                            byte[] channels = wrapper.read(Types.SERVERBOUND_CUSTOM_PAYLOAD_DATA);
 
                             if (ViaLegacy.getConfig().isIgnoreLong1_8ChannelNames()) {
                                 final String[] registeredChannels = new String(channels, StandardCharsets.UTF_8).split("\0");
@@ -1451,7 +1451,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                                 channels = Joiner.on('\0').join(validChannels).getBytes(StandardCharsets.UTF_8);
                             }
 
-                            wrapper.write(Types.REMAINING_BYTES, channels); // data
+                            wrapper.write(Types.SERVERBOUND_CUSTOM_PAYLOAD_DATA, channels); // data
                         }
                     }
 
