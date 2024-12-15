@@ -305,6 +305,9 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     byte yaw = wrapper.get(Types.BYTE, 2);
                     int data = wrapper.get(Types.INT, 3);
                     final EntityTypes1_8.EntityType type = EntityTypes1_8.getTypeFromId(typeID, true);
+                    if (type == null) {
+                        return;
+                    }
                     tracker.trackEntity(entityID, type);
                     tracker.updateEntityLocation(entityID, x, y, z, false);
 
@@ -370,6 +373,10 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     final int z = wrapper.get(Types.INT, 2);
                     final List<EntityData> entityDataList = wrapper.get(Types1_8.ENTITY_DATA_LIST, 0);
                     final EntityTypes1_8.EntityType entityType = EntityTypes1_8.getTypeFromId(typeID, false);
+                    if (entityType == null) {
+                        wrapper.cancel();
+                        return;
+                    }
                     tracker.trackEntity(entityID, entityType);
                     tracker.updateEntityLocation(entityID, x, y, z, false);
                     tracker.updateEntityData(entityID, entityDataList);

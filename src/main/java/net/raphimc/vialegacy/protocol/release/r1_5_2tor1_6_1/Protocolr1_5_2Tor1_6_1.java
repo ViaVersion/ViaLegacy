@@ -133,7 +133,10 @@ public class Protocolr1_5_2Tor1_6_1 extends StatelessProtocol<ClientboundPackets
                 handler(wrapper -> {
                     final int entityID = wrapper.get(Types.INT, 0);
                     final int typeID = wrapper.get(Types.BYTE, 0);
-                    wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityID, EntityTypes1_8.getTypeFromId(typeID, true));
+                    final EntityTypes1_8.EntityType entityType = EntityTypes1_8.getTypeFromId(typeID, true);
+                    if (entityType != null) {
+                        wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityID, entityType);
+                    }
                 });
             }
         });
@@ -156,6 +159,10 @@ public class Protocolr1_5_2Tor1_6_1 extends StatelessProtocol<ClientboundPackets
                     final int entityID = wrapper.get(Types.INT, 0);
                     final int typeID = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     final EntityTypes1_8.EntityType entityType = EntityTypes1_8.getTypeFromId(typeID, false);
+                    if (entityType == null) {
+                        wrapper.cancel();
+                        return;
+                    }
                     final List<EntityData> entityDataList = wrapper.get(Types1_6_4.ENTITY_DATA_LIST, 0);
                     wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityID, entityType);
                     EntityDataRewriter.transform(entityType, entityDataList);

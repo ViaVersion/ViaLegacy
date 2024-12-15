@@ -270,7 +270,9 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
                         wrapper.write(Types.SHORT, speedZ);
                     }
 
-                    entityTracker.getTrackedEntities().put(entityId, new TrackedEntity(entityId, location, type));
+                    if (type != null) {
+                        entityTracker.getTrackedEntities().put(entityId, new TrackedEntity(entityId, location, type));
+                    }
                     final EntityTypes1_8.ObjectType objectType = EntityTypes1_8.ObjectType.findById(typeId);
                     if (objectType == null) return;
 
@@ -312,6 +314,10 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
                     final double z = wrapper.get(Types.INT, 3) / 32.0D;
                     final List<EntityData> entityDataList = wrapper.get(Types1_3_1.ENTITY_DATA_LIST, 0);
                     final EntityTypes1_8.EntityType entityType = EntityTypes1_8.getTypeFromId(type, false);
+                    if (entityType == null) {
+                        wrapper.cancel();
+                        return;
+                    }
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                     tracker.getTrackedEntities().put(entityId, new TrackedLivingEntity(entityId, new Location(x, y, z), entityType));
                     tracker.updateEntityDataList(entityId, entityDataList);
