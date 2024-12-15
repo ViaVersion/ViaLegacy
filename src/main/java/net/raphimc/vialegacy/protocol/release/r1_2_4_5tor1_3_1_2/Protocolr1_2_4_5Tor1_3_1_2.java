@@ -270,20 +270,20 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
                         wrapper.write(Types.SHORT, speedZ);
                     }
 
-                    if (type != null) {
-                        entityTracker.getTrackedEntities().put(entityId, new TrackedEntity(entityId, location, type));
+                    if (type == null) {
+                        return;
                     }
-                    final EntityTypes1_8.ObjectType objectType = EntityTypes1_8.ObjectType.findById(typeId);
-                    if (objectType == null) return;
+
+                    entityTracker.getTrackedEntities().put(entityId, new TrackedEntity(entityId, location, type));
 
                     float pitch;
-                    switch (objectType) {
-                        case TNT_PRIMED -> entityTracker.playSoundAt(location, Sound.RANDOM_FUSE, 1.0F, 1.0F);
-                        case TIPPED_ARROW -> {
+                    switch (type) {
+                        case TNT -> entityTracker.playSoundAt(location, Sound.RANDOM_FUSE, 1.0F, 1.0F);
+                        case ARROW -> {
                             pitch = 1.0F / (entityTracker.RND.nextFloat() * 0.4F + 1.2F) + 0.5F;
                             entityTracker.playSoundAt(location, Sound.RANDOM_BOW, 1.0F, pitch);
                         }
-                        case SNOWBALL, EGG, ENDER_PEARL, EYE_OF_ENDER, POTION, EXPERIENCE_BOTTLE, FISHIHNG_HOOK -> {
+                        case SNOWBALL, EGG, ENDER_PEARL, EYE_OF_ENDER, POTION, EXPERIENCE_BOTTLE, FISHING_HOOK -> {
                             pitch = 0.4F / (entityTracker.RND.nextFloat() * 0.4F + 0.8F);
                             entityTracker.playSoundAt(location, Sound.RANDOM_BOW, 0.5F, pitch);
                         }
