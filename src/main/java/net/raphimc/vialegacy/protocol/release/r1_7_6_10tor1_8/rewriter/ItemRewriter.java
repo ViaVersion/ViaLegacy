@@ -24,6 +24,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Types;
+import com.viaversion.viaversion.libs.mcstructs.text.ATextComponent;
 import com.viaversion.viaversion.libs.mcstructs.text.components.StringComponent;
 import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSerializer;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
@@ -104,7 +105,7 @@ public class ItemRewriter extends LegacyItemRewriter<ClientboundPackets1_7_2, Se
 
                 gameProfileFetcher.getMojangUUIDAsync(skullOwnerName).thenAccept(gameProfileFetcher::getGameProfile);
             }
-        } else if ((item.identifier() == ItemList1_6.writtenBook.itemId() || item.identifier() == ItemList1_6.writableBook.itemId()) && item.tag() != null) {
+        } else if (item.identifier() == ItemList1_6.writtenBook.itemId() && item.tag() != null) {
             final ListTag<StringTag> pages = item.tag().getListTag("pages", StringTag.class);
             if (pages == null) return item;
 
@@ -127,13 +128,18 @@ public class ItemRewriter extends LegacyItemRewriter<ClientboundPackets1_7_2, Se
             if (item.tag().get("1_7_SkullOwner") instanceof StringTag) {
                 item.tag().put("SkullOwner", item.tag().remove("1_7_SkullOwner"));
             }
-        } else if ((item.identifier() == ItemList1_6.writtenBook.itemId() || item.identifier() == ItemList1_6.writableBook.itemId()) && item.tag() != null) {
+        } else if (item.identifier() == ItemList1_6.writtenBook.itemId() && item.tag() != null) {
             final ListTag<StringTag> pages = item.tag().getListTag("pages", StringTag.class);
             if (pages == null) break NOT_VALID;
 
             for (int i = 0; i < pages.size(); i++) {
                 final String text = pages.get(i).getValue();
-                pages.set(i, new StringTag(TextComponentSerializer.V1_8.deserialize(text).asLegacyFormatString()));
+                final ATextComponent textComponent = TextComponentSerializer.V1_8.deserialize(text);
+                if (textComponent instanceof StringComponent stringComponent) {
+                    pages.set(i, new StringTag(stringComponent.getText()));
+                } else {
+                    pages.set(i, new StringTag(textComponent.asLegacyFormatString()));
+                }
             }
         }
 
