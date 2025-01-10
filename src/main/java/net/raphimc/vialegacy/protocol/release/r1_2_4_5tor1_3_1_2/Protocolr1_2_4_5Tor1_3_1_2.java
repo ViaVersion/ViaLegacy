@@ -234,6 +234,7 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
                     final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                     final int entityId = wrapper.get(Types.INT, 0);
                     final byte typeId = wrapper.get(Types.BYTE, 0);
+                    final int data = wrapper.get(Types.INT, 1);
                     final EntityTypes1_8.EntityType type;
                     if (typeId == 70 || typeId == 71 || typeId == 74) {
                         type = EntityTypes1_8.ObjectType.FALLING_BLOCK.getType();
@@ -241,7 +242,7 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
                     } else if (typeId == 10 || typeId == 11 || typeId == 12) {
                         type = EntityTypes1_8.ObjectType.MINECART.getType();
                     } else {
-                        type = EntityTypes1_8.getTypeFromId(typeId, true);
+                        type = EntityTypes1_8.ObjectType.getEntityType(typeId, data);
                     }
                     final double x = wrapper.get(Types.INT, 1) / 32.0D;
                     final double y = wrapper.get(Types.INT, 2) / 32.0D;
@@ -313,7 +314,7 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
                     final double y = wrapper.get(Types.INT, 2) / 32.0D;
                     final double z = wrapper.get(Types.INT, 3) / 32.0D;
                     final List<EntityData> entityDataList = wrapper.get(Types1_3_1.ENTITY_DATA_LIST, 0);
-                    final EntityTypes1_8.EntityType entityType = EntityTypes1_8.getTypeFromId(type, false);
+                    final EntityTypes1_8.EntityType entityType = EntityTypes1_8.EntityType.findById(type);
                     if (entityType == null) {
                         wrapper.cancel();
                         return;

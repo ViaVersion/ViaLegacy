@@ -304,7 +304,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     int z = wrapper.get(Types.INT, 2);
                     byte yaw = wrapper.get(Types.BYTE, 2);
                     int data = wrapper.get(Types.INT, 3);
-                    final EntityTypes1_8.EntityType type = EntityTypes1_8.getTypeFromId(typeID, true);
+                    final EntityTypes1_8.EntityType type = EntityTypes1_8.ObjectType.getEntityType(typeID, data);
                     if (type == null) {
                         return;
                     }
@@ -372,7 +372,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     final int y = wrapper.get(Types.INT, 1);
                     final int z = wrapper.get(Types.INT, 2);
                     final List<EntityData> entityDataList = wrapper.get(Types1_8.ENTITY_DATA_LIST, 0);
-                    final EntityTypes1_8.EntityType entityType = EntityTypes1_8.getTypeFromId(typeID, false);
+                    final EntityTypes1_8.EntityType entityType = EntityTypes1_8.EntityType.findById(typeID);
                     if (entityType == null) {
                         wrapper.cancel();
                         return;

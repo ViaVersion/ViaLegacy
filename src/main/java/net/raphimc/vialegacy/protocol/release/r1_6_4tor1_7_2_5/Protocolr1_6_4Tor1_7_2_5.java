@@ -315,7 +315,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 map(Types.INT); // data
                 handler(wrapper -> {
                     int data = wrapper.get(Types.INT, 3);
-                    if (EntityTypes1_8.getTypeFromId(wrapper.get(Types.BYTE, 0), true) == EntityTypes1_8.ObjectType.FALLING_BLOCK.getType()) {
+                    if (EntityTypes1_8.ObjectType.findById(wrapper.get(Types.BYTE, 0), data) == EntityTypes1_8.ObjectType.FALLING_BLOCK) {
                         final int id = data & 0xFFFF;
                         final int metadata = data >> 16;
                         final IdAndData block = new IdAndData(id, metadata);
