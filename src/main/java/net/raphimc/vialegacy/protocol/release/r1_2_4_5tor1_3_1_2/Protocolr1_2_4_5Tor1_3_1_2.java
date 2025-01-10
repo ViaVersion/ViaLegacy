@@ -234,7 +234,7 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
                     final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                     final int entityId = wrapper.get(Types.INT, 0);
                     final byte typeId = wrapper.get(Types.BYTE, 0);
-                    final int data = wrapper.get(Types.INT, 1);
+                    final int data = wrapper.get(Types.INT, 4);
                     final EntityTypes1_8.EntityType type;
                     if (typeId == 70 || typeId == 71 || typeId == 74) {
                         type = EntityTypes1_8.ObjectType.FALLING_BLOCK.getType();
