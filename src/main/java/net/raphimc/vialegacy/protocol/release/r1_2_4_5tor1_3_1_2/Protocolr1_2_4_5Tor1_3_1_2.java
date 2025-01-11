@@ -234,7 +234,7 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
                     final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                     final int entityId = wrapper.get(Types.INT, 0);
                     final byte typeId = wrapper.get(Types.BYTE, 0);
-                    final int data = wrapper.get(Types.INT, 4);
+                    int data = wrapper.get(Types.INT, 4);
                     final EntityTypes1_8.EntityType type;
                     if (typeId == 70 || typeId == 71 || typeId == 74) {
                         type = EntityTypes1_8.ObjectType.FALLING_BLOCK.getType();
@@ -248,24 +248,23 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
                     final double y = wrapper.get(Types.INT, 2) / 32.0D;
                     final double z = wrapper.get(Types.INT, 3) / 32.0D;
                     final Location location = new Location(x, y, z);
-                    int throwerEntityId = wrapper.get(Types.INT, 4);
                     short speedX = 0;
                     short speedY = 0;
                     short speedZ = 0;
-                    if (throwerEntityId > 0) {
+                    if (data > 0) {
                         speedX = wrapper.read(Types.SHORT); // velocity x
                         speedY = wrapper.read(Types.SHORT); // velocity y
                         speedZ = wrapper.read(Types.SHORT); // velocity z
                     }
-                    if (typeId == 70) throwerEntityId = 12; // sand
-                    if (typeId == 71) throwerEntityId = 13; // gravel
-                    if (typeId == 74) throwerEntityId = 122; // dragon egg
+                    if (typeId == 70) data = 12; // sand
+                    if (typeId == 71) data = 13; // gravel
+                    if (typeId == 74) data = 122; // dragon egg
                     if (typeId == EntityTypes1_8.ObjectType.FISHIHNG_HOOK.getId()) {
-                        final Optional<AbstractTrackedEntity> nearestEntity = entityTracker.getNearestEntity(location, 2.0D, e -> e.getEntityType().isOrHasParent(EntityTypes1_8.EntityType.PLAYER));
-                        throwerEntityId = nearestEntity.map(AbstractTrackedEntity::getEntityId).orElseGet(entityTracker::getPlayerID);
+                        final Optional<AbstractTrackedEntity> nearestEntity = entityTracker.getNearestEntity(location, 2D, e -> e.getEntityType().isOrHasParent(EntityTypes1_8.EntityType.PLAYER));
+                        data = nearestEntity.map(AbstractTrackedEntity::getEntityId).orElseGet(entityTracker::getPlayerID);
                     }
-                    wrapper.set(Types.INT, 4, throwerEntityId);
-                    if (throwerEntityId > 0) {
+                    wrapper.set(Types.INT, 4, data);
+                    if (data > 0) {
                         wrapper.write(Types.SHORT, speedX);
                         wrapper.write(Types.SHORT, speedY);
                         wrapper.write(Types.SHORT, speedZ);

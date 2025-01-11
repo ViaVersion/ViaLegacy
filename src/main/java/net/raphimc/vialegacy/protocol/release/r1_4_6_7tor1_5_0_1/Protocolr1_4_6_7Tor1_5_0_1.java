@@ -60,20 +60,20 @@ public class Protocolr1_4_6_7Tor1_5_0_1 extends StatelessProtocol<ClientboundPac
                     if (typeId == 10 || typeId == 11 || typeId == 12) {
                         wrapper.set(Types.BYTE, 0, (byte) EntityTypes1_8.ObjectType.MINECART.getId());
                     }
-                    int throwerEntityId = wrapper.get(Types.INT, 4);
+                    int data = wrapper.get(Types.INT, 4);
                     short speedX = 0;
                     short speedY = 0;
                     short speedZ = 0;
-                    if (throwerEntityId > 0) {
+                    if (data > 0) {
                         speedX = wrapper.read(Types.SHORT); // velocity x
                         speedY = wrapper.read(Types.SHORT); // velocity y
                         speedZ = wrapper.read(Types.SHORT); // velocity z
                     }
-                    if (typeId == 10) throwerEntityId = 0; // normal minecart
-                    if (typeId == 11) throwerEntityId = 1; // chest minecart
-                    if (typeId == 12) throwerEntityId = 2; // oven minecart
-                    wrapper.set(Types.INT, 4, throwerEntityId);
-                    if (throwerEntityId > 0) {
+                    if (typeId == 10) data = EntityTypes1_8.ObjectType.MINECART.getData();
+                    if (typeId == 11) data = EntityTypes1_8.ObjectType.CHEST_MINECART.getData();
+                    if (typeId == 12) data = EntityTypes1_8.ObjectType.FURNACE_MINECART.getData();
+                    wrapper.set(Types.INT, 4, data);
+                    if (data > 0) {
                         wrapper.write(Types.SHORT, speedX);
                         wrapper.write(Types.SHORT, speedY);
                         wrapper.write(Types.SHORT, speedZ);

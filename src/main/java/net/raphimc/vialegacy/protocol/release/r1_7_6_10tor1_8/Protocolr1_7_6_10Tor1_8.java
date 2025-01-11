@@ -1480,21 +1480,21 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
     private int realignEntityY(final EntityTypes1_8.EntityType type, final int y) {
         float yPos = y / 32F;
         float yOffset = 0F;
-        if (type == EntityTypes1_8.ObjectType.FALLING_BLOCK.getType())
+        if (type.isOrHasParent(EntityTypes1_8.ObjectType.FALLING_BLOCK.getType()))
             yOffset = 0.98F / 2F;
-        if (type == EntityTypes1_8.ObjectType.TNT_PRIMED.getType())
+        if (type.isOrHasParent(EntityTypes1_8.ObjectType.TNT_PRIMED.getType()))
             yOffset = 0.98F / 2F;
-        if (type == EntityTypes1_8.ObjectType.ENDER_CRYSTAL.getType())
+        if (type.isOrHasParent(EntityTypes1_8.ObjectType.ENDER_CRYSTAL.getType()))
             yOffset = 1F;
-        else if (type == EntityTypes1_8.ObjectType.MINECART.getType())
+        else if (type.isOrHasParent(EntityTypes1_8.ObjectType.MINECART.getType()))
             yOffset = 0.7F / 2F;
-        else if (type == EntityTypes1_8.ObjectType.BOAT.getType())
+        else if (type.isOrHasParent(EntityTypes1_8.ObjectType.BOAT.getType()))
             yOffset = 0.6F / 2F;
-        else if (type == EntityTypes1_8.ObjectType.ITEM.getType())
+        else if (type.isOrHasParent(EntityTypes1_8.ObjectType.ITEM.getType()))
             yOffset = 0.24F / 2F; // Should be 0.25F but that causes items to fall through the ground on modern client versions
-        else if (type == EntityTypes1_8.ObjectType.LEASH.getType())
+        else if (type.isOrHasParent(EntityTypes1_8.ObjectType.LEASH.getType()))
             yOffset = 0.5F;
-        else if (type == EntityTypes1_8.EntityType.EXPERIENCE_ORB)
+        else if (type.isOrHasParent(EntityTypes1_8.EntityType.EXPERIENCE_ORB))
             yOffset = 0.5F / 2F;
         return (int) Math.floor((yPos - yOffset) * 32F);
     }
