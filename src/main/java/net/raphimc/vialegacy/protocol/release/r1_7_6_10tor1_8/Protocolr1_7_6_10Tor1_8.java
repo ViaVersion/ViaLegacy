@@ -540,7 +540,9 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     entityTracker.updateEntityLocation(entityId, x, y, z, false);
 
                     final EntityTypes1_8.EntityType type = entityTracker.getTrackedEntities().get(entityId);
-                    wrapper.set(Types.INT, 1, realignEntityY(type, y));
+                    if (type != null) {
+                        wrapper.set(Types.INT, 1, realignEntityY(type, y));
+                    }
                 });
             }
         });
