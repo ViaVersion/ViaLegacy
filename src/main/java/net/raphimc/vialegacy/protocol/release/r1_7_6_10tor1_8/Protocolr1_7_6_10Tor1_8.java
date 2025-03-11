@@ -928,8 +928,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final short windowId = wrapper.read(Types.BYTE); // window id
-                    wrapper.write(Types.UNSIGNED_BYTE, windowId); // actually wrong, should by BYTE but Via uses U_BYTE
+                    final byte windowId = wrapper.passthrough(Types.BYTE); // window id
                     short slot = wrapper.read(Types.SHORT); // slot
                     final short windowType = wrapper.user().get(WindowTracker.class).get(windowId);
                     if (windowType == 4/*enchanting_table*/ && slot >= 1) slot += 1;
@@ -1328,20 +1327,19 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             @Override
             public void register() {
                 handler(wrapper -> {
-                    final short windowId = wrapper.read(Types.UNSIGNED_BYTE); // window id
-                    wrapper.write(Types.BYTE, (byte) windowId); // actually wrong, should be BYTE but Via uses U_BYTE
+                    final byte windowId = wrapper.passthrough(Types.BYTE); // window id
                     final short slot = wrapper.passthrough(Types.SHORT); // slot
 
                     final short windowType = wrapper.user().get(WindowTracker.class).get(windowId);
                     if (windowType == 4/*enchanting_table*/) {
                         if (slot == 1) {
                             final PacketWrapper resetHandItem = PacketWrapper.create(ClientboundPackets1_8.CONTAINER_SET_SLOT, wrapper.user());
-                            resetHandItem.write(Types.UNSIGNED_BYTE, (short) -1); // window id
+                            resetHandItem.write(Types.BYTE, (byte) -1); // window id
                             resetHandItem.write(Types.SHORT, (short) 0); // slot
                             resetHandItem.write(Types.ITEM1_8, null); // item
                             resetHandItem.send(Protocolr1_7_6_10Tor1_8.class);
                             final PacketWrapper setLapisSlot = PacketWrapper.create(ClientboundPackets1_8.CONTAINER_SET_SLOT, wrapper.user());
-                            setLapisSlot.write(Types.UNSIGNED_BYTE, windowId); // window id
+                            setLapisSlot.write(Types.BYTE, windowId); // window id
                             setLapisSlot.write(Types.SHORT, slot); // slot
                             setLapisSlot.write(Types.ITEM1_8, new DataItem(351/*lapis_lazuli*/, (byte) 3, (short) 4, null)); // item
                             setLapisSlot.send(Protocolr1_7_6_10Tor1_8.class);
