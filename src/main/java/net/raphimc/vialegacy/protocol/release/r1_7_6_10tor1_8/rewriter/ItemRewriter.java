@@ -24,7 +24,7 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.libs.mcstructs.text.ATextComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.TextComponent;
 import com.viaversion.viaversion.libs.mcstructs.text.components.StringComponent;
 import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSerializer;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_8;
@@ -134,7 +134,7 @@ public class ItemRewriter extends LegacyItemRewriter<ClientboundPackets1_7_2, Se
 
             for (int i = 0; i < pages.size(); i++) {
                 final String text = pages.get(i).getValue();
-                final ATextComponent textComponent = TextComponentSerializer.V1_8.deserialize(text);
+                final TextComponent textComponent = TextComponentSerializer.V1_8.deserialize(text);
                 if (textComponent instanceof StringComponent stringComponent) {
                     pages.set(i, new StringTag(stringComponent.getText()));
                 } else {

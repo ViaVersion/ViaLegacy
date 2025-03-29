@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.rewriter;
 
 import com.viaversion.viaversion.libs.fastutil.objects.Object2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2ObjectOpenHashMap;
-import com.viaversion.viaversion.libs.mcstructs.text.ATextComponent;
+import com.viaversion.viaversion.libs.mcstructs.text.TextComponent;
 import com.viaversion.viaversion.libs.mcstructs.text.components.StringComponent;
 import com.viaversion.viaversion.libs.mcstructs.text.components.TranslationComponent;
 import com.viaversion.viaversion.libs.mcstructs.text.serializer.LegacyStringDeserializer;
@@ -72,7 +72,7 @@ public class TextRewriter {
     }
 
     public static String toClient(final String text) {
-        ATextComponent component = TextComponentSerializer.V1_6.deserialize(text);
+        TextComponent component = TextComponentSerializer.V1_6.deserialize(text);
         // Replace translation keys with their actual translations
         TextUtils.iterateAll(component, c -> {
             if (c instanceof TranslationComponent translationComponent) {
@@ -94,7 +94,7 @@ public class TextRewriter {
             if (c instanceof TranslationComponent translationComponent) {
                 final Object[] args = translationComponent.getArgs();
                 for (int i = 0; i < args.length; i++) {
-                    if (args[i] != null && !(args[i] instanceof ATextComponent)) {
+                    if (args[i] != null && !(args[i] instanceof TextComponent)) {
                         args[i] = new StringComponent(args[i].toString());
                     }
                 }

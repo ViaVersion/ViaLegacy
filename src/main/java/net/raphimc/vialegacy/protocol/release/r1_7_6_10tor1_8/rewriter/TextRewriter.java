@@ -27,12 +27,10 @@ import com.viaversion.viaversion.api.protocol.Protocol;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2ObjectOpenHashMap;
-import com.viaversion.viaversion.libs.mcstructs.snbt.SNbtSerializer;
-import com.viaversion.viaversion.libs.mcstructs.text.ATextComponent;
-import com.viaversion.viaversion.libs.mcstructs.text.components.StringComponent;
+import com.viaversion.viaversion.libs.mcstructs.snbt.SNbt;
+import com.viaversion.viaversion.libs.mcstructs.text.TextComponent;
 import com.viaversion.viaversion.libs.mcstructs.text.components.TranslationComponent;
-import com.viaversion.viaversion.libs.mcstructs.text.events.hover.HoverEventAction;
-import com.viaversion.viaversion.libs.mcstructs.text.events.hover.impl.TextHoverEvent;
+import com.viaversion.viaversion.libs.mcstructs.text.events.hover.impl.ItemHoverEvent;
 import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSerializer;
 import com.viaversion.viaversion.libs.mcstructs.text.utils.TextUtils;
 import com.viaversion.viaversion.util.Key;
@@ -430,7 +428,7 @@ public class TextRewriter {
     }
 
     public String toClient(final UserConnection user, final String text) {
-        final ATextComponent component = TextComponentSerializer.V1_7.deserialize(text);
+        final TextComponent component = TextComponentSerializer.V1_7.deserialize(text);
         // Replace translation keys with their actual translations
         TextUtils.iterateAll(component, c -> {
             if (c instanceof TranslationComponent translationComponent) {
@@ -441,38 +439,36 @@ public class TextRewriter {
         });
         // Translate item hover events
         TextUtils.iterateAll(component, c -> {
-            if (c.getStyle().getHoverEvent() instanceof TextHoverEvent textHoverEvent) {
-                if (textHoverEvent.getAction().equals(HoverEventAction.SHOW_ITEM)) {
-                    try {
-                        final CompoundTag tag = (CompoundTag) SNbtSerializer.V1_7.deserialize(textHoverEvent.getText().asUnformattedString());
-                        final short id = tag.getShort("id");
-                        final short damage = tag.getShort("Damage");
-                        final CompoundTag itemTag = tag.getCompoundTag("tag");
+            if (c.getStyle().getHoverEvent() instanceof ItemHoverEvent itemHoverEvent && itemHoverEvent.getData() instanceof ItemHoverEvent.LegacyHolder legacyHolder) {
+                try {
+                    final CompoundTag tag = (CompoundTag) SNbt.V1_7.deserialize(legacyHolder.getData());
+                    final short id = tag.getShort("id");
+                    final short damage = tag.getShort("Damage");
+                    final CompoundTag itemTag = tag.getCompoundTag("tag");
 
-                        Item item = new DataItem();
-                        item.setIdentifier(id);
-                        item.setData(damage);
-                        item.setTag(itemTag);
-                        item = this.protocol.getItemRewriter().handleItemToClient(user, item);
+                    Item item = new DataItem();
+                    item.setIdentifier(id);
+                    item.setData(damage);
+                    item.setTag(itemTag);
+                    item = this.protocol.getItemRewriter().handleItemToClient(user, item);
 
-                        if (!ID_TO_NAME.containsKey(item.identifier())) {
-                            throw new IllegalArgumentException("Invalid item ID: " + item.identifier());
-                        }
-                        tag.putString("id", Key.namespaced(ID_TO_NAME.get(item.identifier())));
-                        if (damage != item.data()) {
-                            tag.putShort("Damage", item.data());
-                        }
-                        if (item.tag() != itemTag) {
-                            tag.put("tag", item.tag());
-                        }
-
-                        c.getStyle().setHoverEvent(new TextHoverEvent(textHoverEvent.getAction(), new StringComponent(SNbtSerializer.V1_8.serialize(tag))));
-                    } catch (Throwable e) {
-                        if (!Via.getConfig().isSuppressConversionWarnings()) {
-                            ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error remapping NBT in show_item:" + textHoverEvent.getText().asUnformattedString(), e);
-                        }
-                        c.getStyle().setHoverEvent(new TextHoverEvent(textHoverEvent.getAction(), new StringComponent())); // Invalid item
+                    if (!ID_TO_NAME.containsKey(item.identifier())) {
+                        throw new IllegalArgumentException("Invalid item ID: " + item.identifier());
                     }
+                    tag.putString("id", Key.namespaced(ID_TO_NAME.get(item.identifier())));
+                    if (damage != item.data()) {
+                        tag.putShort("Damage", item.data());
+                    }
+                    if (item.tag() != itemTag) {
+                        tag.put("tag", item.tag());
+                    }
+
+                    legacyHolder.setData(SNbt.V1_8.serialize(tag));
+                } catch (Throwable e) {
+                    if (!Via.getConfig().isSuppressConversionWarnings()) {
+                        ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error remapping NBT in show_item:" + legacyHolder.getData(), e);
+                    }
+                    legacyHolder.setData("");
                 }
             }
         });
