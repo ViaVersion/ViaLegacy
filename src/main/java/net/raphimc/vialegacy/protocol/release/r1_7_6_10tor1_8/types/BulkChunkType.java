@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
 
-import java.io.ByteArrayOutputStream;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
 import java.util.zip.Inflater;
@@ -98,22 +97,29 @@ public class BulkChunkType extends Type<Chunk[]> {
     @Override
     public void write(ByteBuf byteBuf, Chunk[] chunks) {
         final int chunkCount = chunks.length;
-        final ByteArrayOutputStream output = new ByteArrayOutputStream();
         final int[] chunkX = new int[chunkCount];
         final int[] chunkZ = new int[chunkCount];
         final short[] primaryBitMask = new short[chunkCount];
         final short[] additionalBitMask = new short[chunkCount];
+        final byte[][] dataArrays = new byte[chunkCount][];
+        int dataSize = 0;
 
         for (int i = 0; i < chunkCount; i++) {
             final Chunk chunk = chunks[i];
             final Pair<byte[], Short> chunkData = ChunkType.serialize(chunk);
-            output.writeBytes(chunkData.key());
             chunkX[i] = chunk.getX();
             chunkZ[i] = chunk.getZ();
             primaryBitMask[i] = (short) chunk.getBitmask();
             additionalBitMask[i] = chunkData.value();
+            dataArrays[i] = chunkData.key();
+            dataSize += chunkData.key().length;
         }
-        final byte[] data = output.toByteArray();
+        final byte[] data = new byte[dataSize];
+        int destPos = 0;
+        for (byte[] array : dataArrays) {
+            System.arraycopy(array, 0, data, destPos, array.length);
+            destPos += array.length;
+        }
 
         final Deflater deflater = new Deflater();
         byte[] compressedData;

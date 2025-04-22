@@ -24,7 +24,6 @@ import com.viaversion.viaversion.util.Pair;
 import io.netty.buffer.ByteBuf;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.model.ExtendedBlockStorage;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.zip.DataFormatException;
 import java.util.zip.Deflater;
@@ -125,34 +124,34 @@ public class ChunkType extends Type<Chunk> {
                     storageArrays[i] = new ExtendedBlockStorage(skyLight);
                 }
 
-                final byte[] lsbArray = storageArrays[i].getBlockLSBArray();
-                System.arraycopy(chunkData, dataPosition, lsbArray, 0, lsbArray.length);
-                dataPosition += lsbArray.length;
+                final byte[] blockLSBArray = storageArrays[i].getBlockLSBArray();
+                System.arraycopy(chunkData, dataPosition, blockLSBArray, 0, blockLSBArray.length);
+                dataPosition += blockLSBArray.length;
             }
         }
 
         for (int i = 0; i < storageArrays.length; i++) {
             if ((primaryBitMask & 1 << i) != 0 && storageArrays[i] != null) {
-                final NibbleArray nibbleArray = storageArrays[i].getBlockMetadataArray();
-                System.arraycopy(chunkData, dataPosition, nibbleArray.getHandle(), 0, nibbleArray.getHandle().length);
-                dataPosition += nibbleArray.getHandle().length;
+                final byte[] blockMetadataArray = storageArrays[i].getBlockMetadataArray().getHandle();
+                System.arraycopy(chunkData, dataPosition, blockMetadataArray, 0, blockMetadataArray.length);
+                dataPosition += blockMetadataArray.length;
             }
         }
 
         for (int i = 0; i < storageArrays.length; i++) {
             if ((primaryBitMask & 1 << i) != 0 && storageArrays[i] != null) {
-                final NibbleArray nibbleArray = storageArrays[i].getBlockLightArray();
-                System.arraycopy(chunkData, dataPosition, nibbleArray.getHandle(), 0, nibbleArray.getHandle().length);
-                dataPosition += nibbleArray.getHandle().length;
+                final byte[] blockLightArray = storageArrays[i].getBlockLightArray().getHandle();
+                System.arraycopy(chunkData, dataPosition, blockLightArray, 0, blockLightArray.length);
+                dataPosition += blockLightArray.length;
             }
         }
 
         if (skyLight) {
             for (int i = 0; i < storageArrays.length; i++) {
                 if ((primaryBitMask & 1 << i) != 0 && storageArrays[i] != null) {
-                    final NibbleArray nibbleArray = storageArrays[i].getSkyLightArray();
-                    System.arraycopy(chunkData, dataPosition, nibbleArray.getHandle(), 0, nibbleArray.getHandle().length);
-                    dataPosition += nibbleArray.getHandle().length;
+                    final byte[] skyLightArray = storageArrays[i].getSkyLightArray().getHandle();
+                    System.arraycopy(chunkData, dataPosition, skyLightArray, 0, skyLightArray.length);
+                    dataPosition += skyLightArray.length;
                 }
             }
         }
@@ -160,11 +159,11 @@ public class ChunkType extends Type<Chunk> {
         for (int i = 0; i < storageArrays.length; i++) {
             if ((additionalBitMask & 1 << i) != 0) {
                 if (storageArrays[i] != null) {
-                    final NibbleArray nibbleArray = storageArrays[i].getOrCreateBlockMSBArray();
-                    System.arraycopy(chunkData, dataPosition, nibbleArray.getHandle(), 0, nibbleArray.getHandle().length);
-                    dataPosition += nibbleArray.getHandle().length;
+                    final byte[] blockMSBArray = storageArrays[i].getOrCreateBlockMSBArray().getHandle();
+                    System.arraycopy(chunkData, dataPosition, blockMSBArray, 0, blockMSBArray.length);
+                    dataPosition += blockMSBArray.length;
                 } else {
-                    dataPosition += 2048;
+                    dataPosition += ChunkSection.SIZE / 2;
                 }
             }
         }
@@ -223,57 +222,91 @@ public class ChunkType extends Type<Chunk> {
             }
         }
 
-        final ByteArrayOutputStream output = new ByteArrayOutputStream();
+        final boolean biomes = chunk.isFullChunk() && chunk.getBiomeData() != null;
+        final int totalSize = getSize(storageArrays, (short) chunk.getBitmask(), biomes);
+        final byte[] chunkData = new byte[totalSize];
 
+        int dataPosition = 0;
         for (int i = 0; i < storageArrays.length; i++) {
             if ((chunk.getBitmask() & 1 << i) != 0) {
-                output.writeBytes(storageArrays[i].getBlockLSBArray());
+                final byte[] blockLSBArray = storageArrays[i].getBlockLSBArray();
+                System.arraycopy(blockLSBArray, 0, chunkData, dataPosition, blockLSBArray.length);
+                dataPosition += blockLSBArray.length;
             }
         }
 
         for (int i = 0; i < storageArrays.length; i++) {
             if ((chunk.getBitmask() & 1 << i) != 0) {
-                output.writeBytes(storageArrays[i].getBlockMetadataArray().getHandle());
+                final byte[] blockMetadataArray = storageArrays[i].getBlockMetadataArray().getHandle();
+                System.arraycopy(blockMetadataArray, 0, chunkData, dataPosition, blockMetadataArray.length);
+                dataPosition += blockMetadataArray.length;
             }
         }
 
         for (int i = 0; i < storageArrays.length; i++) {
             if ((chunk.getBitmask() & 1 << i) != 0) {
-                output.writeBytes(storageArrays[i].getBlockLightArray().getHandle());
+                final byte[] blockLightArray = storageArrays[i].getBlockLightArray().getHandle();
+                System.arraycopy(blockLightArray, 0, chunkData, dataPosition, blockLightArray.length);
+                dataPosition += blockLightArray.length;
             }
         }
 
         for (int i = 0; i < storageArrays.length; i++) {
             if ((chunk.getBitmask() & 1 << i) != 0 && storageArrays[i].getSkyLightArray() != null) {
-                output.writeBytes(storageArrays[i].getSkyLightArray().getHandle());
+                final byte[] skyLightArray = storageArrays[i].getSkyLightArray().getHandle();
+                System.arraycopy(skyLightArray, 0, chunkData, dataPosition, skyLightArray.length);
+                dataPosition += skyLightArray.length;
             }
         }
 
         short additionalBitMask = 0;
         for (int i = 0; i < storageArrays.length; i++) {
             if ((chunk.getBitmask() & 1 << i) != 0 && storageArrays[i].hasBlockMSBArray()) {
-                additionalBitMask |= 1 << i;
-                output.writeBytes(storageArrays[i].getOrCreateBlockMSBArray().getHandle());
+                additionalBitMask |= (short) (1 << i);
+                final byte[] blockMSBArray = storageArrays[i].getOrCreateBlockMSBArray().getHandle();
+                System.arraycopy(blockMSBArray, 0, chunkData, dataPosition, blockMSBArray.length);
+                dataPosition += blockMSBArray.length;
             }
         }
 
-        if (chunk.isFullChunk() && chunk.getBiomeData() != null) {
+        if (biomes) {
             for (int biome : chunk.getBiomeData()) {
-                output.write(biome);
+                chunkData[dataPosition++] = (byte) biome;
             }
         }
 
-        return new Pair<>(output.toByteArray(), additionalBitMask);
+        return new Pair<>(chunkData, additionalBitMask);
     }
 
     public static int getSize(final short primaryBitMask, final short additionalBitMask, final boolean fullChunk, final boolean skyLight) {
         final int primarySectionCount = Integer.bitCount(primaryBitMask & 0xFFFF);
         final int additionalSectionCount = Integer.bitCount(additionalBitMask & 0xFFFF);
 
-        int size = ((4096 + 2048 + 2048) * primarySectionCount) + (2048 * additionalSectionCount);
-        if (skyLight) size += 2048 * primarySectionCount;
+        int size = ((ChunkSection.SIZE + ChunkSection.SIZE / 2 + ChunkSectionLight.LIGHT_LENGTH) * primarySectionCount) + (ChunkSection.SIZE / 2 * additionalSectionCount);
+        if (skyLight) size += ChunkSectionLight.LIGHT_LENGTH * primarySectionCount;
         if (fullChunk) size += 256;
 
+        return size;
+    }
+
+    public static int getSize(final ExtendedBlockStorage[] storageArrays, final short bitmask, final boolean biomes) {
+        int size = 0;
+        for (int i = 0; i < storageArrays.length; i++) {
+            if ((bitmask & 1 << i) != 0) {
+                size += ChunkSection.SIZE; // Block lsb array
+                size += ChunkSection.SIZE / 2; // Block metadata array
+                size += ChunkSectionLight.LIGHT_LENGTH; // Block light array
+                if (storageArrays[i].getSkyLightArray() != null) {
+                    size += ChunkSectionLight.LIGHT_LENGTH;
+                }
+                if (storageArrays[i].hasBlockMSBArray()) {
+                    size += ChunkSection.SIZE / 2; // Block msb array
+                }
+            }
+        }
+        if (biomes) {
+            size += 256;
+        }
         return size;
     }
 

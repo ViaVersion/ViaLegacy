@@ -54,7 +54,7 @@ public class BlockChangeRecordArrayType extends Type<BlockChangeRecord[]> {
 
     @Override
     public void write(ByteBuf buffer, BlockChangeRecord[] records) {
-        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(records.length * Short.BYTES * 2);
         final DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
         try {
             for (BlockChangeRecord record : records) {

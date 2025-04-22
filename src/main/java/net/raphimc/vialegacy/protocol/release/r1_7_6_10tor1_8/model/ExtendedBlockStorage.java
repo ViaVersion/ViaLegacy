@@ -29,7 +29,7 @@ public class ExtendedBlockStorage {
     private NibbleArray skyLightArray;
 
     public ExtendedBlockStorage(final boolean skylight) {
-        this.blockLSBArray = new byte[4096];
+        this.blockLSBArray = new byte[ChunkSection.SIZE];
         this.blockMetadataArray = new NibbleArray(this.blockLSBArray.length);
         this.blockLightArray = new NibbleArray(this.blockLSBArray.length);
 
