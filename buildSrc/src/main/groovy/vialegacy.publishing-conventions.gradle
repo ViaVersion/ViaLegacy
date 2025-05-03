@@ -1,0 +1,32 @@
+plugins {
+    id "base.publishing-conventions"
+    id "via.viaversion-maven-publishing"
+}
+
+publishing {
+    publications {
+        mavenJava {
+            pom {
+                name = "ViaLegacy"
+                description = "ViaVersion addon to add support for EVERY Minecraft server version (Classic, Alpha, Beta, Release)"
+                url = "https://github.com/ViaVersion/ViaLegacy"
+                licenses {
+                    license {
+                        name = "GPL-3.0 License"
+                        url = "https://github.com/ViaVersion/ViaLegacy/blob/main/LICENSE"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "RK_01"
+                    }
+                }
+                scm {
+                    connection = "scm:git:git://github.com/ViaVersion/ViaLegacy.git"
+                    developerConnection = "scm:git:ssh://github.com/ViaVersion/ViaLegacy.git"
+                    url = "https://github.com/ViaVersion/ViaLegacy.git"
+                }
+            }
+        }
+    }
+}
