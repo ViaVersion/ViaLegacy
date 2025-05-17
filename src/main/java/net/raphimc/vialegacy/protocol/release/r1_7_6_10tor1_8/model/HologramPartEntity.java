@@ -23,7 +23,6 @@ import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
-import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.protocols.v1_8to1_9.data.EntityDataIndex1_9;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import net.raphimc.vialegacy.api.model.Location;
@@ -121,7 +120,7 @@ public class HologramPartEntity {
             spawnMob.write(Types.SHORT, (short) 0); // velocity x
             spawnMob.write(Types.SHORT, (short) 0); // velocity y
             spawnMob.write(Types.SHORT, (short) 0); // velocity z
-            spawnMob.write(Types1_8.ENTITY_DATA_LIST, this.get1_8EntityData()); // entity data
+            spawnMob.write(Types.ENTITY_DATA_LIST1_8, this.get1_8EntityData()); // entity data
             spawnMob.send(Protocolr1_7_6_10Tor1_8.class);
         }
         if (this.vehicleEntity != null) {
@@ -143,7 +142,7 @@ public class HologramPartEntity {
 
             final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_DATA, this.user);
             setEntityData.write(Types.VAR_INT, this.vehicleEntity.entityId); // entity id
-            setEntityData.write(Types1_8.ENTITY_DATA_LIST, this.vehicleEntity.get1_8EntityData()); // entity data
+            setEntityData.write(Types.ENTITY_DATA_LIST1_8, this.vehicleEntity.get1_8EntityData()); // entity data
             setEntityData.send(Protocolr1_7_6_10Tor1_8.class);
 
             final PacketWrapper attachEntity = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_LINK, this.user);
@@ -173,7 +172,7 @@ public class HologramPartEntity {
         spawnMob.write(Types.SHORT, (short) 0); // velocity x
         spawnMob.write(Types.SHORT, (short) 0); // velocity y
         spawnMob.write(Types.SHORT, (short) 0); // velocity z
-        spawnMob.write(Types1_8.ENTITY_DATA_LIST, this.getArmorStandEntityData()); // entity data
+        spawnMob.write(Types.ENTITY_DATA_LIST1_8, this.getArmorStandEntityData()); // entity data
         spawnMob.send(Protocolr1_7_6_10Tor1_8.class);
     }
 
@@ -190,7 +189,7 @@ public class HologramPartEntity {
 
         final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_DATA, this.user);
         setEntityData.write(Types.VAR_INT, this.mappedEntityId); // entity id
-        setEntityData.write(Types1_8.ENTITY_DATA_LIST, this.getArmorStandEntityData()); // entity data
+        setEntityData.write(Types.ENTITY_DATA_LIST1_8, this.getArmorStandEntityData()); // entity data
         setEntityData.send(Protocolr1_7_6_10Tor1_8.class);
 
         final PacketWrapper entityTeleport = PacketWrapper.create(ClientboundPackets1_8.TELEPORT_ENTITY, this.user);

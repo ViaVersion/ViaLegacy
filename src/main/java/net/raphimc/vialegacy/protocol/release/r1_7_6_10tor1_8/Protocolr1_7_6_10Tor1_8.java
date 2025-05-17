@@ -40,7 +40,6 @@ import com.viaversion.viaversion.api.protocol.remapper.ValueTransformer;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.api.type.types.chunk.BulkChunkType1_8;
 import com.viaversion.viaversion.api.type.types.chunk.ChunkType1_8;
-import com.viaversion.viaversion.api.type.types.version.Types1_8;
 import com.viaversion.viaversion.libs.gson.JsonElement;
 import com.viaversion.viaversion.libs.gson.JsonObject;
 import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSerializer;
@@ -216,7 +215,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     defaultEntityData.add(new EntityData(EntityDataIndex1_7_6.HUMAN_SCORE.getNewIndex(), EntityDataTypes1_8.INT, 0));
                     final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_DATA, wrapper.user());
                     setEntityData.write(Types.VAR_INT, entityTracker.getPlayerID()); // entity id
-                    setEntityData.write(Types1_8.ENTITY_DATA_LIST, defaultEntityData); // entity data
+                    setEntityData.write(Types.ENTITY_DATA_LIST1_8, defaultEntityData); // entity data
                     setEntityData.send(Protocolr1_7_6_10Tor1_8.class);
                 });
             }
@@ -270,7 +269,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
 
             final List<EntityData> entityDataList = wrapper.read(Types1_7_6.ENTITY_DATA_LIST); // entity data
             entityDataRewriter.transform(wrapper.user(), EntityTypes1_8.EntityType.PLAYER, entityDataList);
-            wrapper.write(Types1_8.ENTITY_DATA_LIST, entityDataList);
+            wrapper.write(Types.ENTITY_DATA_LIST1_8, entityDataList);
 
             tablistStorage.sendTempEntry(tempTabEntry);
 
@@ -363,7 +362,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 map(Types.SHORT); // velocity x
                 map(Types.SHORT); // velocity y
                 map(Types.SHORT); // velocity z
-                map(Types1_7_6.ENTITY_DATA_LIST, Types1_8.ENTITY_DATA_LIST); // entity data
+                map(Types1_7_6.ENTITY_DATA_LIST, Types.ENTITY_DATA_LIST1_8); // entity data
                 handler(wrapper -> {
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                     final int entityID = wrapper.get(Types.VAR_INT, 0);
@@ -371,7 +370,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     final int x = wrapper.get(Types.INT, 0);
                     final int y = wrapper.get(Types.INT, 1);
                     final int z = wrapper.get(Types.INT, 2);
-                    final List<EntityData> entityDataList = wrapper.get(Types1_8.ENTITY_DATA_LIST, 0);
+                    final List<EntityData> entityDataList = wrapper.get(Types.ENTITY_DATA_LIST1_8, 0);
                     final EntityTypes1_8.EntityType entityType = EntityTypes1_8.EntityType.findById(typeID);
                     if (entityType == null) {
                         wrapper.cancel();
@@ -574,10 +573,10 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             @Override
             public void register() {
                 map(Types.INT, Types.VAR_INT); // entity id
-                map(Types1_7_6.ENTITY_DATA_LIST, Types1_8.ENTITY_DATA_LIST); // entity data
+                map(Types1_7_6.ENTITY_DATA_LIST, Types.ENTITY_DATA_LIST1_8); // entity data
                 handler(wrapper -> {
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                    final List<EntityData> entityDataList = wrapper.get(Types1_8.ENTITY_DATA_LIST, 0);
+                    final List<EntityData> entityDataList = wrapper.get(Types.ENTITY_DATA_LIST1_8, 0);
                     final int entityID = wrapper.get(Types.VAR_INT, 0);
                     if (tracker.getTrackedEntities().containsKey(entityID)) {
                         tracker.updateEntityData(entityID, entityDataList);

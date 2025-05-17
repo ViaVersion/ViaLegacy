@@ -17,8 +17,7 @@
  */
 package net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.model;
 
-import com.google.common.base.Charsets;
-
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 public class TabListEntry {
@@ -35,7 +34,7 @@ public class TabListEntry {
     }
 
     public TabListEntry(final String name, final short ping) {
-        this.gameProfile = new GameProfile(name, UUID.nameUUIDFromBytes(("LegacyPlayer:" + name).getBytes(Charsets.UTF_8)));
+        this.gameProfile = new GameProfile(name, UUID.nameUUIDFromBytes(("LegacyPlayer:" + name).getBytes(StandardCharsets.UTF_8)));
         this.ping = ping;
     }
 
