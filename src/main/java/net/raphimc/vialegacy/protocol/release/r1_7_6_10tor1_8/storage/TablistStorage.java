@@ -47,20 +47,18 @@ public class TablistStorage extends StoredObject {
 
     public void sendAddEntry(final TabListEntry entry) {
         final List<GameProfile.Property> gameProfileProperties = entry.gameProfile.getAllProperties();
+        final com.viaversion.viaversion.api.minecraft.GameProfile.Property[] properties = new com.viaversion.viaversion.api.minecraft.GameProfile.Property[gameProfileProperties.size()];
+        for (int i = 0; i < gameProfileProperties.size(); i++) {
+            final GameProfile.Property property = gameProfileProperties.get(i);
+            properties[i] = new com.viaversion.viaversion.api.minecraft.GameProfile.Property(property.key, property.value, property.signature);
+        }
 
         final PacketWrapper addPlayerListItemPacket = PacketWrapper.create(ClientboundPackets1_8.PLAYER_INFO, this.user());
         addPlayerListItemPacket.write(Types.VAR_INT, 0); // action
         addPlayerListItemPacket.write(Types.VAR_INT, 1); // count
         addPlayerListItemPacket.write(Types.UUID, entry.gameProfile.uuid); // uuid
         addPlayerListItemPacket.write(Types.STRING, entry.gameProfile.userName); // name
-        addPlayerListItemPacket.write(Types.VAR_INT, gameProfileProperties.size()); // properties count
-        { // properties
-            for (GameProfile.Property profileEntry : gameProfileProperties) {
-                addPlayerListItemPacket.write(Types.STRING, profileEntry.key); // key
-                addPlayerListItemPacket.write(Types.STRING, profileEntry.value); // value
-                addPlayerListItemPacket.write(Types.OPTIONAL_STRING, profileEntry.signature); // signature
-            }
-        }
+        addPlayerListItemPacket.write(Types.PROFILE_PROPERTY_ARRAY, properties); // properties
         addPlayerListItemPacket.write(Types.VAR_INT, entry.gameMode); // gamemode
         addPlayerListItemPacket.write(Types.VAR_INT, entry.ping); // ping
         addPlayerListItemPacket.write(Types.OPTIONAL_STRING, null); // display name

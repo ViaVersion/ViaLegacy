@@ -1067,7 +1067,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 wrapper.write(Types.VAR_INT, 1); // count
                 wrapper.write(Types.UUID, entry.gameProfile.uuid); // uuid
                 wrapper.write(Types.STRING, entry.gameProfile.userName); // name
-                wrapper.write(Types.VAR_INT, 0); // properties count
+                wrapper.write(Types.PROFILE_PROPERTY_ARRAY, new com.viaversion.viaversion.api.minecraft.GameProfile.Property[0]); // properties
                 wrapper.write(Types.VAR_INT, 0); // gamemode
                 wrapper.write(Types.VAR_INT, entry.ping); // ping
                 wrapper.write(Types.OPTIONAL_STRING, null); // display name
