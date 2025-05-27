@@ -127,47 +127,7 @@ If your platform supports online mode authentication you also should not always 
 The game profile fetcher is used to fetch the game profile of a player if the server version is <= 1.7.10.
 This is required because the game profile or UUID of players is not sent by the server in <= 1.7.10.
 The GameProfileFetcher is only used when ``legacy-skin-loading`` or ``legacy-skull-loading`` is set to ``true`` in the config. If you don't plan to use those options you don't need to implement this provider.
-Here is an example implementation using the [Steveice10 AuthLib](https://github.com/GeyserMC/MCAuthLib):
-```java
-public class AuthLibGameProfileFetcher extends GameProfileFetcher {
-
-    private static final SessionService sessionService = new SessionService();
-    private static final ProfileService profileService = new ProfileService();
-
-    @Override
-    public UUID loadMojangUUID(String playerName) throws ExecutionException, InterruptedException {
-        final CompletableFuture<com.github.steveice10.mc.auth.data.GameProfile> future = new CompletableFuture<>();
-        profileService.findProfilesByName(new String[]{playerName}, new ProfileService.ProfileLookupCallback() {
-            @Override
-            public void onProfileLookupSucceeded(com.github.steveice10.mc.auth.data.GameProfile profile) {
-                future.complete(profile);
-            }
-
-            @Override
-            public void onProfileLookupFailed(com.github.steveice10.mc.auth.data.GameProfile profile, Exception e) {
-                future.completeExceptionally(e);
-            }
-        });
-        if (!future.isDone()) {
-            future.completeExceptionally(new ProfileNotFoundException());
-        }
-        return future.get().getId();
-    }
-
-    @Override
-    public GameProfile loadGameProfile(UUID uuid) throws ProfileException {
-        final com.github.steveice10.mc.auth.data.GameProfile inProfile = new com.github.steveice10.mc.auth.data.GameProfile(uuid, null);
-        final com.github.steveice10.mc.auth.data.GameProfile mojangProfile = sessionService.fillProfileProperties(inProfile);
-
-        final GameProfile gameProfile = new GameProfile(mojangProfile.getName(), mojangProfile.getId());
-        for (com.github.steveice10.mc.auth.data.GameProfile.Property prop : mojangProfile.getProperties()) {
-            gameProfile.addProperty(new GameProfile.Property(prop.getName(), prop.getValue(), prop.getSignature()));
-        }
-        return gameProfile;
-    }
-
-}
-```
+For a reference implementation using the Mojang AuthLib you can take a look at how [ViaProxy](https://github.com/ViaVersion/ViaProxy/blob/60e6e2ad49ee15617bb5b1aebeb3ac6fec05ba43/src/main/java/net/raphimc/viaproxy/protocoltranslator/providers/ViaProxyGameProfileFetcher.java) implements it.
 
 #### OldAuthProvider
 The old auth provider is used to authenticate the player if the server version is <= 1.2.5 and has online mode enabled.
@@ -194,7 +154,7 @@ The classic MP pass provider is used to get the MP pass (Authentication token) o
 This is required for joining classic servers with enabled online mode.  
 The implementation of this provider requires the implementer to be able to get the MP pass of a given player.  
 The default implementation of this provider simply returns "0" which indicates to the server that the client does not have a valid MP pass.  
-For a reference implementation you can take a look at how [ViaProxy](https://github.com/ViaVersion/ViaProxy/blob/main/src/main/java/net/raphimc/viaproxy/protocolhack/providers/ViaProxyClassicMPPassProvider.java) implements it.
+For a reference implementation you can take a look at how [ViaProxy](https://github.com/ViaVersion/ViaProxy/blob/60e6e2ad49ee15617bb5b1aebeb3ac6fec05ba43/src/main/java/net/raphimc/viaproxy/protocoltranslator/providers/ViaProxyClassicMPPassProvider.java) implements it.
 
 ## Contact
 If you encounter any issues, please report them on the
