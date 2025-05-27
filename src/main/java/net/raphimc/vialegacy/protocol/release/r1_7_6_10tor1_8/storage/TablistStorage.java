@@ -23,12 +23,11 @@ import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
+import net.raphimc.vialegacy.api.util.GameProfileUtil;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.Protocolr1_7_6_10Tor1_8;
-import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.model.GameProfile;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.model.TabListEntry;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class TablistStorage extends StoredObject {
@@ -42,23 +41,16 @@ public class TablistStorage extends StoredObject {
     public void sendTempEntry(final TabListEntry entry) {
         entry.ping = -1;
         this.sendAddEntry(entry); // send tablist entry before spawning player
-        Via.getPlatform().runSync(() -> this.sendRemoveEntry(entry), entry.gameProfile.isOffline() ? 2L : 60L); // wait for the client to load the skin then remove the fake tablist entry
+        Via.getPlatform().runSync(() -> this.sendRemoveEntry(entry), GameProfileUtil.isOfflineGameProfile(entry.gameProfile) ? 2L : 60L); // wait for the client to load the skin then remove the fake tablist entry
     }
 
     public void sendAddEntry(final TabListEntry entry) {
-        final List<GameProfile.Property> gameProfileProperties = entry.gameProfile.getAllProperties();
-        final com.viaversion.viaversion.api.minecraft.GameProfile.Property[] properties = new com.viaversion.viaversion.api.minecraft.GameProfile.Property[gameProfileProperties.size()];
-        for (int i = 0; i < gameProfileProperties.size(); i++) {
-            final GameProfile.Property property = gameProfileProperties.get(i);
-            properties[i] = new com.viaversion.viaversion.api.minecraft.GameProfile.Property(property.key, property.value, property.signature);
-        }
-
         final PacketWrapper addPlayerListItemPacket = PacketWrapper.create(ClientboundPackets1_8.PLAYER_INFO, this.user());
         addPlayerListItemPacket.write(Types.VAR_INT, 0); // action
         addPlayerListItemPacket.write(Types.VAR_INT, 1); // count
-        addPlayerListItemPacket.write(Types.UUID, entry.gameProfile.uuid); // uuid
-        addPlayerListItemPacket.write(Types.STRING, entry.gameProfile.userName); // name
-        addPlayerListItemPacket.write(Types.PROFILE_PROPERTY_ARRAY, properties); // properties
+        addPlayerListItemPacket.write(Types.UUID, entry.gameProfile.id()); // uuid
+        addPlayerListItemPacket.write(Types.STRING, entry.gameProfile.name()); // name
+        addPlayerListItemPacket.write(Types.PROFILE_PROPERTY_ARRAY, entry.gameProfile.properties()); // properties
         addPlayerListItemPacket.write(Types.VAR_INT, entry.gameMode); // gamemode
         addPlayerListItemPacket.write(Types.VAR_INT, entry.ping); // ping
         addPlayerListItemPacket.write(Types.OPTIONAL_STRING, null); // display name
@@ -69,7 +61,7 @@ public class TablistStorage extends StoredObject {
         final PacketWrapper removePlayerListItemPacket = PacketWrapper.create(ClientboundPackets1_8.PLAYER_INFO, this.user());
         removePlayerListItemPacket.write(Types.VAR_INT, 4); // action
         removePlayerListItemPacket.write(Types.VAR_INT, 1); // count
-        removePlayerListItemPacket.write(Types.UUID, entry.gameProfile.uuid); // uuid
+        removePlayerListItemPacket.write(Types.UUID, entry.gameProfile.id()); // uuid
         removePlayerListItemPacket.send(Protocolr1_7_6_10Tor1_8.class);
     }
 

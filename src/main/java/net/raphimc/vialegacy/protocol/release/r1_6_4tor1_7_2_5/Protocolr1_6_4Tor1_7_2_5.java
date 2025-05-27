@@ -49,6 +49,7 @@ import io.netty.channel.ChannelPromise;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.protocol.StatelessTransitionProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
+import net.raphimc.vialegacy.api.util.GameProfileUtil;
 import net.raphimc.vialegacy.api.util.PacketUtil;
 import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.packet.ClientboundPackets1_6_4;
 import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.packet.ServerboundPackets1_6_4;
@@ -63,7 +64,6 @@ import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.types.Types1_6_4;
 import net.raphimc.vialegacy.protocol.release.r1_7_2_5tor1_7_6_10.packet.ClientboundPackets1_7_2;
 import net.raphimc.vialegacy.protocol.release.r1_7_2_5tor1_7_6_10.packet.ServerboundPackets1_7_2;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.Protocolr1_7_6_10Tor1_8;
-import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.model.GameProfile;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.provider.GameProfileFetcher;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.types.EntityDataTypes1_7_6;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.types.Types1_7_6;
@@ -285,7 +285,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 map(Types.INT, Types.VAR_INT); // entity id
                 handler(wrapper -> {
                     final String name = wrapper.read(Types1_6_4.STRING); // name
-                    wrapper.write(Types.STRING, (ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUUID(name) : new GameProfile(name).uuid).toString().replace("-", "")); // uuid
+                    wrapper.write(Types.STRING, (ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUuid(name) : GameProfileUtil.getOfflinePlayerUuid(name)).toString().replace("-", "")); // uuid
                     wrapper.write(Types.STRING, name);
                 });
                 map(Types.INT); // x
@@ -889,7 +889,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 info.setUsername(name);
             }
             if (info.getUuid() == null) {
-                info.setUuid(ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUUID(name) : new GameProfile(name).uuid);
+                info.setUuid(ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUuid(name) : GameProfileUtil.getOfflinePlayerUuid(name));
             }
         });
         this.registerServerboundTransition(ServerboundLoginPackets.ENCRYPTION_KEY, ServerboundPackets1_6_4.SHARED_KEY, null);

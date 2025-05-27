@@ -17,6 +17,8 @@
  */
 package net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.model;
 
+import com.viaversion.viaversion.api.minecraft.GameProfile;
+
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
@@ -29,7 +31,11 @@ public class TabListEntry {
     public boolean resolved;
 
     public TabListEntry(final String name, final UUID uuid) {
-        this.gameProfile = new GameProfile(name, uuid);
+        this(new GameProfile(name, uuid));
+    }
+
+    public TabListEntry(final GameProfile gameProfile) {
+        this.gameProfile = gameProfile;
         this.resolved = true;
     }
 

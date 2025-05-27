@@ -22,6 +22,7 @@ import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.protocol.AbstractProtocol;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.api.protocol.packet.State;
@@ -30,11 +31,10 @@ import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
 import com.viaversion.viaversion.protocols.base.v1_7.ClientboundBaseProtocol1_7;
 import net.raphimc.vialegacy.ViaLegacy;
-import net.raphimc.vialegacy.api.util.UuidUtil;
+import net.raphimc.vialegacy.api.util.GameProfileUtil;
 import net.raphimc.vialegacy.protocol.release.r1_7_2_5tor1_7_6_10.packet.ClientboundPackets1_7_2;
 import net.raphimc.vialegacy.protocol.release.r1_7_2_5tor1_7_6_10.packet.ServerboundPackets1_7_2;
 import net.raphimc.vialegacy.protocol.release.r1_7_2_5tor1_7_6_10.rewriter.TextRewriter;
-import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.model.GameProfile;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.provider.GameProfileFetcher;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.types.Types1_7_6;
 
@@ -107,11 +107,11 @@ public class Protocolr1_7_2_5Tor1_7_6_10 extends AbstractProtocol<ClientboundPac
                         final String skullName = extraType.getValue();
                         final CompoundTag newTag = tag.copy();
 
-                        if (gameProfileFetcher.isUUIDLoaded(skullName)) { // short cut if skull is already loaded
-                            final UUID uuid = gameProfileFetcher.getMojangUUID(skullName);
+                        if (gameProfileFetcher.isUuidLoaded(skullName)) { // short cut if skull is already loaded
+                            final UUID uuid = gameProfileFetcher.getMojangUuid(skullName);
                             if (gameProfileFetcher.isGameProfileLoaded(uuid)) {
                                 final GameProfile skullProfile = gameProfileFetcher.getGameProfile(uuid);
-                                if (skullProfile == null || skullProfile.isOffline()) return;
+                                if (skullProfile == null) return;
 
                                 newTag.put("Owner", writeGameProfileToTag(skullProfile));
                                 wrapper.set(Types1_7_6.NBT, 0, newTag);
@@ -119,9 +119,9 @@ public class Protocolr1_7_2_5Tor1_7_6_10 extends AbstractProtocol<ClientboundPac
                             }
                         }
 
-                        gameProfileFetcher.getMojangUUIDAsync(skullName).thenAccept(uuid -> {
+                        gameProfileFetcher.getMojangUuidAsync(skullName).thenAccept(uuid -> {
                             final GameProfile skullProfile = gameProfileFetcher.getGameProfile(uuid);
-                            if (skullProfile == null || skullProfile.isOffline()) return;
+                            if (skullProfile == null) return;
 
                             newTag.put("Owner", writeGameProfileToTag(skullProfile));
                             try {
@@ -143,19 +143,23 @@ public class Protocolr1_7_2_5Tor1_7_6_10 extends AbstractProtocol<ClientboundPac
     public static CompoundTag writeGameProfileToTag(final GameProfile gameProfile) {
         final CompoundTag ownerTag = new CompoundTag();
 
-        if (gameProfile.userName != null && !gameProfile.userName.isEmpty()) ownerTag.putString("Name", gameProfile.userName);
-        if (gameProfile.uuid != null) ownerTag.putString("Id", gameProfile.uuid.toString());
-        if (!gameProfile.properties.isEmpty()) {
+        if (gameProfile.name() != null && !gameProfile.name().isEmpty()) {
+            ownerTag.putString("Name", gameProfile.name());
+        }
+        if (gameProfile.id() != null) {
+            ownerTag.putString("Id", gameProfile.id().toString());
+        }
+        if (gameProfile.properties().length != 0) {
             final CompoundTag propertiesTag = new CompoundTag();
 
-            for (Map.Entry<String, List<GameProfile.Property>> entry : gameProfile.properties.entrySet()) {
+            for (Map.Entry<String, List<GameProfile.Property>> entry : gameProfile.propertiesMap().entrySet()) {
                 final ListTag<CompoundTag> propertiesList = new ListTag<>(CompoundTag.class);
 
                 for (GameProfile.Property property : entry.getValue()) {
                     final CompoundTag propertyTag = new CompoundTag();
-                    propertyTag.putString("Value", property.value);
-                    if (property.signature != null) {
-                        propertyTag.putString("Signature", property.signature);
+                    propertyTag.putString("Value", property.value());
+                    if (property.signature() != null) {
+                        propertyTag.putString("Signature", property.signature());
                     }
                     propertiesList.add(propertyTag);
                 }
@@ -178,7 +182,7 @@ public class Protocolr1_7_2_5Tor1_7_6_10 extends AbstractProtocol<ClientboundPac
                 return dashedUuid;
             }
         }
-        return UuidUtil.createOfflinePlayerUuid(name).toString();
+        return GameProfileUtil.getOfflinePlayerUuid(name).toString();
     }
 
 }

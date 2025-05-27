@@ -20,96 +20,92 @@ package net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.provider;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
+import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.platform.providers.Provider;
 import net.raphimc.vialegacy.ViaLegacy;
-import net.raphimc.vialegacy.api.util.UuidUtil;
-import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.model.GameProfile;
+import net.raphimc.vialegacy.api.util.GameProfileUtil;
 
 import java.util.UUID;
-import java.util.concurrent.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.regex.Pattern;
 
 public abstract class GameProfileFetcher implements Provider {
 
-    protected static final Pattern PATTERN_CONTROL_CODE = Pattern.compile("(?i)\\u00A7[0-9A-FK-OR]");
+    private static final GameProfile NULL_GAME_PROFILE = new GameProfile(null, null);
+    private static final Pattern COLOR_CODE_PATTERN = Pattern.compile("(?i)\\u00A7[0-9A-FK-OR]");
 
-    private static final ThreadPoolExecutor LOADING_POOL = (ThreadPoolExecutor) Executors.newFixedThreadPool(2, new ThreadFactoryBuilder().setNameFormat("ViaLegacy GameProfile Loader #%d").setDaemon(true).build());
-
-    private final LoadingCache<String, UUID> UUID_CACHE = CacheBuilder.newBuilder().expireAfterWrite(6, TimeUnit.HOURS).build(new CacheLoader<>() {
+    private final LoadingCache<String, UUID> uuidCache = CacheBuilder.newBuilder().expireAfterWrite(6, TimeUnit.HOURS).build(new CacheLoader<>() {
         @Override
         public UUID load(String key) throws Exception {
-            return loadMojangUUID(key);
+            return GameProfileFetcher.this.loadMojangUuid(key);
         }
     });
-    private final LoadingCache<UUID, GameProfile> GAMEPROFILE_CACHE = CacheBuilder.newBuilder().expireAfterWrite(6, TimeUnit.HOURS).build(new CacheLoader<>() {
+    private final LoadingCache<UUID, GameProfile> gameProfileCache = CacheBuilder.newBuilder().expireAfterWrite(6, TimeUnit.HOURS).build(new CacheLoader<>() {
         @Override
         public GameProfile load(UUID key) throws Exception {
-            return loadGameProfile(key);
+            return GameProfileFetcher.this.loadGameProfile(key);
         }
     });
 
-    public boolean isUUIDLoaded(String playerName) {
-        return UUID_CACHE.getIfPresent(playerName) != null;
+    public boolean isUuidLoaded(final String playerName) {
+        return this.uuidCache.getIfPresent(playerName) != null;
     }
 
-    public UUID getMojangUUID(String playerName) {
-        playerName = PATTERN_CONTROL_CODE.matcher(playerName).replaceAll("");
+    public UUID getMojangUuid(String playerName) {
+        playerName = COLOR_CODE_PATTERN.matcher(playerName).replaceAll("");
         try {
-            return UUID_CACHE.get(playerName);
+            return this.uuidCache.get(playerName);
         } catch (Throwable e) {
-            while (e instanceof ExecutionException || e instanceof UncheckedExecutionException || e instanceof CompletionException) e = e.getCause();
+            while (e instanceof ExecutionException || e instanceof UncheckedExecutionException || e instanceof CompletionException || e instanceof ExecutionError) e = e.getCause();
             ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Failed to load uuid for player '" + playerName + "' (" + e.getClass().getName() + ")");
         }
-        final UUID uuid = UuidUtil.createOfflinePlayerUuid(playerName);
-        UUID_CACHE.put(playerName, uuid);
+        final UUID uuid = GameProfileUtil.getOfflinePlayerUuid(playerName);
+        this.uuidCache.put(playerName, uuid);
         return uuid;
     }
 
-    public CompletableFuture<UUID> getMojangUUIDAsync(String playerName) {
-        final CompletableFuture<UUID> future = new CompletableFuture<>();
-        if (this.isUUIDLoaded(playerName)) {
-            future.complete(this.getMojangUUID(playerName));
+    public CompletableFuture<UUID> getMojangUuidAsync(final String playerName) {
+        if (this.isUuidLoaded(playerName)) {
+            return CompletableFuture.completedFuture(this.getMojangUuid(playerName));
         } else {
-            LOADING_POOL.submit(() -> {
-                future.complete(this.getMojangUUID(playerName));
-            });
+            return CompletableFuture.supplyAsync(() -> this.getMojangUuid(playerName));
         }
-        return future;
     }
 
-    public boolean isGameProfileLoaded(UUID uuid) {
-        return GAMEPROFILE_CACHE.getIfPresent(uuid) != null;
+    public boolean isGameProfileLoaded(final UUID uuid) {
+        return this.gameProfileCache.getIfPresent(uuid) != null;
     }
 
-    public GameProfile getGameProfile(UUID uuid) {
+    public GameProfile getGameProfile(final UUID uuid) {
         try {
-            final GameProfile value = GAMEPROFILE_CACHE.get(uuid);
-            if (GameProfile.NULL.equals(value)) return null;
+            final GameProfile value = this.gameProfileCache.get(uuid);
+            if (NULL_GAME_PROFILE.equals(value)) {
+                return null;
+            }
             return value;
         } catch (Throwable e) {
-            while (e instanceof ExecutionException || e instanceof UncheckedExecutionException || e instanceof CompletionException) e = e.getCause();
+            while (e instanceof ExecutionException || e instanceof UncheckedExecutionException || e instanceof CompletionException || e instanceof ExecutionError) e = e.getCause();
             ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Failed to load game profile for uuid '" + uuid + "' (" + e.getClass().getName() + ")");
         }
-        GAMEPROFILE_CACHE.put(uuid, GameProfile.NULL);
+        this.gameProfileCache.put(uuid, NULL_GAME_PROFILE);
         return null;
     }
 
-    public CompletableFuture<GameProfile> getGameProfileAsync(UUID uuid) {
-        final CompletableFuture<GameProfile> future = new CompletableFuture<>();
+    public CompletableFuture<GameProfile> getGameProfileAsync(final UUID uuid) {
         if (this.isGameProfileLoaded(uuid)) {
-            future.complete(this.getGameProfile(uuid));
+            return CompletableFuture.completedFuture(this.getGameProfile(uuid));
         } else {
-            LOADING_POOL.submit(() -> {
-                future.complete(this.getGameProfile(uuid));
-            });
+            return CompletableFuture.supplyAsync(() -> this.getGameProfile(uuid));
         }
-        return future;
     }
 
-    public abstract UUID loadMojangUUID(final String playerName) throws Exception;
+    public abstract UUID loadMojangUuid(final String playerName) throws Exception;
 
     public abstract GameProfile loadGameProfile(final UUID uuid) throws Exception;
 

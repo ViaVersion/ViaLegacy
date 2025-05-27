@@ -21,10 +21,7 @@ import com.google.common.base.Joiner;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
-import com.viaversion.viaversion.api.minecraft.BlockPosition;
-import com.viaversion.viaversion.api.minecraft.ClientWorld;
-import com.viaversion.viaversion.api.minecraft.Environment;
+import com.viaversion.viaversion.api.minecraft.*;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
@@ -50,12 +47,12 @@ import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ServerboundPackets1_
 import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
+import net.raphimc.vialegacy.api.util.GameProfileUtil;
 import net.raphimc.vialegacy.api.util.PacketUtil;
 import net.raphimc.vialegacy.protocol.release.r1_7_2_5tor1_7_6_10.packet.ClientboundPackets1_7_2;
 import net.raphimc.vialegacy.protocol.release.r1_7_2_5tor1_7_6_10.packet.ServerboundPackets1_7_2;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.data.EntityDataIndex1_7_6;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.data.Particle1_7_6;
-import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.model.GameProfile;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.model.MapData;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.model.MapIcon;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.model.TabListEntry;
@@ -244,16 +241,12 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             final UUID uuid = UUID.fromString(wrapper.read(Types.STRING)); // uuid
             wrapper.write(Types.UUID, uuid);
             final String name = wrapper.read(Types.STRING); // name
-
-            final TablistStorage tablistStorage = wrapper.user().get(TablistStorage.class);
-            final TabListEntry tempTabEntry = new TabListEntry(name, uuid);
-
-            final int dataCount = wrapper.read(Types.VAR_INT); // properties count
-            for (int i = 0; i < dataCount; i++) {
+            final GameProfile.Property[] properties = new GameProfile.Property[wrapper.read(Types.VAR_INT)]; // properties count
+            for (int i = 0; i < properties.length; i++) {
                 final String key = wrapper.read(Types.STRING); // name
                 final String value = wrapper.read(Types.STRING); // value
                 final String signature = wrapper.read(Types.STRING); // signature
-                tempTabEntry.gameProfile.addProperty(new GameProfile.Property(key, value, signature));
+                properties[i] = new GameProfile.Property(key, value, signature);
             }
 
             wrapper.passthrough(Types.INT); // x
@@ -271,8 +264,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             entityDataRewriter.transform(wrapper.user(), EntityTypes1_8.EntityType.PLAYER, entityDataList);
             wrapper.write(Types.ENTITY_DATA_LIST1_8, entityDataList);
 
-            tablistStorage.sendTempEntry(tempTabEntry);
-
+            wrapper.user().get(TablistStorage.class).sendTempEntry(new TabListEntry(new GameProfile(name, uuid, properties)));
             wrapper.user().get(EntityTracker.class).trackEntity(entityID, EntityTypes1_8.EntityType.PLAYER);
         });
         this.registerClientbound(ClientboundPackets1_7_2.TAKE_ITEM_ENTITY, new PacketHandlers() {
@@ -1065,9 +1057,9 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 tablistStorage.tablist.put(name, entry = new TabListEntry(name, ping));
                 wrapper.write(Types.VAR_INT, 0); // action
                 wrapper.write(Types.VAR_INT, 1); // count
-                wrapper.write(Types.UUID, entry.gameProfile.uuid); // uuid
-                wrapper.write(Types.STRING, entry.gameProfile.userName); // name
-                wrapper.write(Types.PROFILE_PROPERTY_ARRAY, new com.viaversion.viaversion.api.minecraft.GameProfile.Property[0]); // properties
+                wrapper.write(Types.UUID, entry.gameProfile.id()); // uuid
+                wrapper.write(Types.STRING, entry.gameProfile.name()); // name
+                wrapper.write(Types.PROFILE_PROPERTY_ARRAY, entry.gameProfile.properties()); // properties
                 wrapper.write(Types.VAR_INT, 0); // gamemode
                 wrapper.write(Types.VAR_INT, entry.ping); // ping
                 wrapper.write(Types.OPTIONAL_STRING, null); // display name
@@ -1075,12 +1067,12 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 tablistStorage.tablist.remove(name);
                 wrapper.write(Types.VAR_INT, 4); // action
                 wrapper.write(Types.VAR_INT, 1); // count
-                wrapper.write(Types.UUID, entry.gameProfile.uuid); // uuid
+                wrapper.write(Types.UUID, entry.gameProfile.id()); // uuid
             } else if (entry != null) { // update ping
                 entry.ping = ping;
                 wrapper.write(Types.VAR_INT, 2); // action
                 wrapper.write(Types.VAR_INT, 1); // count
-                wrapper.write(Types.UUID, entry.gameProfile.uuid); // uuid
+                wrapper.write(Types.UUID, entry.gameProfile.id()); // uuid
                 wrapper.write(Types.VAR_INT, entry.ping); // ping
             } else {
                 wrapper.cancel();
@@ -1198,7 +1190,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                         info.setUsername(name);
                     }
                     if (info.getUuid() == null) {
-                        info.setUuid(ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUUID(name) : new GameProfile(name).uuid);
+                        info.setUuid(ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUuid(name) : GameProfileUtil.getOfflinePlayerUuid(name));
                     }
                 });
             }

@@ -82,7 +82,7 @@ public class ChunkCoordSpiral implements Iterable<ChunkCoord> {
                     return new ChunkCoord(x, z);
                 }
                 j = 0;
-                n += 0.5;
+                n += 0.5F;
                 i++;
                 return next();
             }

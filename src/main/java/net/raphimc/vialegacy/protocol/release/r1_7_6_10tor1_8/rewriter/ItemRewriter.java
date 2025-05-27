@@ -22,6 +22,7 @@ import com.viaversion.nbt.tag.ListTag;
 import com.viaversion.nbt.tag.StringTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
+import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Types;
 import com.viaversion.viaversion.libs.mcstructs.text.TextComponent;
@@ -34,7 +35,6 @@ import net.raphimc.vialegacy.api.remapper.LegacyItemRewriter;
 import net.raphimc.vialegacy.protocol.release.r1_7_2_5tor1_7_6_10.Protocolr1_7_2_5Tor1_7_6_10;
 import net.raphimc.vialegacy.protocol.release.r1_7_2_5tor1_7_6_10.packet.ClientboundPackets1_7_2;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.Protocolr1_7_6_10Tor1_8;
-import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.model.GameProfile;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.provider.GameProfileFetcher;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.types.Types1_7_6;
 
@@ -93,17 +93,18 @@ public class ItemRewriter extends LegacyItemRewriter<ClientboundPackets1_7_2, Se
             if (skullOwnerName != null && ViaLegacy.getConfig().isLegacySkullLoading()) {
                 final GameProfileFetcher gameProfileFetcher = Via.getManager().getProviders().get(GameProfileFetcher.class);
 
-                if (gameProfileFetcher.isUUIDLoaded(skullOwnerName)) {
-                    final UUID uuid = gameProfileFetcher.getMojangUUID(skullOwnerName);
+                if (gameProfileFetcher.isUuidLoaded(skullOwnerName)) {
+                    final UUID uuid = gameProfileFetcher.getMojangUuid(skullOwnerName);
                     if (gameProfileFetcher.isGameProfileLoaded(uuid)) {
                         final GameProfile skullProfile = gameProfileFetcher.getGameProfile(uuid);
-                        if (skullProfile == null || skullProfile.isOffline()) return item;
-                        item.tag().put("SkullOwner", Protocolr1_7_2_5Tor1_7_6_10.writeGameProfileToTag(skullProfile));
+                        if (skullProfile != null) {
+                            item.tag().put("SkullOwner", Protocolr1_7_2_5Tor1_7_6_10.writeGameProfileToTag(skullProfile));
+                        }
                         return item;
                     }
                 }
 
-                gameProfileFetcher.getMojangUUIDAsync(skullOwnerName).thenAccept(gameProfileFetcher::getGameProfile);
+                gameProfileFetcher.getMojangUuidAsync(skullOwnerName).thenAccept(gameProfileFetcher::getGameProfile);
             }
         } else if (item.identifier() == ItemList1_6.writtenBook.itemId() && item.tag() != null) {
             final ListTag<StringTag> pages = item.tag().getListTag("pages", StringTag.class);
