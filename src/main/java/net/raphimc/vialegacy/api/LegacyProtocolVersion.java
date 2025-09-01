@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.api;
 import com.viaversion.viaversion.api.protocol.version.ProtocolVersion;
 import com.viaversion.viaversion.api.protocol.version.SubVersionRange;
 import com.viaversion.viaversion.api.protocol.version.VersionType;
-import com.viaversion.viaversion.protocol.RedirectProtocolVersion;
+import com.viaversion.viaversion.protocol.SpecialProtocolVersion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +68,7 @@ public class LegacyProtocolVersion {
     public static final ProtocolVersion r1_6_2 = registerLegacy(RELEASE_INITIAL, 74, "1.6.2");
     public static final ProtocolVersion r1_6_4 = registerLegacy(RELEASE_INITIAL, 78, "1.6.4");
 
-    public static final ProtocolVersion c0_30cpe = new RedirectProtocolVersion(7, "c0.30 CPE", c0_28toc0_30);
+    public static final ProtocolVersion c0_30cpe = new SpecialProtocolVersion(7, "c0.30 CPE", c0_28toc0_30);
 
     static {
         ProtocolVersion.register(c0_30cpe);
