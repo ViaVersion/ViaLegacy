@@ -11,6 +11,11 @@ repositories {
     maven {
         name = "ViaVersion"
         url = "https://repo.viaversion.com"
+
+        content {
+            includeGroupByRegex "com\\.viaversion(\\..+)?"
+            includeGroupByRegex "net\\.raphimc(\\..+)?"
+        }
     }
 }
 
