@@ -451,7 +451,7 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
             wrapper.user().get(ChestStateTracker.class).unload(chunk.getX(), chunk.getZ());
 
             if (chunk.isFullChunk() && chunk.getBitmask() == 0) { // Remap to empty chunk
-                if (!Via.getConfig().isSuppressConversionWarnings()) {
+                if (Via.getConfig().logOtherConversionWarnings()) {
                     ViaLegacy.getPlatform().getLogger().warning("Received empty 1.2.5 chunk packet");
                 }
                 chunk = ChunkUtil.createEmptyChunk(chunk.getX(), chunk.getZ());

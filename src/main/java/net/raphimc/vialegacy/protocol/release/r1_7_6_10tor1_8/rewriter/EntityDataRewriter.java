@@ -45,7 +45,7 @@ public class EntityDataRewriter {
             final EntityDataIndex1_7_6 entityDataIndex = EntityDataIndex1_7_6.searchIndex(type, entry.id());
             try {
                 if (entityDataIndex == null) {
-                    if (!Via.getConfig().isSuppressConversionWarnings()) {
+                    if (Via.getConfig().logEntityDataErrors()) {
                         ViaLegacy.getPlatform().getLogger().warning("Could not find valid entity data index entry for " + type.name() + ": " + entry);
                     }
                     list.remove(entry);
@@ -95,14 +95,14 @@ public class EntityDataRewriter {
                     case STRING, BLOCK_POSITION, ROTATIONS -> {
                     }
                     default -> {
-                        if (!Via.getConfig().isSuppressConversionWarnings()) {
+                        if (Via.getConfig().logEntityDataErrors()) {
                             ViaLegacy.getPlatform().getLogger().warning("1.7.10 EntityDataRewriter: Unhandled Type: " + entityDataIndex.getNewType() + " " + entry);
                         }
                         list.remove(entry);
                     }
                 }
             } catch (Throwable e) {
-                if (!Via.getConfig().isSuppressConversionWarnings()) {
+                if (Via.getConfig().logEntityDataErrors()) {
                     ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error rewriting entity data entry for " + type.name() + ": " + entry, e);
                 }
                 list.remove(entry);

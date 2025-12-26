@@ -465,7 +465,7 @@ public class TextRewriter {
 
                     legacyHolder.setData(SNbt.V1_8.serialize(tag));
                 } catch (Throwable e) {
-                    if (!Via.getConfig().isSuppressConversionWarnings()) {
+                    if (Via.getConfig().logTextComponentConversionErrors()) {
                         ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error remapping NBT in show_item:" + legacyHolder.getData(), e);
                     }
                     legacyHolder.setData("");

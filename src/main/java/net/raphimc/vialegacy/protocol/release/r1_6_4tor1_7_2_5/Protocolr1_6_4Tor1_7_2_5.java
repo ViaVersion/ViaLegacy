@@ -489,7 +489,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                     String newSound = SoundRewriter.map(oldSound);
                     if (oldSound.isEmpty()) newSound = "";
                     if (newSound == null) {
-                        if (!Via.getConfig().isSuppressConversionWarnings()) {
+                        if (Via.getConfig().logOtherConversionWarnings()) {
                             ViaLegacy.getPlatform().getLogger().warning("Unable to map 1.6.4 sound '" + oldSound + "'");
                         }
                         newSound = "";
@@ -766,7 +766,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                                     length = PacketUtil.calculateLength(wrapper);
                                 }
                             } catch (Exception e) {
-                                if (!Via.getConfig().isSuppressConversionWarnings()) {
+                                if (Via.getConfig().logOtherConversionWarnings()) {
                                     Via.getPlatform().getLogger().log(Level.WARNING, "Failed to handle packet", e);
                                 }
                                 wrapper.cancel();

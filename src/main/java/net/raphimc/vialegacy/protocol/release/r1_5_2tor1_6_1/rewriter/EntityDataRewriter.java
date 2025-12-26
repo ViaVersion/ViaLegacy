@@ -48,14 +48,14 @@ public class EntityDataRewriter {
                     case ITEM, STRING, BLOCK_POSITION -> {
                     }
                     default -> {
-                        if (!Via.getConfig().isSuppressConversionWarnings()) {
+                        if (Via.getConfig().logEntityDataErrors()) {
                             ViaLegacy.getPlatform().getLogger().warning("1.5.2 EntityDataRewriter: Unhandled Type: " + entityDataIndex.getNewType() + " " + entry);
                         }
                         list.remove(entry);
                     }
                 }
             } catch (Throwable e) {
-                if (!Via.getConfig().isSuppressConversionWarnings()) {
+                if (Via.getConfig().logEntityDataErrors()) {
                     ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error rewriting entity data entry for " + type.name() + ": " + entry, e);
                 }
                 list.remove(entry);
