@@ -161,17 +161,17 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
             levelStorage.sendChunk(new ChunkCoord(0, 0));
 
             if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocolr1_7_6_10Tor1_8.class)) {
-                final PacketWrapper worldBorder = PacketWrapper.create(ClientboundPackets1_8.SET_BORDER, wrapper.user());
-                worldBorder.write(Types.VAR_INT, 3); // action (INITIALIZE)
-                worldBorder.write(Types.DOUBLE, sizeX / 2D); // centerX
-                worldBorder.write(Types.DOUBLE, sizeZ / 2D); // centerZ
-                worldBorder.write(Types.DOUBLE, 0.0D); // diameter
-                worldBorder.write(Types.DOUBLE, (double) Math.max(sizeX, sizeZ)); // target size
-                worldBorder.write(Types.VAR_LONG, 0L); // time until target size
-                worldBorder.write(Types.VAR_INT, Math.max(sizeX, sizeZ)); // size
-                worldBorder.write(Types.VAR_INT, 0); // warning distance
-                worldBorder.write(Types.VAR_INT, 0); // warning time
-                worldBorder.send(Protocolr1_7_6_10Tor1_8.class);
+                final PacketWrapper setBorder = PacketWrapper.create(ClientboundPackets1_8.SET_BORDER, wrapper.user());
+                setBorder.write(Types.VAR_INT, 3); // action (INITIALIZE)
+                setBorder.write(Types.DOUBLE, sizeX / 2D); // center x
+                setBorder.write(Types.DOUBLE, sizeZ / 2D); // center z
+                setBorder.write(Types.DOUBLE, 0D); // old size
+                setBorder.write(Types.DOUBLE, (double) Math.max(sizeX, sizeZ)); // new size
+                setBorder.write(Types.VAR_LONG, 0L); // lerp time
+                setBorder.write(Types.VAR_INT, Math.max(sizeX, sizeZ)); // new absolute max size
+                setBorder.write(Types.VAR_INT, 0); // warning blocks
+                setBorder.write(Types.VAR_INT, 0); // warning time
+                setBorder.send(Protocolr1_7_6_10Tor1_8.class);
             }
 
             sendChatMessage(wrapper.user(), "§aWorld dimensions: §6" + sizeX + "§ax§6" + sizeY + "§ax§6" + sizeZ);

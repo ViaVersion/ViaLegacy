@@ -145,6 +145,21 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     tracker.trackEntity(entityId, EntityTypes1_8.EntityType.PLAYER);
                     tracker.setPlayerID(entityId);
                     wrapper.user().getClientWorld(Protocolr1_7_6_10Tor1_8.class).setEnvironment(dimensionId);
+
+                    wrapper.send(Protocolr1_7_6_10Tor1_8.class);
+                    wrapper.cancel();
+
+                    final PacketWrapper setBorder = PacketWrapper.create(ClientboundPackets1_8.SET_BORDER, wrapper.user());
+                    setBorder.write(Types.VAR_INT, 3); // action (INITIALIZE)
+                    setBorder.write(Types.DOUBLE, 0D); // center x
+                    setBorder.write(Types.DOUBLE, 0D); // center z
+                    setBorder.write(Types.DOUBLE, 0D); // old size
+                    setBorder.write(Types.DOUBLE, 60_000_000D); // new size
+                    setBorder.write(Types.VAR_LONG, 0L); // lerp time
+                    setBorder.write(Types.VAR_INT, 60_000_000); // new absolute max size
+                    setBorder.write(Types.VAR_INT, 0); // warning blocks
+                    setBorder.write(Types.VAR_INT, 0); // warning time
+                    setBorder.send(Protocolr1_7_6_10Tor1_8.class);
                 });
             }
         });
@@ -199,6 +214,18 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
 
                     wrapper.send(Protocolr1_7_6_10Tor1_8.class);
                     wrapper.cancel();
+
+                    final PacketWrapper setBorder = PacketWrapper.create(ClientboundPackets1_8.SET_BORDER, wrapper.user());
+                    setBorder.write(Types.VAR_INT, 3); // action (INITIALIZE)
+                    setBorder.write(Types.DOUBLE, 0D); // center x
+                    setBorder.write(Types.DOUBLE, 0D); // center z
+                    setBorder.write(Types.DOUBLE, 0D); // old size
+                    setBorder.write(Types.DOUBLE, 60_000_000D); // new size
+                    setBorder.write(Types.VAR_LONG, 0L); // lerp time
+                    setBorder.write(Types.VAR_INT, 60_000_000); // new absolute max size
+                    setBorder.write(Types.VAR_INT, 0); // warning blocks
+                    setBorder.write(Types.VAR_INT, 0); // warning time
+                    setBorder.send(Protocolr1_7_6_10Tor1_8.class);
 
                     // 1.7 doesn't keep entity data after respawn, but 1.8 does
                     final List<EntityData> defaultEntityData = new ArrayList<>();
