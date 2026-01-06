@@ -69,7 +69,10 @@ import java.util.logging.Logger;
 public interface ViaLegacyPlatform {
 
     default void init(final File configFile) {
-        final ViaLegacyConfig config = new ViaLegacyConfig(configFile, this.getLogger());
+        this.init(new ViaLegacyConfig(configFile, this.getLogger()));
+    }
+
+    default void init(final net.raphimc.vialegacy.platform.ViaLegacyConfig config) {
         config.reload();
         Via.getManager().getConfigurationProvider().register(config);
         ViaLegacy.init(this, config);
