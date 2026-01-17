@@ -25,6 +25,8 @@ import io.netty.handler.codec.MessageToByteEncoder;
 
 public class PreNettyLengthRemover extends MessageToByteEncoder<ByteBuf> {
 
+    public static final String NAME = "vialegacy-pre-netty-length-remover";
+
     protected final UserConnection user;
 
     public PreNettyLengthRemover(final UserConnection user) {

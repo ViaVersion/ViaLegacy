@@ -26,6 +26,8 @@ import java.util.List;
 
 public class PreNettyLengthCodec extends ByteToMessageCodec<ByteBuf> {
 
+    public static final String NAME = "vialegacy-pre-netty-length-codec";
+
     protected final PreNettyLengthRemover encoder;
     protected final PreNettyLengthPrepender decoder;
 

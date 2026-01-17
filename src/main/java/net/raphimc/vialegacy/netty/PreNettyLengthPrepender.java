@@ -32,6 +32,8 @@ import java.util.List;
 
 public class PreNettyLengthPrepender extends ByteToMessageDecoder {
 
+    public static final String NAME = "vialegacy-pre-netty-length-prepender";
+
     protected final UserConnection user;
     private final EvictingQueue<Integer> lastPackets = EvictingQueue.create(8);
 
