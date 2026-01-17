@@ -54,51 +54,17 @@ If you just want the latest jar file you can download it from [GitHub Actions](h
 
 ## Usage
 ViaLegacy requires you to have an already functional ViaVersion implementation for your platform.
-If you don't have one you can check out [ViaLoader](https://github.com/ViaVersion/ViaLoader) for an abstracted and simplified, but still customizable implementation. 
-You can also go to the other [ViaVersion](https://github.com/ViaVersion) repositories and look at their server and proxy implementations.
+If you don't have one you can check out [this documentation](https://github.com/ViaVersion/ViaVersion/wiki/Creating-a-new-ViaVersion-platform) in order to create one.
 
 ### Base Implementation
-Note: In case you use [ViaLoader](https://github.com/ViaVersion/ViaLoader) you can skip "ViaLegacy platform implementation" and "Loading the platform" as ViaLoader already does that for you.
 
-#### ViaLegacy platform implementation
-To get started you should create a class which implements the ViaLegacy platform interface.
+To implement ViaLegacy you need to create a new instance of its platform implementation class ``ViaLegacyPlatformImpl`` when ViaVersion is being enabled.
 Here is an example:
 ```java
-public class ViaLegacyPlatformImpl implements ViaLegacyPlatform {
-
-    public ViaLegacyPlatformImpl() {
-        this.init(this.getDataFolder());
-    }
-
-    @Override
-    public Logger getLogger() {
-        return Via.getPlatform().getLogger();
-    }
-
-    @Override
-    public File getDataFolder() {
-        return Via.getPlatform().getDataFolder();
-    }
-
-}
+new ViaLegacyPlatformImpl();
 ```
-This is a very basic implementation which just uses the ViaVersion logger and data folder.
+This should be done in your ``ViaManagerImpl.initAndLoad()`` method call as enable listener (or otherwise after the Via manager is initialized).
 
-#### Loading the platform
-After you have created your platform implementation you should load it in your ViaVersion implementation.
-Here is an example:
-```java
-Via.getManager().addEnableListener(ViaLegacyPlatformImpl::new);
-```
-Make sure to add the enable listener before the Via manager is initialized (``((ViaManagerImpl) Via.getManager()).init();``).
-
-It is also highly recommended to increase the max protocol path size of ViaVersion. The default value is 50 which means there can't be more than 50 protocols in one pipeline. This can get exceeded by ViaLegacy.
-You can increase the path size by adding the following lines after the Via manager is initialized:
-```java
-Via.getManager().getProtocolManager().setMaxProtocolPathSize(Integer.MAX_VALUE); // Allow Integer.MAX_VALUE protocols in the pipeline
-Via.getManager().getProtocolManager().setMaxPathDeltaIncrease(-1); // Allow unlimited protocol path size increase
-((ProtocolManagerImpl) Via.getManager().getProtocolManager()).refreshVersions(); // Refresh the version paths
-```
 #### Implementing the netty changes
 ViaLegacy requires you to make some changes to your netty pipeline where ViaVersion is being added into the pipeline.
 ViaLegacy needs to have custom netty handlers in the pipeline which handle <= 1.6.4 connections. This is required due to the way how <= 1.6.4 (called pre-netty protocol) protocol differs.
@@ -107,13 +73,13 @@ To implement the changes you should add something similar to the following lines
 ```java
 if (serverTargetVersion.olderThanOrEqualTo(LegacyProtocolVersion.r1_6_4)) { // Only add those handlers if the server version is <= 1.6.4
     // You can either add a codec (if your pipeline is built for that)
-    channel.pipeline().addBefore("length-codec", "vialegacy-pre-netty-length-codec", new PreNettyLengthCodec(user));
+    channel.pipeline().addBefore("length-codec", PreNettyLengthCodec.NAME, new PreNettyLengthCodec(user));
     // or two seperate netty handlers
-    // channel.pipeline().addBefore("length-decoder", "vialegacy-pre-netty-length-prepender", new PreNettyLengthPrepender(user));
-    // channel.pipeline().addBefore("length-encoder", "vialegacy-pre-netty-length-remover", new PreNettyLengthRemover(user));
+    // channel.pipeline().addBefore("length-decoder", PreNettyLengthPrepender.NAME, new PreNettyLengthPrepender(user));
+    // channel.pipeline().addBefore("length-encoder", PreNettyLengthRemover.NAME, new PreNettyLengthRemover(user));
 }
 ```
-In case you use [ViaLoader](https://github.com/ViaVersion/ViaLoader) and the [VLPipeline](https://github.com/ViaVersion/ViaLoader/blob/main/src/main/java/net/raphimc/vialoader/netty/VLPipeline.java) (or the [VLLegacyPipeline](https://github.com/ViaVersion/ViaLoader/blob/main/src/main/java/net/raphimc/vialoader/netty/VLLegacyPipeline.java)), you don't need to make these modifications anymore, as the VLPipeline/VLLegacyPipeline already does it automatically.
+
 ### Implementing the platform specific providers
 The platform specific providers are all optional (except for ``EncryptionProvider`` and ``GameProfileFetcher``) and only required if you want to use the features which require them.  
 To implement a provider you can simply call ``Via.getManager().getProviders().use(TheNameOfTheProvider.class, new YouImplementationOfThatProvider());`` after the Via manager is initialized.
