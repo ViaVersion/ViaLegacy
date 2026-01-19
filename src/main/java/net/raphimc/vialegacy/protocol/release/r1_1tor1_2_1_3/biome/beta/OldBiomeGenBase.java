@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.biome.beta;
 
 public class OldBiomeGenBase {
@@ -61,49 +62,31 @@ public class OldBiomeGenBase {
         f1 *= f;
         if (f < 0.1F) {
             return tundra;
-        }
-        if (f1 < 0.2F) {
+        } else if (f1 < 0.2F) {
             if (f < 0.5F) {
                 return tundra;
-            }
-            if (f < 0.95F) {
+            } else if (f < 0.95F) {
                 return savanna;
             } else {
                 return desert;
             }
-        }
-        if (f1 > 0.5F && f < 0.7F) {
+        } else if (f1 > 0.5F && f < 0.7F) {
             return swampland;
-        }
-        if (f < 0.5F) {
+        } else if (f < 0.5F) {
             return taiga;
-        }
-        if (f < 0.97F) {
+        } else if (f < 0.97F) {
             if (f1 < 0.35F) {
                 return shrubland;
             } else {
                 return forest;
             }
-        }
-        if (f1 < 0.45F) {
+        } else if (f1 < 0.45F) {
             return plains;
-        }
-        if (f1 < 0.9F) {
+        } else if (f1 < 0.9F) {
             return seasonalForest;
         } else {
             return rainforest;
         }
-    }
-
-    public int getSkyColorByTemp(float f) {
-        f /= 3F;
-        if (f < -1F) {
-            f = -1F;
-        }
-        if (f > 1.0F) {
-            f = 1.0F;
-        }
-        return java.awt.Color.getHSBColor(0.6222222F - f * 0.05F, 0.5F + f * 0.1F, 1.0F).getRGB();
     }
 
 }

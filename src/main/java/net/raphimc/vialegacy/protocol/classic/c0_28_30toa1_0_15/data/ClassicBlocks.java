@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.data;
 
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectMap;

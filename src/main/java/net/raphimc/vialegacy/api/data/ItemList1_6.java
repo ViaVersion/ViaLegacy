@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.api.data;
 
 import com.google.common.collect.Lists;
@@ -225,6 +226,7 @@ public class ItemList1_6 {
                 return item;
             }
         }
+
         return null;
     }
 
@@ -234,6 +236,7 @@ public class ItemList1_6 {
                 return item;
             }
         }
+
         return null;
     }
 
@@ -244,7 +247,6 @@ public class ItemList1_6 {
             this.name = name;
             this.maxDamage = maxDamage;
             this.hasSubTypes = hasSubTypes;
-
             itemList.add(this);
         }
 

@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.api.remapper;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
@@ -42,6 +43,7 @@ public abstract class AbstractChunkTracker implements StorableObject {
         for (final int trackedBlock : toTrack) {
             this.toTrack.add(trackedBlock);
         }
+
         this.trackAll = this.toTrack.contains(0);
     }
 
@@ -93,14 +95,18 @@ public abstract class AbstractChunkTracker implements StorableObject {
         // Remap
         for (int i = 0; i < chunk.getSections().length; i++) {
             final ChunkSection section = chunk.getSections()[i];
-            if (section == null) continue;
-            final DataPalette palette = section.palette(PaletteType.BLOCKS);
+            if (section == null) {
+                continue;
+            }
 
+            final DataPalette palette = section.palette(PaletteType.BLOCKS);
             for (Int2IntMap.Entry entry : this.replacements.int2IntEntrySet()) {
                 palette.replaceId(entry.getIntKey(), entry.getIntValue());
             }
 
-            if (!this.hasRemappableBlocks(palette)) continue;
+            if (!this.hasRemappableBlocks(palette)) {
+                continue;
+            }
 
             for (int x = 0; x < 16; x++) {
                 for (int y = 0; y < 16; y++) {

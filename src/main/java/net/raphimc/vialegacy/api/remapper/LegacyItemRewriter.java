@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.api.remapper;
 
 import com.viaversion.nbt.tag.CompoundTag;
@@ -106,7 +107,6 @@ public abstract class LegacyItemRewriter<C extends ClientboundPacketType, S exte
     @Override
     public Item handleItemToClient(final UserConnection user, final Item item) {
         if (item == null) return null;
-
         for (RewriteEntry rewriteEntry : this.rewriteEntries) {
             if (rewriteEntry.rewrites(item)) {
                 this.setRemappedNameRead(item, rewriteEntry.newItemName);
@@ -123,7 +123,6 @@ public abstract class LegacyItemRewriter<C extends ClientboundPacketType, S exte
     @Override
     public Item handleItemToServer(final UserConnection user, final Item item) {
         if (item == null) return null;
-
         for (NonExistentEntry nonExistentEntry : this.nonExistentItems) {
             if (nonExistentEntry.rewrites(item)) {
                 item.setIdentifier(1);
@@ -196,6 +195,7 @@ public abstract class LegacyItemRewriter<C extends ClientboundPacketType, S exte
             tag.put("display", display);
             viaLegacyTag.putBoolean("RemoveDisplayTag", true);
         }
+
         if (display.contains("Name")) {
             ListTag<StringTag> lore = display.getListTag("Lore", StringTag.class);
             if (lore == null) {

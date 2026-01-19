@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.api.util;
 
 import com.viaversion.viaversion.api.minecraft.BlockFace;
@@ -24,11 +25,11 @@ public class BlockFaceUtil {
     public static BlockFace getFace(final int direction) {
         return switch (direction) {
             case 0 -> BlockFace.BOTTOM;
-            default -> BlockFace.TOP;
             case 2 -> BlockFace.NORTH;
             case 3 -> BlockFace.SOUTH;
             case 4 -> BlockFace.WEST;
             case 5 -> BlockFace.EAST;
+            default -> BlockFace.TOP;
         };
     }
 

@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.api.util;
 
 import com.viaversion.viaversion.api.protocol.packet.PacketType;
@@ -33,10 +34,12 @@ public class PacketUtil {
         if (wrapper instanceof PacketWrapperImpl impl && impl.getInputBuffer() != null) {
             impl.getInputBuffer().markReaderIndex();
         }
+
         wrapper.writeToBuffer(lengthBuffer);
         if (wrapper instanceof PacketWrapperImpl impl && impl.getInputBuffer() != null) {
             impl.getInputBuffer().resetReaderIndex();
         }
+
         final int length = lengthBuffer.readableBytes();
         lengthBuffer.release();
 

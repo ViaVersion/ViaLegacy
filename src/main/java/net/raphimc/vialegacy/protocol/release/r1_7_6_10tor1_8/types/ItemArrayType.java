@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.types;
 
 import com.viaversion.viaversion.api.minecraft.item.Item;

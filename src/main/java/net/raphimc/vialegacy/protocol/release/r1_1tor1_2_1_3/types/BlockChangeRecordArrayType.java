@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.types;
 
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
@@ -32,15 +33,18 @@ public class BlockChangeRecordArrayType extends Type<BlockChangeRecord[]> {
     @Override
     public BlockChangeRecord[] read(ByteBuf buffer) {
         final int length = buffer.readUnsignedShort();
+
         final short[] positions = new short[length];
-        final short[] blocks = new short[length];
-        final byte[] metas = new byte[length];
         for (int i = 0; i < length; i++) {
             positions[i] = buffer.readShort();
         }
+
+        final short[] blocks = new short[length];
         for (int i = 0; i < length; i++) {
             blocks[i] = buffer.readUnsignedByte();
         }
+
+        final byte[] metas = new byte[length];
         for (int i = 0; i < length; i++) {
             metas[i] = buffer.readByte();
         }
@@ -49,6 +53,7 @@ public class BlockChangeRecordArrayType extends Type<BlockChangeRecord[]> {
         for (int i = 0; i < length; i++) {
             blockChangeRecords[i] = new BlockChangeRecord1_8(positions[i] >> 12 & 15, positions[i] & 255, positions[i] >> 8 & 15, IdAndData.toRawData(blocks[i], metas[i]));
         }
+
         return blockChangeRecords;
     }
 
@@ -58,9 +63,11 @@ public class BlockChangeRecordArrayType extends Type<BlockChangeRecord[]> {
         for (BlockChangeRecord record : records) {
             buffer.writeShort(record.getSectionX() << 12 | record.getSectionZ() << 8 | record.getY(-1));
         }
+
         for (BlockChangeRecord record : records) {
             buffer.writeByte(record.getBlockId() >> 4);
         }
+
         for (BlockChangeRecord record : records) {
             buffer.writeByte(record.getBlockId() & 15);
         }

@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.netty;
 
 import com.google.common.collect.EvictingQueue;
@@ -46,6 +47,7 @@ public class PreNettyLengthPrepender extends ByteToMessageDecoder {
         if (!in.isReadable() || in.readableBytes() <= 0) {
             return;
         }
+
         final PreNettySplitter splitter = this.user.get(PreNettySplitter.class);
         if (splitter == null) {
             ViaLegacy.getPlatform().getLogger().severe("Received data, but no splitter is set");
@@ -63,6 +65,7 @@ public class PreNettyLengthPrepender extends ByteToMessageDecoder {
                 ctx.channel().close();
                 return;
             }
+
             this.lastPackets.add(packetId);
             try {
                 final int begin = in.readerIndex();
