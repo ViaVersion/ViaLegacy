@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.biome.beta;
 
 import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.biome.IWorldChunkManager;
@@ -103,15 +102,16 @@ public class WorldChunkManager_b1_7 implements IWorldChunkManager {
                 double d = field_4196_c[i1] * 1.1000000000000001D + 0.5D;
                 double d1 = 0.01D;
                 double d2 = 1.0D - d1;
+
                 double temperature = (this.temperature[i1] * 0.14999999999999999D + 0.69999999999999996D) * d2 + d * d1;
                 d1 = 0.002D;
                 d2 = 1.0D - d1;
-                double downfall = Math.max(0.0, Math.min(1.0, (humidity[i1] * 0.14999999999999999D + 0.5D) * d2 + d * d1));
 
+                final double rainfall = Math.max(0.0, Math.min(1.0, (humidity[i1] * 0.14999999999999999D + 0.5D) * d2 + d * d1));
                 this.temperature[i1] = Math.max(0.0, Math.min(1.0, 1.0D - (1.0D - temperature) * (1.0D - temperature)));
-                this.humidity[i1] = downfall;
+                this.humidity[i1] = rainfall;
 
-                biomes[i1++] = OldBiomeGenBase.getBiomeFromLookup(temperature, downfall);
+                biomes[i1++] = OldBiomeGenBase.getBiomeFromLookup(temperature, rainfall);
             }
         }
 
