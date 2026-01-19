@@ -35,13 +35,13 @@ public class BiomeCache {
     }
 
     public BiomeCacheBlock getBiomeCacheBlock(int blockX, int blockZ) {
-        blockX >>= 4;
-        blockZ >>= 4;
+        final int chunkX = blockX >> 4;
+        final int chunkZ = blockZ >> 4;
 
-        long l = (long) blockX & 0xffffffffL | ((long) blockZ & 0xffffffffL) << 32;
+        final long l = (long) chunkX & 0xffffffffL | ((long) chunkZ & 0xffffffffL) << 32;
         BiomeCacheBlock biomecacheblock = cacheMap.get(l);
         if (biomecacheblock == null) {
-            biomecacheblock = new BiomeCacheBlock(this, blockX, blockZ);
+            biomecacheblock = new BiomeCacheBlock(this, chunkX, chunkZ);
             cacheMap.put(l, biomecacheblock);
             cache.add(biomecacheblock);
         }
