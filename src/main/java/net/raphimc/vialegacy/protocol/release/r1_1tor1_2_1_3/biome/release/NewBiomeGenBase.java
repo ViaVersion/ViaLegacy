@@ -43,10 +43,8 @@ public class NewBiomeGenBase {
     public static final NewBiomeGenBase taigaHills = new NewBiomeGenBase(19).setTemperatureRainfall(0.05F, 0.8F);
     public static final NewBiomeGenBase extremeHillsEdge = new NewBiomeGenBase(20).setTemperatureRainfall(0.2F, 0.3F);
 
-    public static final NewBiomeGenBase jungle = new NewBiomeGenBase(21); //This is here for the OldWorldChunkManager
-    public static final NewBiomeGenBase cold_taiga = new NewBiomeGenBase(30); //This is here for the OldWorldChunkManager
-    public static final NewBiomeGenBase savanna = new NewBiomeGenBase(35); //This is here for the OldWorldChunkManager
-    public static final NewBiomeGenBase mutatedJungleEdge = new NewBiomeGenBase(151); //This is here for the OldWorldChunkManager
+    public static final NewBiomeGenBase jungle = new NewBiomeGenBase(21); // This is here for the WorldChunkManager_b1_7 (Added in 1.2.1)
+    public static final NewBiomeGenBase savanna = new NewBiomeGenBase(35); // This is here for the WorldChunkManager_b1_7 (Added in 1.7.2)
 
     public final int biomeID;
     public float temperature;
