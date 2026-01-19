@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.biome.release;
 
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ public class IntCacheInstance {
                 return ai1;
             }
         }
+
         if (i > intCacheSize) {
             intCacheSize = i;
             freeLargeArrays.clear();
@@ -48,6 +50,7 @@ public class IntCacheInstance {
             inUseLargeArrays.add(ai2);
             return ai2;
         }
+
         if (freeLargeArrays.isEmpty()) {
             int[] ai3 = new int[intCacheSize];
             inUseLargeArrays.add(ai3);
@@ -63,9 +66,11 @@ public class IntCacheInstance {
         if (!freeLargeArrays.isEmpty()) {
             freeLargeArrays.remove(freeLargeArrays.size() - 1);
         }
+
         if (!freeSmallArrays.isEmpty()) {
             freeSmallArrays.remove(freeSmallArrays.size() - 1);
         }
+
         freeLargeArrays.addAll(inUseLargeArrays);
         freeSmallArrays.addAll(inUseSmallArrays);
         inUseLargeArrays.clear();

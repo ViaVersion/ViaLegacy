@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.protocol.beta.b1_8_0_1tor1_0_0_1.task;
 
 import com.google.common.collect.Lists;

@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.api.util;
 
 import net.raphimc.vialegacy.api.model.ChunkCoord;
@@ -40,7 +41,7 @@ public class ChunkCoordSpiral implements Iterable<ChunkCoord> {
     }
 
     public ChunkCoordSpiral(ChunkCoord center, ChunkCoord radius, int step) {
-        this(center, new ChunkCoord(center.chunkX - radius.chunkX, center.chunkZ - radius.chunkZ), new ChunkCoord(center.chunkX + radius.chunkX, center.chunkZ + radius.chunkZ), step);
+        this(center, center.subtract(radius), center.add(radius), step);
     }
 
     public ChunkCoordSpiral(ChunkCoord center, ChunkCoord radius) {
@@ -50,8 +51,8 @@ public class ChunkCoordSpiral implements Iterable<ChunkCoord> {
     @Override
     public Iterator<ChunkCoord> iterator() {
         return new Iterator<>() {
-            int x = center.chunkX;
-            int z = center.chunkZ;
+            int x = center.x();
+            int z = center.z();
 
             float n = 1;
             int floorN = 1;
@@ -60,7 +61,7 @@ public class ChunkCoordSpiral implements Iterable<ChunkCoord> {
 
             @Override
             public boolean hasNext() {
-                return returnCenter || x >= lowerBound.chunkX && x <= upperBound.chunkX && z >= lowerBound.chunkZ && z <= upperBound.chunkZ;
+                return returnCenter || x >= lowerBound.x() && x <= upperBound.x() && z >= lowerBound.z() && z <= upperBound.z();
             }
 
             @Override
@@ -78,9 +79,11 @@ public class ChunkCoordSpiral implements Iterable<ChunkCoord> {
                         case 2 -> z -= step;
                         case 3 -> x -= step;
                     }
+
                     j++;
                     return new ChunkCoord(x, z);
                 }
+
                 j = 0;
                 n += 0.5F;
                 i++;

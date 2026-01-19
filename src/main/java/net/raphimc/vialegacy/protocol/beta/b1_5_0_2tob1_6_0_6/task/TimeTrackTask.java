@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.protocol.beta.b1_5_0_2tob1_6_0_6.task;
 
 import com.viaversion.viaversion.api.Via;

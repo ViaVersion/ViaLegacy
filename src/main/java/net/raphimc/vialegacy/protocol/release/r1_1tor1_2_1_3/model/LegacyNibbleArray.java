@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.model;
 
 import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
@@ -26,10 +27,6 @@ public class LegacyNibbleArray extends NibbleArray {
 
     public LegacyNibbleArray(final int length) {
         this(length, 7);
-    }
-
-    public LegacyNibbleArray(final byte[] handle) {
-        this(handle, 7);
     }
 
     public LegacyNibbleArray(final int length, final int depthBits) {

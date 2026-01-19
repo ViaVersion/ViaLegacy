@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.api.protocol;
 
 import com.viaversion.viaversion.api.protocol.packet.ClientboundPacketType;
@@ -38,11 +39,12 @@ public abstract class StatelessTransitionProtocol<CU extends ClientboundPacketTy
     }
 
     public void registerClientboundTransition(final CU unmappedPacketType, final Object... handlers) {
-        if (handlers.length % 2 != 0) throw new IllegalArgumentException("handlers.length % 2 != 0");
+        if (handlers.length % 2 != 0) {
+            throw new IllegalArgumentException("handlers.length % 2 != 0");
+        }
 
         this.registerClientbound(unmappedPacketType.state(), unmappedPacketType.getId(), -1, wrapper -> {
             final State currentState = wrapper.user().getProtocolInfo().getServerState();
-
             for (int i = 0; i < handlers.length; i += 2) {
                 if (handlers[i] instanceof State state) {
                     if (state != currentState) continue;

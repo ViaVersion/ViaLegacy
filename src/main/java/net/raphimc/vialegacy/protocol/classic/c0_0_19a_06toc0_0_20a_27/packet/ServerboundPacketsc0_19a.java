@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.protocol.classic.c0_0_19a_06toc0_0_20a_27.packet;
 
 import com.viaversion.viaversion.api.connection.UserConnection;

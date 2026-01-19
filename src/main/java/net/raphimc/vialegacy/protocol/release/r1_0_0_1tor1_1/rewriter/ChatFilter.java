@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 package net.raphimc.vialegacy.protocol.release.r1_0_0_1tor1_1.rewriter;
 
 public class ChatFilter {
@@ -38,11 +39,9 @@ public class ChatFilter {
     };
 
     public static String filter(String message) {
-        String allowed = new String(ALLOWED_CHARACTERS);
-
+        final String allowed = new String(ALLOWED_CHARACTERS);
         for (int i = 0; i < message.length(); ++i) {
-            String toReplace = Character.toString(message.charAt(i));
-
+            final String toReplace = Character.toString(message.charAt(i));
             if (!allowed.contains(toReplace)) {
                 message = message.replaceAll(toReplace, "*");
             }
