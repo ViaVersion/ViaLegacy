@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.raphimc.vialegacy.protocol.beta.b1_6_0_6tob1_7_0_3;
 
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;

@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.biome.beta;
 
 public class OldBiomeGenBase {
@@ -48,41 +47,40 @@ public class OldBiomeGenBase {
             for (int j = 0; j < 64; j++) {
                 biomeLookupTable[i + j * 64] = getBiome((float) i / 63F, (float) j / 63F);
             }
-
         }
     }
 
-    public static OldBiomeGenBase getBiomeFromLookup(double d, double d1) {
-        int i = (int) (d * 63D);
-        int j = (int) (d1 * 63D);
+    public static OldBiomeGenBase getBiomeFromLookup(double temperature, double rainfall) {
+        int i = (int) (temperature * 63D);
+        int j = (int) (rainfall * 63D);
         return biomeLookupTable[i + j * 64];
     }
 
-    public static OldBiomeGenBase getBiome(float f, float f1) {
-        f1 *= f;
-        if (f < 0.1F) {
+    public static OldBiomeGenBase getBiome(float temperature, float rainfall) {
+        rainfall *= temperature;
+        if (temperature < 0.1F) {
             return tundra;
-        } else if (f1 < 0.2F) {
-            if (f < 0.5F) {
+        } else if (rainfall < 0.2F) {
+            if (temperature < 0.5F) {
                 return tundra;
-            } else if (f < 0.95F) {
+            } else if (temperature < 0.95F) {
                 return savanna;
             } else {
                 return desert;
             }
-        } else if (f1 > 0.5F && f < 0.7F) {
+        } else if (rainfall > 0.5F && temperature < 0.7F) {
             return swampland;
-        } else if (f < 0.5F) {
+        } else if (temperature < 0.5F) {
             return taiga;
-        } else if (f < 0.97F) {
-            if (f1 < 0.35F) {
+        } else if (temperature < 0.97F) {
+            if (rainfall < 0.35F) {
                 return shrubland;
             } else {
                 return forest;
             }
-        } else if (f1 < 0.45F) {
+        } else if (rainfall < 0.45F) {
             return plains;
-        } else if (f1 < 0.9F) {
+        } else if (rainfall < 0.9F) {
             return seasonalForest;
         } else {
             return rainforest;

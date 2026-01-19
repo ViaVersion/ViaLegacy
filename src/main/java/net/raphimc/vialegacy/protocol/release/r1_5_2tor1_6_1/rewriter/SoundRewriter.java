@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package net.raphimc.vialegacy.protocol.release.r1_5_2tor1_6_1.rewriter;
 
 import com.viaversion.viaversion.libs.fastutil.objects.Object2ObjectMap;
