@@ -49,6 +49,7 @@ public class WorldChunkManager_r1_1 implements IWorldChunkManager {
                 biomeData[z << 4 | x] = (byte) this.getBiomeGenAt((chunkX * 16) + x, (chunkZ * 16) + z).biomeID;
             }
         }
+
         return biomeData;
     }
 
@@ -56,60 +57,24 @@ public class WorldChunkManager_r1_1 implements IWorldChunkManager {
         return biomeCache.getBiomeGenAt(i, j);
     }
 
-    public NewBiomeGenBase[] getBiomeGenAt(NewBiomeGenBase[] abiomegenbase, int i, int j, int k, int l, boolean flag) {
+    public NewBiomeGenBase[] getBiomeGenAt(NewBiomeGenBase[] abiomegenbase, int blockX, int blockZ, int k, int l, boolean flag) {
         IntCache.resetIntCache();
         if (abiomegenbase == null || abiomegenbase.length < k * l) {
             abiomegenbase = new NewBiomeGenBase[k * l];
         }
-        if (flag && k == 16 && l == 16 && (i & 0xf) == 0 && (j & 0xf) == 0) {
-            NewBiomeGenBase[] abiomegenbase1 = biomeCache.getCachedBiomes(i, j);
+
+        if (flag && k == 16 && l == 16 && (blockX & 0xf) == 0 && (blockZ & 0xf) == 0) {
+            NewBiomeGenBase[] abiomegenbase1 = biomeCache.getCachedBiomes(blockX, blockZ);
             System.arraycopy(abiomegenbase1, 0, abiomegenbase, 0, k * l);
             return abiomegenbase;
         }
-        int[] ai = biomeIndexLayer.getInts(i, j, k, l);
+
+        int[] ai = biomeIndexLayer.getInts(blockX, blockZ, k, l);
         for (int i1 = 0; i1 < k * l; i1++) {
             abiomegenbase[i1] = NewBiomeGenBase.BIOME_LIST[ai[i1]];
         }
 
         return abiomegenbase;
-    }
-
-    public float[] getRainfall(float[] af, int i, int j, int k, int l) {
-        IntCache.resetIntCache();
-        if (af == null || af.length < k * l) {
-            af = new float[k * l];
-        }
-        int[] ai = rainfallLayer.getInts(i, j, k, l);
-        for (int i1 = 0; i1 < k * l; i1++) {
-            float f = (float) ai[i1] / 65536F;
-            if (f > 1.0F) {
-                f = 1.0F;
-            }
-            af[i1] = f;
-        }
-
-        return af;
-    }
-
-    public float[] getTemperatures(float[] af, int i, int j, int k, int l) {
-        IntCache.resetIntCache();
-        if (af == null || af.length < k * l) {
-            af = new float[k * l];
-        }
-        int[] ai = temperatureLayer.getInts(i, j, k, l);
-        for (int i1 = 0; i1 < k * l; i1++) {
-            float f = (float) ai[i1] / 65536F;
-            if (f > 1.0F) {
-                f = 1.0F;
-            }
-            af[i1] = f;
-        }
-
-        return af;
-    }
-
-    public void cleanupCache() {
-        biomeCache.cleanupCache();
     }
 
 }

@@ -47,63 +47,44 @@ public class OldBiomeGenBase {
             for (int j = 0; j < 64; j++) {
                 biomeLookupTable[i + j * 64] = getBiome((float) i / 63F, (float) j / 63F);
             }
-
         }
     }
 
-    public static OldBiomeGenBase getBiomeFromLookup(double d, double d1) {
-        int i = (int) (d * 63D);
-        int j = (int) (d1 * 63D);
+    public static OldBiomeGenBase getBiomeFromLookup(double temperature, double rainfall) {
+        int i = (int) (temperature * 63D);
+        int j = (int) (rainfall * 63D);
         return biomeLookupTable[i + j * 64];
     }
 
-    public static OldBiomeGenBase getBiome(float f, float f1) {
-        f1 *= f;
-        if (f < 0.1F) {
+    public static OldBiomeGenBase getBiome(float temperature, float rainfall) {
+        rainfall *= temperature;
+        if (temperature < 0.1F) {
             return tundra;
-        }
-        if (f1 < 0.2F) {
-            if (f < 0.5F) {
+        } else if (rainfall < 0.2F) {
+            if (temperature < 0.5F) {
                 return tundra;
-            }
-            if (f < 0.95F) {
+            } else if (temperature < 0.95F) {
                 return savanna;
             } else {
                 return desert;
             }
-        }
-        if (f1 > 0.5F && f < 0.7F) {
+        } else if (rainfall > 0.5F && temperature < 0.7F) {
             return swampland;
-        }
-        if (f < 0.5F) {
+        } else if (temperature < 0.5F) {
             return taiga;
-        }
-        if (f < 0.97F) {
-            if (f1 < 0.35F) {
+        } else if (temperature < 0.97F) {
+            if (rainfall < 0.35F) {
                 return shrubland;
             } else {
                 return forest;
             }
-        }
-        if (f1 < 0.45F) {
+        } else if (rainfall < 0.45F) {
             return plains;
-        }
-        if (f1 < 0.9F) {
+        } else if (rainfall < 0.9F) {
             return seasonalForest;
         } else {
             return rainforest;
         }
-    }
-
-    public int getSkyColorByTemp(float f) {
-        f /= 3F;
-        if (f < -1F) {
-            f = -1F;
-        }
-        if (f > 1.0F) {
-            f = 1.0F;
-        }
-        return java.awt.Color.getHSBColor(0.6222222F - f * 0.05F, 0.5F + f * 0.1F, 1.0F).getRGB();
     }
 
 }

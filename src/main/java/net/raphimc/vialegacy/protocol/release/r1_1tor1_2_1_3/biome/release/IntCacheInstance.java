@@ -40,6 +40,7 @@ public class IntCacheInstance {
                 return ai1;
             }
         }
+
         if (i > intCacheSize) {
             intCacheSize = i;
             freeLargeArrays.clear();
@@ -48,6 +49,7 @@ public class IntCacheInstance {
             inUseLargeArrays.add(ai2);
             return ai2;
         }
+
         if (freeLargeArrays.isEmpty()) {
             int[] ai3 = new int[intCacheSize];
             inUseLargeArrays.add(ai3);
@@ -63,9 +65,11 @@ public class IntCacheInstance {
         if (!freeLargeArrays.isEmpty()) {
             freeLargeArrays.remove(freeLargeArrays.size() - 1);
         }
+
         if (!freeSmallArrays.isEmpty()) {
             freeSmallArrays.remove(freeSmallArrays.size() - 1);
         }
+
         freeLargeArrays.addAll(inUseLargeArrays);
         freeSmallArrays.addAll(inUseSmallArrays);
         inUseLargeArrays.clear();

@@ -38,11 +38,9 @@ public class ChatFilter {
     };
 
     public static String filter(String message) {
-        String allowed = new String(ALLOWED_CHARACTERS);
-
+        final String allowed = new String(ALLOWED_CHARACTERS);
         for (int i = 0; i < message.length(); ++i) {
-            String toReplace = Character.toString(message.charAt(i));
-
+            final String toReplace = Character.toString(message.charAt(i));
             if (!allowed.contains(toReplace)) {
                 message = message.replaceAll(toReplace, "*");
             }

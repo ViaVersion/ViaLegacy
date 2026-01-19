@@ -28,10 +28,6 @@ public class LegacyNibbleArray extends NibbleArray {
         this(length, 7);
     }
 
-    public LegacyNibbleArray(final byte[] handle) {
-        this(handle, 7);
-    }
-
     public LegacyNibbleArray(final int length, final int depthBits) {
         super(length);
         this.depthBits = depthBits;

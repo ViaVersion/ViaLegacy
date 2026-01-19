@@ -225,6 +225,7 @@ public class ItemList1_6 {
                 return item;
             }
         }
+
         return null;
     }
 
@@ -234,6 +235,7 @@ public class ItemList1_6 {
                 return item;
             }
         }
+
         return null;
     }
 
@@ -244,7 +246,6 @@ public class ItemList1_6 {
             this.name = name;
             this.maxDamage = maxDamage;
             this.hasSubTypes = hasSubTypes;
-
             itemList.add(this);
         }
 

@@ -17,7 +17,6 @@
  */
 package net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.biome.beta;
 
-import net.raphimc.vialegacy.api.model.ChunkCoord;
 import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.biome.IWorldChunkManager;
 import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.biome.release.NewBiomeGenBase;
 
@@ -25,17 +24,17 @@ import java.util.Random;
 
 public class WorldChunkManager_b1_7 implements IWorldChunkManager {
 
-    private final NoiseGeneratorOctaves2 field_4194_e;
-    private final NoiseGeneratorOctaves2 field_4193_f;
+    private final NoiseGeneratorOctaves2 temperatureNoise;
+    private final NoiseGeneratorOctaves2 humidityNoise;
     private final NoiseGeneratorOctaves2 field_4192_g;
     public double[] temperature;
     public double[] humidity;
     public double[] field_4196_c;
-    public OldBiomeGenBase[] field_4195_d;
+    public OldBiomeGenBase[] biomes;
 
     public WorldChunkManager_b1_7(final long seed) {
-        field_4194_e = new NoiseGeneratorOctaves2(new Random(seed * 9871L), 4);
-        field_4193_f = new NoiseGeneratorOctaves2(new Random(seed * 39811L), 4);
+        temperatureNoise = new NoiseGeneratorOctaves2(new Random(seed * 9871L), 4);
+        humidityNoise = new NoiseGeneratorOctaves2(new Random(seed * 39811L), 4);
         field_4192_g = new NoiseGeneratorOctaves2(new Random(seed * 0x84a59L), 2);
     }
 
@@ -47,15 +46,12 @@ public class WorldChunkManager_b1_7 implements IWorldChunkManager {
                 biomeData[z << 4 | x] = (byte) this.getBiomeGenAt((chunkX * 16) + x, (chunkZ * 16) + z).biomeID;
             }
         }
+
         return biomeData;
     }
 
-    public NewBiomeGenBase getBiomeGenAtChunkCoord(ChunkCoord chunkcoordintpair) {
-        return getBiomeGenAt(chunkcoordintpair.chunkX << 4, chunkcoordintpair.chunkZ << 4);
-    }
-
-    public NewBiomeGenBase getBiomeGenAt(int i, int j) {
-        final OldBiomeGenBase oldBiomeGenBase = func_4069_a(i, j, 1, 1)[0];
+    public NewBiomeGenBase getBiomeGenAt(int x, int z) {
+        final OldBiomeGenBase oldBiomeGenBase = getBiomes(x, z, 1, 1)[0];
         if (oldBiomeGenBase.equals(OldBiomeGenBase.rainforest)) {
             return NewBiomeGenBase.jungle;
         } else if (oldBiomeGenBase.equals(OldBiomeGenBase.swampland)) {
@@ -87,83 +83,39 @@ public class WorldChunkManager_b1_7 implements IWorldChunkManager {
         }
     }
 
-    public double getTemperature(int i, int j) {
-        temperature = field_4194_e.func_4112_a(temperature, i, j, 1, 1, 0.02500000037252903D, 0.02500000037252903D, 0.5D);
-        return temperature[0];
+    public OldBiomeGenBase[] getBiomes(int blockX, int blockZ, int k, int l) {
+        biomes = loadBlockGeneratorData(biomes, blockX, blockZ, k, l);
+        return biomes;
     }
 
-    public OldBiomeGenBase[] func_4069_a(int i, int j, int k, int l) {
-        field_4195_d = loadBlockGeneratorData(field_4195_d, i, j, k, l);
-        return field_4195_d;
-    }
-
-    public double[] getTemperatures(double[] ad, int i, int j, int k, int l) {
-        if (ad == null || ad.length < k * l) {
-            ad = new double[k * l];
+    public OldBiomeGenBase[] loadBlockGeneratorData(OldBiomeGenBase[] biomes, int blockX, int blockZ, int k, int l) {
+        if (biomes == null || biomes.length < k * l) {
+            biomes = new OldBiomeGenBase[k * l];
         }
-        ad = field_4194_e.func_4112_a(ad, i, j, k, l, 0.02500000037252903D, 0.02500000037252903D, 0.25D);
-        field_4196_c = field_4192_g.func_4112_a(field_4196_c, i, j, k, l, 0.25D, 0.25D, 0.58823529411764708D);
+
+        temperature = temperatureNoise.getValues(temperature, blockX, blockZ, k, k, 0.02500000037252903D, 0.02500000037252903D, 0.25D);
+        humidity = humidityNoise.getValues(humidity, blockX, blockZ, k, k, 0.05000000074505806D, 0.05000000074505806D, 0.33333333333333331D);
+        field_4196_c = field_4192_g.getValues(field_4196_c, blockX, blockZ, k, k, 0.25D, 0.25D, 0.58823529411764708D);
         int i1 = 0;
         for (int j1 = 0; j1 < k; j1++) {
             for (int k1 = 0; k1 < l; k1++) {
                 double d = field_4196_c[i1] * 1.1000000000000001D + 0.5D;
                 double d1 = 0.01D;
                 double d2 = 1.0D - d1;
-                double d3 = (ad[i1] * 0.14999999999999999D + 0.69999999999999996D) * d2 + d * d1;
-                d3 = 1.0D - (1.0D - d3) * (1.0D - d3);
-                if (d3 < 0.0D) {
-                    d3 = 0.0D;
-                }
-                if (d3 > 1.0D) {
-                    d3 = 1.0D;
-                }
-                ad[i1] = d3;
-                i1++;
-            }
 
-        }
-
-        return ad;
-    }
-
-    public OldBiomeGenBase[] loadBlockGeneratorData(OldBiomeGenBase abiomegenbase[], int i, int j, int k, int l) {
-        if (abiomegenbase == null || abiomegenbase.length < k * l) {
-            abiomegenbase = new OldBiomeGenBase[k * l];
-        }
-        temperature = field_4194_e.func_4112_a(temperature, i, j, k, k, 0.02500000037252903D, 0.02500000037252903D, 0.25D);
-        humidity = field_4193_f.func_4112_a(humidity, i, j, k, k, 0.05000000074505806D, 0.05000000074505806D, 0.33333333333333331D);
-        field_4196_c = field_4192_g.func_4112_a(field_4196_c, i, j, k, k, 0.25D, 0.25D, 0.58823529411764708D);
-        int i1 = 0;
-        for (int j1 = 0; j1 < k; j1++) {
-            for (int k1 = 0; k1 < l; k1++) {
-                double d = field_4196_c[i1] * 1.1000000000000001D + 0.5D;
-                double d1 = 0.01D;
-                double d2 = 1.0D - d1;
-                double d3 = (temperature[i1] * 0.14999999999999999D + 0.69999999999999996D) * d2 + d * d1;
+                double temperature = (this.temperature[i1] * 0.14999999999999999D + 0.69999999999999996D) * d2 + d * d1;
                 d1 = 0.002D;
                 d2 = 1.0D - d1;
-                double d4 = (humidity[i1] * 0.14999999999999999D + 0.5D) * d2 + d * d1;
-                d3 = 1.0D - (1.0D - d3) * (1.0D - d3);
-                if (d3 < 0.0D) {
-                    d3 = 0.0D;
-                }
-                if (d4 < 0.0D) {
-                    d4 = 0.0D;
-                }
-                if (d3 > 1.0D) {
-                    d3 = 1.0D;
-                }
-                if (d4 > 1.0D) {
-                    d4 = 1.0D;
-                }
-                temperature[i1] = d3;
-                humidity[i1] = d4;
-                abiomegenbase[i1++] = OldBiomeGenBase.getBiomeFromLookup(d3, d4);
-            }
 
+                final double rainfall = Math.max(0.0, Math.min(1.0, (humidity[i1] * 0.14999999999999999D + 0.5D) * d2 + d * d1));
+                this.temperature[i1] = Math.max(0.0, Math.min(1.0, 1.0D - (1.0D - temperature) * (1.0D - temperature)));
+                this.humidity[i1] = rainfall;
+
+                biomes[i1++] = OldBiomeGenBase.getBiomeFromLookup(temperature, rainfall);
+            }
         }
 
-        return abiomegenbase;
+        return biomes;
     }
 
 }

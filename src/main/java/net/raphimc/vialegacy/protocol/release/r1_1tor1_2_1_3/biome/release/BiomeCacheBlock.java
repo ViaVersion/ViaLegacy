@@ -25,13 +25,13 @@ public class BiomeCacheBlock {
     public long lastAccessTime;
     final BiomeCache biomeCache;
 
-    public BiomeCacheBlock(BiomeCache biomecache, int i, int j) {
+    public BiomeCacheBlock(BiomeCache biomecache, int chunkX, int chunkZ) {
         biomeCache = biomecache;
 
         biomes = new NewBiomeGenBase[256];
-        xPosition = i;
-        zPosition = j;
-        BiomeCache.getWorldChunkManager(biomecache).getBiomeGenAt(biomes, i << 4, j << 4, 16, 16, false);
+        xPosition = chunkX;
+        zPosition = chunkZ;
+        BiomeCache.getWorldChunkManager(biomecache).getBiomeGenAt(biomes, chunkX << 4, chunkZ << 4, 16, 16, false);
     }
 
     public NewBiomeGenBase getBiomeGenAt(int i, int j) {

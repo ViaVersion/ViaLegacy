@@ -62,19 +62,20 @@ public class Location {
     }
 
     public double distanceTo(final Location p2) {
-        return Math.sqrt(Math.pow(p2.getX() - this.x, 2) +
-                Math.pow(p2.getY() - this.y, 2) +
-                Math.pow(p2.getZ() - this.z, 2)
-        );
+        return Math.sqrt(Math.pow(p2.getX() - this.x, 2) + Math.pow(p2.getY() - this.y, 2) + Math.pow(p2.getZ() - this.z, 2));
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Location location = (Location) o;
-        return Double.compare(location.x, x) == 0 && Double.compare(location.y, y) == 0 && Double.compare(location.z, z) == 0;
-    }
+		if (this == o) {
+			return true;
+		} else if (o == null || getClass() != o.getClass()) {
+			return false;
+		} else {
+			final Location location = (Location) o;
+			return Double.compare(location.x, x) == 0 && Double.compare(location.y, y) == 0 && Double.compare(location.z, z) == 0;
+		}
+	}
 
     @Override
     public int hashCode() {
@@ -83,11 +84,7 @@ public class Location {
 
     @Override
     public String toString() {
-        return "Location{" +
-                "x=" + x +
-                ", y=" + y +
-                ", z=" + z +
-                '}';
+		return String.format("Location{x=%f, y=%f, z=%f}", x, y, z);
     }
 
 }

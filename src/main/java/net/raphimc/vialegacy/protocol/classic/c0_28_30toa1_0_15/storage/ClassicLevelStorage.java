@@ -153,20 +153,19 @@ public class ClassicLevelStorage extends StoredObject {
         if (!this.shouldSend(coord)) return;
         final ClassicBlockRemapper remapper = this.user().get(ClassicBlockRemapper.class);
 
-        this.classicLevel.calculateLight(coord.chunkX * 16, coord.chunkZ * 16, this.subChunkXLength, this.subChunkZLength);
+        this.classicLevel.calculateLight(coord.x() * 16, coord.z() * 16, this.subChunkXLength, this.subChunkZLength);
 
         final ChunkSection[] modernSections = new ChunkSection[Math.max(8, this.sectionYCount)];
         for (int sectionY = 0; sectionY < this.sectionYCount; sectionY++) {
             final ChunkSection section = modernSections[sectionY] = new ChunkSectionImpl(true);
             section.palette(PaletteType.BLOCKS).addId(0);
             final LegacyNibbleArray skyLight = new LegacyNibbleArray(16 * 16 * 16, 4);
-
             for (int y = 0; y < this.subChunkYLength; y++) {
                 final int totalY = y + (sectionY * 16);
                 for (int x = 0; x < this.subChunkXLength; x++) {
-                    final int totalX = x + (coord.chunkX * 16);
+                    final int totalX = x + (coord.x() * 16);
                     for (int z = 0; z < this.subChunkZLength; z++) {
-                        final int totalZ = z + (coord.chunkZ * 16);
+                        final int totalZ = z + (coord.z() * 16);
                         section.palette(PaletteType.BLOCKS).setIdAt(x, y, z, remapper.mapper().get(this.classicLevel.getBlock(totalX, totalY, totalZ)).toRawData());
                         skyLight.set(x, y, z, this.classicLevel.isLit(totalX, totalY, totalZ) ? 15 : 9);
                     }
@@ -178,7 +177,7 @@ public class ClassicLevelStorage extends StoredObject {
 
         this.loadedChunks.add(coord);
 
-        final Chunk viaChunk = new BaseChunk(coord.chunkX, coord.chunkZ, true, false, this.sectionBitmask, modernSections, new int[256], new ArrayList<>());
+        final Chunk viaChunk = new BaseChunk(coord.x(), coord.z(), true, false, this.sectionBitmask, modernSections, new int[256], new ArrayList<>());
         final PacketWrapper chunkData = PacketWrapper.create(ClientboundPacketsa1_0_15.LEVEL_CHUNK, this.user());
         chunkData.write(Types1_1.CHUNK, viaChunk);
         chunkData.send(Protocolc0_28_30Toa1_0_15.class);
@@ -186,7 +185,7 @@ public class ClassicLevelStorage extends StoredObject {
 
     private boolean shouldSend(final ChunkCoord coord) {
         if (!this.hasReceivedLevel()) return false;
-        boolean isInBounds = (coord.chunkX >= 0 && coord.chunkX < chunkXCount) && coord.chunkZ >= 0 && coord.chunkZ < chunkZCount;
+        boolean isInBounds = (coord.x() >= 0 && coord.x() < chunkXCount) && coord.z() >= 0 && coord.z() < chunkZCount;
         return isInBounds && !this.isChunkLoaded(coord);
     }
 

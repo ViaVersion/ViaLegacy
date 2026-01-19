@@ -33,10 +33,12 @@ public class PacketUtil {
         if (wrapper instanceof PacketWrapperImpl impl && impl.getInputBuffer() != null) {
             impl.getInputBuffer().markReaderIndex();
         }
+
         wrapper.writeToBuffer(lengthBuffer);
         if (wrapper instanceof PacketWrapperImpl impl && impl.getInputBuffer() != null) {
             impl.getInputBuffer().resetReaderIndex();
         }
+
         final int length = lengthBuffer.readableBytes();
         lengthBuffer.release();
 

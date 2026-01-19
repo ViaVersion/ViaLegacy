@@ -120,10 +120,7 @@ public abstract class GenLayer {
         obj3.initWorldGenSeed(seed);
         obj4.initWorldGenSeed(seed);
         genlayerzoomvoronoi.initWorldGenSeed(seed);
-        return (new GenLayer[]
-                {
-                        obj2, genlayerzoomvoronoi, obj3, obj4, genlayerrivermix
-                });
+        return (new GenLayer[]{obj2, genlayerzoomvoronoi, obj3, obj4, genlayerrivermix});
     }
 
     public GenLayer(long l) {
@@ -141,6 +138,7 @@ public abstract class GenLayer {
         if (parent != null) {
             parent.initWorldGenSeed(l);
         }
+
         worldGenSeed *= worldGenSeed * 0x5851f42d4c957f2dL + 0x14057b7ef767814fL;
         worldGenSeed += baseSeed;
         worldGenSeed *= worldGenSeed * 0x5851f42d4c957f2dL + 0x14057b7ef767814fL;
@@ -166,6 +164,7 @@ public abstract class GenLayer {
         if (j < 0) {
             j += i;
         }
+
         chunkSeed *= chunkSeed * 0x5851f42d4c957f2dL + 0x14057b7ef767814fL;
         chunkSeed += worldGenSeed;
         return j;

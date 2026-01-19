@@ -46,6 +46,7 @@ public class PreNettyLengthPrepender extends ByteToMessageDecoder {
         if (!in.isReadable() || in.readableBytes() <= 0) {
             return;
         }
+
         final PreNettySplitter splitter = this.user.get(PreNettySplitter.class);
         if (splitter == null) {
             ViaLegacy.getPlatform().getLogger().severe("Received data, but no splitter is set");
@@ -63,6 +64,7 @@ public class PreNettyLengthPrepender extends ByteToMessageDecoder {
                 ctx.channel().close();
                 return;
             }
+
             this.lastPackets.add(packetId);
             try {
                 final int begin = in.readerIndex();

@@ -17,6 +17,7 @@
  */
 package net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.biome.beta;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class NoiseGeneratorOctaves2 {
@@ -27,26 +28,21 @@ public class NoiseGeneratorOctaves2 {
         for (int j = 0; j < i; j++) {
             field_4234_a[j] = new NoiseGenerator2(random);
         }
-
     }
 
-    public double[] func_4112_a(double ad[], double d, double d1, int i, int j,
-                                double d2, double d3, double d4) {
-        return func_4111_a(ad, d, d1, i, j, d2, d3, d4, 0.5D);
+    public double[] getValues(double ad[], double d, double d1, int i, int j, double d2, double d3, double d4) {
+        return getValues(ad, d, d1, i, j, d2, d3, d4, 0.5D);
     }
 
-    public double[] func_4111_a(double ad[], double d, double d1, int i, int j,
-                                double d2, double d3, double d4, double d5) {
+    public double[] getValues(double ad[], double d, double d1, int i, int j, double d2, double d3, double d4, double d5) {
         d2 /= 1.5D;
         d3 /= 1.5D;
         if (ad == null || ad.length < i * j) {
             ad = new double[i * j];
         } else {
-            for (int k = 0; k < ad.length; k++) {
-                ad[k] = 0.0D;
-            }
-
+			Arrays.fill(ad, 0.0D);
         }
+
         double d6 = 1.0D;
         double d7 = 1.0D;
         for (int l = 0; l < field_4233_b; l++) {
