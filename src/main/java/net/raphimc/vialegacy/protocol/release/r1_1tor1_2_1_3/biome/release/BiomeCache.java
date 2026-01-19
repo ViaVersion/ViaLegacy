@@ -17,33 +17,28 @@
  */
 package net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.biome.release;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class BiomeCache {
 
     private final WorldChunkManager_r1_1 chunkmanager;
     private final Map<Long, BiomeCacheBlock> cacheMap;
-    private final List<BiomeCacheBlock> cache;
 
     public BiomeCache(WorldChunkManager_r1_1 worldchunkmanager) {
         cacheMap = new HashMap<>();
-        cache = new ArrayList<>();
         chunkmanager = worldchunkmanager;
     }
 
     public BiomeCacheBlock getBiomeCacheBlock(int blockX, int blockZ) {
-        final int chunkX = blockX >> 4;
-        final int chunkZ = blockZ >> 4;
+        blockX >>= 4;
+        blockZ >>= 4;
 
-        final long l = (long) chunkX & 0xffffffffL | ((long) chunkZ & 0xffffffffL) << 32;
+        final long l = (long) blockX & 0xffffffffL | ((long) blockZ & 0xffffffffL) << 32;
         BiomeCacheBlock biomecacheblock = cacheMap.get(l);
         if (biomecacheblock == null) {
-            biomecacheblock = new BiomeCacheBlock(this, chunkX, chunkZ);
+            biomecacheblock = new BiomeCacheBlock(this, blockX, blockZ);
             cacheMap.put(l, biomecacheblock);
-            cache.add(biomecacheblock);
         }
 
         biomecacheblock.lastAccessTime = System.currentTimeMillis();

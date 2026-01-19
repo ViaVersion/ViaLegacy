@@ -24,17 +24,17 @@ import java.util.Random;
 
 public class WorldChunkManager_b1_7 implements IWorldChunkManager {
 
-    private final NoiseGeneratorOctaves2 field_4194_e;
-    private final NoiseGeneratorOctaves2 field_4193_f;
+    private final NoiseGeneratorOctaves2 temperatureNoise;
+    private final NoiseGeneratorOctaves2 humidityNoise;
     private final NoiseGeneratorOctaves2 field_4192_g;
     public double[] temperature;
     public double[] humidity;
     public double[] field_4196_c;
-    public OldBiomeGenBase[] field_4195_d;
+    public OldBiomeGenBase[] biomes;
 
     public WorldChunkManager_b1_7(final long seed) {
-        field_4194_e = new NoiseGeneratorOctaves2(new Random(seed * 9871L), 4);
-        field_4193_f = new NoiseGeneratorOctaves2(new Random(seed * 39811L), 4);
+        temperatureNoise = new NoiseGeneratorOctaves2(new Random(seed * 9871L), 4);
+        humidityNoise = new NoiseGeneratorOctaves2(new Random(seed * 39811L), 4);
         field_4192_g = new NoiseGeneratorOctaves2(new Random(seed * 0x84a59L), 2);
     }
 
@@ -50,8 +50,8 @@ public class WorldChunkManager_b1_7 implements IWorldChunkManager {
         return biomeData;
     }
 
-    public NewBiomeGenBase getBiomeGenAt(int i, int j) {
-        final OldBiomeGenBase oldBiomeGenBase = func_4069_a(i, j, 1, 1)[0];
+    public NewBiomeGenBase getBiomeGenAt(int x, int z) {
+        final OldBiomeGenBase oldBiomeGenBase = getBiomes(x, z, 1, 1)[0];
         if (oldBiomeGenBase.equals(OldBiomeGenBase.rainforest)) {
             return NewBiomeGenBase.jungle;
         } else if (oldBiomeGenBase.equals(OldBiomeGenBase.swampland)) {
@@ -83,19 +83,19 @@ public class WorldChunkManager_b1_7 implements IWorldChunkManager {
         }
     }
 
-    public OldBiomeGenBase[] func_4069_a(int i, int j, int k, int l) {
-        field_4195_d = loadBlockGeneratorData(field_4195_d, i, j, k, l);
-        return field_4195_d;
+    public OldBiomeGenBase[] getBiomes(int blockX, int blockZ, int k, int l) {
+        biomes = loadBlockGeneratorData(biomes, blockX, blockZ, k, l);
+        return biomes;
     }
 
-    public OldBiomeGenBase[] loadBlockGeneratorData(OldBiomeGenBase[] biomes, int i, int j, int k, int l) {
+    public OldBiomeGenBase[] loadBlockGeneratorData(OldBiomeGenBase[] biomes, int blockX, int blockZ, int k, int l) {
         if (biomes == null || biomes.length < k * l) {
             biomes = new OldBiomeGenBase[k * l];
         }
 
-        temperature = field_4194_e.func_4112_a(temperature, i, j, k, k, 0.02500000037252903D, 0.02500000037252903D, 0.25D);
-        humidity = field_4193_f.func_4112_a(humidity, i, j, k, k, 0.05000000074505806D, 0.05000000074505806D, 0.33333333333333331D);
-        field_4196_c = field_4192_g.func_4112_a(field_4196_c, i, j, k, k, 0.25D, 0.25D, 0.58823529411764708D);
+        temperature = temperatureNoise.getValues(temperature, blockX, blockZ, k, k, 0.02500000037252903D, 0.02500000037252903D, 0.25D);
+        humidity = humidityNoise.getValues(humidity, blockX, blockZ, k, k, 0.05000000074505806D, 0.05000000074505806D, 0.33333333333333331D);
+        field_4196_c = field_4192_g.getValues(field_4196_c, blockX, blockZ, k, k, 0.25D, 0.25D, 0.58823529411764708D);
         int i1 = 0;
         for (int j1 = 0; j1 < k; j1++) {
             for (int k1 = 0; k1 < l; k1++) {
