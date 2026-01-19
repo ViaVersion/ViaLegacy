@@ -67,7 +67,7 @@ public class WorldChunkManager_b1_7 implements IWorldChunkManager {
         } else if (oldBiomeGenBase.equals(OldBiomeGenBase.savanna)) {
             return NewBiomeGenBase.savanna;
         } else if (oldBiomeGenBase.equals(OldBiomeGenBase.shrubland)) {
-            return NewBiomeGenBase.mutatedJungleEdge;
+            return NewBiomeGenBase.savanna;
         } else if (oldBiomeGenBase.equals(OldBiomeGenBase.taiga)) {
             return NewBiomeGenBase.taiga;
         } else if (oldBiomeGenBase.equals(OldBiomeGenBase.desert)) {
