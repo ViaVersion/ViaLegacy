@@ -23,4 +23,20 @@ dependencies {
     compileOnly "com.viaversion:viaversion-common:5.7.1"
     compileOnly "com.google.guava:guava:33.5.0-jre"
     compileOnly "io.netty:netty-handler:4.2.9.Final"
+
+    api("com.seedfinding:mc_biome:1.171.1") {
+        transitive = false
+    }
+    api("com.seedfinding:mc_noise:1.171.1") {
+        transitive = false
+    }
+    api("com.seedfinding:mc_seed:1.171.2") {
+        transitive = false
+    }
+    api("com.seedfinding:mc_math:1.171.0") {
+        transitive = false
+    }
+    api("com.seedfinding:mc_core:1.210.0") {
+        transitive = false
+    }
 }

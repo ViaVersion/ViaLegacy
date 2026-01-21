@@ -17,6 +17,9 @@
  */
 package net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3;
 
+import com.seedfinding.mcbiome.source.BiomeSource;
+import com.seedfinding.mccore.state.Dimension;
+import com.seedfinding.mccore.version.MCVersion;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
@@ -34,11 +37,8 @@ import net.raphimc.vialegacy.ViaLegacy;
 import net.raphimc.vialegacy.api.LegacyProtocolVersion;
 import net.raphimc.vialegacy.api.protocol.StatelessProtocol;
 import net.raphimc.vialegacy.api.splitter.PreNettySplitter;
-import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.biome.EndBiomeGenerator;
-import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.biome.NetherBiomeGenerator;
-import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.biome.PlainsBiomeGenerator;
-import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.biome.beta.WorldChunkManager_b1_7;
-import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.biome.release.WorldChunkManager_r1_1;
+import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.biome.BetaOverworldBiomeSource;
+import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.biome.PlainsBiomeSource;
 import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.model.LegacyNibbleArray;
 import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.model.NonFullChunk;
 import net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.packet.ClientboundPackets1_1;
@@ -55,8 +55,6 @@ import net.raphimc.vialegacy.protocol.release.r1_3_1_2tor1_4_2.types.Types1_3_1;
 import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.storage.ChunkTracker;
 import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.types.Types1_6_4;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.types.Types1_7_6;
-
-import java.util.Arrays;
 
 public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets1_1, ClientboundPackets1_2_1, ServerboundPackets1_1, ServerboundPackets1_2_1> {
 
@@ -166,19 +164,6 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
             }
             pendingBlocksTracker.markReceived(new BlockPosition(chunk.getX() << 4, 0, chunk.getZ() << 4), new BlockPosition((chunk.getX() << 4) + 15, chunk.getSections().length * 16, (chunk.getZ() << 4) + 15));
 
-            int[] newBiomeData;
-            if (seedStorage.worldChunkManager != null) {
-                final byte[] oldBiomeData = seedStorage.worldChunkManager.getBiomeDataAt(chunk.getX(), chunk.getZ());
-                newBiomeData = new int[oldBiomeData.length];
-                for (int i = 0; i < oldBiomeData.length; i++) {
-                    newBiomeData[i] = oldBiomeData[i] & 255;
-                }
-            } else {
-                newBiomeData = new int[256];
-                Arrays.fill(newBiomeData, 1); // plains
-            }
-            chunk.setBiomeData(newBiomeData);
-
             for (ChunkSection section : chunk.getSections()) {
                 if (section == null) continue;
                 final LegacyNibbleArray oldBlockLight = new LegacyNibbleArray(section.getLight().getBlockLight(), 4);
@@ -203,6 +188,16 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
                 System.arraycopy(chunk.getSections(), 0, newArray, 0, chunk.getSections().length);
                 chunk.setSections(newArray);
             }
+
+            final int baseX = chunk.getX() << 4;
+            final int baseZ = chunk.getZ() << 4;
+            final int[] biomeData = new int[16 * 16];
+            for (int z = 0; z < 16; z++) {
+                for (int x = 0; x < 16; x++) {
+                    biomeData[z << 4 | x] = seedStorage.biomeSource.getBiome(baseX + x, 0, baseZ + z).getId();
+                }
+            }
+            chunk.setBiomeData(biomeData);
 
             wrapper.write(Types1_2_4.CHUNK, chunk);
         });
@@ -318,24 +313,33 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
             user.get(PendingBlocksTracker.class).clear();
         }
 
+        final SeedStorage seedStorage = user.get(SeedStorage.class);
         if (ViaLegacy.getConfig().isOldBiomes()) {
-            final SeedStorage seedStorage = user.get(SeedStorage.class);
-            if (dimensionId == -1) { // Nether
-                seedStorage.worldChunkManager = new NetherBiomeGenerator();
-            } else if (dimensionId == 1) { // End
-                seedStorage.worldChunkManager = new EndBiomeGenerator();
-            } else if (dimensionId == 0) { // Overworld
-
+            if (dimensionId == 0) { // Overworld
                 if (user.getProtocolInfo().serverProtocolVersion().newerThanOrEqualTo(LegacyProtocolVersion.b1_8tob1_8_1)) {
-                    seedStorage.worldChunkManager = new WorldChunkManager_r1_1(user, seedStorage.seed);
+                    final MCVersion generatorVersion;
+                    if (user.getProtocolInfo().serverProtocolVersion().newerThanOrEqualTo(LegacyProtocolVersion.r1_1)) {
+                        generatorVersion = MCVersion.v1_1;
+                    } else if (user.getProtocolInfo().serverProtocolVersion().newerThanOrEqualTo(LegacyProtocolVersion.r1_0_0tor1_0_1)) {
+                        generatorVersion = MCVersion.v1_0;
+                    } else {
+                        generatorVersion = MCVersion.vb1_8_1;
+                    }
+                    seedStorage.biomeSource = BiomeSource.of(Dimension.OVERWORLD, generatorVersion, seedStorage.seed);
                 } else if (user.getProtocolInfo().serverProtocolVersion().newerThanOrEqualTo(LegacyProtocolVersion.a1_0_15)) {
-                    seedStorage.worldChunkManager = new WorldChunkManager_b1_7(seedStorage.seed);
+                    seedStorage.biomeSource = new BetaOverworldBiomeSource(seedStorage.seed);
                 } else {
-                    seedStorage.worldChunkManager = new PlainsBiomeGenerator();
+                    seedStorage.biomeSource = new PlainsBiomeSource();
                 }
+            } else if (dimensionId == -1) { // Nether
+                seedStorage.biomeSource = BiomeSource.of(Dimension.NETHER, MCVersion.v1_1, seedStorage.seed);
+            } else if (dimensionId == 1) { // End
+                seedStorage.biomeSource = BiomeSource.of(Dimension.END, MCVersion.v1_1, seedStorage.seed);
             } else {
-                seedStorage.worldChunkManager = null;
+                seedStorage.biomeSource = new PlainsBiomeSource();
             }
+        } else {
+            seedStorage.biomeSource = new PlainsBiomeSource();
         }
     }
 
