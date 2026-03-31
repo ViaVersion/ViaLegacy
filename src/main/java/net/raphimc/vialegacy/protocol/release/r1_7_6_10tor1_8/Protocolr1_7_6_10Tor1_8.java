@@ -1287,7 +1287,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 map(Types.UNSIGNED_BYTE); // direction
                 handler(wrapper -> {
                     final short status = wrapper.get(Types.UNSIGNED_BYTE, 0);
-                    if (status == 5) { // RELEASE_USE_ITEM
+                    if (status == 1 || status == 5) { // ABORT_DESTROY_BLOCK, RELEASE_USE_ITEM
                         wrapper.set(Types.UNSIGNED_BYTE, 1, (short) 255);
                     }
                 });
