@@ -51,7 +51,7 @@ public abstract class AbstractBlockRemapper {
     }
 
     public void remapBlockChangeRecords(final BlockChangeRecord[] blockChangeRecords) {
-        for (final BlockChangeRecord record : blockChangeRecords) {
+        for (BlockChangeRecord record : blockChangeRecords) {
             final int id = record.getBlockId();
             if (this.REPLACEMENTS.containsKey(id)) {
                 record.setBlockId(this.REPLACEMENTS.get(id));

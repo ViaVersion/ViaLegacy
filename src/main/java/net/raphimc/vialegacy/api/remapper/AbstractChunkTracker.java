@@ -39,7 +39,7 @@ public abstract class AbstractChunkTracker implements StorableObject {
     private final Int2IntMap replacements = new Int2IntOpenHashMap();
 
     public AbstractChunkTracker(final int... toTrack) {
-        for (final int trackedBlock : toTrack) {
+        for (int trackedBlock : toTrack) {
             this.toTrack.add(trackedBlock);
         }
         this.trackAll = this.toTrack.contains(0);

@@ -303,7 +303,7 @@ public class HologramPartEntity {
 
     private List<EntityData> get1_8EntityData() {
         final List<EntityData> entityDataList = new ArrayList<>();
-        for (final Map.Entry<EntityDataIndex1_7_6, Object> entry : this.entityData.entrySet()) {
+        for (Map.Entry<EntityDataIndex1_7_6, Object> entry : this.entityData.entrySet()) {
             entityDataList.add(new EntityData(entry.getKey().getOldIndex(), entry.getKey().getOldType(), entry.getValue()));
         }
         Via.getManager().getProtocolManager().getProtocol(Protocolr1_7_6_10Tor1_8.class).getEntityDataRewriter().transform(this.user, this.entityType, entityDataList);
