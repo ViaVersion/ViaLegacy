@@ -21,7 +21,6 @@ import com.viaversion.nbt.io.NBTIO;
 import com.viaversion.nbt.limiter.TagLimiter;
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.type.Type;
-import com.viaversion.viaversion.api.type.types.misc.NamedCompoundTagType;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
@@ -45,7 +44,7 @@ public class NBTType extends Type<CompoundTag> {
 
         final ByteBuf data = buffer.readSlice(length);
         try (InputStream in = new GZIPInputStream(new ByteBufInputStream(data))) {
-            return NBTIO.readTag(new DataInputStream(in), TagLimiter.create(NamedCompoundTagType.MAX_NBT_BYTES, NamedCompoundTagType.MAX_NESTING_LEVEL), true, CompoundTag.class);
+            return NBTIO.readTag(new DataInputStream(in), TagLimiter.create(TagLimiter.DEFAULT_MAX_BYTES, TagLimiter.DEFAULT_MAX_NESTING_LEVEL), true, CompoundTag.class);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
