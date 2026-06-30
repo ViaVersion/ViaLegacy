@@ -80,7 +80,7 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
                     wrapper.user().put(new ClassicServerTitleStorage(wrapper.user(), title, motd));
                     wrapper.user().get(ClassicOpLevelStorage.class).setOpLevel(opLevel);
 
-                    wrapper.write(Types.INT, wrapper.user().getProtocolInfo().getUsername().hashCode()); // entity id
+                    wrapper.write(Types.INT, -1); // entity id
                     wrapper.write(Typesb1_7_0_3.STRING, wrapper.user().getProtocolInfo().getUsername()); // username
                     wrapper.write(Typesb1_7_0_3.STRING, ""); // password
 
@@ -272,7 +272,7 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
                 handler(wrapper -> {
                     if (wrapper.get(Types.INT, 0) < 0) { // client player
                         wrapper.set(Types.INT, 2, wrapper.get(Types.INT, 2) - 29);
-                        wrapper.set(Types.INT, 0, wrapper.user().getProtocolInfo().getUsername().hashCode());
+                        wrapper.set(Types.INT, 0, -1);
                     } else {
                         wrapper.set(Types.INT, 2, wrapper.get(Types.INT, 2) - Float.valueOf(1.62F * 32).intValue());
                     }
