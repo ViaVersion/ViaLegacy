@@ -27,13 +27,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-public class EntityDataRewriter {
+public final class EntityDataRewriter {
+
+    private EntityDataRewriter() {
+    }
 
     public static void transform(final EntityTypes1_8.EntityType type, final List<EntityData> list) {
         for (EntityData entry : new ArrayList<>(list)) {
             final EntityDataIndex1_5_2 entityDataIndex = EntityDataIndex1_5_2.searchIndex(type, entry.id());
             try {
-                if (entityDataIndex == null) continue;
+                if (entityDataIndex == null) {
+                    continue;
+                }
 
                 final Object value = entry.getValue();
                 entry.setTypeAndValue(entityDataIndex.getOldType(), value); // check if entity data type is the expected type from entity data index entry
@@ -54,7 +59,7 @@ public class EntityDataRewriter {
                         list.remove(entry);
                     }
                 }
-            } catch (Throwable e) {
+            } catch (final Throwable e) {
                 if (Via.getConfig().logEntityDataErrors()) {
                     ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error rewriting entity data entry for " + type.name() + ": " + entry, e);
                 }

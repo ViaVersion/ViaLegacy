@@ -21,8 +21,8 @@ import java.util.Objects;
 
 public class ChunkCoord {
 
-    public int chunkX;
-    public int chunkZ;
+    private final int chunkX;
+    private final int chunkZ;
 
     public ChunkCoord(final int chunkX, final int chunkZ) {
         this.chunkX = chunkX;
@@ -43,25 +43,37 @@ public class ChunkCoord {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChunkCoord that = (ChunkCoord) o;
-        return chunkX == that.chunkX &&
-                chunkZ == that.chunkZ;
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final ChunkCoord that = (ChunkCoord) o;
+        return this.chunkX == that.chunkX
+            && this.chunkZ == that.chunkZ;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(chunkX, chunkZ);
+        return Objects.hash(this.chunkX, this.chunkZ);
     }
 
     @Override
     public String toString() {
-        return "ChunkCoord{" +
-                "chunkX=" + chunkX +
-                ", chunkZ=" + chunkZ +
-                '}';
+        return "ChunkCoord{"
+            + "chunkX=" + this.chunkX
+            + ", chunkZ=" + this.chunkZ
+            + '}';
+    }
+
+    public int getChunkX() {
+        return this.chunkX;
+    }
+
+    public int getChunkZ() {
+        return this.chunkZ;
     }
 
 }

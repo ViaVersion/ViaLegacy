@@ -22,7 +22,10 @@ import com.viaversion.viaversion.api.minecraft.GameProfile;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
-public class GameProfileUtil {
+public final class GameProfileUtil {
+
+    private GameProfileUtil() {
+    }
 
     public static UUID getOfflinePlayerUuid(final String name) {
         return UUID.nameUUIDFromBytes(("OfflinePlayer:" + name).getBytes(StandardCharsets.UTF_8));

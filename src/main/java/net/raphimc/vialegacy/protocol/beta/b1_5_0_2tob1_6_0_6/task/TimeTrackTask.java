@@ -27,7 +27,9 @@ public class TimeTrackTask implements Runnable {
     public void run() {
         for (UserConnection info : Via.getManager().getConnectionManager().getConnections()) {
             final WorldTimeStorage worldTimeStorage = info.get(WorldTimeStorage.class);
-            if (worldTimeStorage != null) worldTimeStorage.time++;
+            if (worldTimeStorage != null) {
+                worldTimeStorage.setTime(worldTimeStorage.getTime() + 1);
+            }
         }
     }
 

@@ -23,6 +23,7 @@ import io.netty.buffer.ByteBuf;
 
 import java.util.function.IntFunction;
 
+@SuppressWarnings("checkstyle:AbbreviationAsWordInName")
 public class BlockPositionVarYType<T extends Number> extends Type<BlockPosition> {
 
     private final Type<T> yType;
@@ -35,12 +36,12 @@ public class BlockPositionVarYType<T extends Number> extends Type<BlockPosition>
     }
 
     @Override
-    public BlockPosition read(ByteBuf buffer) {
+    public BlockPosition read(final ByteBuf buffer) {
         return new BlockPosition(buffer.readInt(), this.yType.read(buffer).intValue(), buffer.readInt());
     }
 
     @Override
-    public void write(ByteBuf buffer, BlockPosition position) {
+    public void write(final ByteBuf buffer, final BlockPosition position) {
         buffer.writeInt(position.x());
         this.yType.write(buffer, this.yConverter.apply(position.y()));
         buffer.writeInt(position.z());

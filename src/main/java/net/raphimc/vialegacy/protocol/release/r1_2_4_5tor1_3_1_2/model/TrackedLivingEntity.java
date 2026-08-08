@@ -33,21 +33,21 @@ public class TrackedLivingEntity extends AbstractTrackedEntity {
     private int soundTime;
 
     // ENTITY_AGEABLE
-    public int growingAge;
+    private int growingAge;
 
     // ENTITY_TAMEABLE_ANIMAL
-    public boolean isTamed;
+    private boolean isTamed;
 
     // WOLF
-    public int wolfHealth;
-    public boolean wolfIsAngry;
+    private int wolfHealth;
+    private boolean wolfIsAngry;
 
-    public TrackedLivingEntity(int entityId, Location location, EntityTypes1_8.EntityType entityType) {
+    public TrackedLivingEntity(final int entityId, final Location location, final EntityTypes1_8.EntityType entityType) {
         super(entityId, location, entityType);
     }
 
-    public void tick(EntityTracker tracker) {
-        if (tracker.RND.nextInt(1000) < this.soundTime++) {
+    public void tick(final EntityTracker tracker) {
+        if (tracker.getRnd().nextInt(1000) < this.soundTime++) {
             this.soundTime = SoundRegistry1_2_4.getSoundDelayTime(this.getEntityType());
 
             tracker.playSound(this.getEntityId(), SoundType.IDLE);
@@ -62,7 +62,7 @@ public class TrackedLivingEntity extends AbstractTrackedEntity {
         }
     }
 
-    public void updateEntityData(List<EntityData> entityDataList) {
+    public void updateEntityData(final List<EntityData> entityDataList) {
         for (EntityData entityData : entityDataList) {
             final EntityDataIndex1_5_2 index = EntityDataIndex1_5_2.searchIndex(this.getEntityType(), entityData.id());
             final EntityDataIndex1_7_6 index2 = EntityDataIndex1_7_6.searchIndex(this.getEntityType(), entityData.id());
@@ -81,16 +81,28 @@ public class TrackedLivingEntity extends AbstractTrackedEntity {
         }
     }
 
-    public void applyPitch(EntityTracker tracker, ConfiguredSound sound) {
-        float pitch;
+    public void applyPitch(final EntityTracker tracker, final ConfiguredSound sound) {
+        final float pitch;
 
         if (this.getEntityType().isOrHasParent(EntityTypes1_8.EntityType.ABSTRACT_AGEABLE) && this.growingAge < 0) {
-            pitch = (tracker.RND.nextFloat() - tracker.RND.nextFloat()) * 0.2F + 1.5F;
+            pitch = (tracker.getRnd().nextFloat() - tracker.getRnd().nextFloat()) * 0.2F + 1.5F;
         } else {
-            pitch = (tracker.RND.nextFloat() - tracker.RND.nextFloat()) * 0.2F + 1.0F;
+            pitch = (tracker.getRnd().nextFloat() - tracker.getRnd().nextFloat()) * 0.2F + 1.0F;
         }
 
         sound.setPitch(pitch);
+    }
+
+    public boolean isTamed() {
+        return this.isTamed;
+    }
+
+    public int getWolfHealth() {
+        return this.wolfHealth;
+    }
+
+    public boolean isWolfIsAngry() {
+        return this.wolfIsAngry;
     }
 
 }

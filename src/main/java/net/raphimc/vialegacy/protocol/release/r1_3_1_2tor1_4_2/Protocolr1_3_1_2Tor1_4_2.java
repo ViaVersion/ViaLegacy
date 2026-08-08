@@ -70,9 +70,10 @@ public class Protocolr1_3_1_2Tor1_4_2 extends StatelessProtocol<ClientboundPacke
                 try {
                     final ProtocolInfo info = wrapper.user().getProtocolInfo();
                     final String[] pingParts = reason.split("§");
-                    final String out = "§1\0" + info.serverProtocolVersion().getVersion() + "\0" + info.serverProtocolVersion().getName() + "\0" + pingParts[0] + "\0" + pingParts[1] + "\0" + pingParts[2];
+                    final String out = "§1\0" + info.serverProtocolVersion().getVersion() + "\0" + info.serverProtocolVersion()
+                        .getName() + "\0" + pingParts[0] + "\0" + pingParts[1] + "\0" + pingParts[2];
                     wrapper.write(Types1_6_4.STRING, out);
-                } catch (Throwable e) {
+                } catch (final Throwable e) {
                     ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Could not parse 1.3.1 ping: " + reason, e);
                     wrapper.cancel();
                 }
@@ -113,9 +114,11 @@ public class Protocolr1_3_1_2Tor1_4_2 extends StatelessProtocol<ClientboundPacke
                 map(Types1_6_4.STRING); // worldType
                 handler(wrapper -> {
                     final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
-                    final Integer[] entityIds = entityTracker.getTrackedEntities().keySet().stream().filter(i -> i != entityTracker.getPlayerID()).toArray(Integer[]::new);
+                    final Integer[] entityIds = entityTracker.getTrackedEntities().keySet().stream().filter(i -> i != entityTracker.getPlayerId()).toArray(Integer[]::new);
                     final int[] primitiveInts = new int[entityIds.length];
-                    for (int i = 0; i < entityIds.length; i++) primitiveInts[i] = entityIds[i];
+                    for (int i = 0; i < entityIds.length; i++) {
+                        primitiveInts[i] = entityIds[i];
+                    }
 
                     final PacketWrapper destroyEntities = PacketWrapper.create(ClientboundPackets1_4_2.REMOVE_ENTITIES, wrapper.user());
                     destroyEntities.write(Types1_7_6.INT_ARRAY, primitiveInts);
@@ -137,7 +140,7 @@ public class Protocolr1_3_1_2Tor1_4_2 extends StatelessProtocol<ClientboundPacke
                 map(Types1_3_1.ENTITY_DATA_LIST, Types1_4_2.ENTITY_DATA_LIST); // entity data
                 handler(wrapper -> {
                     final List<EntityData> entityDataList = wrapper.get(Types1_4_2.ENTITY_DATA_LIST, 0);
-                    rewriteEntityData(entityDataList);
+                    Protocolr1_3_1_2Tor1_4_2.this.rewriteEntityData(entityDataList);
                     entityDataList.removeIf(entityData -> entityData.dataType() == EntityDataTypes1_4_2.BYTE && entityData.id() == EntityDataIndex1_7_6.HUMAN_SKIN_FLAGS.getOldIndex());
                     entityDataList.add(new EntityData(EntityDataIndex1_7_6.HUMAN_SKIN_FLAGS.getOldIndex(), EntityDataTypes1_4_2.BYTE, (byte) 0));
                 });
@@ -172,14 +175,14 @@ public class Protocolr1_3_1_2Tor1_4_2 extends StatelessProtocol<ClientboundPacke
                 map(Types.SHORT); // velocity z
                 map(Types1_3_1.ENTITY_DATA_LIST, Types1_4_2.ENTITY_DATA_LIST); // entity data
                 handler(wrapper -> {
-                    rewriteEntityData(wrapper.get(Types1_4_2.ENTITY_DATA_LIST, 0));
+                    Protocolr1_3_1_2Tor1_4_2.this.rewriteEntityData(wrapper.get(Types1_4_2.ENTITY_DATA_LIST, 0));
 
                     final int entityId = wrapper.get(Types.INT, 0);
                     final short typeId = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     if (typeId == EntityTypes1_8.EntityType.SKELETON.getId()) {
-                        setMobHandItem(entityId, new DataItem(ItemList1_6.bow.itemId(), (byte) 1, (short) 0, null), wrapper);
+                        Protocolr1_3_1_2Tor1_4_2.this.setMobHandItem(entityId, new DataItem(ItemList1_6.BOW, (byte) 1, (short) 0, null), wrapper);
                     } else if (typeId == EntityTypes1_8.EntityType.ZOMBIE_PIGMEN.getId()) {
-                        setMobHandItem(entityId, new DataItem(ItemList1_6.swordGold.itemId(), (byte) 1, (short) 0, null), wrapper);
+                        Protocolr1_3_1_2Tor1_4_2.this.setMobHandItem(entityId, new DataItem(ItemList1_6.SWORD_GOLD, (byte) 1, (short) 0, null), wrapper);
                     }
                 });
             }
@@ -207,7 +210,7 @@ public class Protocolr1_3_1_2Tor1_4_2 extends StatelessProtocol<ClientboundPacke
             public void register() {
                 map(Types.INT); // entity id
                 map(Types1_3_1.ENTITY_DATA_LIST, Types1_4_2.ENTITY_DATA_LIST); // entity data
-                handler(wrapper -> rewriteEntityData(wrapper.get(Types1_4_2.ENTITY_DATA_LIST, 0)));
+                handler(wrapper -> Protocolr1_3_1_2Tor1_4_2.this.rewriteEntityData(wrapper.get(Types1_4_2.ENTITY_DATA_LIST, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_3_1.LEVEL_EVENT, new PacketHandlers() {
@@ -225,7 +228,9 @@ public class Protocolr1_3_1_2Tor1_4_2 extends StatelessProtocol<ClientboundPacke
                 handler(wrapper -> {
                     final String oldSound = wrapper.read(Types1_6_4.STRING); // sound
                     String newSound = SoundRewriter.map(oldSound);
-                    if (oldSound.isEmpty()) newSound = "";
+                    if (oldSound.isEmpty()) {
+                        newSound = "";
+                    }
                     if (newSound == null) {
                         if (Via.getConfig().logOtherConversionWarnings()) {
                             ViaLegacy.getPlatform().getLogger().warning("Unable to map 1.3.2 sound '" + oldSound + "'");
@@ -288,7 +293,7 @@ public class Protocolr1_3_1_2Tor1_4_2 extends StatelessProtocol<ClientboundPacke
                             }
                             length = (short) PacketUtil.calculateLength(wrapper);
                         }
-                    } catch (Exception e) {
+                    } catch (final Exception e) {
                         if (Via.getConfig().logOtherConversionWarnings()) {
                             Via.getPlatform().getLogger().log(Level.WARNING, "Failed to handle packet", e);
                         }
@@ -339,7 +344,7 @@ public class Protocolr1_3_1_2Tor1_4_2 extends StatelessProtocol<ClientboundPacke
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolr1_3_1_2Tor1_4_2.class, ClientboundPackets1_3_1::getPacket));
     }
 

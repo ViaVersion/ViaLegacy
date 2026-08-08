@@ -24,10 +24,14 @@ import java.util.Map;
 
 public class WindowTracker implements StorableObject {
 
-    public final Map<Short, Short> types = new HashMap<>();
+    private final Map<Short, Short> types = new HashMap<>();
 
-    public short get(short windowId) {
-        return types.getOrDefault(windowId, (short) -1);
+    public short get(final short windowId) {
+        return this.types.getOrDefault(windowId, (short) -1);
+    }
+
+    public Map<Short, Short> getTypes() {
+        return this.types;
     }
 
 }

@@ -32,11 +32,13 @@ public class ClassicLevelStorageTickTask implements Runnable {
             final ClassicLevelStorage classicLevelStorage = info.get(ClassicLevelStorage.class);
             if (classicLevelStorage != null) {
                 info.getChannel().eventLoop().submit(() -> {
-                    if (!info.getChannel().isActive()) return;
+                    if (!info.getChannel().isActive()) {
+                        return;
+                    }
 
                     try {
                         classicLevelStorage.tick();
-                    } catch (Throwable e) {
+                    } catch (final Throwable e) {
                         ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error while ticking ClassicLevelStorage", e);
                     }
                 });

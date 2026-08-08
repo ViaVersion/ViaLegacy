@@ -25,7 +25,7 @@ import net.raphimc.vialegacy.api.remapper.AbstractChunkTracker;
 public class ChunkTracker extends AbstractChunkTracker {
 
     public ChunkTracker() {
-        super(BlockList1_6.obsidian.blockId(), BlockList1_6.portal.blockId());
+        super(BlockList1_6.OBSIDIAN, BlockList1_6.PORTAL);
 
         for (int i = 9; i < 16; i++) { // double plant
             this.registerReplacement(new IdAndData(175, i), new IdAndData(175, 0));
@@ -34,17 +34,17 @@ public class ChunkTracker extends AbstractChunkTracker {
             this.registerReplacement(new IdAndData(0, i), new IdAndData(0, 0));
         }
         for (int i = 1; i < 7; i++) { // stone variants
-            this.registerReplacement(new IdAndData(BlockList1_6.stone.blockId(), i), new IdAndData(BlockList1_6.stone.blockId(), 0));
+            this.registerReplacement(new IdAndData(BlockList1_6.STONE, i), new IdAndData(BlockList1_6.STONE, 0));
         }
-        this.registerInvalidDirectionReplacements(BlockList1_6.ladder.blockId(), new IdAndData(BlockList1_6.planks.blockId(), 0)); // Ladders with broken data values use the last ladder collision box the player has looked at. We just set them to a full block to avoid glitches.
-        this.registerInvalidDirectionReplacements(BlockList1_6.furnaceBurning.blockId(), new IdAndData(BlockList1_6.furnaceBurning.blockId(), 2));
-        this.registerReplacement(new IdAndData(BlockList1_6.chest.blockId(), 0), new IdAndData(BlockList1_6.chest.blockId(), 3));
+        this.registerInvalidDirectionReplacements(BlockList1_6.LADDER, new IdAndData(BlockList1_6.PLANKS, 0)); // Ladders with broken data values use the last ladder collision box the player has looked at. We just set them to a full block to avoid glitches.
+        this.registerInvalidDirectionReplacements(BlockList1_6.FURNACE_BURNING, new IdAndData(BlockList1_6.FURNACE_BURNING, 2));
+        this.registerReplacement(new IdAndData(BlockList1_6.CHEST, 0), new IdAndData(BlockList1_6.CHEST, 3));
     }
 
     @Override
-    protected void remapBlock(IdAndData block, int x, int y, int z) {
-        if (block.getId() == BlockList1_6.portal.blockId() && block.getData() == 0) {
-            if (this.getBlockNotNull(x - 1, y, z).getId() == BlockList1_6.obsidian.blockId() || this.getBlockNotNull(x + 1, y, z).getId() == BlockList1_6.obsidian.blockId()) {
+    protected void remapBlock(final IdAndData block, final int x, final int y, final int z) {
+        if (block.getId() == BlockList1_6.PORTAL && block.getData() == 0) {
+            if (this.getBlockNotNull(x - 1, y, z).getId() == BlockList1_6.OBSIDIAN || this.getBlockNotNull(x + 1, y, z).getId() == BlockList1_6.OBSIDIAN) {
                 block.setData(1);
             } else {
                 block.setData(2);
@@ -53,8 +53,8 @@ public class ChunkTracker extends AbstractChunkTracker {
     }
 
     @Override
-    protected void postRemap(DataPalette palette) {
-        palette.replaceId(BlockList1_6.portal.blockId() << 4, 0);
+    protected void postRemap(final DataPalette palette) {
+        palette.replaceId(BlockList1_6.PORTAL << 4, 0);
     }
 
     private void registerInvalidDirectionReplacements(final int blockId, final IdAndData replacement) {

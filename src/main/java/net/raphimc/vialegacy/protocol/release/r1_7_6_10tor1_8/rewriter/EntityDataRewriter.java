@@ -80,7 +80,7 @@ public class EntityDataRewriter {
                     continue;
                 } else if (entityDataIndex == EntityDataIndex1_7_6.HUMAN_SKIN_FLAGS) {
                     byte flags = (byte) value;
-                    boolean cape = (flags & 2) == 0;
+                    final boolean cape = (flags & 2) == 0;
                     flags = (byte) (cape ? 127 : 126);
                     entry.setValue(flags);
                     continue;
@@ -101,7 +101,7 @@ public class EntityDataRewriter {
                         list.remove(entry);
                     }
                 }
-            } catch (Throwable e) {
+            } catch (final Throwable e) {
                 if (Via.getConfig().logEntityDataErrors()) {
                     ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error rewriting entity data entry for " + type.name() + ": " + entry, e);
                 }

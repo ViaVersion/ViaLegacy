@@ -22,7 +22,23 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 
 public class SeedStorage implements StorableObject {
 
-    public long seed;
-    public BiomeSource biomeSource;
+    private long seed;
+    private BiomeSource biomeSource;
+
+    public long getSeed() {
+        return this.seed;
+    }
+
+    public void setSeed(final long seed) {
+        this.seed = seed;
+    }
+
+    public BiomeSource getBiomeSource() {
+        return this.biomeSource;
+    }
+
+    public void setBiomeSource(final BiomeSource biomeSource) {
+        this.biomeSource = biomeSource;
+    }
 
 }

@@ -86,8 +86,10 @@ public enum ServerboundPackets1_3_1 implements ServerboundPacketType, PreNettyPa
     CLIENT_COMMAND(205, (user, buf) -> buf.skipBytes(1)),
     CUSTOM_PAYLOAD(250, (user, buf) -> {
         readString(buf);
-        short s = buf.readShort();
-        for (int i = 0; i < s; i++) buf.readByte();
+        final short s = buf.readShort();
+        for (int i = 0; i < s; i++) {
+            buf.readByte();
+        }
     }),
     SHARED_KEY(252, (user, buf) -> {
         readByteArray(buf);
@@ -99,6 +101,9 @@ public enum ServerboundPackets1_3_1 implements ServerboundPacketType, PreNettyPa
 
     private static final ServerboundPackets1_3_1[] REGISTRY = new ServerboundPackets1_3_1[256];
 
+    private final int id;
+    private final BiConsumer<UserConnection, ByteBuf> packetReader;
+
     static {
         for (ServerboundPackets1_3_1 packet : values()) {
             REGISTRY[packet.id] = packet;
@@ -108,9 +113,6 @@ public enum ServerboundPackets1_3_1 implements ServerboundPacketType, PreNettyPa
     public static ServerboundPackets1_3_1 getPacket(final int id) {
         return REGISTRY[id];
     }
-
-    private final int id;
-    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     ServerboundPackets1_3_1(final int id, final BiConsumer<UserConnection, ByteBuf> packetReader) {
         this.id = id;

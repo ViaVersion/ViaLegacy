@@ -22,36 +22,36 @@ import com.viaversion.viaversion.api.minecraft.chunks.NibbleArray;
 
 public class ExtendedBlockStorage {
 
-    private final byte[] blockLSBArray;
-    private NibbleArray blockMSBArray;
+    private final byte[] blockLsbArray;
+    private NibbleArray blockMsbArray;
     private final NibbleArray blockMetadataArray;
     private final NibbleArray blockLightArray;
     private NibbleArray skyLightArray;
 
     public ExtendedBlockStorage(final boolean skylight) {
-        this.blockLSBArray = new byte[ChunkSection.SIZE];
-        this.blockMetadataArray = new NibbleArray(this.blockLSBArray.length);
-        this.blockLightArray = new NibbleArray(this.blockLSBArray.length);
+        this.blockLsbArray = new byte[ChunkSection.SIZE];
+        this.blockMetadataArray = new NibbleArray(this.blockLsbArray.length);
+        this.blockLightArray = new NibbleArray(this.blockLsbArray.length);
 
         if (skylight) {
-            this.skyLightArray = new NibbleArray(this.blockLSBArray.length);
+            this.skyLightArray = new NibbleArray(this.blockLsbArray.length);
         }
     }
 
     public int getBlockId(final int x, final int y, final int z) {
-        int value = this.blockLSBArray[ChunkSection.index(x, y, z)] & 255;
-        if (this.blockMSBArray != null) {
-            value |= this.blockMSBArray.get(x, y, z) << 8;
+        int value = this.blockLsbArray[ChunkSection.index(x, y, z)] & 255;
+        if (this.blockMsbArray != null) {
+            value |= this.blockMsbArray.get(x, y, z) << 8;
         }
         return value;
     }
 
     public void setBlockId(final int x, final int y, final int z, final int value) {
-        this.blockLSBArray[ChunkSection.index(x, y, z)] = (byte) (value & 255);
+        this.blockLsbArray[ChunkSection.index(x, y, z)] = (byte) (value & 255);
         if (value > 255) {
-            this.getOrCreateBlockMSBArray().set(x, y, z, (value & 0xF00) >> 8);
-        } else if (this.blockMSBArray != null) {
-            this.blockMSBArray.set(x, y, z, 0);
+            this.getOrCreateBlockMsbArray().set(x, y, z, (value & 0xF00) >> 8);
+        } else if (this.blockMsbArray != null) {
+            this.blockMsbArray.set(x, y, z, 0);
         }
     }
 
@@ -67,7 +67,7 @@ public class ExtendedBlockStorage {
         return this.blockLightArray.get(x, y, z);
     }
 
-    public void setBlockLight(final int x, final int y, int z, final int value) {
+    public void setBlockLight(final int x, final int y, final int z, final int value) {
         this.blockLightArray.set(x, y, z, value);
     }
 
@@ -79,19 +79,19 @@ public class ExtendedBlockStorage {
         this.skyLightArray.set(x, y, z, value);
     }
 
-    public boolean hasBlockMSBArray() {
-        return this.blockMSBArray != null;
+    public boolean hasBlockMsbArray() {
+        return this.blockMsbArray != null;
     }
 
-    public byte[] getBlockLSBArray() {
-        return this.blockLSBArray;
+    public byte[] getBlockLsbArray() {
+        return this.blockLsbArray;
     }
 
-    public NibbleArray getOrCreateBlockMSBArray() {
-        if (this.blockMSBArray == null) {
-            return this.blockMSBArray = new NibbleArray(this.blockLSBArray.length);
+    public NibbleArray getOrCreateBlockMsbArray() {
+        if (this.blockMsbArray == null) {
+            return this.blockMsbArray = new NibbleArray(this.blockLsbArray.length);
         }
-        return this.blockMSBArray;
+        return this.blockMsbArray;
     }
 
     public NibbleArray getBlockMetadataArray() {

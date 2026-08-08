@@ -21,8 +21,32 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 
 public class ClassicProgressStorage implements StorableObject {
 
-    public int upperBound = 100;
-    public int progress; // 0% - upperBound
-    public String status = "Waiting...";
+    private String status = "Waiting...";
+    private int progress; // 0% - upperBound
+    private int upperBound = 100;
+
+    public String getStatus() {
+        return this.status;
+    }
+
+    public void setStatus(final String status) {
+        this.status = status;
+    }
+
+    public int getProgress() {
+        return this.progress;
+    }
+
+    public void setProgress(final int progress) {
+        this.progress = progress;
+    }
+
+    public int getUpperBound() {
+        return this.upperBound;
+    }
+
+    public void setUpperBound(final int upperBound) {
+        this.upperBound = upperBound;
+    }
 
 }

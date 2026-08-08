@@ -42,7 +42,7 @@ public class PreNettyLengthPrepender extends ByteToMessageDecoder {
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+    protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) {
         if (!in.isReadable() || in.readableBytes() <= 0) {
             return;
         }
@@ -83,7 +83,7 @@ public class PreNettyLengthPrepender extends ByteToMessageDecoder {
                 Types.VAR_INT.writePrimitive(buf, packetId); // id
                 buf.writeBytes(in.readSlice(length)); // content
                 out.add(buf);
-            } catch (IndexOutOfBoundsException e) { // Not enough data
+            } catch (final IndexOutOfBoundsException e) { // Not enough data
                 in.resetReaderIndex();
                 return;
             }

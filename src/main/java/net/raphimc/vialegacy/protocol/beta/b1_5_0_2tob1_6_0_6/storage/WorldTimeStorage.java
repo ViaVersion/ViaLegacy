@@ -21,6 +21,14 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 
 public class WorldTimeStorage implements StorableObject {
 
-    public long time;
+    private long time;
+
+    public long getTime() {
+        return this.time;
+    }
+
+    public void setTime(final long time) {
+        this.time = time;
+    }
 
 }

@@ -37,12 +37,12 @@ public class PreNettyLengthCodec extends ByteToMessageCodec<ByteBuf> {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) {
+    protected void encode(final ChannelHandlerContext ctx, final ByteBuf in, final ByteBuf out) {
         this.encoder.encode(ctx, in, out);
     }
 
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
+    protected void decode(final ChannelHandlerContext ctx, final ByteBuf in, final List<Object> out) {
         this.decoder.decode(ctx, in, out);
     }
 

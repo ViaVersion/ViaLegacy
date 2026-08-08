@@ -28,17 +28,17 @@ public class ChunkType extends net.raphimc.vialegacy.protocol.release.r1_7_6_10t
     }
 
     @Override
-    protected void readUnusedInt(ByteBuf byteBuf) {
+    protected void readUnusedInt(final ByteBuf byteBuf) {
         byteBuf.readInt();
     }
 
     @Override
-    protected void writeUnusedInt(ByteBuf byteBuf, Chunk chunk) {
+    protected void writeUnusedInt(final ByteBuf byteBuf, final Chunk chunk) {
         byteBuf.writeInt(0);
     }
 
     @Override
-    public void write(ByteBuf byteBuf, Chunk chunk) {
+    public void write(final ByteBuf byteBuf, final Chunk chunk) {
         for (ChunkSection section : chunk.getSections()) {
             if (section != null && !section.getLight().hasSkyLight()) {
                 throw new IllegalStateException("Chunk section does not have skylight");

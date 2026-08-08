@@ -23,6 +23,10 @@ import com.viaversion.viaversion.libs.fastutil.ints.Int2IntOpenHashMap;
 
 public class StatisticsStorage implements StorableObject {
 
-    public final Int2IntMap values = new Int2IntOpenHashMap();
+    private final Int2IntMap values = new Int2IntOpenHashMap();
+
+    public Int2IntMap getValues() {
+        return this.values;
+    }
 
 }

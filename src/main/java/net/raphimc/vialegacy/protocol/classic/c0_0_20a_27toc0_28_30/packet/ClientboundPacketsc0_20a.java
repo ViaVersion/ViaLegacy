@@ -45,6 +45,9 @@ public enum ClientboundPacketsc0_20a implements ClientboundPacketType, PreNettyP
 
     private static final ClientboundPacketsc0_20a[] REGISTRY = new ClientboundPacketsc0_20a[256];
 
+    private final int id;
+    private final BiConsumer<UserConnection, ByteBuf> packetReader;
+
     static {
         for (ClientboundPacketsc0_20a packet : values()) {
             REGISTRY[packet.id] = packet;
@@ -54,9 +57,6 @@ public enum ClientboundPacketsc0_20a implements ClientboundPacketType, PreNettyP
     public static ClientboundPacketsc0_20a getPacket(final int id) {
         return REGISTRY[id];
     }
-
-    private final int id;
-    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     ClientboundPacketsc0_20a(final int id, final BiConsumer<UserConnection, ByteBuf> packetReader) {
         this.id = id;

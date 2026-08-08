@@ -65,7 +65,7 @@ public class Protocolr1_4_2Tor1_4_4_5 extends StatelessProtocol<ClientboundPacke
                 map(Types.BYTE); // pitch
                 map(Types.UNSIGNED_SHORT); // item
                 map(Types1_4_2.ENTITY_DATA_LIST, Types1_6_4.ENTITY_DATA_LIST); // entity data
-                handler(wrapper -> rewriteEntityData(wrapper.get(Types1_6_4.ENTITY_DATA_LIST, 0)));
+                handler(wrapper -> Protocolr1_4_2Tor1_4_4_5.this.rewriteEntityData(wrapper.get(Types1_6_4.ENTITY_DATA_LIST, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_4_2.ADD_MOB, new PacketHandlers() {
@@ -83,7 +83,7 @@ public class Protocolr1_4_2Tor1_4_4_5 extends StatelessProtocol<ClientboundPacke
                 map(Types.SHORT); // velocity y
                 map(Types.SHORT); // velocity z
                 map(Types1_4_2.ENTITY_DATA_LIST, Types1_6_4.ENTITY_DATA_LIST); // entity data
-                handler(wrapper -> rewriteEntityData(wrapper.get(Types1_6_4.ENTITY_DATA_LIST, 0)));
+                handler(wrapper -> Protocolr1_4_2Tor1_4_4_5.this.rewriteEntityData(wrapper.get(Types1_6_4.ENTITY_DATA_LIST, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_4_2.SET_ENTITY_DATA, new PacketHandlers() {
@@ -91,7 +91,7 @@ public class Protocolr1_4_2Tor1_4_4_5 extends StatelessProtocol<ClientboundPacke
             public void register() {
                 map(Types.INT); // entity id
                 map(Types1_4_2.ENTITY_DATA_LIST, Types1_6_4.ENTITY_DATA_LIST); // entity data
-                handler(wrapper -> rewriteEntityData(wrapper.get(Types1_6_4.ENTITY_DATA_LIST, 0)));
+                handler(wrapper -> Protocolr1_4_2Tor1_4_4_5.this.rewriteEntityData(wrapper.get(Types1_6_4.ENTITY_DATA_LIST, 0)));
             }
         });
     }
@@ -103,7 +103,7 @@ public class Protocolr1_4_2Tor1_4_4_5 extends StatelessProtocol<ClientboundPacke
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolr1_4_2Tor1_4_4_5.class, ClientboundPackets1_4_2::getPacket));
     }
 

@@ -31,8 +31,7 @@ public enum BetaBiome {
     ICE_DESERT,
     TUNDRA,
     HELL,
-    SKY,
-    ;
+    SKY;
 
     public static BetaBiome getBiome(final double temperature, double humidity) {
         humidity *= temperature;

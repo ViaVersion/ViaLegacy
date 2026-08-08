@@ -51,9 +51,14 @@ import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.model.ClassicLev
 import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.packet.ClientboundPacketsc0_28;
 import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.packet.ServerboundPacketsc0_28;
 import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.provider.ClassicCustomCommandProvider;
-import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.provider.ClassicMPPassProvider;
+import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.provider.ClassicMpPassProvider;
 import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.provider.ClassicWorldHeightProvider;
-import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.storage.*;
+import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.storage.ClassicBlockRemapper;
+import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.storage.ClassicLevelStorage;
+import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.storage.ClassicOpLevelStorage;
+import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.storage.ClassicPositionTracker;
+import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.storage.ClassicProgressStorage;
+import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.storage.ClassicServerTitleStorage;
 import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.task.ClassicLevelStorageTickTask;
 import net.raphimc.vialegacy.protocol.classic.c0_28_30toa1_0_15.types.Typesc0_30;
 import net.raphimc.vialegacy.protocol.classic.c0_30cpetoc0_28_30.Protocolc0_30cpeToc0_28_30;
@@ -96,9 +101,9 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
                     }
 
                     final ClassicProgressStorage classicProgressStorage = wrapper.user().get(ClassicProgressStorage.class);
-                    classicProgressStorage.progress = 1;
-                    classicProgressStorage.upperBound = 2;
-                    classicProgressStorage.status = "Waiting for server...";
+                    classicProgressStorage.setProgress(1);
+                    classicProgressStorage.setUpperBound(2);
+                    classicProgressStorage.setStatus("Waiting for server...");
                 });
             }
         });
@@ -113,7 +118,7 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
                     final PacketWrapper respawn = PacketWrapper.create(ClientboundPacketsb1_7.RESPAWN, wrapper.user());
                     respawn.write(Types.BYTE, (byte) 0); // dimension id
                     respawn.send(Protocolb1_5_0_2Tob1_6_0_6.class);
-                    wrapper.user().get(ClassicPositionTracker.class).spawned = false;
+                    wrapper.user().get(ClassicPositionTracker.class).setSpawned(false);
                 }
             }
             if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocolb1_7_0_3Tob1_8_0_1.class)) {
@@ -127,9 +132,9 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
             wrapper.user().put(new ClassicLevelStorage(wrapper.user()));
 
             final ClassicProgressStorage classicProgressStorage = wrapper.user().get(ClassicProgressStorage.class);
-            classicProgressStorage.progress = 2;
-            classicProgressStorage.upperBound = 2;
-            classicProgressStorage.status = "Waiting for server...";
+            classicProgressStorage.setProgress(2);
+            classicProgressStorage.setUpperBound(2);
+            classicProgressStorage.setStatus("Waiting for server...");
         });
         this.registerClientbound(ClientboundPacketsc0_28.LEVEL_DATA, null, wrapper -> {
             wrapper.cancel();
@@ -140,9 +145,9 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
             wrapper.user().get(ClassicLevelStorage.class).addDataPart(data, partSize);
 
             final ClassicProgressStorage classicProgressStorage = wrapper.user().get(ClassicProgressStorage.class);
-            classicProgressStorage.upperBound = 100;
-            classicProgressStorage.progress = progress;
-            classicProgressStorage.status = "Receiving level... §7" + progress + "%";
+            classicProgressStorage.setUpperBound(100);
+            classicProgressStorage.setProgress(progress);
+            classicProgressStorage.setStatus("Receiving level... §7" + progress + "%");
         });
         this.registerClientbound(ClientboundPacketsc0_28.LEVEL_FINALIZE, null, wrapper -> {
             wrapper.cancel();
@@ -154,9 +159,9 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
             final ClassicLevelStorage levelStorage = wrapper.user().get(ClassicLevelStorage.class);
             final short maxChunkSectionCount = Via.getManager().getProviders().get(ClassicWorldHeightProvider.class).getMaxChunkSectionCount(wrapper.user());
 
-            classicProgressStorage.upperBound = 2;
-            classicProgressStorage.progress = 0;
-            classicProgressStorage.status = "Finishing level... §7Decompressing";
+            classicProgressStorage.setUpperBound(2);
+            classicProgressStorage.setProgress(0);
+            classicProgressStorage.setStatus("Finishing level... §7Decompressing");
             levelStorage.finish(sizeX, sizeY, sizeZ);
             levelStorage.sendChunk(new ChunkCoord(0, 0));
 
@@ -174,13 +179,13 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
                 setBorder.send(Protocolr1_7_6_10Tor1_8.class);
             }
 
-            sendChatMessage(wrapper.user(), "§aWorld dimensions: §6" + sizeX + "§ax§6" + sizeY + "§ax§6" + sizeZ);
+            this.sendChatMessage(wrapper.user(), "§aWorld dimensions: §6" + sizeX + "§ax§6" + sizeY + "§ax§6" + sizeZ);
             if (sizeY > (maxChunkSectionCount << 4)) {
-                sendChatMessage(wrapper.user(), "§cThis server has a world higher than " + (maxChunkSectionCount << 4) + " blocks! Expect world errors");
+                this.sendChatMessage(wrapper.user(), "§cThis server has a world higher than " + (maxChunkSectionCount << 4) + " blocks! Expect world errors");
             }
 
-            classicProgressStorage.progress = 1;
-            classicProgressStorage.status = "Finishing level... §7Waiting for server";
+            classicProgressStorage.setProgress(1);
+            classicProgressStorage.setStatus("Finishing level... §7Waiting for server");
         });
         this.registerClientbound(ClientboundPacketsc0_28.BLOCK_UPDATE, new PacketHandlers() {
             @Override
@@ -227,33 +232,33 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
                         final byte pitch = wrapper.get(Types.BYTE, 1);
 
                         final ClassicProgressStorage classicProgressStorage = wrapper.user().get(ClassicProgressStorage.class);
-                        classicProgressStorage.progress = 2;
-                        classicProgressStorage.status = "Finishing level... §7Loading spawn chunks";
+                        classicProgressStorage.setProgress(2);
+                        classicProgressStorage.setStatus("Finishing level... §7Loading spawn chunks");
 
                         final ClassicPositionTracker classicPositionTracker = wrapper.user().get(ClassicPositionTracker.class);
-                        classicPositionTracker.posX = (x / 32.0F);
-                        classicPositionTracker.stance = (y / 32.0F) + 0.714F;
-                        classicPositionTracker.posZ = (z / 32.0F);
-                        classicPositionTracker.yaw = yaw * 360 / 256.0F;
-                        classicPositionTracker.pitch = pitch * 360 / 256.0F;
+                        classicPositionTracker.setPosX((x / 32.0F));
+                        classicPositionTracker.setStance((y / 32.0F) + 0.714F);
+                        classicPositionTracker.setPosZ((z / 32.0F));
+                        classicPositionTracker.setYaw(yaw * 360 / 256.0F);
+                        classicPositionTracker.setPitch(pitch * 360 / 256.0F);
                         wrapper.user().get(ClassicLevelStorage.class).sendChunks(classicPositionTracker.getChunkPosition(), 1);
 
                         if (wrapper.user().getProtocolInfo().getPipeline().contains(Protocola1_0_17_1_0_17_4Toa1_1_0_1_1_2_1.class)) {
                             final PacketWrapper spawnPosition = PacketWrapper.create(ClientboundPacketsa1_1_0.SET_DEFAULT_SPAWN_POSITION, wrapper.user());
-                            spawnPosition.write(Types1_7_6.BLOCK_POSITION_INT, new BlockPosition((int) classicPositionTracker.posX, (int) (classicPositionTracker.stance), (int) classicPositionTracker.posZ));
+                            spawnPosition.write(Types1_7_6.BLOCK_POSITION_INT, new BlockPosition((int) classicPositionTracker.getPosX(), (int) (classicPositionTracker.getStance()), (int) classicPositionTracker.getPosZ()));
                             spawnPosition.send(Protocola1_0_17_1_0_17_4Toa1_1_0_1_1_2_1.class);
                         }
 
                         final PacketWrapper playerPosition = PacketWrapper.create(ClientboundPacketsa1_0_15.PLAYER_POSITION, wrapper.user());
-                        playerPosition.write(Types.DOUBLE, classicPositionTracker.posX); // x
-                        playerPosition.write(Types.DOUBLE, classicPositionTracker.stance); // stance
-                        playerPosition.write(Types.DOUBLE, classicPositionTracker.stance - 1.62F); // y
-                        playerPosition.write(Types.DOUBLE, classicPositionTracker.posZ); // z
-                        playerPosition.write(Types.FLOAT, classicPositionTracker.yaw); // yaw
-                        playerPosition.write(Types.FLOAT, classicPositionTracker.pitch); // pitch
+                        playerPosition.write(Types.DOUBLE, classicPositionTracker.getPosX()); // x
+                        playerPosition.write(Types.DOUBLE, classicPositionTracker.getStance()); // stance
+                        playerPosition.write(Types.DOUBLE, classicPositionTracker.getStance() - 1.62F); // y
+                        playerPosition.write(Types.DOUBLE, classicPositionTracker.getPosZ()); // z
+                        playerPosition.write(Types.FLOAT, classicPositionTracker.getYaw()); // yaw
+                        playerPosition.write(Types.FLOAT, classicPositionTracker.getPitch()); // pitch
                         playerPosition.write(Types.BOOLEAN, true); // onGround
                         playerPosition.send(Protocolc0_28_30Toa1_0_15.class);
-                        classicPositionTracker.spawned = true;
+                        classicPositionTracker.setSpawned(true);
                     } else {
                         wrapper.set(Types.INT, 2, wrapper.get(Types.INT, 2) - Float.valueOf(1.62F * 32).intValue());
                     }
@@ -346,12 +351,12 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
                 map(Typesb1_7_0_3.STRING, Typesc0_30.STRING); // username
                 read(Typesb1_7_0_3.STRING); // password
                 handler(wrapper -> {
-                    wrapper.write(Typesc0_30.STRING, Via.getManager().getProviders().get(ClassicMPPassProvider.class).getMpPass(wrapper.user())); // mp pass
+                    wrapper.write(Typesc0_30.STRING, Via.getManager().getProviders().get(ClassicMpPassProvider.class).getMpPass(wrapper.user())); // mp pass
                     wrapper.write(Types.BYTE, (byte) 0); // op level
 
                     final ClassicProgressStorage classicProgressStorage = wrapper.user().get(ClassicProgressStorage.class);
-                    classicProgressStorage.upperBound = 2;
-                    classicProgressStorage.status = "Logging in...";
+                    classicProgressStorage.setUpperBound(2);
+                    classicProgressStorage.setStatus("Logging in...");
                 });
             }
         });
@@ -372,30 +377,30 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
         });
         this.registerServerbound(ServerboundPacketsa1_0_15.MOVE_PLAYER_POS, ServerboundPacketsc0_28.MOVE_PLAYER_POS_ROT, wrapper -> {
             final ClassicPositionTracker positionTracker = wrapper.user().get(ClassicPositionTracker.class);
-            positionTracker.posX = wrapper.read(Types.DOUBLE); // x
+            positionTracker.setPosX(wrapper.read(Types.DOUBLE)); // x
             wrapper.read(Types.DOUBLE); // y
-            positionTracker.stance = wrapper.read(Types.DOUBLE); // stance
-            positionTracker.posZ = wrapper.read(Types.DOUBLE); // z
+            positionTracker.setStance(wrapper.read(Types.DOUBLE)); // stance
+            positionTracker.setPosZ(wrapper.read(Types.DOUBLE)); // z
             wrapper.read(Types.BOOLEAN); // onGround
 
             positionTracker.writeToPacket(wrapper);
         });
         this.registerServerbound(ServerboundPacketsa1_0_15.MOVE_PLAYER_ROT, ServerboundPacketsc0_28.MOVE_PLAYER_POS_ROT, wrapper -> {
             final ClassicPositionTracker positionTracker = wrapper.user().get(ClassicPositionTracker.class);
-            positionTracker.yaw = wrapper.read(Types.FLOAT); // yaw
-            positionTracker.pitch = wrapper.read(Types.FLOAT); // pitch
+            positionTracker.setYaw(wrapper.read(Types.FLOAT)); // yaw
+            positionTracker.setPitch(wrapper.read(Types.FLOAT)); // pitch
             wrapper.read(Types.BOOLEAN); // onGround
 
             positionTracker.writeToPacket(wrapper);
         });
         this.registerServerbound(ServerboundPacketsa1_0_15.MOVE_PLAYER_POS_ROT, wrapper -> {
             final ClassicPositionTracker positionTracker = wrapper.user().get(ClassicPositionTracker.class);
-            positionTracker.posX = wrapper.read(Types.DOUBLE); // x
+            positionTracker.setPosX(wrapper.read(Types.DOUBLE)); // x
             wrapper.read(Types.DOUBLE); // y
-            positionTracker.stance = wrapper.read(Types.DOUBLE); // stance
-            positionTracker.posZ = wrapper.read(Types.DOUBLE); // z
-            positionTracker.yaw = wrapper.read(Types.FLOAT); // yaw
-            positionTracker.pitch = wrapper.read(Types.FLOAT); // pitch
+            positionTracker.setStance(wrapper.read(Types.DOUBLE)); // stance
+            positionTracker.setPosZ(wrapper.read(Types.DOUBLE)); // z
+            positionTracker.setYaw(wrapper.read(Types.FLOAT)); // yaw
+            positionTracker.setPitch(wrapper.read(Types.FLOAT)); // pitch
             wrapper.read(Types.BOOLEAN); // onGround
 
             positionTracker.writeToPacket(wrapper);
@@ -415,13 +420,13 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
             if ((status == 0 && hasCreative) || (status == 2 && !hasCreative)) {
                 if (!extendedVerification && blockId == ClassicBlocks.BEDROCK && opTracker.getOpLevel() < 100) {
                     wrapper.cancel();
-                    sendChatMessage(wrapper.user(), "§cOnly op players can break bedrock!");
-                    sendBlockChange(wrapper.user(), pos, new IdAndData(BlockList1_6.bedrock.blockId(), 0));
+                    this.sendChatMessage(wrapper.user(), "§cOnly op players can break bedrock!");
+                    this.sendBlockChange(wrapper.user(), pos, new IdAndData(BlockList1_6.BEDROCK, 0));
                     return;
                 }
                 if (!extendedVerification) {
                     level.setBlock(pos, ClassicBlocks.AIR);
-                    sendBlockChange(wrapper.user(), pos, new IdAndData(0, 0));
+                    this.sendBlockChange(wrapper.user(), pos, new IdAndData(0, 0));
                 }
 
                 wrapper.write(Typesc0_30.BLOCK_POSITION, pos); // position
@@ -449,8 +454,8 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
 
             if (pos.y() >= level.getSizeY()) {
                 wrapper.cancel();
-                sendChatMessage(wrapper.user(), "§cHeight limit for building is " + level.getSizeY() + " blocks");
-                sendBlockChange(wrapper.user(), pos, new IdAndData(0, 0));
+                this.sendChatMessage(wrapper.user(), "§cHeight limit for building is " + level.getSizeY() + " blocks");
+                this.sendBlockChange(wrapper.user(), pos, new IdAndData(0, 0));
                 return;
             }
 
@@ -458,7 +463,7 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
 
             if (!extendedVerification) {
                 level.setBlock(pos, classicBlock);
-                sendBlockChange(wrapper.user(), pos, remapper.mapper().get(classicBlock));
+                this.sendBlockChange(wrapper.user(), pos, remapper.mapper().get(classicBlock));
             }
 
             wrapper.write(Typesc0_30.BLOCK_POSITION, pos); // position
@@ -487,36 +492,45 @@ public class Protocolc0_28_30Toa1_0_15 extends StatelessProtocol<ClientboundPack
     }
 
     @Override
-    public void register(ViaProviders providers) {
+    public void register(final ViaProviders providers) {
         providers.register(ClassicWorldHeightProvider.class, new ClassicWorldHeightProvider());
-        providers.register(ClassicMPPassProvider.class, new ClassicMPPassProvider());
+        providers.register(ClassicMpPassProvider.class, new ClassicMpPassProvider());
         providers.register(ClassicCustomCommandProvider.class, new ClassicCustomCommandProvider());
 
         Via.getPlatform().runRepeatingSync(new ClassicLevelStorageTickTask(), 2L);
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolc0_28_30Toa1_0_15.class, ClientboundPacketsc0_28::getPacket));
 
         userConnection.put(new ClassicPositionTracker());
         userConnection.put(new ClassicOpLevelStorage(userConnection, ViaLegacy.getConfig().enableClassicFly()));
         userConnection.put(new ClassicProgressStorage());
-        userConnection.put(new ClassicBlockRemapper(i -> ClassicBlocks.MAPPING.get(i), o -> {
-            int block = ClassicBlocks.REVERSE_MAPPING.getInt(o);
+        userConnection.put(new ClassicBlockRemapper(i -> ClassicBlocks.getMapping().get(i), o -> {
+            int block = ClassicBlocks.getReverseMapping().getInt(o);
 
             if (!userConnection.getProtocolInfo().getPipeline().contains(Protocolc0_30cpeToc0_28_30.class)) {
-                if (block == ClassicBlocks.GRASS) block = ClassicBlocks.DIRT;
-                else if (block == ClassicBlocks.BEDROCK) block = ClassicBlocks.STONE;
-                else if (block == ClassicBlocks.STATIONARY_WATER) block = ClassicBlocks.BLUE_WOOL;
-                else if (block == ClassicBlocks.STATIONARY_LAVA) block = ClassicBlocks.ORANGE_WOOL;
+                if (block == ClassicBlocks.GRASS) {
+                    block = ClassicBlocks.DIRT;
+                } else if (block == ClassicBlocks.BEDROCK) {
+                    block = ClassicBlocks.STONE;
+                } else if (block == ClassicBlocks.STATIONARY_WATER) {
+                    block = ClassicBlocks.BLUE_WOOL;
+                } else if (block == ClassicBlocks.STATIONARY_LAVA) {
+                    block = ClassicBlocks.ORANGE_WOOL;
+                }
             }
 
             return block;
         }));
 
-        if (userConnection.has(AlphaInventoryTracker.class)) userConnection.get(AlphaInventoryTracker.class).setCreativeMode(true);
-        if (userConnection.has(TimeLockStorage.class)) userConnection.get(TimeLockStorage.class).setTime(6000L);
+        if (userConnection.has(AlphaInventoryTracker.class)) {
+            userConnection.get(AlphaInventoryTracker.class).setCreativeMode(true);
+        }
+        if (userConnection.has(TimeLockStorage.class)) {
+            userConnection.get(TimeLockStorage.class).setTime(6000L);
+        }
     }
 
 }

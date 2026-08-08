@@ -25,7 +25,7 @@ import com.viaversion.viaversion.util.IdAndData;
 import net.raphimc.vialegacy.api.data.BlockList1_6;
 import net.raphimc.vialegacy.api.data.ItemList1_6;
 
-public class ClassicBlocks {
+public final class ClassicBlocks {
 
     public static final int AIR = 0;
     public static final int STONE = 1;
@@ -78,108 +78,119 @@ public class ClassicBlocks {
     public static final int MOSSY_COBBLESTONE = 48;
     public static final int OBSIDIAN = 49;
 
-    public static Int2ObjectMap<IdAndData> MAPPING = new Int2ObjectOpenHashMap<>(50, 0.99F);
-    public static Object2IntMap<IdAndData> REVERSE_MAPPING = new Object2IntOpenHashMap<>(42, 0.99F);
+    public static final Int2ObjectMap<IdAndData> MAPPING = new Int2ObjectOpenHashMap<>(50, 0.99F);
+    public static final Object2IntMap<IdAndData> REVERSE_MAPPING = new Object2IntOpenHashMap<>(42, 0.99F);
 
     static {
-        MAPPING.defaultReturnValue(new IdAndData(BlockList1_6.stone.blockId(), 0));
+        MAPPING.defaultReturnValue(new IdAndData(BlockList1_6.STONE, 0));
         REVERSE_MAPPING.defaultReturnValue(STONE);
 
         MAPPING.put(AIR, new IdAndData(0, 0));
-        MAPPING.put(STONE, new IdAndData(BlockList1_6.stone.blockId(), 0));
-        MAPPING.put(GRASS, new IdAndData(BlockList1_6.grass.blockId(), 0));
-        MAPPING.put(DIRT, new IdAndData(BlockList1_6.dirt.blockId(), 0));
-        MAPPING.put(COBBLESTONE, new IdAndData(BlockList1_6.cobblestone.blockId(), 0));
-        MAPPING.put(WOOD, new IdAndData(BlockList1_6.planks.blockId(), 0));
-        MAPPING.put(SAPLING, new IdAndData(BlockList1_6.sapling.blockId(), 0));
-        MAPPING.put(BEDROCK, new IdAndData(BlockList1_6.bedrock.blockId(), 0));
-        MAPPING.put(WATER, new IdAndData(BlockList1_6.waterMoving.blockId(), 0));
-        MAPPING.put(STATIONARY_WATER, new IdAndData(BlockList1_6.waterStill.blockId(), 0));
-        MAPPING.put(LAVA, new IdAndData(BlockList1_6.lavaMoving.blockId(), 0));
-        MAPPING.put(STATIONARY_LAVA, new IdAndData(BlockList1_6.lavaStill.blockId(), 0));
-        MAPPING.put(SAND, new IdAndData(BlockList1_6.sand.blockId(), 0));
-        MAPPING.put(GRAVEL, new IdAndData(BlockList1_6.gravel.blockId(), 0));
-        MAPPING.put(GOLD_ORE, new IdAndData(BlockList1_6.oreGold.blockId(), 0));
-        MAPPING.put(IRON_ORE, new IdAndData(BlockList1_6.oreIron.blockId(), 0));
-        MAPPING.put(COAL_ORE, new IdAndData(BlockList1_6.oreCoal.blockId(), 0));
-        MAPPING.put(LOG, new IdAndData(BlockList1_6.wood.blockId(), 0));
-        MAPPING.put(LEAVES, new IdAndData(BlockList1_6.leaves.blockId(), 0));
-        MAPPING.put(SPONGE, new IdAndData(BlockList1_6.sponge.blockId(), 0));
-        MAPPING.put(GLASS, new IdAndData(BlockList1_6.glass.blockId(), 0));
-        MAPPING.put(RED_WOOL, new IdAndData(BlockList1_6.cloth.blockId(), 14));
-        MAPPING.put(ORANGE_WOOL, new IdAndData(BlockList1_6.cloth.blockId(), 1));
-        MAPPING.put(YELLOW_WOOL, new IdAndData(BlockList1_6.cloth.blockId(), 4));
-        MAPPING.put(LIME_WOOL, new IdAndData(BlockList1_6.cloth.blockId(), 5));
-        MAPPING.put(GREEN_WOOL, new IdAndData(BlockList1_6.cloth.blockId(), 13));
-        MAPPING.put(TEAL_WOOL, new IdAndData(BlockList1_6.cloth.blockId(), 5));
-        MAPPING.put(AQUA_BLUE_WOOL, new IdAndData(BlockList1_6.cloth.blockId(), 3));
-        MAPPING.put(CYAN_WOOL, new IdAndData(BlockList1_6.cloth.blockId(), 9));
-        MAPPING.put(BLUE_WOOL, new IdAndData(BlockList1_6.cloth.blockId(), 11));
-        MAPPING.put(INDIGO_WOOL, new IdAndData(BlockList1_6.cloth.blockId(), 10));
-        MAPPING.put(VIOLET_WOOL, new IdAndData(BlockList1_6.cloth.blockId(), 2));
-        MAPPING.put(MAGENTA_WOOL, new IdAndData(BlockList1_6.cloth.blockId(), 2));
-        MAPPING.put(PINK_WOOL, new IdAndData(BlockList1_6.cloth.blockId(), 6));
-        MAPPING.put(BLACK_WOOL, new IdAndData(BlockList1_6.cloth.blockId(), 7));
-        MAPPING.put(GRAY_WOOL, new IdAndData(BlockList1_6.cloth.blockId(), 8));
-        MAPPING.put(WHITE_WOOL, new IdAndData(BlockList1_6.cloth.blockId(), 0));
-        MAPPING.put(DANDELION, new IdAndData(BlockList1_6.plantYellow.blockId(), 0));
-        MAPPING.put(ROSE, new IdAndData(BlockList1_6.plantRed.blockId(), 0));
-        MAPPING.put(BROWN_MUSHROOM, new IdAndData(BlockList1_6.mushroomBrown.blockId(), 0));
-        MAPPING.put(RED_MUSHROOM, new IdAndData(BlockList1_6.mushroomRed.blockId(), 0));
-        MAPPING.put(GOLD_BLOCK, new IdAndData(BlockList1_6.blockGold.blockId(), 0));
-        MAPPING.put(IRON_BLOCK, new IdAndData(BlockList1_6.blockIron.blockId(), 0));
-        MAPPING.put(DOUBLE_SLAB, new IdAndData(BlockList1_6.stoneDoubleSlab.blockId(), 0));
-        MAPPING.put(SLAB, new IdAndData(BlockList1_6.stoneSingleSlab.blockId(), 0));
-        MAPPING.put(BRICK, new IdAndData(BlockList1_6.brick.blockId(), 0));
-        MAPPING.put(TNT, new IdAndData(BlockList1_6.tnt.blockId(), 0));
-        MAPPING.put(BOOKSHELF, new IdAndData(BlockList1_6.bookShelf.blockId(), 0));
-        MAPPING.put(MOSSY_COBBLESTONE, new IdAndData(BlockList1_6.cobblestoneMossy.blockId(), 0));
-        MAPPING.put(OBSIDIAN, new IdAndData(BlockList1_6.obsidian.blockId(), 0));
+        MAPPING.put(STONE, new IdAndData(BlockList1_6.STONE, 0));
+        MAPPING.put(GRASS, new IdAndData(BlockList1_6.GRASS, 0));
+        MAPPING.put(DIRT, new IdAndData(BlockList1_6.DIRT, 0));
+        MAPPING.put(COBBLESTONE, new IdAndData(BlockList1_6.COBBLESTONE, 0));
+        MAPPING.put(WOOD, new IdAndData(BlockList1_6.PLANKS, 0));
+        MAPPING.put(SAPLING, new IdAndData(BlockList1_6.SAPLING, 0));
+        MAPPING.put(BEDROCK, new IdAndData(BlockList1_6.BEDROCK, 0));
+        MAPPING.put(WATER, new IdAndData(BlockList1_6.WATER_MOVING, 0));
+        MAPPING.put(STATIONARY_WATER, new IdAndData(BlockList1_6.WATER_STILL, 0));
+        MAPPING.put(LAVA, new IdAndData(BlockList1_6.LAVA_MOVING, 0));
+        MAPPING.put(STATIONARY_LAVA, new IdAndData(BlockList1_6.LAVA_STILL, 0));
+        MAPPING.put(SAND, new IdAndData(BlockList1_6.SAND, 0));
+        MAPPING.put(GRAVEL, new IdAndData(BlockList1_6.GRAVEL, 0));
+        MAPPING.put(GOLD_ORE, new IdAndData(BlockList1_6.ORE_GOLD, 0));
+        MAPPING.put(IRON_ORE, new IdAndData(BlockList1_6.ORE_IRON, 0));
+        MAPPING.put(COAL_ORE, new IdAndData(BlockList1_6.ORE_COAL, 0));
+        MAPPING.put(LOG, new IdAndData(BlockList1_6.WOOD, 0));
+        MAPPING.put(LEAVES, new IdAndData(BlockList1_6.LEAVES, 0));
+        MAPPING.put(SPONGE, new IdAndData(BlockList1_6.SPONGE, 0));
+        MAPPING.put(GLASS, new IdAndData(BlockList1_6.GLASS, 0));
+        MAPPING.put(RED_WOOL, new IdAndData(BlockList1_6.CLOTH, 14));
+        MAPPING.put(ORANGE_WOOL, new IdAndData(BlockList1_6.CLOTH, 1));
+        MAPPING.put(YELLOW_WOOL, new IdAndData(BlockList1_6.CLOTH, 4));
+        MAPPING.put(LIME_WOOL, new IdAndData(BlockList1_6.CLOTH, 5));
+        MAPPING.put(GREEN_WOOL, new IdAndData(BlockList1_6.CLOTH, 13));
+        MAPPING.put(TEAL_WOOL, new IdAndData(BlockList1_6.CLOTH, 5));
+        MAPPING.put(AQUA_BLUE_WOOL, new IdAndData(BlockList1_6.CLOTH, 3));
+        MAPPING.put(CYAN_WOOL, new IdAndData(BlockList1_6.CLOTH, 9));
+        MAPPING.put(BLUE_WOOL, new IdAndData(BlockList1_6.CLOTH, 11));
+        MAPPING.put(INDIGO_WOOL, new IdAndData(BlockList1_6.CLOTH, 10));
+        MAPPING.put(VIOLET_WOOL, new IdAndData(BlockList1_6.CLOTH, 2));
+        MAPPING.put(MAGENTA_WOOL, new IdAndData(BlockList1_6.CLOTH, 2));
+        MAPPING.put(PINK_WOOL, new IdAndData(BlockList1_6.CLOTH, 6));
+        MAPPING.put(BLACK_WOOL, new IdAndData(BlockList1_6.CLOTH, 7));
+        MAPPING.put(GRAY_WOOL, new IdAndData(BlockList1_6.CLOTH, 8));
+        MAPPING.put(WHITE_WOOL, new IdAndData(BlockList1_6.CLOTH, 0));
+        MAPPING.put(DANDELION, new IdAndData(BlockList1_6.PLANT_YELLOW, 0));
+        MAPPING.put(ROSE, new IdAndData(BlockList1_6.PLANT_RED, 0));
+        MAPPING.put(BROWN_MUSHROOM, new IdAndData(BlockList1_6.MUSHROOM_BROWN, 0));
+        MAPPING.put(RED_MUSHROOM, new IdAndData(BlockList1_6.MUSHROOM_RED, 0));
+        MAPPING.put(GOLD_BLOCK, new IdAndData(BlockList1_6.BLOCK_GOLD, 0));
+        MAPPING.put(IRON_BLOCK, new IdAndData(BlockList1_6.BLOCK_IRON, 0));
+        MAPPING.put(DOUBLE_SLAB, new IdAndData(BlockList1_6.STONE_DOUBLE_SLAB, 0));
+        MAPPING.put(SLAB, new IdAndData(BlockList1_6.STONE_SINGLE_SLAB, 0));
+        MAPPING.put(BRICK, new IdAndData(BlockList1_6.BRICK, 0));
+        MAPPING.put(TNT, new IdAndData(BlockList1_6.TNT, 0));
+        MAPPING.put(BOOKSHELF, new IdAndData(BlockList1_6.BOOK_SHELF, 0));
+        MAPPING.put(MOSSY_COBBLESTONE, new IdAndData(BlockList1_6.COBBLESTONE_MOSSY, 0));
+        MAPPING.put(OBSIDIAN, new IdAndData(BlockList1_6.OBSIDIAN, 0));
 
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.stone.blockId(), 0), STONE);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.grass.blockId(), 0), GRASS); // normally not placeable
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.dirt.blockId(), 0), DIRT);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.cobblestone.blockId(), 0), COBBLESTONE);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.planks.blockId(), 0), WOOD);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.sapling.blockId(), 0), SAPLING);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.bedrock.blockId(), 0), BEDROCK); // normally not placeable
-        REVERSE_MAPPING.put(new IdAndData(ItemList1_6.bucketWater.itemId(), 0), STATIONARY_WATER); // normally not placeable
-        REVERSE_MAPPING.put(new IdAndData(ItemList1_6.bucketLava.itemId(), 0), STATIONARY_LAVA); // normally not placeable
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.sand.blockId(), 0), SAND);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.gravel.blockId(), 0), GRAVEL);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.oreGold.blockId(), 0), GOLD_ORE);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.oreIron.blockId(), 0), IRON_ORE);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.oreCoal.blockId(), 0), COAL_ORE);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.wood.blockId(), 0), LOG);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.leaves.blockId(), 0), LEAVES);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.sponge.blockId(), 0), SPONGE);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.glass.blockId(), 0), GLASS);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.plantYellow.blockId(), 0), DANDELION);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.plantRed.blockId(), 0), ROSE);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.mushroomBrown.blockId(), 0), BROWN_MUSHROOM);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.mushroomRed.blockId(), 0), RED_MUSHROOM);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.cloth.blockId(), 14), RED_WOOL);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.cloth.blockId(), 1), ORANGE_WOOL);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.cloth.blockId(), 4), YELLOW_WOOL);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.cloth.blockId(), 5), LIME_WOOL);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.cloth.blockId(), 13), GREEN_WOOL);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.cloth.blockId(), 3), AQUA_BLUE_WOOL);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.cloth.blockId(), 9), CYAN_WOOL);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.cloth.blockId(), 11), BLUE_WOOL);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.cloth.blockId(), 10), INDIGO_WOOL);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.cloth.blockId(), 2), MAGENTA_WOOL);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.cloth.blockId(), 6), PINK_WOOL);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.cloth.blockId(), 7), BLACK_WOOL);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.cloth.blockId(), 8), GRAY_WOOL);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.cloth.blockId(), 0), WHITE_WOOL);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.blockGold.blockId(), 0), GOLD_BLOCK);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.blockIron.blockId(), 0), IRON_BLOCK);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.stoneSingleSlab.blockId(), 0), SLAB);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.brick.blockId(), 0), BRICK);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.tnt.blockId(), 0), TNT);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.bookShelf.blockId(), 0), BOOKSHELF);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.cobblestoneMossy.blockId(), 0), MOSSY_COBBLESTONE);
-        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.obsidian.blockId(), 0), OBSIDIAN);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.STONE, 0), STONE);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.GRASS, 0), GRASS); // normally not placeable
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.DIRT, 0), DIRT);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.COBBLESTONE, 0), COBBLESTONE);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.PLANKS, 0), WOOD);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.SAPLING, 0), SAPLING);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.BEDROCK, 0), BEDROCK); // normally not placeable
+        REVERSE_MAPPING.put(new IdAndData(ItemList1_6.BUCKET_WATER, 0), STATIONARY_WATER); // normally not placeable
+        REVERSE_MAPPING.put(new IdAndData(ItemList1_6.BUCKET_LAVA, 0), STATIONARY_LAVA); // normally not placeable
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.SAND, 0), SAND);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.GRAVEL, 0), GRAVEL);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.ORE_GOLD, 0), GOLD_ORE);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.ORE_IRON, 0), IRON_ORE);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.ORE_COAL, 0), COAL_ORE);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.WOOD, 0), LOG);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.LEAVES, 0), LEAVES);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.SPONGE, 0), SPONGE);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.GLASS, 0), GLASS);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.PLANT_YELLOW, 0), DANDELION);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.PLANT_RED, 0), ROSE);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.MUSHROOM_BROWN, 0), BROWN_MUSHROOM);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.MUSHROOM_RED, 0), RED_MUSHROOM);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.CLOTH, 14), RED_WOOL);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.CLOTH, 1), ORANGE_WOOL);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.CLOTH, 4), YELLOW_WOOL);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.CLOTH, 5), LIME_WOOL);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.CLOTH, 13), GREEN_WOOL);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.CLOTH, 3), AQUA_BLUE_WOOL);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.CLOTH, 9), CYAN_WOOL);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.CLOTH, 11), BLUE_WOOL);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.CLOTH, 10), INDIGO_WOOL);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.CLOTH, 2), MAGENTA_WOOL);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.CLOTH, 6), PINK_WOOL);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.CLOTH, 7), BLACK_WOOL);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.CLOTH, 8), GRAY_WOOL);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.CLOTH, 0), WHITE_WOOL);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.BLOCK_GOLD, 0), GOLD_BLOCK);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.BLOCK_IRON, 0), IRON_BLOCK);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.STONE_SINGLE_SLAB, 0), SLAB);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.BRICK, 0), BRICK);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.TNT, 0), TNT);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.BOOK_SHELF, 0), BOOKSHELF);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.COBBLESTONE_MOSSY, 0), MOSSY_COBBLESTONE);
+        REVERSE_MAPPING.put(new IdAndData(BlockList1_6.OBSIDIAN, 0), OBSIDIAN);
+    }
+
+    private ClassicBlocks() {
+    }
+
+    public static Int2ObjectMap<IdAndData> getMapping() {
+        return MAPPING;
+    }
+
+    public static Object2IntMap<IdAndData> getReverseMapping() {
+        return REVERSE_MAPPING;
     }
 
 }

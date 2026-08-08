@@ -54,7 +54,7 @@ public class Protocolb1_5_0_2Tob1_6_0_6 extends StatelessProtocol<ClientboundPac
             @Override
             public void register() {
                 map(Types.LONG); // time
-                handler(wrapper -> wrapper.user().get(WorldTimeStorage.class).time = wrapper.get(Types.LONG, 0));
+                handler(wrapper -> wrapper.user().get(WorldTimeStorage.class).setTime(wrapper.get(Types.LONG, 0)));
             }
         });
         this.registerClientbound(ClientboundPacketsb1_5.RESPAWN, new PacketHandlers() {
@@ -92,14 +92,16 @@ public class Protocolb1_5_0_2Tob1_6_0_6 extends StatelessProtocol<ClientboundPac
                     BlockPosition pos = wrapper.get(Types1_7_6.BLOCK_POSITION_UBYTE, 0);
                     IdAndData block = wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos);
                     final Item item = wrapper.get(Types1_4_2.NBTLESS_ITEM, 0);
-                    if (block.getId() == BlockList1_6.bed.blockId()) {
+                    if (block.getId() == BlockList1_6.BED) {
                         final byte[][] headBlockToFootBlock = {{0, 1}, {-1, 0}, {0, -1}, {1, 0}};
                         final boolean isFoot = (block.getData() & 8) != 0;
                         if (!isFoot) {
                             final int bedDirection = block.getData() & 3;
                             pos = new BlockPosition(pos.x() + headBlockToFootBlock[bedDirection][0], pos.y(), pos.z() + headBlockToFootBlock[bedDirection][1]);
                             block = wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos);
-                            if (block.getId() != BlockList1_6.bed.blockId()) return;
+                            if (block.getId() != BlockList1_6.BED) {
+                                return;
+                            }
                         }
 
                         final boolean isOccupied = (block.getData() & 4) != 0;
@@ -110,17 +112,25 @@ public class Protocolb1_5_0_2Tob1_6_0_6 extends StatelessProtocol<ClientboundPac
                             return;
                         }
 
-                        int dayTime = (int) (wrapper.user().get(WorldTimeStorage.class).time % 24000L);
+                        final int dayTime = (int) (wrapper.user().get(WorldTimeStorage.class).getTime() % 24000L);
                         float dayPercent = (dayTime + 1.0F) / 24000F - 0.25F;
-                        if (dayPercent < 0.0F) dayPercent++;
-                        if (dayPercent > 1.0F) dayPercent--;
+                        if (dayPercent < 0.0F) {
+                            dayPercent++;
+                        }
+                        if (dayPercent > 1.0F) {
+                            dayPercent--;
+                        }
 
                         final float tempDayPercent = dayPercent;
                         dayPercent = 1.0F - (float) ((Math.cos((double) dayPercent * Math.PI) + 1.0D) / 2D);
                         dayPercent = tempDayPercent + (dayPercent - tempDayPercent) / 3F;
                         float skyRotation = (float) (1.0F - (Math.cos(dayPercent * Math.PI * 2.0F) * 2.0F + 0.5F));
-                        if (skyRotation < 0.0F) skyRotation = 0.0F;
-                        if (skyRotation > 1.0F) skyRotation = 1.0F;
+                        if (skyRotation < 0.0F) {
+                            skyRotation = 0.0F;
+                        }
+                        if (skyRotation > 1.0F) {
+                            skyRotation = 1.0F;
+                        }
 
                         final boolean isDayTime = (int) (skyRotation * 11F) < 4;
 
@@ -131,23 +141,23 @@ public class Protocolb1_5_0_2Tob1_6_0_6 extends StatelessProtocol<ClientboundPac
                             return;
                         }
 
-                        if (Math.abs(playerInfoStorage.posX - (double) pos.x()) > 3D || Math.abs(playerInfoStorage.posY - (double) pos.y()) > 2D || Math.abs(playerInfoStorage.posZ - (double) pos.z()) > 3D) {
+                        if (Math.abs(playerInfoStorage.getPosX() - (double) pos.x()) > 3D || Math.abs(playerInfoStorage.getPosY() - (double) pos.y()) > 2D || Math.abs(playerInfoStorage.getPosZ() - (double) pos.z()) > 3D) {
                             return;
                         }
 
                         final PacketWrapper useBed = PacketWrapper.create(ClientboundPacketsb1_7.PLAYER_SLEEP, wrapper.user());
-                        useBed.write(Types.INT, playerInfoStorage.entityId); // entity id
+                        useBed.write(Types.INT, playerInfoStorage.getEntityId()); // entity id
                         useBed.write(Types.BYTE, (byte) 0); // magic value (always 0)
                         useBed.write(Types1_7_6.BLOCK_POSITION_BYTE, pos); // position
                         useBed.send(Protocolb1_5_0_2Tob1_6_0_6.class);
-                    } else if (block.getId() == BlockList1_6.jukebox.blockId()) {
+                    } else if (block.getId() == BlockList1_6.JUKEBOX) {
                         if (block.getData() > 0) {
                             final PacketWrapper effect = PacketWrapper.create(ClientboundPacketsb1_7.LEVEL_EVENT, wrapper.user());
                             effect.write(Types.INT, 1005); // effect id
                             effect.write(Types1_7_6.BLOCK_POSITION_UBYTE, pos); // position
                             effect.write(Types.INT, 0); // data
                             effect.send(Protocolb1_5_0_2Tob1_6_0_6.class);
-                        } else if (item != null && (item.identifier() == ItemList1_6.record13.itemId() || item.identifier() == ItemList1_6.recordCat.itemId())) {
+                        } else if (item != null && (item.identifier() == ItemList1_6.RECORD_13 || item.identifier() == ItemList1_6.RECORD_CAT)) {
                             final PacketWrapper effect = PacketWrapper.create(ClientboundPacketsb1_7.LEVEL_EVENT, wrapper.user());
                             effect.write(Types.INT, 1005); // effect id
                             effect.write(Types1_7_6.BLOCK_POSITION_UBYTE, pos); // position
@@ -161,12 +171,12 @@ public class Protocolb1_5_0_2Tob1_6_0_6 extends StatelessProtocol<ClientboundPac
     }
 
     @Override
-    public void register(ViaProviders providers) {
+    public void register(final ViaProviders providers) {
         Via.getPlatform().runRepeatingSync(new TimeTrackTask(), 1L);
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolb1_5_0_2Tob1_6_0_6.class, ClientboundPacketsb1_5::getPacket));
 
         userConnection.put(new WorldTimeStorage());

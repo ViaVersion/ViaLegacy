@@ -27,7 +27,7 @@ public class PreNettySplitter implements StorableObject {
     private final IntFunction<PreNettyPacketType> packetTypeSupplier;
     private final Class<? extends Protocol<?, ?, ?, ?>> protocolClass;
 
-    public PreNettySplitter(Class<? extends Protocol<?, ?, ?, ?>> protocolClass, IntFunction<PreNettyPacketType> packetTypeSupplier) {
+    public PreNettySplitter(final Class<? extends Protocol<?, ?, ?, ?>> protocolClass, final IntFunction<PreNettyPacketType> packetTypeSupplier) {
         this.protocolClass = protocolClass;
         this.packetTypeSupplier = packetTypeSupplier;
     }

@@ -20,24 +20,33 @@ package net.raphimc.vialegacy.api.splitter;
 import io.netty.buffer.ByteBuf;
 import net.raphimc.vialegacy.protocol.release.r1_2_4_5tor1_3_1_2.data.NbtItemList1_2_4;
 
-public class PreNettyTypes {
+public final class PreNettyTypes {
 
-    public static void readString(final ByteBuf buffer) {
-        short s = buffer.readShort();
-        for (int i = 0; i < s; i++) buffer.readShort();
+    private PreNettyTypes() {
     }
 
-    public static void readUTF(final ByteBuf buffer) {
-        int l = buffer.readUnsignedShort();
-        for (int i = 0; i < l; i++) buffer.readByte();
+    public static void readString(final ByteBuf buffer) {
+        final short s = buffer.readShort();
+        for (int i = 0; i < s; i++) {
+            buffer.readShort();
+        }
+    }
+
+    public static void readUtf(final ByteBuf buffer) {
+        final int l = buffer.readUnsignedShort();
+        for (int i = 0; i < l; i++) {
+            buffer.readByte();
+        }
     }
 
     public static void readString64(final ByteBuf buffer) {
-        for (int i = 0; i < 64; i++) buffer.readByte();
+        for (int i = 0; i < 64; i++) {
+            buffer.readByte();
+        }
     }
 
     public static void readItemStack1_3_1(final ByteBuf buffer) {
-        short s = buffer.readShort();
+        final short s = buffer.readShort();
         if (s >= 0) {
             buffer.readByte();
             buffer.readShort();
@@ -46,7 +55,7 @@ public class PreNettyTypes {
     }
 
     public static void readItemStack1_0(final ByteBuf buffer) {
-        short s = buffer.readShort();
+        final short s = buffer.readShort();
         if (s >= 0) {
             buffer.readByte();
             buffer.readShort();
@@ -57,7 +66,7 @@ public class PreNettyTypes {
     }
 
     public static void readItemStackb1_2(final ByteBuf buffer) {
-        short s = buffer.readShort();
+        final short s = buffer.readShort();
         if (s >= 0) {
             buffer.readByte();
             buffer.readShort();
@@ -65,7 +74,7 @@ public class PreNettyTypes {
     }
 
     public static void readItemStackb1_1(final ByteBuf buffer) {
-        short s = buffer.readShort();
+        final short s = buffer.readShort();
         if (s >= 0) {
             buffer.readByte();
             buffer.readByte();
@@ -73,22 +82,28 @@ public class PreNettyTypes {
     }
 
     public static void readByteArray(final ByteBuf buffer) {
-        short s = buffer.readShort();
-        for (int i = 0; i < s; i++) buffer.readByte();
+        final short s = buffer.readShort();
+        for (int i = 0; i < s; i++) {
+            buffer.readByte();
+        }
     }
 
     public static void readByteArray1024(final ByteBuf buffer) {
-        for (int i = 0; i < 1024; i++) buffer.readByte();
+        for (int i = 0; i < 1024; i++) {
+            buffer.readByte();
+        }
     }
 
     public static void readTag(final ByteBuf buffer) {
-        int s = buffer.readShort();
-        for (int i = 0; i < s; i++) buffer.readByte();
+        final int s = buffer.readShort();
+        for (int i = 0; i < s; i++) {
+            buffer.readByte();
+        }
     }
 
     public static void readEntityDataList1_4_4(final ByteBuf buffer) {
         for (byte b = buffer.readByte(); b != 127; b = buffer.readByte()) {
-            int i = (b & 224) >> 5;
+            final int i = (b & 224) >> 5;
             switch (i) {
                 case 0 -> buffer.readByte();
                 case 1 -> buffer.readShort();
@@ -107,7 +122,7 @@ public class PreNettyTypes {
 
     public static void readEntityDataList1_4_2(final ByteBuf buffer) {
         for (byte b = buffer.readByte(); b != 127; b = buffer.readByte()) {
-            int i = (b & 224) >> 5;
+            final int i = (b & 224) >> 5;
             switch (i) {
                 case 0 -> buffer.readByte();
                 case 1 -> buffer.readShort();
@@ -115,7 +130,7 @@ public class PreNettyTypes {
                 case 3 -> buffer.readFloat();
                 case 4 -> readString(buffer);
                 case 5 -> {
-                    short x = buffer.readShort();
+                    final short x = buffer.readShort();
                     if (x > -1) {
                         buffer.readByte();
                         buffer.readShort();
@@ -132,7 +147,7 @@ public class PreNettyTypes {
 
     public static void readEntityDataListb1_5(final ByteBuf buffer) {
         for (byte b = buffer.readByte(); b != 127; b = buffer.readByte()) {
-            int i = (b & 224) >> 5;
+            final int i = (b & 224) >> 5;
             switch (i) {
                 case 0 -> buffer.readByte();
                 case 1 -> buffer.readShort();
@@ -155,13 +170,13 @@ public class PreNettyTypes {
 
     public static void readEntityDataListb1_3(final ByteBuf buffer) {
         for (byte b = buffer.readByte(); b != 127; b = buffer.readByte()) {
-            int i = (b & 224) >> 5;
+            final int i = (b & 224) >> 5;
             switch (i) {
                 case 0 -> buffer.readByte();
                 case 1 -> buffer.readShort();
                 case 2 -> buffer.readInt();
                 case 3 -> buffer.readFloat();
-                case 4 -> readUTF(buffer);
+                case 4 -> readUtf(buffer);
                 case 5 -> {
                     buffer.readShort();
                     buffer.readByte();
@@ -178,13 +193,13 @@ public class PreNettyTypes {
 
     public static void readEntityDataListb1_2(final ByteBuf buffer) {
         for (byte b = buffer.readByte(); b != 127; b = buffer.readByte()) {
-            int i = (b & 224) >> 5;
+            final int i = (b & 224) >> 5;
             switch (i) {
                 case 0 -> buffer.readByte();
                 case 1 -> buffer.readShort();
                 case 2 -> buffer.readInt();
                 case 3 -> buffer.readFloat();
-                case 4 -> readUTF(buffer);
+                case 4 -> readUtf(buffer);
                 case 5 -> {
                     buffer.readShort();
                     buffer.readByte();

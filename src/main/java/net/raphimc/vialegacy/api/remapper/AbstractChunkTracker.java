@@ -19,7 +19,12 @@ package net.raphimc.vialegacy.api.remapper;
 
 import com.viaversion.viaversion.api.connection.StorableObject;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
-import com.viaversion.viaversion.api.minecraft.chunks.*;
+import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
+import com.viaversion.viaversion.api.minecraft.chunks.DataPalette;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2IntMap;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2IntOpenHashMap;
 import com.viaversion.viaversion.libs.fastutil.ints.IntOpenHashSet;
@@ -67,11 +72,15 @@ public abstract class AbstractChunkTracker implements StorableObject {
         if (!this.toTrack.isEmpty()) {
             for (int i = 0; i < chunk.getSections().length; i++) {
                 final ChunkSection section = chunk.getSections()[i];
-                if (section == null) continue;
+                if (section == null) {
+                    continue;
+                }
                 copyChunk.getSections()[i] = null;
 
                 final DataPalette palette = section.palette(PaletteType.BLOCKS);
-                if (!this.hasRemappableBlocks(palette)) continue;
+                if (!this.hasRemappableBlocks(palette)) {
+                    continue;
+                }
 
                 final ChunkSection copySection = copyChunk.getSections()[i] = new ChunkSectionImpl(false);
                 final DataPalette copyPalette = copySection.palette(PaletteType.BLOCKS);
@@ -93,14 +102,18 @@ public abstract class AbstractChunkTracker implements StorableObject {
         // Remap
         for (int i = 0; i < chunk.getSections().length; i++) {
             final ChunkSection section = chunk.getSections()[i];
-            if (section == null) continue;
+            if (section == null) {
+                continue;
+            }
             final DataPalette palette = section.palette(PaletteType.BLOCKS);
 
             for (Int2IntMap.Entry entry : this.replacements.int2IntEntrySet()) {
                 palette.replaceId(entry.getIntKey(), entry.getIntValue());
             }
 
-            if (!this.hasRemappableBlocks(palette)) continue;
+            if (!this.hasRemappableBlocks(palette)) {
+                continue;
+            }
 
             for (int x = 0; x < 16; x++) {
                 for (int y = 0; y < 16; y++) {
@@ -176,7 +189,9 @@ public abstract class AbstractChunkTracker implements StorableObject {
 
     public IdAndData getBlockNotNull(final int x, final int y, final int z) {
         IdAndData block = this.getBlock(x, y, z);
-        if (block == null) block = new IdAndData(0, 0);
+        if (block == null) {
+            block = new IdAndData(0, 0);
+        }
         return block;
     }
 
@@ -187,7 +202,9 @@ public abstract class AbstractChunkTracker implements StorableObject {
     public IdAndData getBlock(final int x, final int y, final int z) {
         final Chunk chunk = this.chunks.get(new ChunkCoord(x >> 4, z >> 4));
         if (chunk != null) {
-            if (y < 0 || y >> 4 > chunk.getSections().length - 1) return null;
+            if (y < 0 || y >> 4 > chunk.getSections().length - 1) {
+                return null;
+            }
             final ChunkSection section = chunk.getSections()[y >> 4];
             if (section != null) {
                 return IdAndData.fromRawData(section.palette(PaletteType.BLOCKS).idAt(x & 15, y & 15, z & 15));
@@ -207,8 +224,12 @@ public abstract class AbstractChunkTracker implements StorableObject {
     }
 
     private boolean hasRemappableBlocks(final DataPalette palette) {
-        if (this.trackAll) return true;
-        if (this.toTrack.isEmpty()) return false;
+        if (this.trackAll) {
+            return true;
+        }
+        if (this.toTrack.isEmpty()) {
+            return false;
+        }
 
         boolean hasTrackableBlocks = false;
         for (int i = 0; i < palette.size(); i++) {

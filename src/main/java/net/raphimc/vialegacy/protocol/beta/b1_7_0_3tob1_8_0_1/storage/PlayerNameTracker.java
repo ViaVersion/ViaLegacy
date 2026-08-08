@@ -23,6 +23,10 @@ import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectMap;
 
 public class PlayerNameTracker implements StorableObject {
 
-    public final Int2ObjectMap<String> names = new Int2ObjectArrayMap<>();
+    private final Int2ObjectMap<String> names = new Int2ObjectArrayMap<>();
+
+    public Int2ObjectMap<String> getNames() {
+        return this.names;
+    }
 
 }

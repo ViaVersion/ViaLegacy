@@ -45,12 +45,12 @@ public class LegacyNibbleArray extends NibbleArray {
     }
 
     @Override
-    public byte get(int x, int y, int z) {
+    public byte get(final int x, final int y, final int z) {
         return this.get(this.index(x, y, z));
     }
 
     @Override
-    public void set(int x, int y, int z, int value) {
+    public void set(final int x, final int y, final int z, final int value) {
         this.set(this.index(x, y, z), value);
     }
 

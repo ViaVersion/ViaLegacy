@@ -43,7 +43,7 @@ import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.types.Types1_7_6;
 
 public class Protocolb1_1_2Tob1_2_0_2 extends StatelessProtocol<ClientboundPacketsb1_1, ClientboundPacketsb1_2, ServerboundPacketsb1_1, ServerboundPacketsb1_2> {
 
-    private final BlockDataRewriter BLOCK_DATA_REWRITER = new BlockDataRewriter();
+    private final BlockDataRewriter blockDataRewriter = new BlockDataRewriter();
 
     public Protocolb1_1_2Tob1_2_0_2() {
         super(ClientboundPacketsb1_1.class, ClientboundPacketsb1_2.class, ServerboundPacketsb1_1.class, ServerboundPacketsb1_2.class);
@@ -68,7 +68,9 @@ public class Protocolb1_1_2Tob1_2_0_2 extends StatelessProtocol<ClientboundPacke
                 handler(wrapper -> {
                     final int entityId = wrapper.get(Types.INT, 0);
                     final byte animationId = wrapper.get(Types.BYTE, 0);
-                    if (animationId <= 2) return; // 1 - Swing | 2 - Hurt
+                    if (animationId <= 2) {
+                        return; // 1 - Swing | 2 - Hurt
+                    }
 
                     wrapper.cancel();
                     final EntityFlagStorage entityFlagStorage = wrapper.user().get(EntityFlagStorage.class);
@@ -124,7 +126,7 @@ public class Protocolb1_1_2Tob1_2_0_2 extends StatelessProtocol<ClientboundPacke
         this.registerClientbound(ClientboundPacketsb1_1.LEVEL_CHUNK, new PacketHandlers() {
             @Override
             public void register() {
-                handler(wrapper -> BLOCK_DATA_REWRITER.remapChunk(wrapper.passthrough(Types1_1.CHUNK))); // chunk
+                handler(wrapper -> Protocolb1_1_2Tob1_2_0_2.this.blockDataRewriter.remapChunk(wrapper.passthrough(Types1_1.CHUNK))); // chunk
             }
         });
         this.registerClientbound(ClientboundPacketsb1_1.CHUNK_BLOCKS_UPDATE, new PacketHandlers() {
@@ -133,7 +135,7 @@ public class Protocolb1_1_2Tob1_2_0_2 extends StatelessProtocol<ClientboundPacke
                 map(Types.INT); // chunkX
                 map(Types.INT); // chunkZ
                 map(Types1_1.BLOCK_CHANGE_RECORD_ARRAY); // blockChangeRecords
-                handler(wrapper -> BLOCK_DATA_REWRITER.remapBlockChangeRecords(wrapper.get(Types1_1.BLOCK_CHANGE_RECORD_ARRAY, 0)));
+                handler(wrapper -> Protocolb1_1_2Tob1_2_0_2.this.blockDataRewriter.remapBlockChangeRecords(wrapper.get(Types1_1.BLOCK_CHANGE_RECORD_ARRAY, 0)));
             }
         });
         this.registerClientbound(ClientboundPacketsb1_1.BLOCK_UPDATE, new PacketHandlers() {
@@ -144,7 +146,7 @@ public class Protocolb1_1_2Tob1_2_0_2 extends StatelessProtocol<ClientboundPacke
                 map(Types.UNSIGNED_BYTE); // block data
                 handler(wrapper -> {
                     final IdAndData block = new IdAndData(wrapper.get(Types.UNSIGNED_BYTE, 0), wrapper.get(Types.UNSIGNED_BYTE, 1));
-                    BLOCK_DATA_REWRITER.remapBlock(block);
+                    Protocolb1_1_2Tob1_2_0_2.this.blockDataRewriter.remapBlock(block);
                     wrapper.set(Types.UNSIGNED_BYTE, 0, (short) block.getId());
                     wrapper.set(Types.UNSIGNED_BYTE, 1, (short) block.getData());
                 });
@@ -187,7 +189,7 @@ public class Protocolb1_1_2Tob1_2_0_2 extends StatelessProtocol<ClientboundPacke
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolb1_1_2Tob1_2_0_2.class, ClientboundPacketsb1_1::getPacket));
 
         userConnection.put(new EntityFlagStorage());

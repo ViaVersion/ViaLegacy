@@ -55,7 +55,7 @@ public class AlphaInventoryTracker extends StoredObject {
 
     final InventoryStorage inventoryStorage;
 
-    public AlphaInventoryTracker(UserConnection user) {
+    public AlphaInventoryTracker(final UserConnection user) {
         super(user);
         this.inventoryStorage = user.get(InventoryStorage.class);
         this.onRespawn();
@@ -70,16 +70,20 @@ public class AlphaInventoryTracker extends StoredObject {
         if (this.openWindowType == 1) { // crafting table
             for (int i = 1; i <= 9; i++) {
                 final Item item = this.openContainerItems[i];
-                if (item == null) continue;
+                if (item == null) {
+                    continue;
+                }
                 dropItem(this.user(), item, false);
                 this.openContainerItems[i] = null;
             }
         }
         for (int i = 0; i < 4; i++) {
-            final Item item = this.craftingInventory[i];
-            if (item == null) continue;
+            final Item item = this.getCraftingInventory()[i];
+            if (item == null) {
+                continue;
+            }
             dropItem(this.user(), item, false);
-            this.craftingInventory[i] = null;
+            this.getCraftingInventory()[i] = null;
         }
 
         if (this.cursorItem != null) {
@@ -112,22 +116,22 @@ public class AlphaInventoryTracker extends StoredObject {
             switch (windowId) {
                 case 0 -> {
                     slots = new Item[45];
-                    System.arraycopy(this.mainInventory, 0, slots, 36, 9);
-                    System.arraycopy(this.mainInventory, 9, slots, 9, 36 - 9);
-                    System.arraycopy(this.craftingInventory, 0, slots, 1, 4);
-                    System.arraycopy(reverseArray(this.armorInventory), 0, slots, 5, 4);
+                    System.arraycopy(this.getMainInventory(), 0, slots, 36, 9);
+                    System.arraycopy(this.getMainInventory(), 9, slots, 9, 36 - 9);
+                    System.arraycopy(this.getCraftingInventory(), 0, slots, 1, 4);
+                    System.arraycopy(reverseArray(this.getArmorInventory()), 0, slots, 5, 4);
                     isCraftingResultSlot = slot == 0; // crafting result slot
                     slotTakesItems = !isCraftingResultSlot;
                     slotStackLimit = slot >= 5 && slot <= 8 ? 1 : 64; // armor slots
                     if (isCraftingResultSlot) {
-                        slots[0] = CraftingManager.getResult(this.craftingInventory);
+                        slots[0] = CraftingManager.getResult(this.getCraftingInventory());
                     }
                 }
                 case InventoryStorage.WORKBENCH_WID -> {
                     slots = new Item[46];
                     System.arraycopy(this.openContainerItems, 0, slots, 0, 10);
-                    System.arraycopy(this.mainInventory, 0, slots, 37, 9);
-                    System.arraycopy(this.mainInventory, 9, slots, 10, 36 - 9);
+                    System.arraycopy(this.getMainInventory(), 0, slots, 37, 9);
+                    System.arraycopy(this.getMainInventory(), 9, slots, 10, 36 - 9);
                     isCraftingResultSlot = slot == 0; // crafting result slot
                     slotTakesItems = !isCraftingResultSlot;
                     if (isCraftingResultSlot) {
@@ -138,14 +142,14 @@ public class AlphaInventoryTracker extends StoredObject {
                 case InventoryStorage.FURNACE_WID -> {
                     slots = new Item[39];
                     System.arraycopy(this.openContainerItems, 0, slots, 0, 3);
-                    System.arraycopy(this.mainInventory, 0, slots, 30, 9);
-                    System.arraycopy(this.mainInventory, 9, slots, 3, 36 - 9);
+                    System.arraycopy(this.getMainInventory(), 0, slots, 30, 9);
+                    System.arraycopy(this.getMainInventory(), 9, slots, 3, 36 - 9);
                 }
                 case InventoryStorage.CHEST_WID -> {
                     slots = new Item[63];
                     System.arraycopy(this.openContainerItems, 0, slots, 0, 3 * 9);
-                    System.arraycopy(this.mainInventory, 0, slots, 54, 9);
-                    System.arraycopy(this.mainInventory, 9, slots, 27, 36 - 9);
+                    System.arraycopy(this.getMainInventory(), 0, slots, 54, 9);
+                    System.arraycopy(this.getMainInventory(), 9, slots, 27, 36 - 9);
                 }
             }
 
@@ -154,14 +158,20 @@ public class AlphaInventoryTracker extends StoredObject {
                 if (itm == null) { // click empty slot
                     if (this.cursorItem != null && slotTakesItems) { // with item on cursor
                         int amount = leftClick ? this.cursorItem.amount() : 1;
-                        if (amount > slotStackLimit) amount = slotStackLimit;
-                        slots[slot] = splitStack(this.cursorItem, amount);
+                        if (amount > slotStackLimit) {
+                            amount = slotStackLimit;
+                        }
+                        slots[slot] = this.splitStack(this.cursorItem, amount);
                     }
                 } else if (this.cursorItem == null) { // click filled slot with no item on cursor
                     int amount = leftClick ? itm.amount() : (itm.amount() + 1) / 2;
-                    if (isCraftingResultSlot) amount = itm.amount(); // crafting result slot does not support taking half the stack
-                    this.cursorItem = splitStack(itm, amount);
-                    if (isCraftingResultSlot) this.onCraftingResultPickup(windowId, slots);
+                    if (isCraftingResultSlot) {
+                        amount = itm.amount(); // crafting result slot does not support taking half the stack
+                    }
+                    this.cursorItem = this.splitStack(itm, amount);
+                    if (isCraftingResultSlot) {
+                        this.onCraftingResultPickup(windowId, slots);
+                    }
                 } else if (slotTakesItems) { // click filled slot with item on cursor
                     if (itm.identifier() != this.cursorItem.identifier()) { // items are different
                         if (this.cursorItem.amount() <= slotStackLimit) {
@@ -170,7 +180,9 @@ public class AlphaInventoryTracker extends StoredObject {
                         }
                     } else { // items are the same
                         int amount = leftClick ? this.cursorItem.amount() : 1;
-                        if (amount > slotStackLimit - itm.amount()) amount = slotStackLimit - itm.amount();
+                        if (amount > slotStackLimit - itm.amount()) {
+                            amount = slotStackLimit - itm.amount();
+                        }
                         if (amount > AlphaItems.getMaxStackSize(this.cursorItem.identifier()) - itm.amount()) {
                             amount = AlphaItems.getMaxStackSize(this.cursorItem.identifier()) - itm.amount();
                         }
@@ -178,41 +190,45 @@ public class AlphaInventoryTracker extends StoredObject {
                         itm.setAmount(itm.amount() + amount);
                     }
                 } else if (itm.identifier() == this.cursorItem.identifier() && AlphaItems.getMaxStackSize(this.cursorItem.identifier()) > 1) {
-                    int amount = itm.amount();
+                    final int amount = itm.amount();
                     if (amount > 0 && amount + this.cursorItem.amount() <= AlphaItems.getMaxStackSize(this.cursorItem.identifier())) {
                         itm.setAmount(itm.amount() - amount);
                         this.cursorItem.setAmount(this.cursorItem.amount() + amount);
-                        if (isCraftingResultSlot) this.onCraftingResultPickup(windowId, slots);
+                        if (isCraftingResultSlot) {
+                            this.onCraftingResultPickup(windowId, slots);
+                        }
                     }
                 }
 
                 for (int i = 0; i < slots.length; i++) {
                     final Item slotItem = slots[i];
-                    if (slotItem != null && slotItem.amount() == 0) slots[i] = null;
+                    if (slotItem != null && slotItem.amount() == 0) {
+                        slots[i] = null;
+                    }
                 }
 
                 switch (windowId) {
                     case 0 -> {
-                        System.arraycopy(slots, 36, this.mainInventory, 0, 9);
-                        System.arraycopy(slots, 9, this.mainInventory, 9, 36 - 9);
-                        System.arraycopy(slots, 1, this.craftingInventory, 0, 4);
-                        System.arraycopy(slots, 5, this.armorInventory, 0, 4);
-                        this.armorInventory = reverseArray(this.armorInventory);
+                        System.arraycopy(slots, 36, this.getMainInventory(), 0, 9);
+                        System.arraycopy(slots, 9, this.getMainInventory(), 9, 36 - 9);
+                        System.arraycopy(slots, 1, this.getCraftingInventory(), 0, 4);
+                        System.arraycopy(slots, 5, this.getArmorInventory(), 0, 4);
+                        this.setArmorInventory(reverseArray(this.getArmorInventory()));
                     }
                     case InventoryStorage.WORKBENCH_WID -> {
                         System.arraycopy(slots, 0, this.openContainerItems, 0, 10);
-                        System.arraycopy(slots, 37, this.mainInventory, 0, 9);
-                        System.arraycopy(slots, 10, this.mainInventory, 9, 36 - 9);
+                        System.arraycopy(slots, 37, this.getMainInventory(), 0, 9);
+                        System.arraycopy(slots, 10, this.getMainInventory(), 9, 36 - 9);
                     }
                     case InventoryStorage.FURNACE_WID -> {
                         System.arraycopy(slots, 0, this.openContainerItems, 0, 3);
-                        System.arraycopy(slots, 30, this.mainInventory, 0, 9);
-                        System.arraycopy(slots, 3, this.mainInventory, 9, 36 - 9);
+                        System.arraycopy(slots, 30, this.getMainInventory(), 0, 9);
+                        System.arraycopy(slots, 3, this.getMainInventory(), 9, 36 - 9);
                     }
                     case InventoryStorage.CHEST_WID -> {
                         System.arraycopy(slots, 0, this.openContainerItems, 0, 3 * 9);
-                        System.arraycopy(slots, 54, this.mainInventory, 0, 9);
-                        System.arraycopy(slots, 27, this.mainInventory, 9, 36 - 9);
+                        System.arraycopy(slots, 54, this.getMainInventory(), 0, 9);
+                        System.arraycopy(slots, 27, this.getMainInventory(), 9, 36 - 9);
                     }
                 }
                 this.updateInventory(windowId, slots);
@@ -220,9 +236,9 @@ public class AlphaInventoryTracker extends StoredObject {
                 boolean updateCraftResultSlot = false;
                 switch (windowId) {
                     case 0 -> {
-                        updateCraftResultSlot = !this.isEmpty(this.craftingInventory);
+                        updateCraftResultSlot = !this.isEmpty(this.getCraftingInventory());
                         if (updateCraftResultSlot) {
-                            slots[0] = CraftingManager.getResult(this.craftingInventory);
+                            slots[0] = CraftingManager.getResult(this.getCraftingInventory());
                         }
                     }
                     case InventoryStorage.WORKBENCH_WID -> {
@@ -234,7 +250,9 @@ public class AlphaInventoryTracker extends StoredObject {
                     }
                 }
 
-                if (updateCraftResultSlot) this.updateInventorySlot(windowId, (short) 0, slots[0]);
+                if (updateCraftResultSlot) {
+                    this.updateInventorySlot(windowId, (short) 0, slots[0]);
+                }
             } else {
                 this.updatePlayerInventory();
             }
@@ -247,10 +265,14 @@ public class AlphaInventoryTracker extends StoredObject {
     }
 
     public void onBlockPlace(final BlockPosition position, final short direction) {
-        if (this.creativeMode) return;
+        if (this.creativeMode) {
+            return;
+        }
 
-        final Item handItem = this.mainInventory[this.inventoryStorage.selectedHotbarSlot];
-        if (handItem == null) return;
+        final Item handItem = this.getMainInventory()[this.inventoryStorage.getSelectedHotbarSlot()];
+        if (handItem == null) {
+            return;
+        }
 
         if (direction == 255) { // interact
             AlphaItems.doInteract(handItem);
@@ -259,51 +281,61 @@ public class AlphaInventoryTracker extends StoredObject {
             final IdAndData targetBlock = this.user().get(ChunkTracker.class).getBlockNotNull(position.getRelative(BlockFaceUtil.getFace(direction)));
             AlphaItems.doPlace(handItem, direction, placedAgainst);
 
-            if (handItem.identifier() < 256 || handItem.identifier() == ItemList1_6.reed.itemId()) { // block item
-                if (targetBlock.getId() == 0 || targetBlock.getId() == BlockList1_6.waterStill.blockId() || targetBlock.getId() == BlockList1_6.waterMoving.blockId() || targetBlock.getId() == BlockList1_6.lavaStill.blockId() || targetBlock.getId() == BlockList1_6.lavaMoving.blockId() || targetBlock.getId() == BlockList1_6.fire.blockId() || targetBlock.getId() == BlockList1_6.snow.blockId()) {
+            if (handItem.identifier() < 256 || handItem.identifier() == ItemList1_6.REED) { // block item
+                if (targetBlock.getId() == 0 || targetBlock.getId() == BlockList1_6.WATER_STILL || targetBlock.getId() == BlockList1_6.WATER_MOVING || targetBlock.getId() == BlockList1_6.LAVA_STILL || targetBlock.getId() == BlockList1_6.LAVA_MOVING || targetBlock.getId() == BlockList1_6.FIRE || targetBlock.getId() == BlockList1_6.SNOW) {
                     handItem.setAmount(handItem.amount() - 1);
                 }
-            } else if (handItem.identifier() == ItemList1_6.sign.itemId()) {
-                if (direction != 0 && targetBlock.getId() == 0) handItem.setAmount(handItem.amount() - 1);
-            } else if (handItem.identifier() == ItemList1_6.redstone.itemId()) {
-                if (targetBlock.getId() == 0) handItem.setAmount(handItem.amount() - 1);
+            } else if (handItem.identifier() == ItemList1_6.SIGN) {
+                if (direction != 0 && targetBlock.getId() == 0) {
+                    handItem.setAmount(handItem.amount() - 1);
+                }
+            } else if (handItem.identifier() == ItemList1_6.REDSTONE) {
+                if (targetBlock.getId() == 0) {
+                    handItem.setAmount(handItem.amount() - 1);
+                }
             }
         }
 
         if (handItem.amount() == 0) {
-            this.mainInventory[this.inventoryStorage.selectedHotbarSlot] = null;
+            this.getMainInventory()[this.inventoryStorage.getSelectedHotbarSlot()] = null;
         }
-        this.updatePlayerInventorySlot(this.inventoryStorage.selectedHotbarSlot);
+        this.updatePlayerInventorySlot(this.inventoryStorage.getSelectedHotbarSlot());
     }
 
     public void onHandItemDrop() {
-        final Item handItem = this.mainInventory[this.inventoryStorage.selectedHotbarSlot];
-        if (handItem == null) return;
+        final Item handItem = this.getMainInventory()[this.inventoryStorage.getSelectedHotbarSlot()];
+        if (handItem == null) {
+            return;
+        }
 
         handItem.setAmount(handItem.amount() - 1);
         if (handItem.amount() == 0) {
-            this.mainInventory[this.inventoryStorage.selectedHotbarSlot] = null;
+            this.getMainInventory()[this.inventoryStorage.getSelectedHotbarSlot()] = null;
         }
-        this.updatePlayerInventorySlot(this.inventoryStorage.selectedHotbarSlot);
+        this.updatePlayerInventorySlot(this.inventoryStorage.getSelectedHotbarSlot());
     }
 
     public void onRespawn() {
-        this.mainInventory = new Item[37];
-        this.craftingInventory = new Item[4];
-        this.armorInventory = new Item[4];
+        this.setMainInventory(new Item[37]);
+        this.setCraftingInventory(new Item[4]);
+        this.setArmorInventory(new Item[4]);
         this.openContainerItems = new Item[0];
         this.cursorItem = null;
         this.openWindowType = -1;
     }
 
     public void addItem(final Item item) {
-        if (item == null) return;
-        if (item.amount() == 0) return;
+        if (item == null) {
+            return;
+        }
+        if (item.amount() == 0) {
+            return;
+        }
 
         if (item.data() == 0) { // item is stackable, try to merge it with stacks of same type
             int slot = -1;
-            for (int i = 0; i < this.mainInventory.length; i++) {
-                if (this.mainInventory[i] != null && this.mainInventory[i].identifier() == item.identifier() && this.mainInventory[i].amount() < AlphaItems.getMaxStackSize(this.mainInventory[i].identifier())) {
+            for (int i = 0; i < this.getMainInventory().length; i++) {
+                if (this.getMainInventory()[i] != null && this.getMainInventory()[i].identifier() == item.identifier() && this.getMainInventory()[i].amount() < AlphaItems.getMaxStackSize(this.getMainInventory()[i].identifier())) {
                     slot = i;
                     break;
                 }
@@ -311,27 +343,27 @@ public class AlphaInventoryTracker extends StoredObject {
 
             if (slot != -1) {
                 int amount = item.amount();
-                if (amount > AlphaItems.getMaxStackSize(this.mainInventory[slot].identifier()) - this.mainInventory[slot].amount()) {
-                    amount = AlphaItems.getMaxStackSize(this.mainInventory[slot].identifier()) - this.mainInventory[slot].amount();
+                if (amount > AlphaItems.getMaxStackSize(this.getMainInventory()[slot].identifier()) - this.getMainInventory()[slot].amount()) {
+                    amount = AlphaItems.getMaxStackSize(this.getMainInventory()[slot].identifier()) - this.getMainInventory()[slot].amount();
                 }
 
                 item.setAmount(item.amount() - amount);
-                this.mainInventory[slot].setAmount(this.mainInventory[slot].amount() + amount);
+                this.getMainInventory()[slot].setAmount(this.getMainInventory()[slot].amount() + amount);
                 this.updatePlayerInventorySlot((short) slot);
             }
         }
 
         if (item.amount() != 0) { // if the item couldn't be fully merged with another stack or is unstackable
             int slot = -1;
-            for (int i = 0; i < this.mainInventory.length; i++) {
-                if (this.mainInventory[i] == null) {
+            for (int i = 0; i < this.getMainInventory().length; i++) {
+                if (this.getMainInventory()[i] == null) {
                     slot = i;
                     break;
                 }
             }
 
             if (slot != -1) {
-                this.mainInventory[slot] = item;
+                this.getMainInventory()[slot] = item;
                 this.updatePlayerInventorySlot((short) slot);
             }
         }
@@ -339,19 +371,25 @@ public class AlphaInventoryTracker extends StoredObject {
 
     // Add support for cheating items and classic block placement
     public void handleCreativeSetSlot(short slot, Item item) {
-        if (!this.user().getProtocolInfo().serverProtocolVersion().equals(LegacyProtocolVersion.c0_30cpe)) item = fixItem(item);
-        if (slot <= 0) return;
+        if (!this.user().getProtocolInfo().serverProtocolVersion().equals(LegacyProtocolVersion.c0_30cpe)) {
+            item = fixItem(item);
+        }
+        if (slot <= 0) {
+            return;
+        }
 
         if (slot <= 4) {
             slot--; // remove result slot
-            this.craftingInventory[slot] = item;
+            this.getCraftingInventory()[slot] = item;
         } else if (slot <= 8) {
             slot -= 5;
             slot = (short) (3 - slot); // reverse array
-            this.armorInventory[slot] = item;
+            this.getArmorInventory()[slot] = item;
         } else if (slot <= 44) {
-            if (slot >= 36) slot -= 36;
-            this.mainInventory[slot] = item;
+            if (slot >= 36) {
+                slot -= 36;
+            }
+            this.getMainInventory()[slot] = item;
         }
     }
 
@@ -396,7 +434,7 @@ public class AlphaInventoryTracker extends StoredObject {
     }
 
     private void updatePlayerInventorySlot(final short slot) {
-        this.updateInventorySlot((byte) 0, slot >= 0 && slot < 9 ? (short) (slot + 36) : slot, this.mainInventory[slot]);
+        this.updateInventorySlot((byte) 0, slot >= 0 && slot < 9 ? (short) (slot + 36) : slot, this.getMainInventory()[slot]);
     }
 
     private void updateCursorItem() {
@@ -413,10 +451,10 @@ public class AlphaInventoryTracker extends StoredObject {
 
     private void updatePlayerInventory() {
         final Item[] items = new Item[45];
-        System.arraycopy(this.mainInventory, 0, items, 36, 9);
-        System.arraycopy(this.mainInventory, 9, items, 9, 36 - 9);
-        System.arraycopy(this.craftingInventory, 0, items, 1, 4);
-        System.arraycopy(reverseArray(this.armorInventory), 0, items, 5, 4);
+        System.arraycopy(this.getMainInventory(), 0, items, 36, 9);
+        System.arraycopy(this.getMainInventory(), 9, items, 9, 36 - 9);
+        System.arraycopy(this.getCraftingInventory(), 0, items, 1, 4);
+        System.arraycopy(reverseArray(this.getArmorInventory()), 0, items, 5, 4);
 
         this.updateInventory((byte) 0, items);
     }
@@ -438,14 +476,18 @@ public class AlphaInventoryTracker extends StoredObject {
     private void onCraftingResultPickup(final byte windowId, final Item[] slots) {
         for (int i = 1; i < 1 + (windowId == 0 ? 4 : 9); i++) {
             final Item item = slots[i];
-            if (item == null) continue;
+            if (item == null) {
+                continue;
+            }
             item.setAmount(item.amount() - 1);
         }
     }
 
     private boolean isEmpty(final Item[] items) {
         for (Item item : items) {
-            if (item != null && item.amount() != 0) return false;
+            if (item != null && item.amount() != 0) {
+                return false;
+            }
         }
         return true;
     }

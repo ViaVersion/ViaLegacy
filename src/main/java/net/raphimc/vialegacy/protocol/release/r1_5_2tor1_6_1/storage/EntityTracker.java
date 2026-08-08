@@ -27,17 +27,17 @@ public class EntityTracker implements StorableObject {
 
     private final Map<Integer, EntityTypes1_8.EntityType> entityMap = new ConcurrentHashMap<>();
 
-    private int playerID;
+    private int playerId;
 
-    public int getPlayerID() {
-        return this.playerID;
+    public int getPlayerId() {
+        return this.playerId;
     }
 
-    public void setPlayerID(int playerID) {
-        this.playerID = playerID;
+    public void setPlayerId(final int playerId) {
+        this.playerId = playerId;
     }
 
-    public void removeEntity(int entityId) {
+    public void removeEntity(final int entityId) {
         this.entityMap.remove(entityId);
     }
 

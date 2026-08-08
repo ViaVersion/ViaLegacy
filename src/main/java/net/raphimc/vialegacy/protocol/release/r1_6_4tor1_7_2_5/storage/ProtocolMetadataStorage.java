@@ -21,7 +21,23 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 
 public class ProtocolMetadataStorage implements StorableObject {
 
-    public boolean authenticate;
-    public boolean skipEncryption;
+    private boolean authenticate;
+    private boolean skipEncryption;
+
+    public boolean isAuthenticate() {
+        return this.authenticate;
+    }
+
+    public void setAuthenticate(final boolean authenticate) {
+        this.authenticate = authenticate;
+    }
+
+    public boolean isSkipEncryption() {
+        return this.skipEncryption;
+    }
+
+    public void setSkipEncryption(final boolean skipEncryption) {
+        this.skipEncryption = skipEncryption;
+    }
 
 }

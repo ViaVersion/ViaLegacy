@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.protocol.release.r1_2_4_5tor1_3_1_2.data;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 
-public class EntityList1_2_4 {
+public final class EntityList1_2_4 {
 
     private static final BiMap<String, Integer> ENTITY_IDS = HashBiMap.create();
 
@@ -68,6 +68,9 @@ public class EntityList1_2_4 {
         ENTITY_IDS.put("VillagerGolem", 99);
         ENTITY_IDS.put("Villager", 120);
         ENTITY_IDS.put("EnderCrystal", 200);
+    }
+
+    private EntityList1_2_4() {
     }
 
     public static int getEntityId(final String entityName) {

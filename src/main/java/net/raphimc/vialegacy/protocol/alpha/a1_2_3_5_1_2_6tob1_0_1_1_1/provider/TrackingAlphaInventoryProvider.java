@@ -31,27 +31,27 @@ public class TrackingAlphaInventoryProvider extends AlphaInventoryProvider {
     }
 
     @Override
-    public Item[] getMainInventoryItems(UserConnection user) {
+    public Item[] getMainInventoryItems(final UserConnection user) {
         return copyItems(user.get(AlphaInventoryTracker.class).getMainInventory());
     }
 
     @Override
-    public Item[] getCraftingInventoryItems(UserConnection user) {
+    public Item[] getCraftingInventoryItems(final UserConnection user) {
         return copyItems(user.get(AlphaInventoryTracker.class).getCraftingInventory());
     }
 
     @Override
-    public Item[] getArmorInventoryItems(UserConnection user) {
+    public Item[] getArmorInventoryItems(final UserConnection user) {
         return copyItems(user.get(AlphaInventoryTracker.class).getArmorInventory());
     }
 
     @Override
-    public Item[] getContainerItems(UserConnection user) {
+    public Item[] getContainerItems(final UserConnection user) {
         return copyItems(user.get(AlphaInventoryTracker.class).getOpenContainerItems());
     }
 
     @Override
-    public void addToInventory(UserConnection user, Item item) {
+    public void addToInventory(final UserConnection user, final Item item) {
         user.get(AlphaInventoryTracker.class).addItem(item);
     }
 

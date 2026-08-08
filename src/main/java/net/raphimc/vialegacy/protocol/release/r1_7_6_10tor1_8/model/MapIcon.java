@@ -19,15 +19,39 @@ package net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.model;
 
 public class MapIcon {
 
-    public byte direction;
-    public byte type;
-    public byte x;
-    public byte z;
+    private final byte direction;
+    private final byte type;
+    private byte x;
+    private byte z;
 
     public MapIcon(final byte direction, final byte type, final byte x, final byte z) {
         this.direction = direction;
         this.type = type;
         this.x = x;
+        this.z = z;
+    }
+
+    public byte getDirection() {
+        return this.direction;
+    }
+
+    public byte getType() {
+        return this.type;
+    }
+
+    public byte getX() {
+        return this.x;
+    }
+
+    public void setX(final byte x) {
+        this.x = x;
+    }
+
+    public byte getZ() {
+        return this.z;
+    }
+
+    public void setZ(final byte z) {
         this.z = z;
     }
 

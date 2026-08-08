@@ -45,10 +45,12 @@ public class ClassicLevel {
         this.lightBlocking = lightBlocking;
     }
 
-    public void calculateLight(int startX, int startZ, int sizeX, int sizeZ) {
+    public void calculateLight(final int startX, final int startZ, final int sizeX, final int sizeZ) {
         for (int x = startX; x < startX + sizeX; x++) {
             for (int z = startZ; z < startZ + sizeZ; z++) {
-                if (!this.isInBounds(x, 0, z)) continue;
+                if (!this.isInBounds(x, 0, z)) {
+                    continue;
+                }
                 int y = this.sizeY - 1;
                 while (y > 0 && !this.isLightBlocking(x, y, z)) {
                     y--;
@@ -70,30 +72,30 @@ public class ClassicLevel {
         return this.sizeZ;
     }
 
-    public int getBlock(BlockPosition position) {
+    public int getBlock(final BlockPosition position) {
         return this.getBlock(position.x(), position.y(), position.z());
     }
 
-    public int getBlock(int x, int y, int z) {
+    public int getBlock(final int x, final int y, final int z) {
         return this.isInBounds(x, y, z) ? this.blocks[(y * this.sizeZ + z) * this.sizeX + x] & 255 : 0;
     }
 
-    public void setBlock(BlockPosition position, int block) {
+    public void setBlock(final BlockPosition position, final int block) {
         this.setBlock(position.x(), position.y(), position.z(), block);
     }
 
-    public void setBlock(int x, int y, int z, int block) {
+    public void setBlock(final int x, final int y, final int z, final int block) {
         if (this.isInBounds(x, y, z)) {
             this.blocks[(y * this.sizeZ + z) * this.sizeX + x] = (byte) block;
             this.calculateLight(x, z, 1, 1);
         }
     }
 
-    public boolean isLightBlocking(BlockPosition position) {
+    public boolean isLightBlocking(final BlockPosition position) {
         return this.isLightBlocking(position.x(), position.y(), position.z());
     }
 
-    public boolean isLightBlocking(int x, int y, int z) {
+    public boolean isLightBlocking(final int x, final int y, final int z) {
         return switch (this.getBlock(x, y, z)) {
             case ClassicBlocks.AIR, ClassicBlocks.WATER, ClassicBlocks.STATIONARY_WATER, ClassicBlocks.LAVA, ClassicBlocks.STATIONARY_LAVA, ClassicBlocks.LEAVES,
                  ClassicBlocks.DANDELION, ClassicBlocks.ROSE, ClassicBlocks.BROWN_MUSHROOM, ClassicBlocks.RED_MUSHROOM, ClassicBlocks.GLASS -> false;
@@ -101,15 +103,15 @@ public class ClassicLevel {
         };
     }
 
-    public boolean isLit(BlockPosition position) {
+    public boolean isLit(final BlockPosition position) {
         return this.isLit(position.x(), position.y(), position.z());
     }
 
-    public boolean isLit(int x, int y, int z) {
+    public boolean isLit(final int x, final int y, final int z) {
         return !this.isInBounds(x, y, z) || y >= this.lightBlocking[x + z * this.sizeX];
     }
 
-    public boolean isInBounds(int x, int y, int z) {
+    public boolean isInBounds(final int x, final int y, final int z) {
         return x >= 0 && y >= 0 && z >= 0 && x < this.sizeX && y < this.sizeY && z < this.sizeZ;
     }
 

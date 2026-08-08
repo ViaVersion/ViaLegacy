@@ -71,6 +71,9 @@ public enum ServerboundPacketsb1_5 implements ServerboundPacketType, PreNettyPac
 
     private static final ServerboundPacketsb1_5[] REGISTRY = new ServerboundPacketsb1_5[256];
 
+    private final int id;
+    private final BiConsumer<UserConnection, ByteBuf> packetReader;
+
     static {
         for (ServerboundPacketsb1_5 packet : values()) {
             REGISTRY[packet.id] = packet;
@@ -80,9 +83,6 @@ public enum ServerboundPacketsb1_5 implements ServerboundPacketType, PreNettyPac
     public static ServerboundPacketsb1_5 getPacket(final int id) {
         return REGISTRY[id];
     }
-
-    private final int id;
-    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     ServerboundPacketsb1_5(final int id, final BiConsumer<UserConnection, ByteBuf> packetReader) {
         this.id = id;

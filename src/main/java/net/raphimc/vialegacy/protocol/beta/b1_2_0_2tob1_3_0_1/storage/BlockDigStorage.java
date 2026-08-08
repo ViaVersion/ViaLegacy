@@ -24,11 +24,11 @@ import net.raphimc.vialegacy.protocol.beta.b1_2_0_2tob1_3_0_1.Protocolb1_2_0_2To
 
 public class BlockDigStorage extends StoredObject {
 
-    public int tick = 1;
+    private int tick = 1;
     private final BlockPosition position;
     private final short facing;
 
-    public BlockDigStorage(UserConnection user, final BlockPosition position, final short facing) {
+    public BlockDigStorage(final UserConnection user, final BlockPosition position, final short facing) {
         super(user);
         this.position = position;
         this.facing = facing;

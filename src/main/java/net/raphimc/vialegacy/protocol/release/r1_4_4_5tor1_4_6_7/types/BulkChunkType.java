@@ -22,12 +22,12 @@ import io.netty.buffer.ByteBuf;
 public class BulkChunkType extends net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.types.BulkChunkType {
 
     @Override
-    protected boolean readHasSkyLight(ByteBuf byteBuf) {
+    protected boolean readHasSkyLight(final ByteBuf byteBuf) {
         return true;
     }
 
     @Override
-    protected void writeHasSkyLight(ByteBuf byteBuf, boolean hasSkyLight) {
+    protected void writeHasSkyLight(final ByteBuf byteBuf, final boolean hasSkyLight) {
     }
 
 }

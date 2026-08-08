@@ -55,12 +55,12 @@ public class Protocola1_0_16_2Toa1_0_17_1_0_17_4 extends StatelessProtocol<Clien
     }
 
     @Override
-    public void register(ViaProviders providers) {
+    public void register(final ViaProviders providers) {
         Via.getPlatform().runRepeatingSync(new TimeLockTask(), 20L);
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocola1_0_16_2Toa1_0_17_1_0_17_4.class, ClientboundPacketsa1_0_16::getPacket));
 
         userConnection.put(new TimeLockStorage(0));

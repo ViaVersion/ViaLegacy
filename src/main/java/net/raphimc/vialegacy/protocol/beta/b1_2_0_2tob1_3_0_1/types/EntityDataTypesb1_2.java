@@ -32,20 +32,20 @@ public enum EntityDataTypesb1_2 implements EntityDataType {
     STRING(4, Typesb1_7_0_3.STRING),
     ITEM(5, Types1_3_1.NBTLESS_ITEM);
 
-    private final int typeID;
+    private final int typeId;
     private final Type<?> type;
 
-    EntityDataTypesb1_2(int typeID, Type<?> type) {
-        this.typeID = typeID;
+    EntityDataTypesb1_2(final int typeId, final Type<?> type) {
+        this.typeId = typeId;
         this.type = type;
     }
 
-    public static EntityDataTypesb1_2 byId(int id) {
+    public static EntityDataTypesb1_2 byId(final int id) {
         return values()[id];
     }
 
     public int typeId() {
-        return this.typeID;
+        return this.typeId;
     }
 
     public Type<?> type() {

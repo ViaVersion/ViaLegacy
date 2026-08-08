@@ -27,7 +27,8 @@ import java.util.List;
 
 import static com.viaversion.viaversion.api.protocol.version.VersionType.*;
 
-public class LegacyProtocolVersion {
+@SuppressWarnings("checkstyle:ConstantName")
+public final class LegacyProtocolVersion {
 
     public static final List<ProtocolVersion> PROTOCOLS = new ArrayList<>();
 
@@ -73,6 +74,9 @@ public class LegacyProtocolVersion {
     static {
         ProtocolVersion.register(c0_30cpe);
         PROTOCOLS.add(c0_30cpe);
+    }
+
+    private LegacyProtocolVersion() {
     }
 
     private static ProtocolVersion registerLegacy(final VersionType versionType, final int version, final String name) {

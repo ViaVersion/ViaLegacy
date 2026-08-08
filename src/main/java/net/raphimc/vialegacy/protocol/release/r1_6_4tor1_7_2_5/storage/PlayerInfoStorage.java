@@ -21,12 +21,64 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 
 public class PlayerInfoStorage implements StorableObject {
 
-    public int entityId = -1;
-    public boolean onGround = false;
-    public double posX = 8;
-    public double posY = 64;
-    public double posZ = 8;
-    public float yaw = -180;
-    public float pitch = 0;
+    private int entityId = -1;
+    private boolean onGround = false;
+    private double posX = 8;
+    private double posY = 64;
+    private double posZ = 8;
+    private float yaw = -180;
+    private float pitch = 0;
+
+    public int getEntityId() {
+        return this.entityId;
+    }
+
+    public void setEntityId(final int entityId) {
+        this.entityId = entityId;
+    }
+
+    public void setOnGround(final boolean onGround) {
+        this.onGround = onGround;
+    }
+
+    public double getPosX() {
+        return this.posX;
+    }
+
+    public void setPosX(final double posX) {
+        this.posX = posX;
+    }
+
+    public double getPosY() {
+        return this.posY;
+    }
+
+    public void setPosY(final double posY) {
+        this.posY = posY;
+    }
+
+    public double getPosZ() {
+        return this.posZ;
+    }
+
+    public void setPosZ(final double posZ) {
+        this.posZ = posZ;
+    }
+
+    public float getYaw() {
+        return this.yaw;
+    }
+
+    public void setYaw(final float yaw) {
+        this.yaw = yaw;
+    }
+
+    public float getPitch() {
+        return this.pitch;
+    }
+
+    public void setPitch(final float pitch) {
+        this.pitch = pitch;
+    }
 
 }

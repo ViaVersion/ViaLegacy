@@ -62,32 +62,36 @@ public class Location {
     }
 
     public double distanceTo(final Location p2) {
-        return Math.sqrt(Math.pow(p2.getX() - this.x, 2) +
-                Math.pow(p2.getY() - this.y, 2) +
-                Math.pow(p2.getZ() - this.z, 2)
+        return Math.sqrt(Math.pow(p2.getX() - this.x, 2)
+            + Math.pow(p2.getY() - this.y, 2)
+            + Math.pow(p2.getZ() - this.z, 2)
         );
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Location location = (Location) o;
-        return Double.compare(location.x, x) == 0 && Double.compare(location.y, y) == 0 && Double.compare(location.z, z) == 0;
+    public boolean equals(final Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        final Location location = (Location) o;
+        return Double.compare(location.x, this.x) == 0 && Double.compare(location.y, this.y) == 0 && Double.compare(location.z, this.z) == 0;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(x, y, z);
+        return Objects.hash(this.x, this.y, this.z);
     }
 
     @Override
     public String toString() {
-        return "Location{" +
-                "x=" + x +
-                ", y=" + y +
-                ", z=" + z +
-                '}';
+        return "Location{"
+            + "x=" + this.x
+            + ", y=" + this.y
+            + ", z=" + this.z
+            + '}';
     }
 
 }

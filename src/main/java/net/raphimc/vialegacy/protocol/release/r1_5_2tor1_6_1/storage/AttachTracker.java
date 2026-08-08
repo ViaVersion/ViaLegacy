@@ -21,7 +21,23 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 
 public class AttachTracker implements StorableObject {
 
-    public int vehicleEntityId = -1;
-    public boolean lastSneakState = false;
+    private int vehicleEntityId = -1;
+    private boolean lastSneakState = false;
+
+    public int getVehicleEntityId() {
+        return this.vehicleEntityId;
+    }
+
+    public void setVehicleEntityId(final int vehicleEntityId) {
+        this.vehicleEntityId = vehicleEntityId;
+    }
+
+    public boolean isLastSneakState() {
+        return this.lastSneakState;
+    }
+
+    public void setLastSneakState(final boolean lastSneakState) {
+        this.lastSneakState = lastSneakState;
+    }
 
 }

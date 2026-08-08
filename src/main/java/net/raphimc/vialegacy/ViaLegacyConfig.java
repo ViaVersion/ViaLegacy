@@ -68,7 +68,7 @@ public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.pla
     }
 
     @Override
-    protected void handleConfig(Map<String, Object> map) {
+    protected void handleConfig(final Map<String, Object> map) {
     }
 
     @Override

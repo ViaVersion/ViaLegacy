@@ -21,8 +21,28 @@ import com.viaversion.viaversion.api.connection.StorableObject;
 
 public class PlayerAirTimeStorage implements StorableObject {
 
-    public final int MAX_AIR = 300;
-    public int air = MAX_AIR;
-    public boolean sentPacket = true;
+    private final int maxAir = 300;
+    private int air = this.maxAir;
+    private boolean sentPacket = true;
+
+    public int getMaxAir() {
+        return this.maxAir;
+    }
+
+    public int getAir() {
+        return this.air;
+    }
+
+    public void setAir(final int air) {
+        this.air = air;
+    }
+
+    public boolean isSentPacket() {
+        return this.sentPacket;
+    }
+
+    public void setSentPacket(final boolean sentPacket) {
+        this.sentPacket = sentPacket;
+    }
 
 }

@@ -22,7 +22,7 @@ import com.viaversion.viaversion.util.IdAndData;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BlockHardnessList {
+public final class BlockHardnessList {
 
     private static final Map<Integer, Float> HARDNESS_TABLE = new HashMap<>(82, 0.99F);
 
@@ -111,8 +111,11 @@ public class BlockHardnessList {
         HARDNESS_TABLE.put(92, 0.5f);
     }
 
-    public static boolean canBeBrokenInstantly(final int blockID) {
-        return HARDNESS_TABLE.getOrDefault(blockID, 0F) == 0F;
+    private BlockHardnessList() {
+    }
+
+    public static boolean canBeBrokenInstantly(final int blockId) {
+        return HARDNESS_TABLE.getOrDefault(blockId, 0F) == 0F;
     }
 
     public static boolean canBeBrokenInstantly(final IdAndData block) {

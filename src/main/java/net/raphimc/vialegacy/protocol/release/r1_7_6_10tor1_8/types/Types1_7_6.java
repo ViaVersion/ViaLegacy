@@ -30,11 +30,11 @@ import com.viaversion.viaversion.api.type.types.entitydata.EntityDataListType;
 
 import java.util.List;
 
-public class Types1_7_6 {
+public final class Types1_7_6 {
 
     public static final Type<int[]> INT_ARRAY = new IntArrayType();
 
-    public static final Type<CompoundTag> NBT = new NBTType();
+    public static final Type<CompoundTag> NBT = new NbtType();
 
     public static final Type<Item> ITEM = new ItemType();
     public static final Type<Item[]> ITEM_ARRAY = new ItemArrayType<>(ITEM);
@@ -52,6 +52,9 @@ public class Types1_7_6 {
     public static final Type<Chunk> CHUNK_WITH_SKYLIGHT = new ChunkType(true);
     public static final Type<Chunk> CHUNK_WITHOUT_SKYLIGHT = new ChunkType(false);
     public static final Type<Chunk[]> CHUNK_BULK = new BulkChunkType();
+
+    private Types1_7_6() {
+    }
 
     public static Type<Chunk> getChunk(final Environment dimension) {
         return dimension == Environment.NORMAL ? CHUNK_WITH_SKYLIGHT : CHUNK_WITHOUT_SKYLIGHT;

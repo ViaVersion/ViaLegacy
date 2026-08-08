@@ -31,7 +31,9 @@ public class ExtensionProtocolMetadataStorage implements StorableObject {
     private final EnumMap<ClassicProtocolExtension, Integer> serverExtensions = new EnumMap<>(ClassicProtocolExtension.class);
 
     public void setServerSoftwareName(final String serverSoftwareName) {
-        if (serverSoftwareName.isEmpty()) return;
+        if (serverSoftwareName.isEmpty()) {
+            return;
+        }
         this.serverSoftwareName = serverSoftwareName;
     }
 
@@ -61,11 +63,17 @@ public class ExtensionProtocolMetadataStorage implements StorableObject {
 
     public boolean hasServerExtension(final ClassicProtocolExtension extension, final int... versions) {
         final Integer extensionVersion = this.serverExtensions.get(extension);
-        if (extensionVersion == null) return false;
-        if (versions.length == 0) return true;
+        if (extensionVersion == null) {
+            return false;
+        }
+        if (versions.length == 0) {
+            return true;
+        }
 
         for (int version : versions) {
-            if (version == extensionVersion) return true;
+            if (version == extensionVersion) {
+                return true;
+            }
         }
         return false;
     }

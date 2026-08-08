@@ -34,33 +34,33 @@ public enum EntityDataTypesb1_4 implements EntityDataType {
     STRING(4, Typesb1_7_0_3.STRING),
     ITEM(5, new Type<>(Item.class) { // b1.3 - b1.4 had broken read/write code where type 5 had a missing break statement causing it to read a type 6 as well (Both are unused)
         @Override
-        public Item read(ByteBuf buffer) {
+        public Item read(final ByteBuf buffer) {
             Types1_3_1.NBTLESS_ITEM.read(buffer);
             Types.VECTOR.read(buffer);
             return null;
         }
 
         @Override
-        public void write(ByteBuf buffer, Item value) {
+        public void write(final ByteBuf buffer, final Item value) {
             throw new UnsupportedOperationException();
         }
     }),
     BLOCK_POSITION(6, Types.VECTOR);
 
-    private final int typeID;
+    private final int typeId;
     private final Type<?> type;
 
-    EntityDataTypesb1_4(int typeID, Type<?> type) {
-        this.typeID = typeID;
+    EntityDataTypesb1_4(final int typeId, final Type<?> type) {
+        this.typeId = typeId;
         this.type = type;
     }
 
-    public static EntityDataTypesb1_4 byId(int id) {
+    public static EntityDataTypesb1_4 byId(final int id) {
         return values()[id];
     }
 
     public int typeId() {
-        return this.typeID;
+        return this.typeId;
     }
 
     public Type<?> type() {

@@ -38,9 +38,11 @@ public class TimeLockTask implements Runnable {
         for (UserConnection info : Via.getManager().getConnectionManager().getConnections()) {
             final TimeLockStorage timeLockStorage = info.get(TimeLockStorage.class);
             final PlayerInfoStorage playerInfoStorage = info.get(PlayerInfoStorage.class);
-            if (timeLockStorage != null && playerInfoStorage != null && playerInfoStorage.entityId != -1) {
+            if (timeLockStorage != null && playerInfoStorage != null && playerInfoStorage.getEntityId() != -1) {
                 info.getChannel().eventLoop().submit(() -> {
-                    if (!info.getChannel().isActive()) return;
+                    if (!info.getChannel().isActive()) {
+                        return;
+                    }
 
                     try {
                         if (info.getProtocolInfo().getPipeline().contains(Protocolr1_5_2Tor1_6_1.class)) {
@@ -56,7 +58,7 @@ public class TimeLockTask implements Runnable {
                             updateTime.write(Types.LONG, timeLockStorage.getTime()); // time
                             updateTime.send(Protocola1_0_16_2Toa1_0_17_1_0_17_4.class);
                         }
-                    } catch (Throwable e) {
+                    } catch (final Throwable e) {
                         ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error sending time update", e);
                     }
                 });

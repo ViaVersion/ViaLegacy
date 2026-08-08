@@ -83,7 +83,7 @@ public class Protocolr1_6_1Tor1_6_2 extends StatelessProtocol<ClientboundPackets
                     final short direction = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     final Item item = wrapper.get(Types1_7_6.ITEM, 0);
 
-                    if (item != null && item.identifier() == ItemList1_6.sign.itemId() && direction != 255 && direction != 0) { // If placed item is a sign then cancel and send a OPEN_SIGN_EDITOR packet
+                    if (item != null && item.identifier() == ItemList1_6.SIGN && direction != 255 && direction != 0) { // If placed item is a sign then cancel and send a OPEN_SIGN_EDITOR packet
                         final PacketWrapper openSignEditor = PacketWrapper.create(ClientboundPackets1_6_4.OPEN_SIGN_EDITOR, wrapper.user());
                         openSignEditor.write(Types.BYTE, (byte) 0); // magic value
                         openSignEditor.write(Types1_7_6.BLOCK_POSITION_INT, pos.getRelative(BlockFaceUtil.getFace(direction)));
@@ -95,7 +95,7 @@ public class Protocolr1_6_1Tor1_6_2 extends StatelessProtocol<ClientboundPackets
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolr1_6_1Tor1_6_2.class, ClientboundPackets1_6_1::getPacket));
     }
 

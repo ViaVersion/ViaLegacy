@@ -36,34 +36,38 @@ import net.raphimc.vialegacy.protocol.release.r1_2_4_5tor1_3_1_2.model.TrackedLi
 import net.raphimc.vialegacy.protocol.release.r1_3_1_2tor1_4_2.packet.ClientboundPackets1_3_1;
 import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.types.Types1_6_4;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 
 public class EntityTracker extends StoredObject {
 
-    public final Random RND = new Random();
+    private final Random rnd = new Random();
     private final Map<Integer, AbstractTrackedEntity> entityMap = new ConcurrentHashMap<>();
 
-    private int playerID;
+    private int playerId;
 
-    public EntityTracker(UserConnection user) {
+    public EntityTracker(final UserConnection user) {
         super(user);
     }
 
-    public int getPlayerID() {
-        return this.playerID;
+    public int getPlayerId() {
+        return this.playerId;
     }
 
-    public void setPlayerID(int playerID) {
-        this.playerID = playerID;
+    public void setPlayerId(final int playerId) {
+        this.playerId = playerId;
     }
 
     public Map<Integer, AbstractTrackedEntity> getTrackedEntities() {
         return this.entityMap;
     }
 
-    public void updateEntityLocation(int entityId, int x, int y, int z, boolean relative) {
+    public void updateEntityLocation(final int entityId, final int x, final int y, final int z, final boolean relative) {
         final AbstractTrackedEntity entity = this.entityMap.get(entityId);
         if (entity != null) {
             final Location oldLoc = entity.getLocation();
@@ -72,7 +76,7 @@ public class EntityTracker extends StoredObject {
             final double yPos = y / 32.0D;
             final double zPos = z / 32.0D;
 
-            Location newLoc;
+            final Location newLoc;
             if (relative) {
                 newLoc = new Location(oldLoc.getX() + xPos, oldLoc.getY() + yPos, oldLoc.getZ() + zPos);
             } else {
@@ -83,19 +87,19 @@ public class EntityTracker extends StoredObject {
         }
     }
 
-    public void updateEntityDataList(int entityId, List<EntityData> entityDataList) {
+    public void updateEntityDataList(final int entityId, final List<EntityData> entityDataList) {
         final AbstractTrackedEntity entity = this.entityMap.get(entityId);
         if (entity instanceof TrackedLivingEntity livingEntity) {
             livingEntity.updateEntityData(entityDataList);
         }
     }
 
-    public Optional<AbstractTrackedEntity> getNearestEntity(Location location, double range, Predicate<AbstractTrackedEntity> entityPredicate) {
+    public Optional<AbstractTrackedEntity> getNearestEntity(final Location location, final double range, final Predicate<AbstractTrackedEntity> entityPredicate) {
         return this.entityMap.values().stream()
-                .filter(entityPredicate)
-                .filter(e -> !e.getLocation().equals(location))
-                .filter(e -> e.getLocation().distanceTo(location) <= range)
-                .min(Comparator.comparingDouble(o -> o.getLocation().distanceTo(location)));
+            .filter(entityPredicate)
+            .filter(e -> !e.getLocation().equals(location))
+            .filter(e -> e.getLocation().distanceTo(location) <= range)
+            .min(Comparator.comparingDouble(o -> o.getLocation().distanceTo(location)));
     }
 
     public void tick() {
@@ -106,52 +110,56 @@ public class EntityTracker extends StoredObject {
         }
     }
 
-    public void playSound(int entityId, SoundType type) {
-        if (this.playerID == entityId && type == SoundType.HURT) return; // Don't play HURT sound for the player
+    public void playSound(final int entityId, final SoundType type) {
+        if (this.playerId == entityId && type == SoundType.HURT) {
+            return; // Don't play HURT sound for the player
+        }
 
         if (this.entityMap.get(entityId) != null) {
             final AbstractTrackedEntity entity = this.entityMap.get(entityId);
             final ConfiguredSound sound = SoundRegistry1_2_4.getEntitySound(entity.getEntityType(), type);
             final Location entityLocation = entity.getLocation();
-            final Location playerLocation = this.entityMap.get(this.playerID).getLocation();
+            final Location playerLocation = this.entityMap.get(this.playerId).getLocation();
 
             if (entity instanceof TrackedLivingEntity livingEntity && type == SoundType.IDLE) {
                 livingEntity.applyPitch(this, sound);
 
                 if (entity.getEntityType().isOrHasParent(EntityTypes1_8.EntityType.WOLF)) {
-                    if (livingEntity.wolfIsAngry) {
+                    if (livingEntity.isWolfIsAngry()) {
                         sound.setSound(Sound.MOB_WOLF_GROWL);
-                    } else if (RND.nextInt(3) == 0) {
-                        sound.setSound(livingEntity.isTamed && livingEntity.wolfHealth < 10 ? Sound.MOB_WOLF_WHINE : Sound.MOB_WOLF_PANTING);
+                    } else if (this.rnd.nextInt(3) == 0) {
+                        sound.setSound(livingEntity.isTamed() && livingEntity.getWolfHealth() < 10 ? Sound.MOB_WOLF_WHINE : Sound.MOB_WOLF_PANTING);
                     }
                 } else if (entity.getEntityType().isOrHasParent(EntityTypes1_8.EntityType.OCELOT)) {
-                    if (livingEntity.isTamed) {
-                        sound.setSound(RND.nextInt(4) == 0 ? Sound.MOB_CAT_PURREOW : Sound.MOB_CAT_MEOW);
+                    if (livingEntity.isTamed()) {
+                        sound.setSound(this.rnd.nextInt(4) == 0 ? Sound.MOB_CAT_PURREOW : Sound.MOB_CAT_MEOW);
                     }
                 }
             }
 
-            if (Sound.NO_SOUND.equals(sound.getSound())) return;
+            if (Sound.NO_SOUND.equals(sound.getSound())) {
+                return;
+            }
             this.playSoundAt(entityLocation, playerLocation, sound);
         }
     }
 
-    public void playSoundAt(Location entityLocation, Sound sound, float volume, float pitch) {
-        final Location playerLocation = this.entityMap.get(this.playerID).getLocation();
+    public void playSoundAt(final Location entityLocation, final Sound sound, final float volume, final float pitch) {
+        final Location playerLocation = this.entityMap.get(this.playerId).getLocation();
 
         this.playSoundAt(entityLocation, playerLocation, new ConfiguredSound(sound, volume, pitch));
     }
 
-    public static short constrainToRange(short value, short min, short max) {
-        return value < min ? min : value < max ? value : max;
-    }
-
-    private void playSoundAt(Location sourceLocation, Location targetLocation, ConfiguredSound sound) {
-        if (!ViaLegacy.getConfig().isSoundEmulation()) return;
+    private void playSoundAt(final Location sourceLocation, final Location targetLocation, final ConfiguredSound sound) {
+        if (!ViaLegacy.getConfig().isSoundEmulation()) {
+            return;
+        }
         final short correctedPitch = (short) MathUtil.clamp((int) (sound.getPitch() * 63.0F), 0, 255);
         final float vol = sound.getVolume();
         float range = 16F;
-        if (vol > 1.0F) range *= vol;
+        if (vol > 1.0F) {
+            range *= vol;
+        }
 
         if (targetLocation.distanceTo(sourceLocation) > range) { // cancel if outside of allowed range
             return;
@@ -165,6 +173,10 @@ public class EntityTracker extends StoredObject {
         entitySound.write(Types.FLOAT, vol); // volume
         entitySound.write(Types.UNSIGNED_BYTE, correctedPitch); // pitch
         entitySound.send(Protocolr1_2_4_5Tor1_3_1_2.class);
+    }
+
+    public Random getRnd() {
+        return this.rnd;
     }
 
 }

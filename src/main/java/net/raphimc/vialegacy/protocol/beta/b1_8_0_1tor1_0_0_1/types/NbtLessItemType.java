@@ -28,7 +28,7 @@ public class NbtLessItemType extends Type<Item> {
         super(Item.class);
     }
 
-    public Item read(ByteBuf buffer) {
+    public Item read(final ByteBuf buffer) {
         final short id = buffer.readShort();
         if (id < 0) {
             return null;
@@ -41,7 +41,7 @@ public class NbtLessItemType extends Type<Item> {
         }
     }
 
-    public void write(ByteBuf buffer, Item item) {
+    public void write(final ByteBuf buffer, final Item item) {
         if (item == null) {
             buffer.writeShort(-1);
             buffer.writeShort(0);

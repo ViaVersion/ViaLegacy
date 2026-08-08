@@ -25,7 +25,7 @@ import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.types.ItemArrayTyp
 
 import java.util.List;
 
-public class Types1_4_2 {
+public final class Types1_4_2 {
 
     public static final Type<byte[]> UNSIGNED_BYTE_BYTE_ARRAY = new UnsignedByteByteArrayType();
 
@@ -34,5 +34,8 @@ public class Types1_4_2 {
 
     public static final Type<EntityData> ENTITY_DATA = new EntityDataType();
     public static final Type<List<EntityData>> ENTITY_DATA_LIST = new EntityDataListType(ENTITY_DATA);
+
+    private Types1_4_2() {
+    }
 
 }

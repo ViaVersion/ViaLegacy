@@ -31,15 +31,15 @@ public class InventoryStorage implements StorableObject {
     public static final byte FURNACE_WID = 44;
     public static final byte CHEST_WID = 55;
 
-    public Item handItem = null;
-    public Item[] mainInventory = null;
-    public Item[] craftingInventory = null;
-    public Item[] armorInventory = null;
+    private Item handItem = null;
+    private Item[] mainInventory = null;
+    private Item[] craftingInventory = null;
+    private Item[] armorInventory = null;
 
-    public final Map<BlockPosition, Item[]> containers = new HashMap<>();
+    private final Map<BlockPosition, Item[]> containers = new HashMap<>();
 
-    public BlockPosition openContainerPos = null;
-    public short selectedHotbarSlot = 0;
+    private BlockPosition openContainerPos = null;
+    private short selectedHotbarSlot = 0;
 
     public InventoryStorage() {
         this.resetPlayerInventory();
@@ -64,6 +64,58 @@ public class InventoryStorage implements StorableObject {
         this.craftingInventory = new Item[4];
         this.armorInventory = new Item[4];
         this.openContainerPos = null;
+    }
+
+    public Item getHandItem() {
+        return this.handItem;
+    }
+
+    public void setHandItem(final Item handItem) {
+        this.handItem = handItem;
+    }
+
+    public Item[] getMainInventory() {
+        return this.mainInventory;
+    }
+
+    public void setMainInventory(final Item[] mainInventory) {
+        this.mainInventory = mainInventory;
+    }
+
+    public Item[] getCraftingInventory() {
+        return this.craftingInventory;
+    }
+
+    public void setCraftingInventory(final Item[] craftingInventory) {
+        this.craftingInventory = craftingInventory;
+    }
+
+    public Item[] getArmorInventory() {
+        return this.armorInventory;
+    }
+
+    public void setArmorInventory(final Item[] armorInventory) {
+        this.armorInventory = armorInventory;
+    }
+
+    public Map<BlockPosition, Item[]> getContainers() {
+        return this.containers;
+    }
+
+    public BlockPosition getOpenContainerPos() {
+        return this.openContainerPos;
+    }
+
+    public void setOpenContainerPos(final BlockPosition openContainerPos) {
+        this.openContainerPos = openContainerPos;
+    }
+
+    public short getSelectedHotbarSlot() {
+        return this.selectedHotbarSlot;
+    }
+
+    public void setSelectedHotbarSlot(final short selectedHotbarSlot) {
+        this.selectedHotbarSlot = selectedHotbarSlot;
     }
 
 }

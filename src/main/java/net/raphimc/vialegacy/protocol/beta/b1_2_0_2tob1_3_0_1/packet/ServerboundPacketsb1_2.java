@@ -31,12 +31,12 @@ public enum ServerboundPacketsb1_2 implements ServerboundPacketType, PreNettyPac
     }),
     LOGIN(1, (user, buf) -> {
         buf.skipBytes(4);
-        PreNettyTypes.readUTF(buf);
-        PreNettyTypes.readUTF(buf);
+        PreNettyTypes.readUtf(buf);
+        PreNettyTypes.readUtf(buf);
         buf.skipBytes(9);
     }),
-    HANDSHAKE(2, (user, buf) -> PreNettyTypes.readUTF(buf)),
-    CHAT(3, (user, buf) -> PreNettyTypes.readUTF(buf)),
+    HANDSHAKE(2, (user, buf) -> PreNettyTypes.readUtf(buf)),
+    CHAT(3, (user, buf) -> PreNettyTypes.readUtf(buf)),
     INTERACT(7, (user, buf) -> buf.skipBytes(9)),
     RESPAWN(9, (user, buf) -> {
     }),
@@ -60,14 +60,17 @@ public enum ServerboundPacketsb1_2 implements ServerboundPacketType, PreNettyPac
     CONTAINER_ACK(106, (user, buf) -> buf.skipBytes(4)),
     SIGN_UPDATE(130, (user, buf) -> {
         buf.skipBytes(10);
-        PreNettyTypes.readUTF(buf);
-        PreNettyTypes.readUTF(buf);
-        PreNettyTypes.readUTF(buf);
-        PreNettyTypes.readUTF(buf);
+        PreNettyTypes.readUtf(buf);
+        PreNettyTypes.readUtf(buf);
+        PreNettyTypes.readUtf(buf);
+        PreNettyTypes.readUtf(buf);
     }),
-    DISCONNECT(255, (user, buf) -> PreNettyTypes.readUTF(buf));
+    DISCONNECT(255, (user, buf) -> PreNettyTypes.readUtf(buf));
 
     private static final ServerboundPacketsb1_2[] REGISTRY = new ServerboundPacketsb1_2[256];
+
+    private final int id;
+    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     static {
         for (ServerboundPacketsb1_2 packet : values()) {
@@ -78,9 +81,6 @@ public enum ServerboundPacketsb1_2 implements ServerboundPacketType, PreNettyPac
     public static ServerboundPacketsb1_2 getPacket(final int id) {
         return REGISTRY[id];
     }
-
-    private final int id;
-    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     ServerboundPacketsb1_2(final int id, final BiConsumer<UserConnection, ByteBuf> packetReader) {
         this.id = id;

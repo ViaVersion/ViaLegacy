@@ -27,100 +27,103 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-public class CraftingManager {
+public final class CraftingManager {
 
-    private static final List<CraftingRecipe> recipes = new ArrayList<>();
+    private static final List<CraftingRecipe> RECIPES = new ArrayList<>();
 
-    private static final String[][] tools_pattern = new String[][]{{"XXX", " # ", " # "}, {"X", "#", "#"}, {"XX", "X#", " #"}, {"XX", " #", " #"}};
-    private static final int[][] tools_ingredients = new int[][]{{BlockList1_6.planks.blockId(), BlockList1_6.cobblestone.blockId(), ItemList1_6.ingotIron.itemId(), ItemList1_6.diamond.itemId(), ItemList1_6.ingotGold.itemId()}, {ItemList1_6.pickaxeWood.itemId(), ItemList1_6.pickaxeStone.itemId(), ItemList1_6.pickaxeIron.itemId(), ItemList1_6.pickaxeDiamond.itemId(), ItemList1_6.pickaxeGold.itemId()}, {ItemList1_6.shovelWood.itemId(), ItemList1_6.shovelStone.itemId(), ItemList1_6.shovelIron.itemId(), ItemList1_6.shovelDiamond.itemId(), ItemList1_6.shovelGold.itemId()}, {ItemList1_6.axeWood.itemId(), ItemList1_6.axeStone.itemId(), ItemList1_6.axeIron.itemId(), ItemList1_6.axeDiamond.itemId(), ItemList1_6.axeGold.itemId()}, {ItemList1_6.hoeWood.itemId(), ItemList1_6.hoeStone.itemId(), ItemList1_6.hoeIron.itemId(), ItemList1_6.hoeDiamond.itemId(), ItemList1_6.hoeGold.itemId()}};
+    private static final String[][] TOOLS_PATTERN = new String[][]{{"XXX", " # ", " # "}, {"X", "#", "#"}, {"XX", "X#", " #"}, {"XX", " #", " #"}};
+    private static final int[][] TOOLS_INGREDIENTS = new int[][]{{BlockList1_6.PLANKS, BlockList1_6.COBBLESTONE, ItemList1_6.INGOT_IRON, ItemList1_6.DIAMOND, ItemList1_6.INGOT_GOLD}, {ItemList1_6.PICKAXE_WOOD, ItemList1_6.PICKAXE_STONE, ItemList1_6.PICKAXE_IRON, ItemList1_6.PICKAXE_DIAMOND, ItemList1_6.PICKAXE_GOLD}, {ItemList1_6.SHOVEL_WOOD, ItemList1_6.SHOVEL_STONE, ItemList1_6.SHOVEL_IRON, ItemList1_6.SHOVEL_DIAMOND, ItemList1_6.SHOVEL_GOLD}, {ItemList1_6.AXE_WOOD, ItemList1_6.AXE_STONE, ItemList1_6.AXE_IRON, ItemList1_6.AXE_DIAMOND, ItemList1_6.AXE_GOLD}, {ItemList1_6.HOE_WOOD, ItemList1_6.HOE_STONE, ItemList1_6.HOE_IRON, ItemList1_6.HOE_DIAMOND, ItemList1_6.HOE_GOLD}};
 
-    private static final String[][] weapons_pattern = new String[][]{{"X", "X", "#"}};
-    private static final int[][] weapons_ingredients = new int[][]{{BlockList1_6.planks.blockId(), BlockList1_6.cobblestone.blockId(), ItemList1_6.ingotIron.itemId(), ItemList1_6.diamond.itemId(), ItemList1_6.ingotGold.itemId()}, {ItemList1_6.swordWood.itemId(), ItemList1_6.swordStone.itemId(), ItemList1_6.swordIron.itemId(), ItemList1_6.swordDiamond.itemId(), ItemList1_6.swordGold.itemId()}};
+    private static final String[][] WEAPONS_PATTERN = new String[][]{{"X", "X", "#"}};
+    private static final int[][] WEAPONS_INGREDIENTS = new int[][]{{BlockList1_6.PLANKS, BlockList1_6.COBBLESTONE, ItemList1_6.INGOT_IRON, ItemList1_6.DIAMOND, ItemList1_6.INGOT_GOLD}, {ItemList1_6.SWORD_WOOD, ItemList1_6.SWORD_STONE, ItemList1_6.SWORD_IRON, ItemList1_6.SWORD_DIAMOND, ItemList1_6.SWORD_GOLD}};
 
-    private static final int[][] ingots_ingredients = new int[][]{{BlockList1_6.blockGold.blockId(), ItemList1_6.ingotGold.itemId()}, {BlockList1_6.blockIron.blockId(), ItemList1_6.ingotIron.itemId()}, {BlockList1_6.blockDiamond.blockId(), ItemList1_6.diamond.itemId()}};
+    private static final int[][] INGOTS_INGREDIENTS = new int[][]{{BlockList1_6.BLOCK_GOLD, ItemList1_6.INGOT_GOLD}, {BlockList1_6.BLOCK_IRON, ItemList1_6.INGOT_IRON}, {BlockList1_6.BLOCK_DIAMOND, ItemList1_6.DIAMOND}};
 
-    private static final String[][] armor_pattern = new String[][]{{"XXX", "X X"}, {"X X", "XXX", "XXX"}, {"XXX", "X X", "X X"}, {"X X", "X X"}};
-    private static final int[][] armor_ingredients = new int[][]{{ItemList1_6.leather.itemId(), BlockList1_6.fire.blockId(), ItemList1_6.ingotIron.itemId(), ItemList1_6.diamond.itemId(), ItemList1_6.ingotGold.itemId()}, {ItemList1_6.helmetLeather.itemId(), ItemList1_6.helmetChain.itemId(), ItemList1_6.helmetIron.itemId(), ItemList1_6.helmetDiamond.itemId(), ItemList1_6.helmetGold.itemId()}, {ItemList1_6.plateLeather.itemId(), ItemList1_6.plateChain.itemId(), ItemList1_6.plateIron.itemId(), ItemList1_6.plateDiamond.itemId(), ItemList1_6.plateGold.itemId()}, {ItemList1_6.legsLeather.itemId(), ItemList1_6.legsChain.itemId(), ItemList1_6.legsIron.itemId(), ItemList1_6.legsDiamond.itemId(), ItemList1_6.legsGold.itemId()}, {ItemList1_6.bootsLeather.itemId(), ItemList1_6.bootsChain.itemId(), ItemList1_6.bootsIron.itemId(), ItemList1_6.bootsDiamond.itemId(), ItemList1_6.bootsGold.itemId()}};
+    private static final String[][] ARMOR_PATTERN = new String[][]{{"XXX", "X X"}, {"X X", "XXX", "XXX"}, {"XXX", "X X", "X X"}, {"X X", "X X"}};
+    private static final int[][] ARMOR_INGREDIENTS = new int[][]{{ItemList1_6.LEATHER, BlockList1_6.FIRE, ItemList1_6.INGOT_IRON, ItemList1_6.DIAMOND, ItemList1_6.INGOT_GOLD}, {ItemList1_6.HELMET_LEATHER, ItemList1_6.HELMET_CHAIN, ItemList1_6.HELMET_IRON, ItemList1_6.HELMET_DIAMOND, ItemList1_6.HELMET_GOLD}, {ItemList1_6.PLATE_LEATHER, ItemList1_6.PLATE_CHAIN, ItemList1_6.PLATE_IRON, ItemList1_6.PLATE_DIAMOND, ItemList1_6.PLATE_GOLD}, {ItemList1_6.LEGS_LEATHER, ItemList1_6.LEGS_CHAIN, ItemList1_6.LEGS_IRON, ItemList1_6.LEGS_DIAMOND, ItemList1_6.LEGS_GOLD}, {ItemList1_6.BOOTS_LEATHER, ItemList1_6.BOOTS_CHAIN, ItemList1_6.BOOTS_IRON, ItemList1_6.BOOTS_DIAMOND, ItemList1_6.BOOTS_GOLD}};
 
     static {
-        for (int i = 0; i < tools_ingredients[0].length; ++i) {
-            for (int i1 = 0; i1 < tools_ingredients.length - 1; ++i1) {
-                addRecipe(new DataItem(tools_ingredients[i1 + 1][i], (byte) 1, (short) 0, null), tools_pattern[i1], '#', ItemList1_6.stick.itemId(), 'X', tools_ingredients[0][i]);
+        for (int i = 0; i < TOOLS_INGREDIENTS[0].length; ++i) {
+            for (int i1 = 0; i1 < TOOLS_INGREDIENTS.length - 1; ++i1) {
+                addRecipe(new DataItem(TOOLS_INGREDIENTS[i1 + 1][i], (byte) 1, (short) 0, null), TOOLS_PATTERN[i1], '#', ItemList1_6.STICK, 'X', TOOLS_INGREDIENTS[0][i]);
             }
         }
-        for (int i = 0; i < weapons_ingredients[0].length; ++i) {
-            for (int i1 = 0; i1 < weapons_ingredients.length - 1; ++i1) {
-                addRecipe(new DataItem(weapons_ingredients[i1 + 1][i], (byte) 1, (short) 0, null), weapons_pattern[i1], '#', ItemList1_6.stick.itemId(), 'X', weapons_ingredients[0][i]);
+        for (int i = 0; i < WEAPONS_INGREDIENTS[0].length; ++i) {
+            for (int i1 = 0; i1 < WEAPONS_INGREDIENTS.length - 1; ++i1) {
+                addRecipe(new DataItem(WEAPONS_INGREDIENTS[i1 + 1][i], (byte) 1, (short) 0, null), WEAPONS_PATTERN[i1], '#', ItemList1_6.STICK, 'X', WEAPONS_INGREDIENTS[0][i]);
             }
         }
-        addRecipe(new DataItem(ItemList1_6.bow.itemId(), (byte) 1, (short) 0, null), " #X", "# X", " #X", 'X', ItemList1_6.silk.itemId(), '#', ItemList1_6.stick.itemId());
-        addRecipe(new DataItem(ItemList1_6.arrow.itemId(), (byte) 4, (short) 0, null), "X", "#", "Y", 'Y', ItemList1_6.feather.itemId(), 'X', ItemList1_6.flint.itemId(), '#', ItemList1_6.stick.itemId());
-        for (int[] ingots_ingredient : ingots_ingredients) {
-            addRecipe(new DataItem(ingots_ingredient[0], (byte) 1, (short) 0, null), "###", "###", "###", '#', ingots_ingredient[1]);
-            addRecipe(new DataItem(ingots_ingredient[1], (byte) 9, (short) 0, null), "#", '#', ingots_ingredient[0]);
+        addRecipe(new DataItem(ItemList1_6.BOW, (byte) 1, (short) 0, null), " #X", "# X", " #X", 'X', ItemList1_6.SILK, '#', ItemList1_6.STICK);
+        addRecipe(new DataItem(ItemList1_6.ARROW, (byte) 4, (short) 0, null), "X", "#", "Y", 'Y', ItemList1_6.FEATHER, 'X', ItemList1_6.FLINT, '#', ItemList1_6.STICK);
+        for (int[] ingotsIngredient : INGOTS_INGREDIENTS) {
+            addRecipe(new DataItem(ingotsIngredient[0], (byte) 1, (short) 0, null), "###", "###", "###", '#', ingotsIngredient[1]);
+            addRecipe(new DataItem(ingotsIngredient[1], (byte) 9, (short) 0, null), "#", '#', ingotsIngredient[0]);
         }
-        addRecipe(new DataItem(ItemList1_6.bowlSoup.itemId(), (byte) 1, (short) 0, null), "Y", "X", "#", 'X', BlockList1_6.mushroomBrown.blockId(), 'Y', BlockList1_6.mushroomRed.blockId(), '#', ItemList1_6.bowlEmpty.itemId());
-        addRecipe(new DataItem(ItemList1_6.bowlSoup.itemId(), (byte) 1, (short) 0, null), "Y", "X", "#", 'X', BlockList1_6.mushroomRed.blockId(), 'Y', BlockList1_6.mushroomBrown.blockId(), '#', ItemList1_6.bowlEmpty.itemId());
-        addRecipe(new DataItem(BlockList1_6.chest.blockId(), (byte) 1, (short) 0, null), "###", "# #", "###", '#', BlockList1_6.planks.blockId());
-        addRecipe(new DataItem(BlockList1_6.furnaceIdle.blockId(), (byte) 1, (short) 0, null), "###", "# #", "###", '#', BlockList1_6.cobblestone.blockId());
-        addRecipe(new DataItem(BlockList1_6.workbench.blockId(), (byte) 1, (short) 0, null), "##", "##", '#', BlockList1_6.planks.blockId());
-        for (int i = 0; i < armor_ingredients[0].length; ++i) {
-            for (int i1 = 0; i1 < armor_ingredients.length - 1; ++i1) {
-                addRecipe(new DataItem(armor_ingredients[i1 + 1][i], (byte) 1, (short) 0, null), armor_pattern[i1], 'X', armor_ingredients[0][i]);
+        addRecipe(new DataItem(ItemList1_6.BOWL_SOUP, (byte) 1, (short) 0, null), "Y", "X", "#", 'X', BlockList1_6.MUSHROOM_BROWN, 'Y', BlockList1_6.MUSHROOM_RED, '#', ItemList1_6.BOWL_EMPTY);
+        addRecipe(new DataItem(ItemList1_6.BOWL_SOUP, (byte) 1, (short) 0, null), "Y", "X", "#", 'X', BlockList1_6.MUSHROOM_RED, 'Y', BlockList1_6.MUSHROOM_BROWN, '#', ItemList1_6.BOWL_EMPTY);
+        addRecipe(new DataItem(BlockList1_6.CHEST, (byte) 1, (short) 0, null), "###", "# #", "###", '#', BlockList1_6.PLANKS);
+        addRecipe(new DataItem(BlockList1_6.FURNACE_IDLE, (byte) 1, (short) 0, null), "###", "# #", "###", '#', BlockList1_6.COBBLESTONE);
+        addRecipe(new DataItem(BlockList1_6.WORKBENCH, (byte) 1, (short) 0, null), "##", "##", '#', BlockList1_6.PLANKS);
+        for (int i = 0; i < ARMOR_INGREDIENTS[0].length; ++i) {
+            for (int i1 = 0; i1 < ARMOR_INGREDIENTS.length - 1; ++i1) {
+                addRecipe(new DataItem(ARMOR_INGREDIENTS[i1 + 1][i], (byte) 1, (short) 0, null), ARMOR_PATTERN[i1], 'X', ARMOR_INGREDIENTS[0][i]);
             }
         }
-        addRecipe(new DataItem(ItemList1_6.paper.itemId(), (byte) 3, (short) 0, null), "###", '#', ItemList1_6.reed.itemId());
-        addRecipe(new DataItem(ItemList1_6.book.itemId(), (byte) 1, (short) 0, null), "#", "#", "#", '#', ItemList1_6.paper.itemId());
-        addRecipe(new DataItem(BlockList1_6.fence.blockId(), (byte) 2, (short) 0, null), "###", "###", '#', ItemList1_6.stick.itemId());
-        addRecipe(new DataItem(BlockList1_6.jukebox.blockId(), (byte) 1, (short) 0, null), "###", "#X#", "###", '#', BlockList1_6.planks.blockId(), 'X', ItemList1_6.diamond.itemId());
-        addRecipe(new DataItem(BlockList1_6.bookShelf.blockId(), (byte) 1, (short) 0, null), "###", "XXX", "###", '#', BlockList1_6.planks.blockId(), 'X', ItemList1_6.book.itemId());
-        addRecipe(new DataItem(BlockList1_6.blockSnow.blockId(), (byte) 1, (short) 0, null), "##", "##", '#', ItemList1_6.snowball.itemId());
-        addRecipe(new DataItem(BlockList1_6.blockClay.blockId(), (byte) 1, (short) 0, null), "##", "##", '#', ItemList1_6.clay.itemId());
-        addRecipe(new DataItem(BlockList1_6.brick.blockId(), (byte) 1, (short) 0, null), "##", "##", '#', ItemList1_6.brick.itemId());
-        addRecipe(new DataItem(BlockList1_6.glowStone.blockId(), (byte) 1, (short) 0, null), "###", "###", "###", '#', ItemList1_6.glowstone.itemId());
-        addRecipe(new DataItem(BlockList1_6.cloth.blockId(), (byte) 1, (short) 0, null), "###", "###", "###", '#', ItemList1_6.silk.itemId());
-        addRecipe(new DataItem(BlockList1_6.tnt.blockId(), (byte) 1, (short) 0, null), "X#X", "#X#", "X#X", 'X', ItemList1_6.gunpowder.itemId(), '#', BlockList1_6.sand.blockId());
-        addRecipe(new DataItem(BlockList1_6.stoneSingleSlab.blockId(), (byte) 3, (short) 0, null), "###", '#', BlockList1_6.cobblestone.blockId());
-        addRecipe(new DataItem(BlockList1_6.ladder.blockId(), (byte) 1, (short) 0, null), "# #", "###", "# #", '#', ItemList1_6.stick.itemId());
-        addRecipe(new DataItem(ItemList1_6.doorWood.itemId(), (byte) 1, (short) 0, null), "##", "##", "##", '#', BlockList1_6.planks.blockId());
-        addRecipe(new DataItem(ItemList1_6.doorIron.itemId(), (byte) 1, (short) 0, null), "##", "##", "##", '#', ItemList1_6.ingotIron.itemId());
-        addRecipe(new DataItem(ItemList1_6.sign.itemId(), (byte) 1, (short) 0, null), "###", "###", " X ", '#', BlockList1_6.planks.blockId(), 'X', ItemList1_6.stick.itemId());
-        addRecipe(new DataItem(BlockList1_6.planks.blockId(), (byte) 4, (short) 0, null), "#", '#', BlockList1_6.wood.blockId());
-        addRecipe(new DataItem(ItemList1_6.stick.itemId(), (byte) 4, (short) 0, null), "#", "#", '#', BlockList1_6.planks.blockId());
-        addRecipe(new DataItem(BlockList1_6.torchWood.blockId(), (byte) 4, (short) 0, null), "X", "#", 'X', ItemList1_6.coal.itemId(), '#', ItemList1_6.stick.itemId());
-        addRecipe(new DataItem(ItemList1_6.bowlEmpty.itemId(), (byte) 4, (short) 0, null), "# #", " # ", '#', BlockList1_6.planks.blockId());
-        addRecipe(new DataItem(BlockList1_6.rail.blockId(), (byte) 16, (short) 0, null), "X X", "X#X", "X X", 'X', ItemList1_6.ingotIron.itemId(), '#', ItemList1_6.stick.itemId());
-        addRecipe(new DataItem(ItemList1_6.minecartEmpty.itemId(), (byte) 1, (short) 0, null), "# #", "###", '#', ItemList1_6.ingotIron.itemId());
-        addRecipe(new DataItem(BlockList1_6.pumpkinLantern.blockId(), (byte) 1, (short) 0, null), "A", "B", 'A', BlockList1_6.pumpkin.blockId(), 'B', BlockList1_6.torchWood.blockId());
-        addRecipe(new DataItem(ItemList1_6.minecartCrate.itemId(), (byte) 1, (short) 0, null), "A", "B", 'A', BlockList1_6.chest.blockId(), 'B', ItemList1_6.minecartEmpty.itemId());
-        addRecipe(new DataItem(ItemList1_6.minecartPowered.itemId(), (byte) 1, (short) 0, null), "A", "B", 'A', BlockList1_6.furnaceIdle.blockId(), 'B', ItemList1_6.minecartEmpty.itemId());
-        addRecipe(new DataItem(ItemList1_6.boat.itemId(), (byte) 1, (short) 0, null), "# #", "###", '#', BlockList1_6.planks.blockId());
-        addRecipe(new DataItem(ItemList1_6.bucketEmpty.itemId(), (byte) 1, (short) 0, null), "# #", " # ", '#', ItemList1_6.ingotIron.itemId());
-        addRecipe(new DataItem(ItemList1_6.flintAndSteel.itemId(), (byte) 1, (short) 0, null), "A ", " B", 'A', ItemList1_6.ingotIron.itemId(), 'B', ItemList1_6.flint.itemId());
-        addRecipe(new DataItem(ItemList1_6.bread.itemId(), (byte) 1, (short) 0, null), "###", '#', ItemList1_6.wheat.itemId());
-        addRecipe(new DataItem(BlockList1_6.stairsWoodOak.blockId(), (byte) 4, (short) 0, null), "#  ", "## ", "###", '#', BlockList1_6.planks.blockId());
-        addRecipe(new DataItem(ItemList1_6.fishingRod.itemId(), (byte) 1, (short) 0, null), "  #", " #X", "# X", '#', ItemList1_6.stick.itemId(), 'X', ItemList1_6.silk.itemId());
-        addRecipe(new DataItem(BlockList1_6.stairsCobblestone.blockId(), (byte) 4, (short) 0, null), "#  ", "## ", "###", '#', BlockList1_6.cobblestone.blockId());
-        addRecipe(new DataItem(ItemList1_6.painting.itemId(), (byte) 1, (short) 0, null), "###", "#X#", "###", '#', ItemList1_6.stick.itemId(), 'X', BlockList1_6.cloth.blockId());
-        addRecipe(new DataItem(ItemList1_6.appleGold.itemId(), (byte) 1, (short) 0, null), "###", "#X#", "###", '#', BlockList1_6.blockGold.blockId(), 'X', ItemList1_6.appleRed.itemId());
-        addRecipe(new DataItem(BlockList1_6.lever.blockId(), (byte) 1, (short) 0, null), "X", "#", '#', BlockList1_6.cobblestone.blockId(), 'X', ItemList1_6.stick.itemId());
-        addRecipe(new DataItem(BlockList1_6.torchRedstoneActive.blockId(), (byte) 1, (short) 0, null), "X", "#", '#', ItemList1_6.stick.itemId(), 'X', ItemList1_6.redstone.itemId());
-        addRecipe(new DataItem(ItemList1_6.pocketSundial.itemId(), (byte) 1, (short) 0, null), " # ", "#X#", " # ", '#', ItemList1_6.ingotGold.itemId(), 'X', ItemList1_6.redstone.itemId());
-        addRecipe(new DataItem(ItemList1_6.compass.itemId(), (byte) 1, (short) 0, null), " # ", "#X#", " # ", '#', ItemList1_6.ingotIron.itemId(), 'X', ItemList1_6.redstone.itemId());
-        addRecipe(new DataItem(BlockList1_6.stoneButton.blockId(), (byte) 1, (short) 0, null), "#", "#", '#', BlockList1_6.stone.blockId());
-        addRecipe(new DataItem(BlockList1_6.pressurePlateStone.blockId(), (byte) 1, (short) 0, null), "###", '#', BlockList1_6.stone.blockId());
-        addRecipe(new DataItem(BlockList1_6.pressurePlatePlanks.blockId(), (byte) 1, (short) 0, null), "###", '#', BlockList1_6.planks.blockId());
-        recipes.sort((o1, o2) -> Integer.compare(o2.getRecipeSize(), o1.getRecipeSize()));
+        addRecipe(new DataItem(ItemList1_6.PAPER, (byte) 3, (short) 0, null), "###", '#', ItemList1_6.REED);
+        addRecipe(new DataItem(ItemList1_6.BOOK, (byte) 1, (short) 0, null), "#", "#", "#", '#', ItemList1_6.PAPER);
+        addRecipe(new DataItem(BlockList1_6.FENCE, (byte) 2, (short) 0, null), "###", "###", '#', ItemList1_6.STICK);
+        addRecipe(new DataItem(BlockList1_6.JUKEBOX, (byte) 1, (short) 0, null), "###", "#X#", "###", '#', BlockList1_6.PLANKS, 'X', ItemList1_6.DIAMOND);
+        addRecipe(new DataItem(BlockList1_6.BOOK_SHELF, (byte) 1, (short) 0, null), "###", "XXX", "###", '#', BlockList1_6.PLANKS, 'X', ItemList1_6.BOOK);
+        addRecipe(new DataItem(BlockList1_6.BLOCK_SNOW, (byte) 1, (short) 0, null), "##", "##", '#', ItemList1_6.SNOWBALL);
+        addRecipe(new DataItem(BlockList1_6.BLOCK_CLAY, (byte) 1, (short) 0, null), "##", "##", '#', ItemList1_6.CLAY);
+        addRecipe(new DataItem(BlockList1_6.BRICK, (byte) 1, (short) 0, null), "##", "##", '#', ItemList1_6.BRICK);
+        addRecipe(new DataItem(BlockList1_6.GLOW_STONE, (byte) 1, (short) 0, null), "###", "###", "###", '#', ItemList1_6.GLOWSTONE);
+        addRecipe(new DataItem(BlockList1_6.CLOTH, (byte) 1, (short) 0, null), "###", "###", "###", '#', ItemList1_6.SILK);
+        addRecipe(new DataItem(BlockList1_6.TNT, (byte) 1, (short) 0, null), "X#X", "#X#", "X#X", 'X', ItemList1_6.GUNPOWDER, '#', BlockList1_6.SAND);
+        addRecipe(new DataItem(BlockList1_6.STONE_SINGLE_SLAB, (byte) 3, (short) 0, null), "###", '#', BlockList1_6.COBBLESTONE);
+        addRecipe(new DataItem(BlockList1_6.LADDER, (byte) 1, (short) 0, null), "# #", "###", "# #", '#', ItemList1_6.STICK);
+        addRecipe(new DataItem(ItemList1_6.DOOR_WOOD, (byte) 1, (short) 0, null), "##", "##", "##", '#', BlockList1_6.PLANKS);
+        addRecipe(new DataItem(ItemList1_6.DOOR_IRON, (byte) 1, (short) 0, null), "##", "##", "##", '#', ItemList1_6.INGOT_IRON);
+        addRecipe(new DataItem(ItemList1_6.SIGN, (byte) 1, (short) 0, null), "###", "###", " X ", '#', BlockList1_6.PLANKS, 'X', ItemList1_6.STICK);
+        addRecipe(new DataItem(BlockList1_6.PLANKS, (byte) 4, (short) 0, null), "#", '#', BlockList1_6.WOOD);
+        addRecipe(new DataItem(ItemList1_6.STICK, (byte) 4, (short) 0, null), "#", "#", '#', BlockList1_6.PLANKS);
+        addRecipe(new DataItem(BlockList1_6.TORCH_WOOD, (byte) 4, (short) 0, null), "X", "#", 'X', ItemList1_6.COAL, '#', ItemList1_6.STICK);
+        addRecipe(new DataItem(ItemList1_6.BOWL_EMPTY, (byte) 4, (short) 0, null), "# #", " # ", '#', BlockList1_6.PLANKS);
+        addRecipe(new DataItem(BlockList1_6.RAIL, (byte) 16, (short) 0, null), "X X", "X#X", "X X", 'X', ItemList1_6.INGOT_IRON, '#', ItemList1_6.STICK);
+        addRecipe(new DataItem(ItemList1_6.MINECART_EMPTY, (byte) 1, (short) 0, null), "# #", "###", '#', ItemList1_6.INGOT_IRON);
+        addRecipe(new DataItem(BlockList1_6.PUMPKIN_LANTERN, (byte) 1, (short) 0, null), "A", "B", 'A', BlockList1_6.PUMPKIN, 'B', BlockList1_6.TORCH_WOOD);
+        addRecipe(new DataItem(ItemList1_6.MINECART_CRATE, (byte) 1, (short) 0, null), "A", "B", 'A', BlockList1_6.CHEST, 'B', ItemList1_6.MINECART_EMPTY);
+        addRecipe(new DataItem(ItemList1_6.MINECART_POWERED, (byte) 1, (short) 0, null), "A", "B", 'A', BlockList1_6.FURNACE_IDLE, 'B', ItemList1_6.MINECART_EMPTY);
+        addRecipe(new DataItem(ItemList1_6.BOAT, (byte) 1, (short) 0, null), "# #", "###", '#', BlockList1_6.PLANKS);
+        addRecipe(new DataItem(ItemList1_6.BUCKET_EMPTY, (byte) 1, (short) 0, null), "# #", " # ", '#', ItemList1_6.INGOT_IRON);
+        addRecipe(new DataItem(ItemList1_6.FLINT_AND_STEEL, (byte) 1, (short) 0, null), "A ", " B", 'A', ItemList1_6.INGOT_IRON, 'B', ItemList1_6.FLINT);
+        addRecipe(new DataItem(ItemList1_6.BREAD, (byte) 1, (short) 0, null), "###", '#', ItemList1_6.WHEAT);
+        addRecipe(new DataItem(BlockList1_6.STAIRS_WOOD_OAK, (byte) 4, (short) 0, null), "#  ", "## ", "###", '#', BlockList1_6.PLANKS);
+        addRecipe(new DataItem(ItemList1_6.FISHING_ROD, (byte) 1, (short) 0, null), "  #", " #X", "# X", '#', ItemList1_6.STICK, 'X', ItemList1_6.SILK);
+        addRecipe(new DataItem(BlockList1_6.STAIRS_COBBLESTONE, (byte) 4, (short) 0, null), "#  ", "## ", "###", '#', BlockList1_6.COBBLESTONE);
+        addRecipe(new DataItem(ItemList1_6.PAINTING, (byte) 1, (short) 0, null), "###", "#X#", "###", '#', ItemList1_6.STICK, 'X', BlockList1_6.CLOTH);
+        addRecipe(new DataItem(ItemList1_6.APPLE_GOLD, (byte) 1, (short) 0, null), "###", "#X#", "###", '#', BlockList1_6.BLOCK_GOLD, 'X', ItemList1_6.APPLE_RED);
+        addRecipe(new DataItem(BlockList1_6.LEVER, (byte) 1, (short) 0, null), "X", "#", '#', BlockList1_6.COBBLESTONE, 'X', ItemList1_6.STICK);
+        addRecipe(new DataItem(BlockList1_6.TORCH_REDSTONE_ACTIVE, (byte) 1, (short) 0, null), "X", "#", '#', ItemList1_6.STICK, 'X', ItemList1_6.REDSTONE);
+        addRecipe(new DataItem(ItemList1_6.POCKET_SUNDIAL, (byte) 1, (short) 0, null), " # ", "#X#", " # ", '#', ItemList1_6.INGOT_GOLD, 'X', ItemList1_6.REDSTONE);
+        addRecipe(new DataItem(ItemList1_6.COMPASS, (byte) 1, (short) 0, null), " # ", "#X#", " # ", '#', ItemList1_6.INGOT_IRON, 'X', ItemList1_6.REDSTONE);
+        addRecipe(new DataItem(BlockList1_6.STONE_BUTTON, (byte) 1, (short) 0, null), "#", "#", '#', BlockList1_6.STONE);
+        addRecipe(new DataItem(BlockList1_6.PRESSURE_PLATE_STONE, (byte) 1, (short) 0, null), "###", '#', BlockList1_6.STONE);
+        addRecipe(new DataItem(BlockList1_6.PRESSURE_PLATE_PLANKS, (byte) 1, (short) 0, null), "###", '#', BlockList1_6.PLANKS);
+        RECIPES.sort((o1, o2) -> Integer.compare(o2.getRecipeSize(), o1.getRecipeSize()));
+    }
+
+    private CraftingManager() {
     }
 
     private static void addRecipe(final Item resultItem, final Object... objects) {
-        StringBuilder var3 = new StringBuilder();
+        final StringBuilder var3 = new StringBuilder();
         int pos = 0;
         int width = 0;
         int height = 0;
 
         if (objects[pos] instanceof String[]) {
-            String[] var11 = (String[]) objects[pos++];
+            final String[] var11 = (String[]) objects[pos++];
 
             for (String var9 : var11) {
                 height++;
@@ -129,7 +132,7 @@ public class CraftingManager {
             }
         } else {
             while (objects[pos] instanceof String) {
-                String var7 = (String) objects[pos++];
+                final String var7 = (String) objects[pos++];
                 height++;
                 width = var7.length();
                 var3.append(var7);
@@ -147,7 +150,7 @@ public class CraftingManager {
             ingredientMap[i] = lookup.getOrDefault(var3.charAt(i), -1);
         }
 
-        recipes.add(new CraftingRecipe(width, height, ingredientMap, resultItem));
+        RECIPES.add(new CraftingRecipe(width, height, ingredientMap, resultItem));
     }
 
     public static Item getResult(final Item[] craftingGrid) {
@@ -170,7 +173,7 @@ public class CraftingManager {
     }
 
     public static Item getResult(final int[] ingredientMap) {
-        for (CraftingRecipe recipe : recipes) {
+        for (CraftingRecipe recipe : RECIPES) {
             if (recipe.matches(ingredientMap)) {
                 return recipe.createResult();
             }

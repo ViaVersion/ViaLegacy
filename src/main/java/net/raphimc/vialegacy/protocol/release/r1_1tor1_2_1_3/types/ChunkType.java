@@ -18,7 +18,11 @@
 package net.raphimc.vialegacy.protocol.release.r1_1tor1_2_1_3.types;
 
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
-import com.viaversion.viaversion.api.minecraft.chunks.*;
+import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.IdAndData;
 import io.netty.buffer.ByteBuf;
@@ -36,7 +40,7 @@ public class ChunkType extends Type<Chunk> {
     }
 
     @Override
-    public Chunk read(ByteBuf byteBuf) {
+    public Chunk read(final ByteBuf byteBuf) {
         final int xPosition = byteBuf.readInt();
         final int yPosition = byteBuf.readShort();
         final int zPosition = byteBuf.readInt();
@@ -51,7 +55,7 @@ public class ChunkType extends Type<Chunk> {
         inflater.setInput(compressedData);
         try {
             inflater.inflate(uncompressedData);
-        } catch (DataFormatException dataformatexception) {
+        } catch (final DataFormatException dataformatexception) {
             throw new RuntimeException("Bad compressed data format");
         } finally {
             inflater.end();
@@ -61,7 +65,7 @@ public class ChunkType extends Type<Chunk> {
     }
 
     @Override
-    public void write(ByteBuf byteBuf, Chunk chunk) {
+    public void write(final ByteBuf byteBuf, final Chunk chunk) {
         throw new UnsupportedOperationException();
     }
 
@@ -93,7 +97,9 @@ public class ChunkType extends Type<Chunk> {
             System.arraycopy(chunkData, blockLightOffset, blockLightArray.getHandle(), 0, blockLightArray.getHandle().length);
             System.arraycopy(chunkData, skyLightOffset, skyLightArray.getHandle(), 0, skyLightArray.getHandle().length);
         } else {
-            if (chunkX != endChunkX || chunkZ != endChunkZ) throw new IllegalStateException("Can't decode 1.1 non full-chunk which spans over multiple chunks");
+            if (chunkX != endChunkX || chunkZ != endChunkZ) {
+                throw new IllegalStateException("Can't decode 1.1 non full-chunk which spans over multiple chunks");
+            }
 
             int offset = 0;
             for (int x = startX; x < endX; x++) {

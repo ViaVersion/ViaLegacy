@@ -38,17 +38,17 @@ import java.util.regex.Pattern;
 public abstract class GameProfileFetcher implements Provider {
 
     private static final GameProfile NULL_GAME_PROFILE = new GameProfile(null, null);
-    private static final Pattern COLOR_CODE_PATTERN = Pattern.compile("(?i)\\u00A7[0-9A-FK-OR]");
+    private static final Pattern COLOR_CODE_PATTERN = Pattern.compile("(?i)§[0-9A-FK-OR]");
 
     private final LoadingCache<String, UUID> uuidCache = CacheBuilder.newBuilder().expireAfterWrite(6, TimeUnit.HOURS).build(new CacheLoader<>() {
         @Override
-        public UUID load(String key) throws Exception {
+        public UUID load(final String key) throws Exception {
             return GameProfileFetcher.this.loadMojangUuid(key);
         }
     });
     private final LoadingCache<UUID, GameProfile> gameProfileCache = CacheBuilder.newBuilder().expireAfterWrite(6, TimeUnit.HOURS).build(new CacheLoader<>() {
         @Override
-        public GameProfile load(UUID key) throws Exception {
+        public GameProfile load(final UUID key) throws Exception {
             return GameProfileFetcher.this.loadGameProfile(key);
         }
     });
@@ -62,7 +62,9 @@ public abstract class GameProfileFetcher implements Provider {
         try {
             return this.uuidCache.get(playerName);
         } catch (Throwable e) {
-            while (e instanceof ExecutionException || e instanceof UncheckedExecutionException || e instanceof CompletionException || e instanceof ExecutionError) e = e.getCause();
+            while (e instanceof ExecutionException || e instanceof UncheckedExecutionException || e instanceof CompletionException || e instanceof ExecutionError) {
+                e = e.getCause();
+            }
             ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Failed to load uuid for player '" + playerName + "' (" + e.getClass().getName() + ")");
         }
         final UUID uuid = GameProfileUtil.getOfflinePlayerUuid(playerName);
@@ -90,7 +92,9 @@ public abstract class GameProfileFetcher implements Provider {
             }
             return value;
         } catch (Throwable e) {
-            while (e instanceof ExecutionException || e instanceof UncheckedExecutionException || e instanceof CompletionException || e instanceof ExecutionError) e = e.getCause();
+            while (e instanceof ExecutionException || e instanceof UncheckedExecutionException || e instanceof CompletionException || e instanceof ExecutionError) {
+                e = e.getCause();
+            }
             ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Failed to load game profile for uuid '" + uuid + "' (" + e.getClass().getName() + ")");
         }
         this.gameProfileCache.put(uuid, NULL_GAME_PROFILE);

@@ -26,7 +26,7 @@ public class StringType extends Type<String> {
         super(String.class);
     }
 
-    public String read(ByteBuf buffer) {
+    public String read(final ByteBuf buffer) {
         final short length = buffer.readShort();
         final StringBuilder builder = new StringBuilder();
         for (int i = 0; i < length; i++) {
@@ -35,7 +35,7 @@ public class StringType extends Type<String> {
         return builder.toString();
     }
 
-    public void write(ByteBuf buffer, String s) {
+    public void write(final ByteBuf buffer, final String s) {
         buffer.writeShort(s.length());
         for (char c : s.toCharArray()) {
             buffer.writeChar(c);

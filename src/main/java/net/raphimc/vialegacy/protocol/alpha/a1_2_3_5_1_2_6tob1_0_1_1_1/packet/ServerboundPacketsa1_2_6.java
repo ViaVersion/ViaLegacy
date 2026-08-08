@@ -31,16 +31,18 @@ public enum ServerboundPacketsa1_2_6 implements ServerboundPacketType, PreNettyP
     }),
     LOGIN(1, (user, buf) -> {
         buf.skipBytes(4);
-        PreNettyTypes.readUTF(buf);
-        PreNettyTypes.readUTF(buf);
+        PreNettyTypes.readUtf(buf);
+        PreNettyTypes.readUtf(buf);
         buf.skipBytes(9);
     }),
-    HANDSHAKE(2, (user, buf) -> PreNettyTypes.readUTF(buf)),
-    CHAT(3, (user, buf) -> PreNettyTypes.readUTF(buf)),
+    HANDSHAKE(2, (user, buf) -> PreNettyTypes.readUtf(buf)),
+    CHAT(3, (user, buf) -> PreNettyTypes.readUtf(buf)),
     PLAYER_INVENTORY(5, (user, buf) -> {
         buf.skipBytes(4);
-        int x = buf.readShort();
-        for (int i = 0; i < x; i++) PreNettyTypes.readItemStackb1_2(buf);
+        final int x = buf.readShort();
+        for (int i = 0; i < x; i++) {
+            PreNettyTypes.readItemStackb1_2(buf);
+        }
     }),
     INTERACT(7, (user, buf) -> buf.skipBytes(9)),
     RESPAWN(9, (user, buf) -> {
@@ -56,12 +58,17 @@ public enum ServerboundPacketsa1_2_6 implements ServerboundPacketType, PreNettyP
     SPAWN_ITEM(21, (user, buf) -> buf.skipBytes(22)),
     BLOCK_ENTITY_DATA(59, (user, buf) -> {
         buf.skipBytes(10);
-        int x = buf.readUnsignedShort();
-        for (int i = 0; i < x; i++) buf.readByte();
+        final int x = buf.readUnsignedShort();
+        for (int i = 0; i < x; i++) {
+            buf.readByte();
+        }
     }),
-    DISCONNECT(255, (user, buf) -> PreNettyTypes.readUTF(buf));
+    DISCONNECT(255, (user, buf) -> PreNettyTypes.readUtf(buf));
 
     private static final ServerboundPacketsa1_2_6[] REGISTRY = new ServerboundPacketsa1_2_6[256];
+
+    private final int id;
+    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     static {
         for (ServerboundPacketsa1_2_6 packet : values()) {
@@ -72,9 +79,6 @@ public enum ServerboundPacketsa1_2_6 implements ServerboundPacketType, PreNettyP
     public static ServerboundPacketsa1_2_6 getPacket(final int id) {
         return REGISTRY[id];
     }
-
-    private final int id;
-    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     ServerboundPacketsa1_2_6(final int id, final BiConsumer<UserConnection, ByteBuf> packetReader) {
         this.id = id;

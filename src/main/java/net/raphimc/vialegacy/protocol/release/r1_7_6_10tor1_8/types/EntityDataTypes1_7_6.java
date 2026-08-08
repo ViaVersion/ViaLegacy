@@ -31,20 +31,20 @@ public enum EntityDataTypes1_7_6 implements EntityDataType {
     ITEM(5, Types1_7_6.ITEM),
     BLOCK_POSITION(6, Types.VECTOR);
 
-    private final int typeID;
+    private final int typeId;
     private final Type<?> type;
 
-    EntityDataTypes1_7_6(int typeID, Type<?> type) {
-        this.typeID = typeID;
+    EntityDataTypes1_7_6(final int typeId, final Type<?> type) {
+        this.typeId = typeId;
         this.type = type;
     }
 
-    public static EntityDataTypes1_7_6 byId(int id) {
+    public static EntityDataTypes1_7_6 byId(final int id) {
         return values()[id];
     }
 
     public int typeId() {
-        return this.typeID;
+        return this.typeId;
     }
 
     public Type<?> type() {

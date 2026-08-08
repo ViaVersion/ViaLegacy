@@ -17,7 +17,6 @@
  */
 package net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.rewriter;
 
-
 import com.viaversion.viaversion.libs.fastutil.objects.Object2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2ObjectOpenHashMap;
 import com.viaversion.viaversion.libs.mcstructs.text.TextComponent;
@@ -27,7 +26,7 @@ import com.viaversion.viaversion.libs.mcstructs.text.serializer.LegacyStringDese
 import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSerializer;
 import com.viaversion.viaversion.libs.mcstructs.text.utils.TextUtils;
 
-public class TextRewriter {
+public final class TextRewriter {
 
     private static final Object2ObjectMap<String, String> TRANSLATIONS = new Object2ObjectOpenHashMap<>(37, 0.99F);
 
@@ -69,6 +68,9 @@ public class TextRewriter {
         TRANSLATIONS.put("commands.weather.usage", "/weather <clear/rain/thunder> [duration in seconds]");
         TRANSLATIONS.put("mco.configure.world.subscription.extend", "Extend");
         TRANSLATIONS.put("mco.configure.world.restore.question.line1", "Your realm will be restored to a previous version");
+    }
+
+    private TextRewriter() {
     }
 
     public static String toClient(final String text) {

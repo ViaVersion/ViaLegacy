@@ -38,7 +38,7 @@ public class Protocola1_0_17_1_0_17_4Toa1_1_0_1_1_2_1 extends StatelessProtocol<
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocola1_0_17_1_0_17_4Toa1_1_0_1_1_2_1.class, ClientboundPacketsa1_0_17::getPacket));
     }
 

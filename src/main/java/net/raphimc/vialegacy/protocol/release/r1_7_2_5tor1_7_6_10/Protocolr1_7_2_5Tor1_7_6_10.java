@@ -94,12 +94,18 @@ public class Protocolr1_7_2_5Tor1_7_6_10 extends AbstractProtocol<ClientboundPac
                     final BlockPosition pos = wrapper.get(Types1_7_6.BLOCK_POSITION_SHORT, 0);
                     final short type = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     final CompoundTag tag = wrapper.get(Types1_7_6.NBT, 0);
-                    if (type != 4/*skull*/) return;
+                    if (type != 4/*skull*/) {
+                        return;
+                    }
                     final byte skullType = tag.getByte("SkullType");
-                    if (skullType != 3 /*player_skull*/) return;
+                    if (skullType != 3 /*player_skull*/) {
+                        return;
+                    }
 
                     final StringTag extraType = tag.removeUnchecked("ExtraType");
-                    if (extraType == null || extraType.getValue().isEmpty()) return;
+                    if (extraType == null || extraType.getValue().isEmpty()) {
+                        return;
+                    }
 
                     if (ViaLegacy.getConfig().isLegacySkullLoading()) {
                         final GameProfileFetcher gameProfileFetcher = Via.getManager().getProviders().get(GameProfileFetcher.class);
@@ -111,7 +117,9 @@ public class Protocolr1_7_2_5Tor1_7_6_10 extends AbstractProtocol<ClientboundPac
                             final UUID uuid = gameProfileFetcher.getMojangUuid(skullName);
                             if (gameProfileFetcher.isGameProfileLoaded(uuid)) {
                                 final GameProfile skullProfile = gameProfileFetcher.getGameProfile(uuid);
-                                if (skullProfile == null) return;
+                                if (skullProfile == null) {
+                                    return;
+                                }
 
                                 newTag.put("Owner", writeGameProfileToTag(skullProfile));
                                 wrapper.set(Types1_7_6.NBT, 0, newTag);
@@ -121,7 +129,9 @@ public class Protocolr1_7_2_5Tor1_7_6_10 extends AbstractProtocol<ClientboundPac
 
                         gameProfileFetcher.getMojangUuidAsync(skullName).thenAccept(uuid -> {
                             final GameProfile skullProfile = gameProfileFetcher.getGameProfile(uuid);
-                            if (skullProfile == null) return;
+                            if (skullProfile == null) {
+                                return;
+                            }
 
                             newTag.put("Owner", writeGameProfileToTag(skullProfile));
                             try {
@@ -130,7 +140,7 @@ public class Protocolr1_7_2_5Tor1_7_6_10 extends AbstractProtocol<ClientboundPac
                                 updateSkull.write(Types.UNSIGNED_BYTE, type);
                                 updateSkull.write(Types1_7_6.NBT, newTag);
                                 updateSkull.send(Protocolr1_7_2_5Tor1_7_6_10.class);
-                            } catch (Throwable e) {
+                            } catch (final Throwable e) {
                                 ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Failed to update skull block entity data for " + skullName, e);
                             }
                         });

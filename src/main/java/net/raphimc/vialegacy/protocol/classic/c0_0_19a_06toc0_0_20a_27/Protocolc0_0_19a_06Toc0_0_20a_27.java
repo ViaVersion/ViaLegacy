@@ -61,7 +61,7 @@ public class Protocolc0_0_19a_06Toc0_0_20a_27 extends StatelessProtocol<Clientbo
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolc0_0_19a_06Toc0_0_20a_27.class, ClientboundPacketsc0_19a::getPacket));
 
         final ClassicBlockRemapper previousRemapper = userConnection.get(ClassicBlockRemapper.class);

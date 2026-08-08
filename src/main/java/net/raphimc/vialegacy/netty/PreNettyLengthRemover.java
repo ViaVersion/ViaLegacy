@@ -34,7 +34,7 @@ public class PreNettyLengthRemover extends MessageToByteEncoder<ByteBuf> {
     }
 
     @Override
-    protected void encode(ChannelHandlerContext ctx, ByteBuf in, ByteBuf out) {
+    protected void encode(final ChannelHandlerContext ctx, final ByteBuf in, final ByteBuf out) {
         Types.VAR_INT.readPrimitive(in); // length
         out.writeByte(Types.VAR_INT.readPrimitive(in) & 255); // id
         out.writeBytes(in); // content

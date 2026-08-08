@@ -28,23 +28,25 @@ import com.viaversion.viaversion.util.IdAndData;
 
 public abstract class AbstractBlockRemapper {
 
-    private final Int2IntMap REPLACEMENTS = new Int2IntOpenHashMap();
+    private final Int2IntMap replacements = new Int2IntOpenHashMap();
 
     protected void registerReplacement(final int from, final int to) {
-        this.REPLACEMENTS.put(from, to);
+        this.replacements.put(from, to);
     }
 
     protected void registerReplacement(final IdAndData from, final IdAndData to) {
-        this.REPLACEMENTS.put(from.toRawData(), to.toRawData());
+        this.replacements.put(from.toRawData(), to.toRawData());
     }
 
     public void remapChunk(final Chunk chunk) {
         for (int i = 0; i < chunk.getSections().length; i++) {
             final ChunkSection section = chunk.getSections()[i];
-            if (section == null) continue;
+            if (section == null) {
+                continue;
+            }
             final DataPalette palette = section.palette(PaletteType.BLOCKS);
 
-            for (Int2IntMap.Entry entry : this.REPLACEMENTS.int2IntEntrySet()) {
+            for (Int2IntMap.Entry entry : this.replacements.int2IntEntrySet()) {
                 palette.replaceId(entry.getIntKey(), entry.getIntValue());
             }
         }
@@ -53,22 +55,22 @@ public abstract class AbstractBlockRemapper {
     public void remapBlockChangeRecords(final BlockChangeRecord[] blockChangeRecords) {
         for (BlockChangeRecord record : blockChangeRecords) {
             final int id = record.getBlockId();
-            if (this.REPLACEMENTS.containsKey(id)) {
-                record.setBlockId(this.REPLACEMENTS.get(id));
+            if (this.replacements.containsKey(id)) {
+                record.setBlockId(this.replacements.get(id));
             }
         }
     }
 
     public void remapBlock(final IdAndData block) {
-        if (this.REPLACEMENTS.containsKey(block.toRawData())) {
-            final int replacement = this.REPLACEMENTS.get(block.toRawData());
+        if (this.replacements.containsKey(block.toRawData())) {
+            final int replacement = this.replacements.get(block.toRawData());
             block.setId(replacement >> 4);
             block.setData(replacement & 15);
         }
     }
 
     public int remapBlock(final int id) {
-        return this.REPLACEMENTS.getOrDefault(id, id);
+        return this.replacements.getOrDefault(id, id);
     }
 
 }

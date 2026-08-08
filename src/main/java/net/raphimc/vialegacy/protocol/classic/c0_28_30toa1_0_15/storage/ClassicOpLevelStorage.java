@@ -50,7 +50,9 @@ public class ClassicOpLevelStorage extends StoredObject {
     }
 
     public void updateHax(final boolean flying, final boolean noClip, final boolean speed, final boolean respawn) {
-        if (!this.haxEnabled) return;
+        if (!this.haxEnabled) {
+            return;
+        }
 
         boolean changed = this.flying != flying;
         changed |= this.noClip != noClip;

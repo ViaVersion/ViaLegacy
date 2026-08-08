@@ -61,7 +61,7 @@ public enum ClientboundPackets1_4_6 implements ClientboundPacketType, PreNettyPa
     TAKE_ITEM_ENTITY(22, (user, buf) -> buf.skipBytes(8)),
     ADD_ENTITY(23, (user, buf) -> {
         buf.skipBytes(19);
-        int i = buf.readInt();
+        final int i = buf.readInt();
         if (i > 0) {
             buf.skipBytes(6);
         }
@@ -78,8 +78,10 @@ public enum ClientboundPackets1_4_6 implements ClientboundPacketType, PreNettyPa
     ADD_EXPERIENCE_ORB(26, (user, buf) -> buf.skipBytes(18)),
     SET_ENTITY_MOTION(28, (user, buf) -> buf.skipBytes(10)),
     REMOVE_ENTITIES(29, (user, buf) -> {
-        int x = buf.readUnsignedByte();
-        for (int i = 0; i < x; i++) buf.readInt();
+        final int x = buf.readUnsignedByte();
+        for (int i = 0; i < x; i++) {
+            buf.readInt();
+        }
     }),
     MOVE_ENTITY(30, (user, buf) -> buf.skipBytes(4)),
     MOVE_ENTITY_POS(31, (user, buf) -> buf.skipBytes(7)),
@@ -98,29 +100,35 @@ public enum ClientboundPackets1_4_6 implements ClientboundPacketType, PreNettyPa
     SET_EXPERIENCE(43, (user, buf) -> buf.skipBytes(8)),
     LEVEL_CHUNK(51, (user, buf) -> {
         buf.skipBytes(13);
-        int x = buf.readInt();
-        for (int i = 0; i < x; i++) buf.readByte();
+        final int x = buf.readInt();
+        for (int i = 0; i < x; i++) {
+            buf.readByte();
+        }
     }),
     CHUNK_BLOCKS_UPDATE(52, (user, buf) -> {
         buf.skipBytes(10);
-        int x = buf.readInt();
-        for (int i = 0; i < x; i++) buf.readByte();
+        final int x = buf.readInt();
+        for (int i = 0; i < x; i++) {
+            buf.readByte();
+        }
     }),
     BLOCK_UPDATE(53, (user, buf) -> buf.skipBytes(12)),
     BLOCK_EVENT(54, (user, buf) -> buf.skipBytes(14)),
     BLOCK_DESTRUCTION(55, (user, buf) -> buf.skipBytes(17)),
     MAP_BULK_CHUNK(56, (user, buf) -> {
-        int x = buf.readShort();
-        int y = buf.readInt();
+        final int x = buf.readShort();
+        final int y = buf.readInt();
         buf.readBoolean();
-        for (int i = 0; i < y; i++) buf.readByte();
+        for (int i = 0; i < y; i++) {
+            buf.readByte();
+        }
         for (int i = 0; i < x; i++) {
             buf.skipBytes(12);
         }
     }),
     EXPLODE(60, (user, buf) -> {
         buf.skipBytes(28);
-        int x = buf.readInt();
+        final int x = buf.readInt();
         for (int i = 0; i < x; i++) {
             buf.skipBytes(3);
         }
@@ -145,8 +153,10 @@ public enum ClientboundPackets1_4_6 implements ClientboundPacketType, PreNettyPa
     }),
     CONTAINER_SET_CONTENT(104, (user, buf) -> {
         buf.skipBytes(1);
-        int x = buf.readShort();
-        for (int i = 0; i < x; i++) PreNettyTypes.readItemStack1_3_1(buf);
+        final int x = buf.readShort();
+        for (int i = 0; i < x; i++) {
+            PreNettyTypes.readItemStack1_3_1(buf);
+        }
     }),
     CONTAINER_SET_DATA(105, (user, buf) -> buf.skipBytes(5)),
     CONTAINER_ACK(106, (user, buf) -> buf.skipBytes(4)),
@@ -163,8 +173,10 @@ public enum ClientboundPackets1_4_6 implements ClientboundPacketType, PreNettyPa
     }),
     MAP_ITEM_DATA(131, (user, buf) -> {
         buf.skipBytes(4);
-        int x = buf.readUnsignedShort();
-        for (int i = 0; i < x; i++) buf.readByte();
+        final int x = buf.readUnsignedShort();
+        for (int i = 0; i < x; i++) {
+            buf.readByte();
+        }
     }),
     BLOCK_ENTITY_DATA(132, (user, buf) -> {
         buf.skipBytes(11);
@@ -179,8 +191,10 @@ public enum ClientboundPackets1_4_6 implements ClientboundPacketType, PreNettyPa
     COMMAND_SUGGESTIONS(203, (user, buf) -> PreNettyTypes.readString(buf)),
     CUSTOM_PAYLOAD(250, (user, buf) -> {
         PreNettyTypes.readString(buf);
-        short s = buf.readShort();
-        for (int i = 0; i < s; i++) buf.readByte();
+        final short s = buf.readShort();
+        for (int i = 0; i < s; i++) {
+            buf.readByte();
+        }
     }),
     SHARED_KEY(252, (user, buf) -> {
         PreNettyTypes.readByteArray(buf);
@@ -195,6 +209,9 @@ public enum ClientboundPackets1_4_6 implements ClientboundPacketType, PreNettyPa
 
     private static final ClientboundPackets1_4_6[] REGISTRY = new ClientboundPackets1_4_6[256];
 
+    private final int id;
+    private final BiConsumer<UserConnection, ByteBuf> packetReader;
+
     static {
         for (ClientboundPackets1_4_6 packet : values()) {
             REGISTRY[packet.id] = packet;
@@ -204,9 +221,6 @@ public enum ClientboundPackets1_4_6 implements ClientboundPacketType, PreNettyPa
     public static ClientboundPackets1_4_6 getPacket(final int id) {
         return REGISTRY[id];
     }
-
-    private final int id;
-    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     ClientboundPackets1_4_6(final int id, final BiConsumer<UserConnection, ByteBuf> packetReader) {
         this.id = id;

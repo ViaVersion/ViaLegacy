@@ -42,10 +42,14 @@ public class AlphaInventoryUpdateTask implements Runnable {
     public void run() {
         for (UserConnection info : Via.getManager().getConnectionManager().getConnections()) {
             final InventoryStorage inventoryStorage = info.get(InventoryStorage.class);
-            if (inventoryStorage == null) continue;
+            if (inventoryStorage == null) {
+                continue;
+            }
 
             info.getChannel().eventLoop().submit(() -> {
-                if (!info.getChannel().isActive()) return;
+                if (!info.getChannel().isActive()) {
+                    return;
+                }
 
                 try {
                     final Item[] mainInventory = fixItems(Via.getManager().getProviders().get(AlphaInventoryProvider.class).getMainInventoryItems(info));
@@ -53,25 +57,27 @@ public class AlphaInventoryUpdateTask implements Runnable {
                     final Item[] armorInventory = fixItems(Via.getManager().getProviders().get(AlphaInventoryProvider.class).getArmorInventoryItems(info));
                     final Item handItem = fixItem(Via.getManager().getProviders().get(AlphaInventoryProvider.class).getHandItem(info));
 
-                    if (!Objects.equals(handItem, inventoryStorage.handItem)) {
+                    if (!Objects.equals(handItem, inventoryStorage.getHandItem())) {
                         final PacketWrapper heldItemChange = PacketWrapper.create(ServerboundPacketsb1_1.SET_CARRIED_ITEM, info);
-                        heldItemChange.write(Types.SHORT, inventoryStorage.selectedHotbarSlot); // slot
+                        heldItemChange.write(Types.SHORT, inventoryStorage.getSelectedHotbarSlot()); // slot
                         heldItemChange.sendToServer(Protocola1_2_3_5_1_2_6Tob1_0_1_1_1.class, false);
                     }
 
-                    final Item[] mergedMainInventory = copyItems(inventoryStorage.mainInventory);
-                    final Item[] mergedCraftingInventory = copyItems(inventoryStorage.craftingInventory);
-                    final Item[] mergedArmorInventory = copyItems(inventoryStorage.armorInventory);
+                    final Item[] mergedMainInventory = copyItems(inventoryStorage.getMainInventory());
+                    final Item[] mergedCraftingInventory = copyItems(inventoryStorage.getCraftingInventory());
+                    final Item[] mergedArmorInventory = copyItems(inventoryStorage.getArmorInventory());
                     System.arraycopy(mainInventory, 0, mergedMainInventory, 0, mainInventory.length);
                     System.arraycopy(craftingInventory, 0, mergedCraftingInventory, 0, craftingInventory.length);
                     System.arraycopy(armorInventory, 0, mergedArmorInventory, 0, armorInventory.length);
 
-                    boolean hasChanged = !Arrays.equals(mergedMainInventory, inventoryStorage.mainInventory) || !Arrays.equals(mergedCraftingInventory, inventoryStorage.craftingInventory) || !Arrays.equals(mergedArmorInventory, inventoryStorage.armorInventory);
-                    if (!hasChanged) return;
+                    final boolean hasChanged = !Arrays.equals(mergedMainInventory, inventoryStorage.getMainInventory()) || !Arrays.equals(mergedCraftingInventory, inventoryStorage.getCraftingInventory()) || !Arrays.equals(mergedArmorInventory, inventoryStorage.getArmorInventory());
+                    if (!hasChanged) {
+                        return;
+                    }
 
-                    inventoryStorage.mainInventory = copyItems(mergedMainInventory);
-                    inventoryStorage.craftingInventory = copyItems(mergedCraftingInventory);
-                    inventoryStorage.armorInventory = copyItems(mergedArmorInventory);
+                    inventoryStorage.setMainInventory(copyItems(mergedMainInventory));
+                    inventoryStorage.setCraftingInventory(copyItems(mergedCraftingInventory));
+                    inventoryStorage.setArmorInventory(copyItems(mergedArmorInventory));
 
                     final PacketWrapper mainContent = PacketWrapper.create(ServerboundPacketsa1_2_6.PLAYER_INVENTORY, info);
                     mainContent.write(Types.INT, -1); // type
@@ -88,7 +94,7 @@ public class AlphaInventoryUpdateTask implements Runnable {
                     mainContent.sendToServer(Protocola1_2_3_5_1_2_6Tob1_0_1_1_1.class);
                     craftingContent.sendToServer(Protocola1_2_3_5_1_2_6Tob1_0_1_1_1.class);
                     armorContent.sendToServer(Protocola1_2_3_5_1_2_6Tob1_0_1_1_1.class);
-                } catch (Throwable e) {
+                } catch (final Throwable e) {
                     ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error sending inventory update packets", e);
                 }
             });

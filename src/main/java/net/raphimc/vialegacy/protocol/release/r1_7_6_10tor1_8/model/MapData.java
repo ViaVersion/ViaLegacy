@@ -19,7 +19,23 @@ package net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.model;
 
 public class MapData {
 
-    public byte scale = 0;
-    public MapIcon[] mapIcons = new MapIcon[0];
+    private byte scale;
+    private MapIcon[] mapIcons = new MapIcon[0];
+
+    public byte getScale() {
+        return this.scale;
+    }
+
+    public void setScale(final byte scale) {
+        this.scale = scale;
+    }
+
+    public MapIcon[] getMapIcons() {
+        return this.mapIcons;
+    }
+
+    public void setMapIcons(final MapIcon[] mapIcons) {
+        this.mapIcons = mapIcons;
+    }
 
 }

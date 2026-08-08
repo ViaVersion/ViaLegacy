@@ -25,7 +25,7 @@ import net.raphimc.vialegacy.api.splitter.PreNettyPacketType;
 import java.util.function.BiConsumer;
 
 import static net.raphimc.vialegacy.api.splitter.PreNettyTypes.readItemStackb1_2;
-import static net.raphimc.vialegacy.api.splitter.PreNettyTypes.readUTF;
+import static net.raphimc.vialegacy.api.splitter.PreNettyTypes.readUtf;
 
 public enum ClientboundPacketsa1_2_3 implements ClientboundPacketType, PreNettyPacketType {
 
@@ -33,17 +33,19 @@ public enum ClientboundPacketsa1_2_3 implements ClientboundPacketType, PreNettyP
     }),
     LOGIN(1, (user, buf) -> {
         buf.skipBytes(4);
-        readUTF(buf);
-        readUTF(buf);
+        readUtf(buf);
+        readUtf(buf);
         buf.skipBytes(9);
     }),
-    HANDSHAKE(2, (user, buf) -> readUTF(buf)),
-    CHAT(3, (user, buf) -> readUTF(buf)),
+    HANDSHAKE(2, (user, buf) -> readUtf(buf)),
+    CHAT(3, (user, buf) -> readUtf(buf)),
     SET_TIME(4, (user, buf) -> buf.skipBytes(8)),
     PLAYER_INVENTORY(5, (user, buf) -> {
         buf.skipBytes(4);
-        int x = buf.readShort();
-        for (int i = 0; i < x; i++) readItemStackb1_2(buf);
+        final int x = buf.readShort();
+        for (int i = 0; i < x; i++) {
+            readItemStackb1_2(buf);
+        }
     }),
     SET_DEFAULT_SPAWN_POSITION(6, (user, buf) -> buf.skipBytes(12)),
     SET_HEALTH(8, (user, buf) -> buf.skipBytes(1)),
@@ -58,7 +60,7 @@ public enum ClientboundPacketsa1_2_3 implements ClientboundPacketType, PreNettyP
     ANIMATE(18, (user, buf) -> buf.skipBytes(5)),
     ADD_PLAYER(20, (user, buf) -> {
         buf.skipBytes(4);
-        readUTF(buf);
+        readUtf(buf);
         buf.skipBytes(16);
     }),
     SPAWN_ITEM(21, (user, buf) -> buf.skipBytes(22)),
@@ -77,25 +79,38 @@ public enum ClientboundPacketsa1_2_3 implements ClientboundPacketType, PreNettyP
     PRE_CHUNK(50, (user, buf) -> buf.skipBytes(9)),
     LEVEL_CHUNK(51, (user, buf) -> {
         buf.skipBytes(13);
-        int x = buf.readInt();
-        for (int i = 0; i < x; i++) buf.readByte();
+        final int x = buf.readInt();
+        for (int i = 0; i < x; i++) {
+            buf.readByte();
+        }
     }),
     CHUNK_BLOCKS_UPDATE(52, (user, buf) -> {
         buf.skipBytes(8);
-        short x = buf.readShort();
-        for (int i = 0; i < x; i++) buf.readShort();
-        for (int i = 0; i < x; i++) buf.readByte();
-        for (int i = 0; i < x; i++) buf.readByte();
+        final short x = buf.readShort();
+        for (int i = 0; i < x; i++) {
+            buf.readShort();
+        }
+        for (int i = 0; i < x; i++) {
+            buf.readByte();
+        }
+        for (int i = 0; i < x; i++) {
+            buf.readByte();
+        }
     }),
     BLOCK_UPDATE(53, (user, buf) -> buf.skipBytes(11)),
     BLOCK_ENTITY_DATA(59, (user, buf) -> {
         buf.skipBytes(10);
-        int x = buf.readUnsignedShort();
-        for (int i = 0; i < x; i++) buf.readByte();
+        final int x = buf.readUnsignedShort();
+        for (int i = 0; i < x; i++) {
+            buf.readByte();
+        }
     }),
-    DISCONNECT(255, (user, buf) -> readUTF(buf));
+    DISCONNECT(255, (user, buf) -> readUtf(buf));
 
     private static final ClientboundPacketsa1_2_3[] REGISTRY = new ClientboundPacketsa1_2_3[256];
+
+    private final int id;
+    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     static {
         for (ClientboundPacketsa1_2_3 packet : values()) {
@@ -106,9 +121,6 @@ public enum ClientboundPacketsa1_2_3 implements ClientboundPacketType, PreNettyP
     public static ClientboundPacketsa1_2_3 getPacket(final int id) {
         return REGISTRY[id];
     }
-
-    private final int id;
-    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     ClientboundPacketsa1_2_3(final int id, final BiConsumer<UserConnection, ByteBuf> packetReader) {
         this.id = id;

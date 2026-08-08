@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.protocol.release.r1_2_4_5tor1_3_1_2.data;
 import java.util.HashMap;
 import java.util.Map;
 
-public class NbtItemList1_2_4 {
+public final class NbtItemList1_2_4 {
 
     private static final Map<Integer, Boolean> ITEMS = new HashMap<>(265, 0.99F);
 
@@ -290,6 +290,9 @@ public class NbtItemList1_2_4 {
         ITEMS.put(2264, false);
         ITEMS.put(2265, false);
         ITEMS.put(2266, false);
+    }
+
+    private NbtItemList1_2_4() {
     }
 
     public static boolean hasNbt(final int id) {

@@ -23,7 +23,10 @@ import com.viaversion.viaversion.protocol.packet.PacketWrapperImpl;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 
-public class PacketUtil {
+public final class PacketUtil {
+
+    private PacketUtil() {
+    }
 
     public static int calculateLength(final PacketWrapper wrapper) {
         final PacketType packetType = wrapper.getPacketType();

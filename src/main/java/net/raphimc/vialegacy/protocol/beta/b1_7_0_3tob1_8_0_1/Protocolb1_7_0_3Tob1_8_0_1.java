@@ -114,7 +114,7 @@ public class Protocolb1_7_0_3Tob1_8_0_1 extends StatelessProtocol<ClientboundPac
                 create(Types.BYTE, (byte) 1); // difficulty
                 create(Types.BYTE, (byte) 0); // game mode
                 create(Types.SHORT, (short) 128); // world height
-                handler(wrapper -> wrapper.write(Types.LONG, wrapper.user().get(SeedStorage.class).seed)); // seed
+                handler(wrapper -> wrapper.write(Types.LONG, wrapper.user().get(SeedStorage.class).getSeed())); // seed
             }
         });
         this.registerClientbound(ClientboundPacketsb1_7.ADD_PLAYER, new PacketHandlers() {
@@ -131,10 +131,10 @@ public class Protocolb1_7_0_3Tob1_8_0_1 extends StatelessProtocol<ClientboundPac
                 handler(wrapper -> {
                     final int entityId = wrapper.get(Types.INT, 0);
                     final PlayerNameTracker playerNameTracker = wrapper.user().get(PlayerNameTracker.class);
-                    playerNameTracker.names.put(entityId, wrapper.get(Types1_6_4.STRING, 0));
+                    playerNameTracker.getNames().put(entityId, wrapper.get(Types1_6_4.STRING, 0));
 
                     final PacketWrapper playerListEntry = PacketWrapper.create(ClientboundPacketsb1_8.PLAYER_INFO, wrapper.user());
-                    playerListEntry.write(Types1_6_4.STRING, playerNameTracker.names.get(entityId)); // name
+                    playerListEntry.write(Types1_6_4.STRING, playerNameTracker.getNames().get(entityId)); // name
                     playerListEntry.write(Types.BOOLEAN, true); // online
                     playerListEntry.write(Types.SHORT, (short) 0); // ping
                     playerListEntry.send(Protocolb1_7_0_3Tob1_8_0_1.class);
@@ -182,7 +182,7 @@ public class Protocolb1_7_0_3Tob1_8_0_1 extends StatelessProtocol<ClientboundPac
                 map(Types.INT); // entity id
                 handler(wrapper -> {
                     final PlayerNameTracker playerNameTracker = wrapper.user().get(PlayerNameTracker.class);
-                    final String name = playerNameTracker.names.get(wrapper.get(Types.INT, 0).intValue());
+                    final String name = playerNameTracker.getNames().get(wrapper.get(Types.INT, 0).intValue());
                     if (name != null) {
                         final PacketWrapper playerListEntry = PacketWrapper.create(ClientboundPacketsb1_8.PLAYER_INFO, wrapper.user());
                         playerListEntry.write(Types1_6_4.STRING, name); // name
@@ -198,21 +198,29 @@ public class Protocolb1_7_0_3Tob1_8_0_1 extends StatelessProtocol<ClientboundPac
 
             boolean hasChest = false;
             for (ChunkSection section : chunk.getSections()) {
-                if (section == null || !section.getLight().hasSkyLight()) continue;
+                if (section == null || !section.getLight().hasSkyLight()) {
+                    continue;
+                }
                 for (int i = 0; i < section.palette(PaletteType.BLOCKS).size(); i++) {
-                    if (section.palette(PaletteType.BLOCKS).idByIndex(i) >> 4 == BlockList1_6.chest.blockId()) {
+                    if (section.palette(PaletteType.BLOCKS).idByIndex(i) >> 4 == BlockList1_6.CHEST) {
                         hasChest = true;
                         break;
                     }
                 }
-                if (!hasChest) continue;
+                if (!hasChest) {
+                    continue;
+                }
 
                 final LegacyNibbleArray sectionSkyLight = new LegacyNibbleArray(section.getLight().getSkyLight(), 4);
-                for (int y = 0; y < 16; y++)
-                    for (int x = 0; x < 16; x++)
-                        for (int z = 0; z < 16; z++)
-                            if (section.palette(PaletteType.BLOCKS).idAt(x, y, z) >> 4 == BlockList1_6.chest.blockId())
+                for (int y = 0; y < 16; y++) {
+                    for (int x = 0; x < 16; x++) {
+                        for (int z = 0; z < 16; z++) {
+                            if (section.palette(PaletteType.BLOCKS).idAt(x, y, z) >> 4 == BlockList1_6.CHEST) {
                                 sectionSkyLight.set(x, y, z, 15);
+                            }
+                        }
+                    }
+                }
             }
         });
         this.registerClientbound(ClientboundPacketsb1_7.GAME_EVENT, new PacketHandlers() {
@@ -275,7 +283,9 @@ public class Protocolb1_7_0_3Tob1_8_0_1 extends StatelessProtocol<ClientboundPac
                 map(Types.UNSIGNED_BYTE); // status
                 handler(wrapper -> {
                     final short status = wrapper.get(Types.UNSIGNED_BYTE, 0);
-                    if (status == 5) wrapper.cancel(); // Stop using item
+                    if (status == 5) {
+                        wrapper.cancel(); // Stop using item
+                    }
                 });
                 map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE); // direction
@@ -290,16 +300,16 @@ public class Protocolb1_7_0_3Tob1_8_0_1 extends StatelessProtocol<ClientboundPac
                 handler(wrapper -> {
                     if (wrapper.get(Types.UNSIGNED_BYTE, 0) == 255) {
                         final Item item = wrapper.get(Types1_4_2.NBTLESS_ITEM, 0);
-                        if (item != null && isSword(item)) {
+                        if (item != null && Protocolb1_7_0_3Tob1_8_0_1.this.isSword(item)) {
                             wrapper.cancel();
                             final PacketWrapper entityStatus = PacketWrapper.create(ClientboundPacketsb1_8.ENTITY_EVENT, wrapper.user());
-                            entityStatus.write(Types.INT, wrapper.user().get(EntityTracker.class).getPlayerID()); // entity id
+                            entityStatus.write(Types.INT, wrapper.user().get(EntityTracker.class).getPlayerId()); // entity id
                             entityStatus.write(Types.BYTE, (byte) 9); // status | 9 = STOP_ITEM_USE
                             entityStatus.send(Protocolb1_7_0_3Tob1_8_0_1.class);
                         }
                     } else {
                         final BlockPosition pos = wrapper.get(Types1_7_6.BLOCK_POSITION_UBYTE, 0);
-                        if (wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos).getId() == BlockList1_6.cake.blockId()) {
+                        if (wrapper.user().get(ChunkTracker.class).getBlockNotNull(pos).getId() == BlockList1_6.CAKE) {
                             final PacketWrapper updateHealth = PacketWrapper.create(ClientboundPacketsb1_7.SET_HEALTH, wrapper.user());
                             updateHealth.write(Types.SHORT, wrapper.user().get(PlayerHealthTracker.class).getHealth()); // health
                             updateHealth.send(Protocolb1_7_0_3Tob1_8_0_1.class, false);
@@ -314,7 +324,9 @@ public class Protocolb1_7_0_3Tob1_8_0_1 extends StatelessProtocol<ClientboundPac
                 map(Types.INT); // entity id
                 map(Types.BYTE); // action id
                 handler(wrapper -> {
-                    if (wrapper.get(Types.BYTE, 0) > 3) wrapper.cancel();
+                    if (wrapper.get(Types.BYTE, 0) > 3) {
+                        wrapper.cancel();
+                    }
                 });
             }
         });
@@ -323,7 +335,9 @@ public class Protocolb1_7_0_3Tob1_8_0_1 extends StatelessProtocol<ClientboundPac
             public void register() {
                 map(Types.BYTE); // window id
                 handler(wrapper -> {
-                    if (wrapper.passthrough(Types.SHORT) /*slot*/ == -1) wrapper.cancel();
+                    if (wrapper.passthrough(Types.SHORT) /*slot*/ == -1) {
+                        wrapper.cancel();
+                    }
                 });
                 map(Types.BYTE); // button
                 map(Types.SHORT); // action
@@ -335,7 +349,9 @@ public class Protocolb1_7_0_3Tob1_8_0_1 extends StatelessProtocol<ClientboundPac
             wrapper.cancel();
             // Track the item for later use in classic protocols
             final AlphaInventoryTracker inventoryTracker = wrapper.user().get(AlphaInventoryTracker.class);
-            if (inventoryTracker != null) inventoryTracker.handleCreativeSetSlot(wrapper.read(Types.SHORT), wrapper.read(Typesb1_8_0_1.CREATIVE_ITEM));
+            if (inventoryTracker != null) {
+                inventoryTracker.handleCreativeSetSlot(wrapper.read(Types.SHORT), wrapper.read(Typesb1_8_0_1.CREATIVE_ITEM));
+            }
         });
         this.registerServerbound(ServerboundPacketsb1_8.KEEP_ALIVE, wrapper -> {
             if (wrapper.read(Types.INT) != 0) { // beta client only sends this packet with the key set to 0 every second if in downloading terrain screen
@@ -345,7 +361,7 @@ public class Protocolb1_7_0_3Tob1_8_0_1 extends StatelessProtocol<ClientboundPac
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolb1_7_0_3Tob1_8_0_1.class, ClientboundPacketsb1_7::getPacket));
 
         userConnection.put(new PlayerNameTracker());
@@ -353,11 +369,11 @@ public class Protocolb1_7_0_3Tob1_8_0_1 extends StatelessProtocol<ClientboundPac
     }
 
     private boolean isSword(final Item item) {
-        return item.identifier() == ItemList1_6.swordWood.itemId() ||
-                item.identifier() == ItemList1_6.swordStone.itemId() ||
-                item.identifier() == ItemList1_6.swordIron.itemId() ||
-                item.identifier() == ItemList1_6.swordGold.itemId() ||
-                item.identifier() == ItemList1_6.swordDiamond.itemId();
+        return item.identifier() == ItemList1_6.SWORD_WOOD
+            || item.identifier() == ItemList1_6.SWORD_STONE
+            || item.identifier() == ItemList1_6.SWORD_IRON
+            || item.identifier() == ItemList1_6.SWORD_GOLD
+            || item.identifier() == ItemList1_6.SWORD_DIAMOND;
     }
 
 }

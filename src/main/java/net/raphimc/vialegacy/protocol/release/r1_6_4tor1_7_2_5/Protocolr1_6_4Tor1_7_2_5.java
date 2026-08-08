@@ -39,7 +39,11 @@ import com.viaversion.viaversion.libs.fastutil.ints.Int2IntMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2IntMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2IntOpenHashMap;
 import com.viaversion.viaversion.libs.gson.JsonObject;
-import com.viaversion.viaversion.protocols.base.*;
+import com.viaversion.viaversion.protocols.base.ClientboundLoginPackets;
+import com.viaversion.viaversion.protocols.base.ClientboundStatusPackets;
+import com.viaversion.viaversion.protocols.base.ServerboundHandshakePackets;
+import com.viaversion.viaversion.protocols.base.ServerboundLoginPackets;
+import com.viaversion.viaversion.protocols.base.ServerboundStatusPackets;
 import com.viaversion.viaversion.protocols.base.v1_7.ClientboundBaseProtocol1_7;
 import com.viaversion.viaversion.protocols.v1_8to1_9.packet.ClientboundPackets1_8;
 import com.viaversion.viaversion.util.IdAndData;
@@ -58,7 +62,11 @@ import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.rewriter.ItemRewr
 import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.rewriter.SoundRewriter;
 import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.rewriter.StatisticRewriter;
 import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.rewriter.TextRewriter;
-import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.storage.*;
+import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.storage.ChunkTracker;
+import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.storage.HandshakeStorage;
+import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.storage.PlayerInfoStorage;
+import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.storage.ProtocolMetadataStorage;
+import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.storage.StatisticsStorage;
 import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.types.EntityDataTypes1_6_4;
 import net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.types.Types1_6_4;
 import net.raphimc.vialegacy.protocol.release.r1_7_2_5tor1_7_6_10.packet.ClientboundPackets1_7_2;
@@ -84,45 +92,45 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
         super.registerPackets();
 
         this.registerClientboundTransition(ClientboundPackets1_6_4.LOGIN,
-                ClientboundPackets1_7_2.LOGIN, new PacketHandlers() {
-                    @Override
-                    public void register() {
-                        map(Types.INT); // entity id
-                        handler(wrapper -> {
-                            wrapper.user().get(PlayerInfoStorage.class).entityId = wrapper.get(Types.INT, 0);
-                            final String terrainType = wrapper.read(Types1_6_4.STRING); // level type
-                            final short gameType = wrapper.read(Types.BYTE); // game mode
-                            final byte dimension = wrapper.read(Types.BYTE); // dimension id
-                            final short difficulty = wrapper.read(Types.BYTE); // difficulty
-                            wrapper.read(Types.BYTE); // world height
-                            final short maxPlayers = wrapper.read(Types.BYTE); // max players
+            ClientboundPackets1_7_2.LOGIN, new PacketHandlers() {
+                @Override
+                public void register() {
+                    map(Types.INT); // entity id
+                    handler(wrapper -> {
+                        wrapper.user().get(PlayerInfoStorage.class).setEntityId(wrapper.get(Types.INT, 0));
+                        final String terrainType = wrapper.read(Types1_6_4.STRING); // level type
+                        final short gameType = wrapper.read(Types.BYTE); // game mode
+                        final byte dimension = wrapper.read(Types.BYTE); // dimension id
+                        final short difficulty = wrapper.read(Types.BYTE); // difficulty
+                        wrapper.read(Types.BYTE); // world height
+                        final short maxPlayers = wrapper.read(Types.BYTE); // max players
 
-                            wrapper.write(Types.UNSIGNED_BYTE, gameType);
-                            wrapper.write(Types.BYTE, dimension);
-                            wrapper.write(Types.UNSIGNED_BYTE, difficulty);
-                            wrapper.write(Types.UNSIGNED_BYTE, maxPlayers);
-                            wrapper.write(Types.STRING, terrainType);
-                        });
-                        handler(wrapper -> {
-                            final byte dimensionId = wrapper.get(Types.BYTE, 0);
-                            wrapper.user().getClientWorld(Protocolr1_6_4Tor1_7_2_5.class).setEnvironment(dimensionId);
+                        wrapper.write(Types.UNSIGNED_BYTE, gameType);
+                        wrapper.write(Types.BYTE, dimension);
+                        wrapper.write(Types.UNSIGNED_BYTE, difficulty);
+                        wrapper.write(Types.UNSIGNED_BYTE, maxPlayers);
+                        wrapper.write(Types.STRING, terrainType);
+                    });
+                    handler(wrapper -> {
+                        final byte dimensionId = wrapper.get(Types.BYTE, 0);
+                        wrapper.user().getClientWorld(Protocolr1_6_4Tor1_7_2_5.class).setEnvironment(dimensionId);
 
-                            wrapper.user().put(new ChunkTracker(wrapper.user()));
-                        });
-                    }
-                }, State.LOGIN, (PacketHandler) wrapper -> {
-                    ViaLegacy.getPlatform().getLogger().warning("Server skipped LOGIN state");
-                    final PacketWrapper sharedKey = PacketWrapper.create(ClientboundPackets1_6_4.SHARED_KEY, wrapper.user());
-                    sharedKey.write(Types.SHORT_BYTE_ARRAY, new byte[0]);
-                    sharedKey.write(Types.SHORT_BYTE_ARRAY, new byte[0]);
-                    wrapper.user().get(ProtocolMetadataStorage.class).skipEncryption = true;
-                    sharedKey.send(Protocolr1_6_4Tor1_7_2_5.class, false); // switch to play state
-                    wrapper.user().get(ProtocolMetadataStorage.class).skipEncryption = false;
-
-                    wrapper.setPacketType(ClientboundPackets1_6_4.LOGIN);
-                    wrapper.send(Protocolr1_6_4Tor1_7_2_5.class, false);
-                    wrapper.cancel();
+                        wrapper.user().put(new ChunkTracker(wrapper.user()));
+                    });
                 }
+            }, State.LOGIN, (PacketHandler) wrapper -> {
+                ViaLegacy.getPlatform().getLogger().warning("Server skipped LOGIN state");
+                final PacketWrapper sharedKey = PacketWrapper.create(ClientboundPackets1_6_4.SHARED_KEY, wrapper.user());
+                sharedKey.write(Types.SHORT_BYTE_ARRAY, new byte[0]);
+                sharedKey.write(Types.SHORT_BYTE_ARRAY, new byte[0]);
+                wrapper.user().get(ProtocolMetadataStorage.class).setSkipEncryption(true);
+                sharedKey.send(Protocolr1_6_4Tor1_7_2_5.class, false); // switch to play state
+                wrapper.user().get(ProtocolMetadataStorage.class).setSkipEncryption(false);
+
+                wrapper.setPacketType(ClientboundPackets1_6_4.LOGIN);
+                wrapper.send(Protocolr1_6_4Tor1_7_2_5.class, false);
+                wrapper.cancel();
+            }
         );
         this.registerClientbound(ClientboundPackets1_6_4.CHAT, new PacketHandlers() {
             @Override
@@ -136,7 +144,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 map(Types.INT); // entity id
                 map(Types.SHORT); // slot
                 map(Types1_7_6.ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
+                handler(wrapper -> Protocolr1_6_4Tor1_7_2_5.this.itemRewriter.handleItemToClient(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.RESPAWN, new PacketHandlers() {
@@ -158,11 +166,11 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             final PlayerInfoStorage playerInfoStorage = wrapper.user().get(PlayerInfoStorage.class);
             final boolean supportsFlags = wrapper.user().getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_8);
 
-            wrapper.write(Types.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posX); // x
-            wrapper.write(Types.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posY + 1.62F); // y
-            wrapper.write(Types.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posZ); // z
-            wrapper.write(Types.FLOAT, supportsFlags ? 0F : playerInfoStorage.yaw); // yaw
-            wrapper.write(Types.FLOAT, supportsFlags ? 0F : playerInfoStorage.pitch); // pitch
+            wrapper.write(Types.DOUBLE, supportsFlags ? 0D : playerInfoStorage.getPosX()); // x
+            wrapper.write(Types.DOUBLE, supportsFlags ? 0D : playerInfoStorage.getPosY() + 1.62F); // y
+            wrapper.write(Types.DOUBLE, supportsFlags ? 0D : playerInfoStorage.getPosZ()); // z
+            wrapper.write(Types.FLOAT, supportsFlags ? 0F : playerInfoStorage.getYaw()); // yaw
+            wrapper.write(Types.FLOAT, supportsFlags ? 0F : playerInfoStorage.getPitch()); // pitch
             if (supportsFlags) {
                 wrapper.read(Types.BOOLEAN); // onGround
                 wrapper.write(Types.BYTE, (byte) 0b11111); // flags
@@ -175,12 +183,14 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             }
 
             final PacketWrapper setVelocityToZero = PacketWrapper.create(ClientboundPackets1_7_2.SET_ENTITY_MOTION, wrapper.user());
-            setVelocityToZero.write(Types.INT, playerInfoStorage.entityId); // entity id
+            setVelocityToZero.write(Types.INT, playerInfoStorage.getEntityId()); // entity id
             setVelocityToZero.write(Types.SHORT, (short) 0); // velocity x
             setVelocityToZero.write(Types.SHORT, (short) 0); // velocity y
             setVelocityToZero.write(Types.SHORT, (short) 0); // velocity z
 
-            if (!wrapper.isCancelled()) wrapper.send(Protocolr1_6_4Tor1_7_2_5.class);
+            if (!wrapper.isCancelled()) {
+                wrapper.send(Protocolr1_6_4Tor1_7_2_5.class);
+            }
             setVelocityToZero.send(Protocolr1_6_4Tor1_7_2_5.class);
             wrapper.cancel();
         });
@@ -192,8 +202,8 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             wrapper.passthrough(Types.DOUBLE); // stance
             wrapper.read(Types.DOUBLE); // y
             wrapper.passthrough(Types.DOUBLE); // z
-            wrapper.write(Types.FLOAT, supportsFlags ? 0F : playerInfoStorage.yaw); // yaw
-            wrapper.write(Types.FLOAT, supportsFlags ? 0F : playerInfoStorage.pitch); // pitch
+            wrapper.write(Types.FLOAT, supportsFlags ? 0F : playerInfoStorage.getYaw()); // yaw
+            wrapper.write(Types.FLOAT, supportsFlags ? 0F : playerInfoStorage.getPitch()); // pitch
             if (supportsFlags) {
                 wrapper.read(Types.BOOLEAN); // onGround
                 wrapper.write(Types.BYTE, (byte) 0b11000); // flags
@@ -209,9 +219,9 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             final PlayerInfoStorage playerInfoStorage = wrapper.user().get(PlayerInfoStorage.class);
             final boolean supportsFlags = wrapper.user().getProtocolInfo().protocolVersion().newerThanOrEqualTo(ProtocolVersion.v1_8);
 
-            wrapper.write(Types.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posX); // x
-            wrapper.write(Types.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posY + 1.62F); // y
-            wrapper.write(Types.DOUBLE, supportsFlags ? 0D : playerInfoStorage.posZ); // z
+            wrapper.write(Types.DOUBLE, supportsFlags ? 0D : playerInfoStorage.getPosX()); // x
+            wrapper.write(Types.DOUBLE, supportsFlags ? 0D : playerInfoStorage.getPosY() + 1.62F); // y
+            wrapper.write(Types.DOUBLE, supportsFlags ? 0D : playerInfoStorage.getPosZ()); // z
             wrapper.passthrough(Types.FLOAT); // yaw
             wrapper.passthrough(Types.FLOAT); // pitch
             if (supportsFlags) {
@@ -226,12 +236,14 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             }
 
             final PacketWrapper setVelocityToZero = PacketWrapper.create(ClientboundPackets1_7_2.SET_ENTITY_MOTION, wrapper.user());
-            setVelocityToZero.write(Types.INT, playerInfoStorage.entityId); // entity id
+            setVelocityToZero.write(Types.INT, playerInfoStorage.getEntityId()); // entity id
             setVelocityToZero.write(Types.SHORT, (short) 0); // velocity x
             setVelocityToZero.write(Types.SHORT, (short) 0); // velocity y
             setVelocityToZero.write(Types.SHORT, (short) 0); // velocity z
 
-            if (!wrapper.isCancelled()) wrapper.send(Protocolr1_6_4Tor1_7_2_5.class);
+            if (!wrapper.isCancelled()) {
+                wrapper.send(Protocolr1_6_4Tor1_7_2_5.class);
+            }
             setVelocityToZero.send(Protocolr1_6_4Tor1_7_2_5.class);
             wrapper.cancel();
         });
@@ -258,7 +270,9 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             public void register() {
                 map(Types.INT); // entity id
                 handler(wrapper -> {
-                    if (wrapper.read(Types.BYTE) != 0) wrapper.cancel();
+                    if (wrapper.read(Types.BYTE) != 0) {
+                        wrapper.cancel();
+                    }
                 });
                 map(Types1_7_6.BLOCK_POSITION_BYTE); // position
             }
@@ -269,7 +283,9 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 map(Types.INT, Types.VAR_INT); // entity id
                 handler(wrapper -> {
                     short animate = wrapper.read(Types.BYTE); // animation
-                    if (animate == 0 || animate == 4) wrapper.cancel();
+                    if (animate == 0 || animate == 4) {
+                        wrapper.cancel();
+                    }
                     if (animate >= 1 && animate <= 3) {
                         animate--;
                     } else {
@@ -285,7 +301,8 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 map(Types.INT, Types.VAR_INT); // entity id
                 handler(wrapper -> {
                     final String name = wrapper.read(Types1_6_4.STRING); // name
-                    wrapper.write(Types.STRING, (ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUuid(name) : GameProfileUtil.getOfflinePlayerUuid(name)).toString().replace("-", "")); // uuid
+                    wrapper.write(Types.STRING, (ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class)
+                        .getMojangUuid(name) : GameProfileUtil.getOfflinePlayerUuid(name)).toString().replace("-", "")); // uuid
                     wrapper.write(Types.STRING, name);
                 });
                 map(Types.INT); // x
@@ -295,11 +312,11 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 map(Types.BYTE); // pitch
                 handler(wrapper -> {
                     final Item currentItem = new DataItem(wrapper.read(Types.UNSIGNED_SHORT), (byte) 1, (short) 0, null); // item
-                    itemRewriter.handleItemToClient(wrapper.user(), currentItem);
+                    Protocolr1_6_4Tor1_7_2_5.this.itemRewriter.handleItemToClient(wrapper.user(), currentItem);
                     wrapper.write(Types.SHORT, (short) currentItem.identifier());
                 });
                 map(Types1_6_4.ENTITY_DATA_LIST, Types1_7_6.ENTITY_DATA_LIST); // entity data
-                handler(wrapper -> rewriteEntityData(wrapper.user(), wrapper.get(Types1_7_6.ENTITY_DATA_LIST, 0)));
+                handler(wrapper -> Protocolr1_6_4Tor1_7_2_5.this.rewriteEntityData(wrapper.user(), wrapper.get(Types1_7_6.ENTITY_DATA_LIST, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.ADD_ENTITY, new PacketHandlers() {
@@ -314,9 +331,9 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 map(Types.BYTE); // yaw
                 map(Types.INT); // data
                 handler(wrapper -> {
-                    final int typeID = wrapper.get(Types.BYTE, 0);
+                    final int typeId = wrapper.get(Types.BYTE, 0);
                     int data = wrapper.get(Types.INT, 3);
-                    if (typeID == EntityTypes1_8.ObjectType.FALLING_BLOCK.getId()) {
+                    if (typeId == EntityTypes1_8.ObjectType.FALLING_BLOCK.getId()) {
                         final int id = data & 0xFFFF;
                         final int metadata = data >> 16;
                         final IdAndData block = new IdAndData(id, metadata);
@@ -342,7 +359,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 map(Types.SHORT); // velocity y
                 map(Types.SHORT); // velocity z
                 map(Types1_6_4.ENTITY_DATA_LIST, Types1_7_6.ENTITY_DATA_LIST); // entity data
-                handler(wrapper -> rewriteEntityData(wrapper.user(), wrapper.get(Types1_7_6.ENTITY_DATA_LIST, 0)));
+                handler(wrapper -> Protocolr1_6_4Tor1_7_2_5.this.rewriteEntityData(wrapper.user(), wrapper.get(Types1_7_6.ENTITY_DATA_LIST, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.ADD_PAINTING, new PacketHandlers() {
@@ -369,7 +386,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             public void register() {
                 map(Types.INT); // entity id
                 map(Types1_6_4.ENTITY_DATA_LIST, Types1_7_6.ENTITY_DATA_LIST); // entity data
-                handler(wrapper -> rewriteEntityData(wrapper.user(), wrapper.get(Types1_7_6.ENTITY_DATA_LIST, 0)));
+                handler(wrapper -> Protocolr1_6_4Tor1_7_2_5.this.rewriteEntityData(wrapper.user(), wrapper.get(Types1_7_6.ENTITY_DATA_LIST, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.UPDATE_ATTRIBUTES, new PacketHandlers() {
@@ -487,7 +504,9 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 handler(wrapper -> {
                     final String oldSound = wrapper.read(Types1_6_4.STRING); // sound
                     String newSound = SoundRewriter.map(oldSound);
-                    if (oldSound.isEmpty()) newSound = "";
+                    if (oldSound.isEmpty()) {
+                        newSound = "";
+                    }
                     if (newSound == null) {
                         if (Via.getConfig().logOtherConversionWarnings()) {
                             ViaLegacy.getPlatform().getLogger().warning("Unable to map 1.6.4 sound '" + oldSound + "'");
@@ -521,9 +540,9 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
 
                     if (!disableRelativeVolume && effectId == 2001) { // block break effect
                         final ChunkTracker chunkTracker = wrapper.user().get(ChunkTracker.class);
-                        final int blockID = data & 4095;
+                        final int blockId = data & 4095;
                         final int blockData = data >> 12 & 255;
-                        final IdAndData block = new IdAndData(blockID, blockData);
+                        final IdAndData block = new IdAndData(blockId, blockData);
                         chunkTracker.remapBlockParticle(block);
                         data = (block.getId() & 4095) | block.getData() << 12;
 
@@ -622,7 +641,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 map(Types.BYTE); // window id
                 map(Types.SHORT); // slot
                 map(Types1_7_6.ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
+                handler(wrapper -> Protocolr1_6_4Tor1_7_2_5.this.itemRewriter.handleItemToClient(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.CONTAINER_SET_CONTENT, new PacketHandlers() {
@@ -632,7 +651,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 handler(wrapper -> {
                     final Item[] items = wrapper.passthrough(Types1_7_6.ITEM_ARRAY); // items
                     for (Item item : items) {
-                        itemRewriter.handleItemToClient(wrapper.user(), item);
+                        Protocolr1_6_4Tor1_7_2_5.this.itemRewriter.handleItemToClient(wrapper.user(), item);
                     }
                 });
             }
@@ -675,7 +694,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             final StatisticsStorage statisticsStorage = wrapper.user().get(StatisticsStorage.class);
             final int statId = wrapper.read(Types.INT); // statistic id
             final int increment = wrapper.read(Types.INT); // increment
-            statisticsStorage.values.put(statId, statisticsStorage.values.get(statId) + increment);
+            statisticsStorage.getValues().put(statId, statisticsStorage.getValues().get(statId) + increment);
         });
         this.registerClientbound(ClientboundPackets1_6_4.PLAYER_INFO, new PacketHandlers() {
             @Override
@@ -738,47 +757,47 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             }
         });
         this.registerClientboundTransition(ClientboundPackets1_6_4.CUSTOM_PAYLOAD,
-                ClientboundPackets1_7_2.CUSTOM_PAYLOAD, new PacketHandlers() {
-                    @Override
-                    public void register() {
-                        handler(wrapper -> {
-                            final String channel = wrapper.read(Types1_6_4.STRING); // channel
-                            int length = wrapper.read(Types.SHORT); // length
+            ClientboundPackets1_7_2.CUSTOM_PAYLOAD, new PacketHandlers() {
+                @Override
+                public void register() {
+                    handler(wrapper -> {
+                        final String channel = wrapper.read(Types1_6_4.STRING); // channel
+                        int length = wrapper.read(Types.SHORT); // length
 
-                            if (length < 0) {
-                                wrapper.write(Types.STRING, channel); // channel
-                                wrapper.write(Types.UNSIGNED_SHORT, 0); // length
-                                return;
-                            }
-
-                            try {
-                                if (channel.equals("MC|TrList")) {
-                                    wrapper.passthrough(Types.INT); // window id
-                                    final int count = wrapper.passthrough(Types.UNSIGNED_BYTE); // count
-                                    for (int i = 0; i < count; i++) {
-                                        itemRewriter.handleItemToClient(wrapper.user(), wrapper.passthrough(Types1_7_6.ITEM)); // item 1
-                                        itemRewriter.handleItemToClient(wrapper.user(), wrapper.passthrough(Types1_7_6.ITEM)); // item 3
-                                        if (wrapper.passthrough(Types.BOOLEAN)) { // has 3 items
-                                            itemRewriter.handleItemToClient(wrapper.user(), wrapper.passthrough(Types1_7_6.ITEM)); // item 2
-                                        }
-                                        wrapper.passthrough(Types.BOOLEAN); // unavailable
-                                    }
-                                    length = PacketUtil.calculateLength(wrapper);
-                                }
-                            } catch (Exception e) {
-                                if (Via.getConfig().logOtherConversionWarnings()) {
-                                    Via.getPlatform().getLogger().log(Level.WARNING, "Failed to handle packet", e);
-                                }
-                                wrapper.cancel();
-                                return;
-                            }
-
-                            wrapper.resetReader();
+                        if (length < 0) {
                             wrapper.write(Types.STRING, channel); // channel
-                            wrapper.write(Types.UNSIGNED_SHORT, length); // length
-                        });
-                    }
-                }, State.LOGIN, (PacketHandler) PacketWrapper::cancel
+                            wrapper.write(Types.UNSIGNED_SHORT, 0); // length
+                            return;
+                        }
+
+                        try {
+                            if (channel.equals("MC|TrList")) {
+                                wrapper.passthrough(Types.INT); // window id
+                                final int count = wrapper.passthrough(Types.UNSIGNED_BYTE); // count
+                                for (int i = 0; i < count; i++) {
+                                    Protocolr1_6_4Tor1_7_2_5.this.itemRewriter.handleItemToClient(wrapper.user(), wrapper.passthrough(Types1_7_6.ITEM)); // item 1
+                                    Protocolr1_6_4Tor1_7_2_5.this.itemRewriter.handleItemToClient(wrapper.user(), wrapper.passthrough(Types1_7_6.ITEM)); // item 3
+                                    if (wrapper.passthrough(Types.BOOLEAN)) { // has 3 items
+                                        Protocolr1_6_4Tor1_7_2_5.this.itemRewriter.handleItemToClient(wrapper.user(), wrapper.passthrough(Types1_7_6.ITEM)); // item 2
+                                    }
+                                    wrapper.passthrough(Types.BOOLEAN); // unavailable
+                                }
+                                length = PacketUtil.calculateLength(wrapper);
+                            }
+                        } catch (final Exception e) {
+                            if (Via.getConfig().logOtherConversionWarnings()) {
+                                Via.getPlatform().getLogger().log(Level.WARNING, "Failed to handle packet", e);
+                            }
+                            wrapper.cancel();
+                            return;
+                        }
+
+                        wrapper.resetReader();
+                        wrapper.write(Types.STRING, channel); // channel
+                        wrapper.write(Types.UNSIGNED_SHORT, length); // length
+                    });
+                }
+            }, State.LOGIN, (PacketHandler) PacketWrapper::cancel
         );
         this.registerClientboundTransition(ClientboundPackets1_6_4.SHARED_KEY, ClientboundLoginPackets.LOGIN_FINISHED, (PacketHandler) wrapper -> {
             final ProtocolInfo info = wrapper.user().getProtocolInfo();
@@ -788,7 +807,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             wrapper.write(Types.STRING, info.getUuid().toString().replace("-", "")); // uuid
             wrapper.write(Types.STRING, info.getUsername()); // user name
 
-            if (!protocolMetadata.skipEncryption) {
+            if (!protocolMetadata.isSkipEncryption()) {
                 Via.getManager().getProviders().get(EncryptionProvider.class).enableDecryption(wrapper.user());
             }
             ClientboundBaseProtocol1_7.onLoginSuccess(wrapper.user());
@@ -806,45 +825,45 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 handler(wrapper -> {
                     final ProtocolMetadataStorage protocolMetadata = wrapper.user().get(ProtocolMetadataStorage.class);
                     final String serverHash = wrapper.get(Types.STRING, 0);
-                    protocolMetadata.authenticate = !serverHash.equals("-");
+                    protocolMetadata.setAuthenticate(!serverHash.equals("-"));
                 });
             }
         });
         this.registerClientboundTransition(ClientboundPackets1_6_4.DISCONNECT,
-                ClientboundStatusPackets.STATUS_RESPONSE, (PacketHandler) wrapper -> {
-                    final String reason = wrapper.read(Types1_6_4.STRING); // reason
-                    try {
-                        final String[] motdParts = reason.split("\0");
-                        final JsonObject rootObject = new JsonObject();
-                        final JsonObject descriptionObject = new JsonObject();
-                        final JsonObject playersObject = new JsonObject();
-                        final JsonObject versionObject = new JsonObject();
+            ClientboundStatusPackets.STATUS_RESPONSE, (PacketHandler) wrapper -> {
+                final String reason = wrapper.read(Types1_6_4.STRING); // reason
+                try {
+                    final String[] motdParts = reason.split("\0");
+                    final JsonObject rootObject = new JsonObject();
+                    final JsonObject descriptionObject = new JsonObject();
+                    final JsonObject playersObject = new JsonObject();
+                    final JsonObject versionObject = new JsonObject();
 
-                        descriptionObject.addProperty("text", motdParts[3]);
-                        playersObject.addProperty("max", Integer.parseInt(motdParts[5]));
-                        playersObject.addProperty("online", Integer.parseInt(motdParts[4]));
-                        versionObject.addProperty("name", motdParts[2]);
-                        versionObject.addProperty("protocol", Integer.parseInt(motdParts[1]));
-                        rootObject.add("description", descriptionObject);
-                        rootObject.add("players", playersObject);
-                        rootObject.add("version", versionObject);
+                    descriptionObject.addProperty("text", motdParts[3]);
+                    playersObject.addProperty("max", Integer.parseInt(motdParts[5]));
+                    playersObject.addProperty("online", Integer.parseInt(motdParts[4]));
+                    versionObject.addProperty("name", motdParts[2]);
+                    versionObject.addProperty("protocol", Integer.parseInt(motdParts[1]));
+                    rootObject.add("description", descriptionObject);
+                    rootObject.add("players", playersObject);
+                    rootObject.add("version", versionObject);
 
-                        wrapper.write(Types.STRING, rootObject.toString());
-                    } catch (Throwable e) {
-                        ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Could not parse 1.6.4 ping: " + reason, e);
-                        wrapper.cancel();
-                    }
-                }, ClientboundLoginPackets.LOGIN_DISCONNECT, new PacketHandlers() {
-                    @Override
-                    protected void register() {
-                        map(Types1_6_4.STRING, Types.STRING, TextRewriter::toClientDisconnect); // reason
-                    }
-                }, ClientboundPackets1_7_2.DISCONNECT, new PacketHandlers() {
-                    @Override
-                    public void register() {
-                        map(Types1_6_4.STRING, Types.STRING, TextRewriter::toClientDisconnect); // reason
-                    }
+                    wrapper.write(Types.STRING, rootObject.toString());
+                } catch (final Throwable e) {
+                    ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Could not parse 1.6.4 ping: " + reason, e);
+                    wrapper.cancel();
                 }
+            }, ClientboundLoginPackets.LOGIN_DISCONNECT, new PacketHandlers() {
+                @Override
+                protected void register() {
+                    map(Types1_6_4.STRING, Types.STRING, TextRewriter::toClientDisconnect); // reason
+                }
+            }, ClientboundPackets1_7_2.DISCONNECT, new PacketHandlers() {
+                @Override
+                public void register() {
+                    map(Types1_6_4.STRING, Types.STRING, TextRewriter::toClientDisconnect); // reason
+                }
+            }
         );
         this.cancelClientbound(ClientboundPackets1_6_4.SET_CREATIVE_MODE_SLOT);
 
@@ -889,7 +908,8 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 info.setUsername(name);
             }
             if (info.getUuid() == null) {
-                info.setUuid(ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUuid(name) : GameProfileUtil.getOfflinePlayerUuid(name));
+                info.setUuid(ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class)
+                    .getMojangUuid(name) : GameProfileUtil.getOfflinePlayerUuid(name));
             }
         });
         this.registerServerboundTransition(ServerboundLoginPackets.ENCRYPTION_KEY, ServerboundPackets1_6_4.SHARED_KEY, null);
@@ -902,7 +922,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
         this.registerServerbound(ServerboundPackets1_7_2.INTERACT, new PacketHandlers() {
             @Override
             public void register() {
-                handler(wrapper -> wrapper.write(Types.INT, wrapper.user().get(PlayerInfoStorage.class).entityId)); // player id
+                handler(wrapper -> wrapper.write(Types.INT, wrapper.user().get(PlayerInfoStorage.class).getEntityId())); // player id
                 map(Types.INT); // entity id
                 map(Types.BYTE); // mode
             }
@@ -911,7 +931,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             @Override
             public void register() {
                 map(Types.BOOLEAN); // onGround
-                handler(wrapper -> wrapper.user().get(PlayerInfoStorage.class).onGround = wrapper.get(Types.BOOLEAN, 0));
+                handler(wrapper -> wrapper.user().get(PlayerInfoStorage.class).setOnGround(wrapper.get(Types.BOOLEAN, 0)));
             }
         });
         this.registerServerbound(ServerboundPackets1_7_2.MOVE_PLAYER_POS, new PacketHandlers() {
@@ -924,10 +944,10 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 map(Types.BOOLEAN); // onGround
                 handler(wrapper -> {
                     final PlayerInfoStorage playerInfoStorage = wrapper.user().get(PlayerInfoStorage.class);
-                    playerInfoStorage.posX = wrapper.get(Types.DOUBLE, 0);
-                    playerInfoStorage.posY = wrapper.get(Types.DOUBLE, 1);
-                    playerInfoStorage.posZ = wrapper.get(Types.DOUBLE, 3);
-                    playerInfoStorage.onGround = wrapper.get(Types.BOOLEAN, 0);
+                    playerInfoStorage.setPosX(wrapper.get(Types.DOUBLE, 0));
+                    playerInfoStorage.setPosY(wrapper.get(Types.DOUBLE, 1));
+                    playerInfoStorage.setPosZ(wrapper.get(Types.DOUBLE, 3));
+                    playerInfoStorage.setOnGround(wrapper.get(Types.BOOLEAN, 0));
                 });
             }
         });
@@ -939,9 +959,9 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 map(Types.BOOLEAN); // onGround
                 handler(wrapper -> {
                     final PlayerInfoStorage playerInfoStorage = wrapper.user().get(PlayerInfoStorage.class);
-                    playerInfoStorage.yaw = wrapper.get(Types.FLOAT, 0);
-                    playerInfoStorage.pitch = wrapper.get(Types.FLOAT, 1);
-                    playerInfoStorage.onGround = wrapper.get(Types.BOOLEAN, 0);
+                    playerInfoStorage.setYaw(wrapper.get(Types.FLOAT, 0));
+                    playerInfoStorage.setPitch(wrapper.get(Types.FLOAT, 1));
+                    playerInfoStorage.setOnGround(wrapper.get(Types.BOOLEAN, 0));
                 });
             }
         });
@@ -957,12 +977,12 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 map(Types.BOOLEAN); // onGround
                 handler(wrapper -> {
                     final PlayerInfoStorage playerInfoStorage = wrapper.user().get(PlayerInfoStorage.class);
-                    playerInfoStorage.posX = wrapper.get(Types.DOUBLE, 0);
-                    playerInfoStorage.posY = wrapper.get(Types.DOUBLE, 1);
-                    playerInfoStorage.posZ = wrapper.get(Types.DOUBLE, 3);
-                    playerInfoStorage.yaw = wrapper.get(Types.FLOAT, 0);
-                    playerInfoStorage.pitch = wrapper.get(Types.FLOAT, 1);
-                    playerInfoStorage.onGround = wrapper.get(Types.BOOLEAN, 0);
+                    playerInfoStorage.setPosX(wrapper.get(Types.DOUBLE, 0));
+                    playerInfoStorage.setPosY(wrapper.get(Types.DOUBLE, 1));
+                    playerInfoStorage.setPosZ(wrapper.get(Types.DOUBLE, 3));
+                    playerInfoStorage.setYaw(wrapper.get(Types.FLOAT, 0));
+                    playerInfoStorage.setPitch(wrapper.get(Types.FLOAT, 1));
+                    playerInfoStorage.setOnGround(wrapper.get(Types.BOOLEAN, 0));
                 });
             }
         });
@@ -972,7 +992,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 map(Types1_7_6.BLOCK_POSITION_UBYTE); // position
                 map(Types.UNSIGNED_BYTE); // direction
                 map(Types1_7_6.ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
+                handler(wrapper -> Protocolr1_6_4Tor1_7_2_5.this.itemRewriter.handleItemToServer(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
                 map(Types.UNSIGNED_BYTE); // offset x
                 map(Types.UNSIGNED_BYTE); // offset y
                 map(Types.UNSIGNED_BYTE); // offset z
@@ -987,7 +1007,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 map(Types.SHORT); // action
                 map(Types.BYTE); // mode
                 map(Types1_7_6.ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
+                handler(wrapper -> Protocolr1_6_4Tor1_7_2_5.this.itemRewriter.handleItemToServer(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
             }
         });
         this.registerServerbound(ServerboundPackets1_7_2.SIGN_UPDATE, new PacketHandlers() {
@@ -1037,9 +1057,11 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
 
             if (action == 1) { // Request Statistics
                 final Object2IntMap<String> loadedStatistics = new Object2IntOpenHashMap<>();
-                for (Int2IntMap.Entry entry : wrapper.user().get(StatisticsStorage.class).values.int2IntEntrySet()) {
+                for (Int2IntMap.Entry entry : wrapper.user().get(StatisticsStorage.class).getValues().int2IntEntrySet()) {
                     final String key = StatisticRewriter.map(entry.getIntKey());
-                    if (key == null) continue;
+                    if (key == null) {
+                        continue;
+                    }
                     loadedStatistics.put(key, entry.getIntValue());
                 }
 
@@ -1066,7 +1088,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
 
                     switch (channel) {
                         case "MC|BEdit", "MC|BSign" -> {
-                            itemRewriter.handleItemToServer(wrapper.user(), wrapper.passthrough(Types1_7_6.ITEM));
+                            Protocolr1_6_4Tor1_7_2_5.this.itemRewriter.handleItemToServer(wrapper.user(), wrapper.passthrough(Types1_7_6.ITEM));
                             length = (short) PacketUtil.calculateLength(wrapper);
                         }
                         case "MC|AdvCdm" -> {
@@ -1095,19 +1117,19 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
     private void rewriteEntityData(final UserConnection user, final List<EntityData> entityDataList) {
         for (EntityData entityData : entityDataList) {
             if (entityData.dataType().equals(EntityDataTypes1_6_4.ITEM)) {
-                itemRewriter.handleItemToClient(user, entityData.value());
+                this.itemRewriter.handleItemToClient(user, entityData.value());
             }
             entityData.setDataType(EntityDataTypes1_7_6.byId(entityData.dataType().typeId()));
         }
     }
 
     @Override
-    public void register(ViaProviders providers) {
+    public void register(final ViaProviders providers) {
         providers.require(EncryptionProvider.class);
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolr1_6_4Tor1_7_2_5.class, ClientboundPackets1_6_4::getPacket));
         userConnection.addClientWorld(Protocolr1_6_4Tor1_7_2_5.class, new ClientWorld());
 
@@ -1119,8 +1141,8 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
         if (userConnection.getChannel() != null) {
             userConnection.getChannel().pipeline().addFirst(new ChannelOutboundHandlerAdapter() {
                 @Override
-                public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-                    if (ctx.channel().isWritable() && userConnection.getProtocolInfo().getClientState().equals(State.PLAY) && userConnection.get(PlayerInfoStorage.class).entityId != -1) {
+                public void close(final ChannelHandlerContext ctx, final ChannelPromise promise) throws Exception {
+                    if (ctx.channel().isWritable() && userConnection.getProtocolInfo().getClientState().equals(State.PLAY) && userConnection.get(PlayerInfoStorage.class).getEntityId() != -1) {
                         final PacketWrapper disconnect = PacketWrapper.create(ServerboundPackets1_6_4.DISCONNECT, userConnection);
                         disconnect.write(Types1_6_4.STRING, "Quitting"); // reason
                         disconnect.sendToServer(Protocolr1_6_4Tor1_7_2_5.class);

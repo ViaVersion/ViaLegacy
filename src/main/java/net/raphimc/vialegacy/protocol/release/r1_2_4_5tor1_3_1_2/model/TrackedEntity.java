@@ -22,7 +22,7 @@ import net.raphimc.vialegacy.api.model.Location;
 
 public class TrackedEntity extends AbstractTrackedEntity {
 
-    public TrackedEntity(int entityId, Location location, EntityTypes1_8.EntityType entityType) {
+    public TrackedEntity(final int entityId, final Location location, final EntityTypes1_8.EntityType entityType) {
         super(entityId, location, entityType);
     }
 

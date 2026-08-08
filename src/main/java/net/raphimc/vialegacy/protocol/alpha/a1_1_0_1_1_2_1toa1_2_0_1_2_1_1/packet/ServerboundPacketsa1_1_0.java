@@ -25,7 +25,7 @@ import net.raphimc.vialegacy.api.splitter.PreNettyPacketType;
 import java.util.function.BiConsumer;
 
 import static net.raphimc.vialegacy.api.splitter.PreNettyTypes.readItemStackb1_2;
-import static net.raphimc.vialegacy.api.splitter.PreNettyTypes.readUTF;
+import static net.raphimc.vialegacy.api.splitter.PreNettyTypes.readUtf;
 
 public enum ServerboundPacketsa1_1_0 implements ServerboundPacketType, PreNettyPacketType {
 
@@ -33,15 +33,17 @@ public enum ServerboundPacketsa1_1_0 implements ServerboundPacketType, PreNettyP
     }),
     LOGIN(1, (user, buf) -> {
         buf.skipBytes(4);
-        readUTF(buf);
-        readUTF(buf);
+        readUtf(buf);
+        readUtf(buf);
     }),
-    HANDSHAKE(2, (user, buf) -> readUTF(buf)),
-    CHAT(3, (user, buf) -> readUTF(buf)),
+    HANDSHAKE(2, (user, buf) -> readUtf(buf)),
+    CHAT(3, (user, buf) -> readUtf(buf)),
     PLAYER_INVENTORY(5, (user, buf) -> {
         buf.skipBytes(4);
-        int x = buf.readShort();
-        for (int i = 0; i < x; i++) readItemStackb1_2(buf);
+        final int x = buf.readShort();
+        for (int i = 0; i < x; i++) {
+            readItemStackb1_2(buf);
+        }
     }),
     MOVE_PLAYER_STATUS_ONLY(10, (user, buf) -> buf.skipBytes(1)),
     MOVE_PLAYER_POS(11, (user, buf) -> buf.skipBytes(33)),
@@ -54,12 +56,17 @@ public enum ServerboundPacketsa1_1_0 implements ServerboundPacketType, PreNettyP
     SPAWN_ITEM(21, (user, buf) -> buf.skipBytes(22)),
     BLOCK_ENTITY_DATA(59, (user, buf) -> {
         buf.skipBytes(10);
-        int x = buf.readUnsignedShort();
-        for (int i = 0; i < x; i++) buf.readByte();
+        final int x = buf.readUnsignedShort();
+        for (int i = 0; i < x; i++) {
+            buf.readByte();
+        }
     }),
-    DISCONNECT(255, (user, buf) -> readUTF(buf));
+    DISCONNECT(255, (user, buf) -> readUtf(buf));
 
     private static final ServerboundPacketsa1_1_0[] REGISTRY = new ServerboundPacketsa1_1_0[256];
+
+    private final int id;
+    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     static {
         for (ServerboundPacketsa1_1_0 packet : values()) {
@@ -70,9 +77,6 @@ public enum ServerboundPacketsa1_1_0 implements ServerboundPacketType, PreNettyP
     public static ServerboundPacketsa1_1_0 getPacket(final int id) {
         return REGISTRY[id];
     }
-
-    private final int id;
-    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     ServerboundPacketsa1_1_0(final int id, final BiConsumer<UserConnection, ByteBuf> packetReader) {
         this.id = id;

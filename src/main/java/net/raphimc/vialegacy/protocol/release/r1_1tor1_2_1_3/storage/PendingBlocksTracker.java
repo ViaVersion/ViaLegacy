@@ -36,7 +36,7 @@ public class PendingBlocksTracker extends StoredObject {
 
     private final List<PendingBlockEntry> pendingBlockEntries = new LinkedList<>();
 
-    public PendingBlocksTracker(UserConnection user) {
+    public PendingBlocksTracker(final UserConnection user) {
         super(user);
     }
 

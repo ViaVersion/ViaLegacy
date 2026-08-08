@@ -21,9 +21,12 @@ import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.type.Type;
 
-public class Types1_1 {
+public final class Types1_1 {
 
-    public static Type<BlockChangeRecord[]> BLOCK_CHANGE_RECORD_ARRAY = new BlockChangeRecordArrayType();
-    public static Type<Chunk> CHUNK = new ChunkType();
+    public static final Type<BlockChangeRecord[]> BLOCK_CHANGE_RECORD_ARRAY = new BlockChangeRecordArrayType();
+    public static final Type<Chunk> CHUNK = new ChunkType();
+
+    private Types1_1() {
+    }
 
 }

@@ -31,12 +31,12 @@ public enum ClientboundPacketsb1_2 implements ClientboundPacketType, PreNettyPac
     }),
     LOGIN(1, (user, buf) -> {
         buf.skipBytes(4);
-        PreNettyTypes.readUTF(buf);
-        PreNettyTypes.readUTF(buf);
+        PreNettyTypes.readUtf(buf);
+        PreNettyTypes.readUtf(buf);
         buf.skipBytes(9);
     }),
-    HANDSHAKE(2, (user, buf) -> PreNettyTypes.readUTF(buf)),
-    CHAT(3, (user, buf) -> PreNettyTypes.readUTF(buf)),
+    HANDSHAKE(2, (user, buf) -> PreNettyTypes.readUtf(buf)),
+    CHAT(3, (user, buf) -> PreNettyTypes.readUtf(buf)),
     SET_TIME(4, (user, buf) -> buf.skipBytes(8)),
     SET_EQUIPPED_ITEM(5, (user, buf) -> buf.skipBytes(10)),
     SET_DEFAULT_SPAWN_POSITION(6, (user, buf) -> buf.skipBytes(12)),
@@ -50,7 +50,7 @@ public enum ClientboundPacketsb1_2 implements ClientboundPacketType, PreNettyPac
     ANIMATE(18, (user, buf) -> buf.skipBytes(5)),
     ADD_PLAYER(20, (user, buf) -> {
         buf.skipBytes(4);
-        PreNettyTypes.readUTF(buf);
+        PreNettyTypes.readUtf(buf);
         buf.skipBytes(16);
     }),
     SPAWN_ITEM(21, (user, buf) -> buf.skipBytes(24)),
@@ -62,7 +62,7 @@ public enum ClientboundPacketsb1_2 implements ClientboundPacketType, PreNettyPac
     }),
     ADD_PAINTING(25, (user, buf) -> {
         buf.skipBytes(4);
-        PreNettyTypes.readUTF(buf);
+        PreNettyTypes.readUtf(buf);
         buf.skipBytes(16);
     }),
     SET_ENTITY_MOTION(28, (user, buf) -> buf.skipBytes(10)),
@@ -81,28 +81,36 @@ public enum ClientboundPacketsb1_2 implements ClientboundPacketType, PreNettyPac
     PRE_CHUNK(50, (user, buf) -> buf.skipBytes(9)),
     LEVEL_CHUNK(51, (user, buf) -> {
         buf.skipBytes(13);
-        int x = buf.readInt();
-        for (int i = 0; i < x; i++) buf.readByte();
+        final int x = buf.readInt();
+        for (int i = 0; i < x; i++) {
+            buf.readByte();
+        }
     }),
     CHUNK_BLOCKS_UPDATE(52, (user, buf) -> {
         buf.skipBytes(8);
-        short x = buf.readShort();
-        for (int i = 0; i < x; i++) buf.readShort();
-        for (int i = 0; i < x; i++) buf.readByte();
-        for (int i = 0; i < x; i++) buf.readByte();
+        final short x = buf.readShort();
+        for (int i = 0; i < x; i++) {
+            buf.readShort();
+        }
+        for (int i = 0; i < x; i++) {
+            buf.readByte();
+        }
+        for (int i = 0; i < x; i++) {
+            buf.readByte();
+        }
     }),
     BLOCK_UPDATE(53, (user, buf) -> buf.skipBytes(11)),
     BLOCK_EVENT(54, (user, buf) -> buf.skipBytes(12)),
     EXPLODE(60, (user, buf) -> {
         buf.skipBytes(28);
-        int x = buf.readInt();
+        final int x = buf.readInt();
         for (int i = 0; i < x; i++) {
             buf.skipBytes(3);
         }
     }),
     OPEN_SCREEN(100, (user, buf) -> {
         buf.skipBytes(2);
-        PreNettyTypes.readUTF(buf);
+        PreNettyTypes.readUtf(buf);
         buf.skipBytes(1);
     }),
     CONTAINER_CLOSE(101, (user, buf) -> buf.skipBytes(1)),
@@ -112,21 +120,26 @@ public enum ClientboundPacketsb1_2 implements ClientboundPacketType, PreNettyPac
     }),
     CONTAINER_SET_CONTENT(104, (user, buf) -> {
         buf.skipBytes(1);
-        int x = buf.readShort();
-        for (int i = 0; i < x; i++) PreNettyTypes.readItemStackb1_2(buf);
+        final int x = buf.readShort();
+        for (int i = 0; i < x; i++) {
+            PreNettyTypes.readItemStackb1_2(buf);
+        }
     }),
     CONTAINER_SET_DATA(105, (user, buf) -> buf.skipBytes(5)),
     CONTAINER_ACK(106, (user, buf) -> buf.skipBytes(4)),
     UPDATE_SIGN(130, (user, buf) -> {
         buf.skipBytes(10);
-        PreNettyTypes.readUTF(buf);
-        PreNettyTypes.readUTF(buf);
-        PreNettyTypes.readUTF(buf);
-        PreNettyTypes.readUTF(buf);
+        PreNettyTypes.readUtf(buf);
+        PreNettyTypes.readUtf(buf);
+        PreNettyTypes.readUtf(buf);
+        PreNettyTypes.readUtf(buf);
     }),
-    DISCONNECT(255, (user, buf) -> PreNettyTypes.readUTF(buf));
+    DISCONNECT(255, (user, buf) -> PreNettyTypes.readUtf(buf));
 
     private static final ClientboundPacketsb1_2[] REGISTRY = new ClientboundPacketsb1_2[256];
+
+    private final int id;
+    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     static {
         for (ClientboundPacketsb1_2 packet : values()) {
@@ -137,9 +150,6 @@ public enum ClientboundPacketsb1_2 implements ClientboundPacketType, PreNettyPac
     public static ClientboundPacketsb1_2 getPacket(final int id) {
         return REGISTRY[id];
     }
-
-    private final int id;
-    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     ClientboundPacketsb1_2(final int id, final BiConsumer<UserConnection, ByteBuf> packetReader) {
         this.id = id;

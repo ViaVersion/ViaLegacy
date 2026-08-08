@@ -33,6 +33,9 @@ public enum ServerboundPacketsc0_28 implements ServerboundPacketType, PreNettyPa
 
     private static final ServerboundPacketsc0_28[] REGISTRY = new ServerboundPacketsc0_28[256];
 
+    private final int id;
+    private final BiConsumer<UserConnection, ByteBuf> packetReader;
+
     static {
         for (ServerboundPacketsc0_28 packet : values()) {
             REGISTRY[packet.id] = packet;
@@ -42,9 +45,6 @@ public enum ServerboundPacketsc0_28 implements ServerboundPacketType, PreNettyPa
     public static ServerboundPacketsc0_28 getPacket(final int id) {
         return REGISTRY[id];
     }
-
-    private final int id;
-    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     ServerboundPacketsc0_28(final int id, final BiConsumer<UserConnection, ByteBuf> packetReader) {
         this.id = id;

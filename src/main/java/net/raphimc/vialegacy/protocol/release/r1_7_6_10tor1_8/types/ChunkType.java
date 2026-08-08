@@ -17,7 +17,12 @@
  */
 package net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.types;
 
-import com.viaversion.viaversion.api.minecraft.chunks.*;
+import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionLight;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.type.Type;
 import com.viaversion.viaversion.util.IdAndData;
 import com.viaversion.viaversion.util.Pair;
@@ -56,7 +61,7 @@ public class ChunkType extends Type<Chunk> {
     }
 
     @Override
-    public Chunk read(ByteBuf byteBuf) {
+    public Chunk read(final ByteBuf byteBuf) {
         final int chunkX = byteBuf.readInt();
         final int chunkZ = byteBuf.readInt();
         final boolean fullChunk = byteBuf.readBoolean();
@@ -72,7 +77,7 @@ public class ChunkType extends Type<Chunk> {
         try {
             inflater.setInput(data, 0, compressedSize);
             inflater.inflate(uncompressedData);
-        } catch (DataFormatException ex) {
+        } catch (final DataFormatException ex) {
             throw new RuntimeException("Bad compressed data format");
         } finally {
             inflater.end();
@@ -87,14 +92,14 @@ public class ChunkType extends Type<Chunk> {
     }
 
     @Override
-    public void write(ByteBuf byteBuf, Chunk chunk) {
+    public void write(final ByteBuf byteBuf, final Chunk chunk) {
         final Pair<byte[], Short> chunkData = serialize(chunk);
         final byte[] data = chunkData.key();
         final short additionalBitMask = chunkData.value();
 
         final Deflater deflater = new Deflater();
-        byte[] compressedData;
-        int compressedSize;
+        final byte[] compressedData;
+        final int compressedSize;
         try {
             deflater.setInput(data, 0, data.length);
             deflater.finish();
@@ -124,9 +129,9 @@ public class ChunkType extends Type<Chunk> {
                     storageArrays[i] = new ExtendedBlockStorage(skyLight);
                 }
 
-                final byte[] blockLSBArray = storageArrays[i].getBlockLSBArray();
-                System.arraycopy(chunkData, dataPosition, blockLSBArray, 0, blockLSBArray.length);
-                dataPosition += blockLSBArray.length;
+                final byte[] blockLsbArray = storageArrays[i].getBlockLsbArray();
+                System.arraycopy(chunkData, dataPosition, blockLsbArray, 0, blockLsbArray.length);
+                dataPosition += blockLsbArray.length;
             }
         }
 
@@ -159,9 +164,9 @@ public class ChunkType extends Type<Chunk> {
         for (int i = 0; i < storageArrays.length; i++) {
             if ((additionalBitMask & 1 << i) != 0) {
                 if (storageArrays[i] != null) {
-                    final byte[] blockMSBArray = storageArrays[i].getOrCreateBlockMSBArray().getHandle();
-                    System.arraycopy(chunkData, dataPosition, blockMSBArray, 0, blockMSBArray.length);
-                    dataPosition += blockMSBArray.length;
+                    final byte[] blockMsbArray = storageArrays[i].getOrCreateBlockMsbArray().getHandle();
+                    System.arraycopy(chunkData, dataPosition, blockMsbArray, 0, blockMsbArray.length);
+                    dataPosition += blockMsbArray.length;
                 } else {
                     dataPosition += ChunkSection.SIZE / 2;
                 }
@@ -229,9 +234,9 @@ public class ChunkType extends Type<Chunk> {
         int dataPosition = 0;
         for (int i = 0; i < storageArrays.length; i++) {
             if ((chunk.getBitmask() & 1 << i) != 0) {
-                final byte[] blockLSBArray = storageArrays[i].getBlockLSBArray();
-                System.arraycopy(blockLSBArray, 0, chunkData, dataPosition, blockLSBArray.length);
-                dataPosition += blockLSBArray.length;
+                final byte[] blockLsbArray = storageArrays[i].getBlockLsbArray();
+                System.arraycopy(blockLsbArray, 0, chunkData, dataPosition, blockLsbArray.length);
+                dataPosition += blockLsbArray.length;
             }
         }
 
@@ -261,11 +266,11 @@ public class ChunkType extends Type<Chunk> {
 
         short additionalBitMask = 0;
         for (int i = 0; i < storageArrays.length; i++) {
-            if ((chunk.getBitmask() & 1 << i) != 0 && storageArrays[i].hasBlockMSBArray()) {
+            if ((chunk.getBitmask() & 1 << i) != 0 && storageArrays[i].hasBlockMsbArray()) {
                 additionalBitMask |= (short) (1 << i);
-                final byte[] blockMSBArray = storageArrays[i].getOrCreateBlockMSBArray().getHandle();
-                System.arraycopy(blockMSBArray, 0, chunkData, dataPosition, blockMSBArray.length);
-                dataPosition += blockMSBArray.length;
+                final byte[] blockMsbArray = storageArrays[i].getOrCreateBlockMsbArray().getHandle();
+                System.arraycopy(blockMsbArray, 0, chunkData, dataPosition, blockMsbArray.length);
+                dataPosition += blockMsbArray.length;
             }
         }
 
@@ -283,8 +288,12 @@ public class ChunkType extends Type<Chunk> {
         final int additionalSectionCount = Integer.bitCount(additionalBitMask & 0xFFFF);
 
         int size = ((ChunkSection.SIZE + ChunkSection.SIZE / 2 + ChunkSectionLight.LIGHT_LENGTH) * primarySectionCount) + (ChunkSection.SIZE / 2 * additionalSectionCount);
-        if (skyLight) size += ChunkSectionLight.LIGHT_LENGTH * primarySectionCount;
-        if (fullChunk) size += 256;
+        if (skyLight) {
+            size += ChunkSectionLight.LIGHT_LENGTH * primarySectionCount;
+        }
+        if (fullChunk) {
+            size += 256;
+        }
 
         return size;
     }
@@ -299,7 +308,7 @@ public class ChunkType extends Type<Chunk> {
                 if (storageArrays[i].getSkyLightArray() != null) {
                     size += ChunkSectionLight.LIGHT_LENGTH;
                 }
-                if (storageArrays[i].hasBlockMSBArray()) {
+                if (storageArrays[i].hasBlockMsbArray()) {
                     size += ChunkSection.SIZE / 2; // Block msb array
                 }
             }

@@ -22,11 +22,14 @@ import com.viaversion.viaversion.api.minecraft.item.Item;
 import com.viaversion.viaversion.api.type.Type;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.types.ItemArrayType;
 
-public class Types1_2_4 {
+public final class Types1_2_4 {
 
     public static final Type<Item> NBT_ITEM = new ItemType();
     public static final Type<Item[]> NBT_ITEM_ARRAY = new ItemArrayType<>(NBT_ITEM);
 
     public static final Type<Chunk> CHUNK = new ChunkType();
+
+    private Types1_2_4() {
+    }
 
 }

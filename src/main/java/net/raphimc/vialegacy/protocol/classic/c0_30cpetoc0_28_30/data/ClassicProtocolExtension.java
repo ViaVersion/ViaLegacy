@@ -65,7 +65,7 @@ public enum ClassicProtocolExtension {
     private final String name;
     private final IntSet supportedVersions;
 
-    ClassicProtocolExtension(String name, int... supportedVersions) {
+    ClassicProtocolExtension(final String name, final int... supportedVersions) {
         this.name = name;
         this.supportedVersions = new IntOpenHashSet();
         for (int supportedVersion : supportedVersions) {
@@ -73,11 +73,11 @@ public enum ClassicProtocolExtension {
         }
     }
 
-    public static ClassicProtocolExtension byName(String name) {
+    public static ClassicProtocolExtension byName(final String name) {
         return Arrays.stream(values()).filter(e -> e.name.equals(name)).findFirst().orElse(null);
     }
 
-    public static ClassicProtocolExtension byNameAndVersion(String name, int version) {
+    public static ClassicProtocolExtension byNameAndVersion(final String name, final int version) {
         final ClassicProtocolExtension extension = byName(name);
         if (extension == null || !extension.supportsVersion(version)) {
             return null;
@@ -85,18 +85,20 @@ public enum ClassicProtocolExtension {
         return extension;
     }
 
-    public boolean supportsVersion(int version) {
+    public boolean supportsVersion(final int version) {
         return this.supportedVersions.contains(version);
     }
 
     public IntSet getSupportedVersions() {
-        return supportedVersions;
+        return this.supportedVersions;
     }
 
     public int getHighestSupportedVersion() {
         int highest = 0;
         for (int supportedVersion : this.supportedVersions) {
-            if (supportedVersion > highest) highest = supportedVersion;
+            if (supportedVersion > highest) {
+                highest = supportedVersion;
+            }
         }
         return highest;
     }
@@ -106,12 +108,12 @@ public enum ClassicProtocolExtension {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     @Override
     public String toString() {
-        return name;
+        return this.name;
     }
 
 }

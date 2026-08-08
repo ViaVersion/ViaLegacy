@@ -20,7 +20,7 @@ package net.raphimc.vialegacy;
 import net.raphimc.vialegacy.platform.ViaLegacyConfig;
 import net.raphimc.vialegacy.platform.ViaLegacyPlatform;
 
-public class ViaLegacy {
+public final class ViaLegacy {
 
     public static final String VERSION = "${version}";
     public static final String IMPL_VERSION = "git-ViaLegacy-${version}:${commit_hash}";
@@ -32,7 +32,9 @@ public class ViaLegacy {
     }
 
     public static void init(final ViaLegacyPlatform platform, final ViaLegacyConfig config) {
-        if (ViaLegacy.platform != null) throw new IllegalStateException("ViaLegacy is already initialized");
+        if (ViaLegacy.platform != null) {
+            throw new IllegalStateException("ViaLegacy is already initialized");
+        }
 
         ViaLegacy.platform = platform;
         ViaLegacy.config = config;

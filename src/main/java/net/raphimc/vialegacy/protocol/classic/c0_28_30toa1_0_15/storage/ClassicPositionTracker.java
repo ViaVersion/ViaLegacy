@@ -25,13 +25,13 @@ import net.raphimc.vialegacy.api.model.ChunkCoord;
 
 public class ClassicPositionTracker implements StorableObject {
 
-    public double posX;
-    public double stance;
-    public double posZ;
-    public float yaw;
-    public float pitch;
+    private double posX;
+    private double stance;
+    private double posZ;
+    private float yaw;
+    private float pitch;
 
-    public boolean spawned;
+    private boolean spawned;
 
     public void writeToPacket(final PacketWrapper wrapper) {
         final int x = (int) (this.posX * 32.0F);
@@ -57,9 +57,57 @@ public class ClassicPositionTracker implements StorableObject {
         return new ChunkCoord(pos.x() >> 4, pos.z() >> 4);
     }
 
-    private static int floor(double f) {
-        int i = (int) f;
+    private static int floor(final double f) {
+        final int i = (int) f;
         return f < (double) i ? i - 1 : i;
+    }
+
+    public double getPosX() {
+        return this.posX;
+    }
+
+    public void setPosX(final double posX) {
+        this.posX = posX;
+    }
+
+    public double getStance() {
+        return this.stance;
+    }
+
+    public void setStance(final double stance) {
+        this.stance = stance;
+    }
+
+    public double getPosZ() {
+        return this.posZ;
+    }
+
+    public void setPosZ(final double posZ) {
+        this.posZ = posZ;
+    }
+
+    public float getYaw() {
+        return this.yaw;
+    }
+
+    public void setYaw(final float yaw) {
+        this.yaw = yaw;
+    }
+
+    public float getPitch() {
+        return this.pitch;
+    }
+
+    public void setPitch(final float pitch) {
+        this.pitch = pitch;
+    }
+
+    public boolean isSpawned() {
+        return this.spawned;
+    }
+
+    public void setSpawned(final boolean spawned) {
+        this.spawned = spawned;
     }
 
 }

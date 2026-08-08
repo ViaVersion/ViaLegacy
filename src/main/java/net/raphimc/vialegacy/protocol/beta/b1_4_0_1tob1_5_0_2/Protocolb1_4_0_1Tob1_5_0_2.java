@@ -96,7 +96,7 @@ public class Protocolb1_4_0_1Tob1_5_0_2 extends StatelessProtocol<ClientboundPac
                 map(Types.BYTE); // yaw
                 map(Types.BYTE); // pitch
                 map(Typesb1_4.ENTITY_DATA_LIST, Types1_3_1.ENTITY_DATA_LIST); // entity data
-                handler(wrapper -> rewriteEntityData(wrapper.get(Types1_3_1.ENTITY_DATA_LIST, 0)));
+                handler(wrapper -> Protocolb1_4_0_1Tob1_5_0_2.this.rewriteEntityData(wrapper.get(Types1_3_1.ENTITY_DATA_LIST, 0)));
             }
         });
         this.registerClientbound(ClientboundPacketsb1_4.ADD_PAINTING, new PacketHandlers() {
@@ -113,7 +113,7 @@ public class Protocolb1_4_0_1Tob1_5_0_2 extends StatelessProtocol<ClientboundPac
             public void register() {
                 map(Types.INT); // entity id
                 map(Typesb1_4.ENTITY_DATA_LIST, Types1_3_1.ENTITY_DATA_LIST); // entity data
-                handler(wrapper -> rewriteEntityData(wrapper.get(Types1_3_1.ENTITY_DATA_LIST, 0)));
+                handler(wrapper -> Protocolb1_4_0_1Tob1_5_0_2.this.rewriteEntityData(wrapper.get(Types1_3_1.ENTITY_DATA_LIST, 0)));
             }
         });
         this.registerClientbound(ClientboundPacketsb1_4.UPDATE_SIGN, new PacketHandlers() {
@@ -191,7 +191,7 @@ public class Protocolb1_4_0_1Tob1_5_0_2 extends StatelessProtocol<ClientboundPac
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolb1_4_0_1Tob1_5_0_2.class, ClientboundPacketsb1_4::getPacket));
     }
 

@@ -54,7 +54,7 @@ public class BulkChunkType extends Type<Chunk[]> {
     }
 
     @Override
-    public Chunk[] read(ByteBuf byteBuf) {
+    public Chunk[] read(final ByteBuf byteBuf) {
         final short chunkCount = byteBuf.readShort();
         final int compressedSize = byteBuf.readInt();
         final boolean hasSkyLight = this.readHasSkyLight(byteBuf);
@@ -76,7 +76,7 @@ public class BulkChunkType extends Type<Chunk[]> {
         try {
             inflater.setInput(data, 0, compressedSize);
             inflater.inflate(uncompressedData);
-        } catch (DataFormatException ex) {
+        } catch (final DataFormatException ex) {
             throw new RuntimeException("Bad compressed data format");
         } finally {
             inflater.end();
@@ -95,7 +95,7 @@ public class BulkChunkType extends Type<Chunk[]> {
     }
 
     @Override
-    public void write(ByteBuf byteBuf, Chunk[] chunks) {
+    public void write(final ByteBuf byteBuf, final Chunk[] chunks) {
         final int chunkCount = chunks.length;
         final int[] chunkX = new int[chunkCount];
         final int[] chunkZ = new int[chunkCount];
@@ -122,8 +122,8 @@ public class BulkChunkType extends Type<Chunk[]> {
         }
 
         final Deflater deflater = new Deflater();
-        byte[] compressedData;
-        int compressedSize;
+        final byte[] compressedData;
+        final int compressedSize;
         try {
             deflater.setInput(data, 0, data.length);
             deflater.finish();

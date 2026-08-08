@@ -19,16 +19,19 @@ package net.raphimc.vialegacy.api.util;
 
 import com.viaversion.viaversion.api.minecraft.BlockFace;
 
-public class BlockFaceUtil {
+public final class BlockFaceUtil {
+
+    private BlockFaceUtil() {
+    }
 
     public static BlockFace getFace(final int direction) {
         return switch (direction) {
             case 0 -> BlockFace.BOTTOM;
-            default -> BlockFace.TOP;
             case 2 -> BlockFace.NORTH;
             case 3 -> BlockFace.SOUTH;
             case 4 -> BlockFace.WEST;
             case 5 -> BlockFace.EAST;
+            default -> BlockFace.TOP;
         };
     }
 

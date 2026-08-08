@@ -93,7 +93,7 @@ public class Protocolr1_0_0_1Tor1_1 extends StatelessProtocol<ClientboundPackets
         this.registerClientbound(ClientboundPackets1_0_0.CHAT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_6_4.STRING, Types1_6_4.STRING, msg -> msg.replace("\u00C2", "")); // message
+                map(Types1_6_4.STRING, Types1_6_4.STRING, msg -> msg.replace("Â", "")); // message
             }
         });
         this.registerClientbound(ClientboundPackets1_0_0.RESPAWN, new PacketHandlers() {
@@ -111,16 +111,16 @@ public class Protocolr1_0_0_1Tor1_1 extends StatelessProtocol<ClientboundPackets
             @Override
             public void register() {
                 map(Types1_7_6.BLOCK_POSITION_SHORT); // position
-                map(Types1_6_4.STRING, Types1_6_4.STRING, msg -> msg.replace("\u00C2", "")); // line 1
-                map(Types1_6_4.STRING, Types1_6_4.STRING, msg -> msg.replace("\u00C2", "")); // line 2
-                map(Types1_6_4.STRING, Types1_6_4.STRING, msg -> msg.replace("\u00C2", "")); // line 3
-                map(Types1_6_4.STRING, Types1_6_4.STRING, msg -> msg.replace("\u00C2", "")); // line 4
+                map(Types1_6_4.STRING, Types1_6_4.STRING, msg -> msg.replace("Â", "")); // line 1
+                map(Types1_6_4.STRING, Types1_6_4.STRING, msg -> msg.replace("Â", "")); // line 2
+                map(Types1_6_4.STRING, Types1_6_4.STRING, msg -> msg.replace("Â", "")); // line 3
+                map(Types1_6_4.STRING, Types1_6_4.STRING, msg -> msg.replace("Â", "")); // line 4
             }
         });
         this.registerClientbound(ClientboundPackets1_0_0.DISCONNECT, new PacketHandlers() {
             @Override
             public void register() {
-                map(Types1_6_4.STRING, Types1_6_4.STRING, reason -> reason.replace("\u00C2", "")); // reason
+                map(Types1_6_4.STRING, Types1_6_4.STRING, reason -> reason.replace("Â", "")); // reason
             }
         });
 
@@ -128,7 +128,7 @@ public class Protocolr1_0_0_1Tor1_1 extends StatelessProtocol<ClientboundPackets
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolr1_0_0_1Tor1_1.class, ClientboundPackets1_0_0::getPacket));
     }
 

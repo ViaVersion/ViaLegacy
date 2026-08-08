@@ -73,7 +73,7 @@ public class Protocolr1_5_2Tor1_6_1 extends StatelessProtocol<ClientboundPackets
                     final int entityId = wrapper.get(Types.INT, 0);
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                     tracker.getTrackedEntities().put(entityId, EntityTypes1_8.EntityType.PLAYER);
-                    tracker.setPlayerID(entityId);
+                    tracker.setPlayerId(entityId);
                 });
             }
         });
@@ -131,12 +131,12 @@ public class Protocolr1_5_2Tor1_6_1 extends StatelessProtocol<ClientboundPackets
                 map(Types.INT); // data
                 // more conditional data
                 handler(wrapper -> {
-                    final int entityID = wrapper.get(Types.INT, 0);
-                    final int typeID = wrapper.get(Types.BYTE, 0);
+                    final int entityId = wrapper.get(Types.INT, 0);
+                    final int typeId = wrapper.get(Types.BYTE, 0);
                     final int data = wrapper.get(Types.INT, 4);
-                    final EntityTypes1_8.EntityType entityType = EntityTypes1_8.ObjectType.getEntityType(typeID, data);
+                    final EntityTypes1_8.EntityType entityType = EntityTypes1_8.ObjectType.getEntityType(typeId, data);
                     if (entityType != null) {
-                        wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityID, entityType);
+                        wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityId, entityType);
                     }
                 });
             }
@@ -157,19 +157,19 @@ public class Protocolr1_5_2Tor1_6_1 extends StatelessProtocol<ClientboundPackets
                 map(Types.SHORT); // velocity z
                 map(Types1_6_4.ENTITY_DATA_LIST); // entity data
                 handler(wrapper -> {
-                    final int entityID = wrapper.get(Types.INT, 0);
-                    final int typeID = wrapper.get(Types.UNSIGNED_BYTE, 0);
-                    final EntityTypes1_8.EntityType entityType = EntityTypes1_8.EntityType.findById(typeID);
+                    final int entityId = wrapper.get(Types.INT, 0);
+                    final int typeId = wrapper.get(Types.UNSIGNED_BYTE, 0);
+                    final EntityTypes1_8.EntityType entityType = EntityTypes1_8.EntityType.findById(typeId);
                     if (entityType == null) {
                         wrapper.cancel();
                         return;
                     }
                     final List<EntityData> entityDataList = wrapper.get(Types1_6_4.ENTITY_DATA_LIST, 0);
-                    wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityID, entityType);
+                    wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityId, entityType);
                     EntityDataRewriter.transform(entityType, entityDataList);
 
                     if (entityType.isOrHasParent(EntityTypes1_8.EntityType.WOLF)) {
-                        handleWolfEntityData(entityID, entityDataList, wrapper);
+                        Protocolr1_5_2Tor1_6_1.this.handleWolfEntityData(entityId, entityDataList, wrapper);
                     }
                 });
             }
@@ -182,8 +182,8 @@ public class Protocolr1_5_2Tor1_6_1 extends StatelessProtocol<ClientboundPackets
                 map(Types1_7_6.BLOCK_POSITION_INT); // position
                 map(Types.INT); // rotation
                 handler(wrapper -> {
-                    final int entityID = wrapper.get(Types.INT, 0);
-                    wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityID, EntityTypes1_8.EntityType.PAINTING);
+                    final int entityId = wrapper.get(Types.INT, 0);
+                    wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityId, EntityTypes1_8.EntityType.PAINTING);
                 });
             }
         });
@@ -196,8 +196,8 @@ public class Protocolr1_5_2Tor1_6_1 extends StatelessProtocol<ClientboundPackets
                 map(Types.INT); // z
                 map(Types.SHORT); // count
                 handler(wrapper -> {
-                    final int entityID = wrapper.get(Types.INT, 0);
-                    wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityID, EntityTypes1_8.EntityType.EXPERIENCE_ORB);
+                    final int entityId = wrapper.get(Types.INT, 0);
+                    wrapper.user().get(EntityTracker.class).getTrackedEntities().put(entityId, EntityTypes1_8.EntityType.EXPERIENCE_ORB);
                 });
             }
         });
@@ -223,8 +223,8 @@ public class Protocolr1_5_2Tor1_6_1 extends StatelessProtocol<ClientboundPackets
                     final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                     final int ridingId = wrapper.get(Types.INT, 0);
                     final int vehicleId = wrapper.get(Types.INT, 1);
-                    if (entityTracker.getPlayerID() == ridingId) {
-                        attachTracker.vehicleEntityId = vehicleId;
+                    if (entityTracker.getPlayerId() == ridingId) {
+                        attachTracker.setVehicleEntityId(vehicleId);
                     }
                 });
                 create(Types.UNSIGNED_BYTE, (short) 0); // leash state
@@ -238,14 +238,16 @@ public class Protocolr1_5_2Tor1_6_1 extends StatelessProtocol<ClientboundPackets
                 handler(wrapper -> {
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                     final List<EntityData> entityDataList = wrapper.get(Types1_6_4.ENTITY_DATA_LIST, 0);
-                    final int entityID = wrapper.get(Types.INT, 0);
-                    final EntityTypes1_8.EntityType entityType = tracker.getTrackedEntities().get(entityID);
-                    if (tracker.getTrackedEntities().containsKey(entityID)) {
+                    final int entityId = wrapper.get(Types.INT, 0);
+                    final EntityTypes1_8.EntityType entityType = tracker.getTrackedEntities().get(entityId);
+                    if (tracker.getTrackedEntities().containsKey(entityId)) {
                         EntityDataRewriter.transform(entityType, entityDataList);
-                        if (entityDataList.isEmpty()) wrapper.cancel();
+                        if (entityDataList.isEmpty()) {
+                            wrapper.cancel();
+                        }
 
                         if (entityType.isOrHasParent(EntityTypes1_8.EntityType.WOLF)) {
-                            handleWolfEntityData(entityID, entityDataList, wrapper);
+                            Protocolr1_5_2Tor1_6_1.this.handleWolfEntityData(entityId, entityDataList, wrapper);
                         }
                     } else {
                         wrapper.cancel();
@@ -259,7 +261,9 @@ public class Protocolr1_5_2Tor1_6_1 extends StatelessProtocol<ClientboundPackets
                 handler(wrapper -> {
                     final String oldSound = wrapper.read(Types1_6_4.STRING); // sound
                     String newSound = SoundRewriter.map(oldSound);
-                    if (oldSound.isEmpty()) newSound = "";
+                    if (oldSound.isEmpty()) {
+                        newSound = "";
+                    }
                     if (newSound == null) {
                         if (Via.getConfig().logOtherConversionWarnings()) {
                             ViaLegacy.getPlatform().getLogger().warning("Unable to map 1.5.2 sound '" + oldSound + "'");
@@ -297,7 +301,7 @@ public class Protocolr1_5_2Tor1_6_1 extends StatelessProtocol<ClientboundPackets
                     wrapper.write(Types.FLOAT, walkSpeed);
 
                     final PacketWrapper entityProperties = PacketWrapper.create(ClientboundPackets1_6_1.UPDATE_ATTRIBUTES, wrapper.user());
-                    entityProperties.write(Types.INT, wrapper.user().get(EntityTracker.class).getPlayerID()); // entity id
+                    entityProperties.write(Types.INT, wrapper.user().get(EntityTracker.class).getPlayerId()); // entity id
                     entityProperties.write(Types.INT, 1); // count
                     entityProperties.write(Types1_6_4.STRING, "generic.movementSpeed"); // id
                     entityProperties.write(Types.DOUBLE, (double) walkSpeed); // value
@@ -329,7 +333,7 @@ public class Protocolr1_5_2Tor1_6_1 extends StatelessProtocol<ClientboundPackets
                             wrapper.write(Types.REMAINING_BYTES, url.getBytes(StandardCharsets.UTF_8));
                             length = (short) PacketUtil.calculateLength(wrapper);
                         }
-                    } catch (Exception e) {
+                    } catch (final Exception e) {
                         if (Via.getConfig().logOtherConversionWarnings()) {
                             Via.getPlatform().getLogger().log(Level.WARNING, "Failed to handle packet", e);
                         }
@@ -355,7 +359,9 @@ public class Protocolr1_5_2Tor1_6_1 extends StatelessProtocol<ClientboundPackets
                 map(Types.BYTE); // action id
                 read(Types.INT); // action parameter
                 handler(wrapper -> {
-                    if (wrapper.get(Types.BYTE, 0) > 5) wrapper.cancel();
+                    if (wrapper.get(Types.BYTE, 0) > 5) {
+                        wrapper.cancel();
+                    }
                 });
             }
         });
@@ -367,11 +373,11 @@ public class Protocolr1_5_2Tor1_6_1 extends StatelessProtocol<ClientboundPackets
             wrapper.read(Types.BOOLEAN); // jumping
             final boolean sneaking = wrapper.read(Types.BOOLEAN); // sneaking
 
-            if (attachTracker.lastSneakState != sneaking) {
-                attachTracker.lastSneakState = sneaking;
+            if (attachTracker.isLastSneakState() != sneaking) {
+                attachTracker.setLastSneakState(sneaking);
                 if (sneaking) {
-                    wrapper.write(Types.INT, entityTracker.getPlayerID()); // player id
-                    wrapper.write(Types.INT, attachTracker.vehicleEntityId); // entity id
+                    wrapper.write(Types.INT, entityTracker.getPlayerId()); // player id
+                    wrapper.write(Types.INT, attachTracker.getVehicleEntityId()); // entity id
                     wrapper.write(Types.BYTE, (byte) 0); // mode
                     return;
                 }
@@ -410,7 +416,7 @@ public class Protocolr1_5_2Tor1_6_1 extends StatelessProtocol<ClientboundPackets
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolr1_5_2Tor1_6_1.class, ClientboundPackets1_5_2::getPacket));
 
         userConnection.put(new EntityTracker());

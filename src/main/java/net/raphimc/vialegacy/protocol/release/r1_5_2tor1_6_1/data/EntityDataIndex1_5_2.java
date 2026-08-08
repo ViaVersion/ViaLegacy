@@ -36,8 +36,7 @@ public enum EntityDataIndex1_5_2 {
     MINECART_DAMAGE_TAKEN(EntityTypes1_8.EntityType.ABSTRACT_MINECART, 19, EntityDataTypes1_6_4.INT, EntityDataTypes1_6_4.FLOAT),
     WITHER_HEALTH(EntityTypes1_8.EntityType.WITHER, 16, EntityDataTypes1_6_4.INT, 6, EntityDataTypes1_6_4.FLOAT),
     ENDER_DRAGON_HEALTH(EntityTypes1_8.EntityType.ENDER_DRAGON, 16, EntityDataTypes1_6_4.INT, 6, EntityDataTypes1_6_4.FLOAT),
-    WOLF_HEALTH(EntityTypes1_8.EntityType.WOLF, 18, EntityDataTypes1_6_4.INT, EntityDataTypes1_6_4.FLOAT),
-    ;
+    WOLF_HEALTH(EntityTypes1_8.EntityType.WOLF, 18, EntityDataTypes1_6_4.INT, EntityDataTypes1_6_4.FLOAT);
 
     private static final HashMap<Pair<EntityTypes1_8.EntityType, Integer>, EntityDataIndex1_5_2> ENTITY_DATA_REWRITES = new HashMap<>();
 
@@ -53,7 +52,7 @@ public enum EntityDataIndex1_5_2 {
     private final EntityDataTypes1_6_4 oldType;
     private final EntityDataTypes1_6_4 newType;
 
-    EntityDataIndex1_5_2(EntityTypes1_8.EntityType entityType, int oldIndex, EntityDataTypes1_6_4 oldType, EntityDataTypes1_6_4 newType) {
+    EntityDataIndex1_5_2(final EntityTypes1_8.EntityType entityType, final int oldIndex, final EntityDataTypes1_6_4 oldType, final EntityDataTypes1_6_4 newType) {
         this.entityType = entityType;
         this.oldIndex = oldIndex;
         this.newIndex = oldIndex;
@@ -61,7 +60,7 @@ public enum EntityDataIndex1_5_2 {
         this.newType = newType;
     }
 
-    EntityDataIndex1_5_2(EntityTypes1_8.EntityType entityType, int oldIndex, EntityDataTypes1_6_4 oldType, int newIndex, EntityDataTypes1_6_4 newType) {
+    EntityDataIndex1_5_2(final EntityTypes1_8.EntityType entityType, final int oldIndex, final EntityDataTypes1_6_4 oldType, final int newIndex, final EntityDataTypes1_6_4 newType) {
         this.entityType = entityType;
         this.oldIndex = oldIndex;
         this.oldType = oldType;
@@ -89,15 +88,15 @@ public enum EntityDataIndex1_5_2 {
         return this.newType;
     }
 
-    private static Optional<EntityDataIndex1_5_2> getIndex(EntityTypes1_8.EntityType type, int index) {
+    private static Optional<EntityDataIndex1_5_2> getIndex(final EntityTypes1_8.EntityType type, final int index) {
         final Pair<EntityTypes1_8.EntityType, Integer> pair = new Pair<>(type, index);
         return Optional.ofNullable(ENTITY_DATA_REWRITES.get(pair));
     }
 
-    public static EntityDataIndex1_5_2 searchIndex(EntityTypes1_8.EntityType type, int index) {
+    public static EntityDataIndex1_5_2 searchIndex(final EntityTypes1_8.EntityType type, final int index) {
         EntityTypes1_8.EntityType currentType = type;
         do {
-            Optional<EntityDataIndex1_5_2> optMeta = getIndex(currentType, index);
+            final Optional<EntityDataIndex1_5_2> optMeta = getIndex(currentType, index);
             if (optMeta.isPresent()) {
                 return optMeta.get();
             }

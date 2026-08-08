@@ -24,7 +24,7 @@ import com.viaversion.viaversion.libs.mcstructs.text.components.TranslationCompo
 import com.viaversion.viaversion.libs.mcstructs.text.serializer.TextComponentSerializer;
 import com.viaversion.viaversion.libs.mcstructs.text.utils.TextUtils;
 
-public class TextRewriter {
+public final class TextRewriter {
 
     private static final Object2ObjectMap<String, String> TRANSLATIONS = new Object2ObjectOpenHashMap<>(86, 0.99F);
 
@@ -115,6 +115,9 @@ public class TextRewriter {
         TRANSLATIONS.put("mco.invites.title", "Pending Invitations");
         TRANSLATIONS.put("mco.invites.pending", "New invitations!");
         TRANSLATIONS.put("mco.invites.nopending", "No pending invitations!");
+    }
+
+    private TextRewriter() {
     }
 
     public static String toClient(final String text) {

@@ -31,7 +31,7 @@ public class Protocolc0_0_18a_02Toc0_0_19a_06 extends StatelessProtocol<Clientbo
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         final ClassicBlockRemapper previousRemapper = userConnection.get(ClassicBlockRemapper.class);
         userConnection.put(new ClassicBlockRemapper(previousRemapper.mapper(), o -> {
             int block = previousRemapper.reverseMapper().getInt(o);

@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.protocol.release.r1_5_2tor1_6_1.rewriter;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.objects.Object2ObjectOpenHashMap;
 
-public class SoundRewriter {
+public final class SoundRewriter {
 
     private static final Object2ObjectMap<String, String> SOUNDS = new Object2ObjectOpenHashMap<>(168, 0.99F);
 
@@ -196,6 +196,9 @@ public class SoundRewriter {
         SOUNDS.put("step.wood", "step.wood");
         SOUNDS.put("tile.piston.in", "tile.piston.in");
         SOUNDS.put("tile.piston.out", "tile.piston.out");
+    }
+
+    private SoundRewriter() {
     }
 
     public static String map(final String sound) {

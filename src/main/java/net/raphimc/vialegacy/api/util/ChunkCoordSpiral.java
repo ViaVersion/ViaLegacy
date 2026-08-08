@@ -32,26 +32,26 @@ public class ChunkCoordSpiral implements Iterable<ChunkCoord> {
 
     private boolean returnCenter = true;
 
-    public ChunkCoordSpiral(ChunkCoord center, ChunkCoord lowerBound, ChunkCoord upperBound, int step) {
+    public ChunkCoordSpiral(final ChunkCoord center, final ChunkCoord lowerBound, final ChunkCoord upperBound, final int step) {
         this.center = center;
         this.lowerBound = lowerBound;
         this.upperBound = upperBound;
         this.step = step;
     }
 
-    public ChunkCoordSpiral(ChunkCoord center, ChunkCoord radius, int step) {
-        this(center, new ChunkCoord(center.chunkX - radius.chunkX, center.chunkZ - radius.chunkZ), new ChunkCoord(center.chunkX + radius.chunkX, center.chunkZ + radius.chunkZ), step);
+    public ChunkCoordSpiral(final ChunkCoord center, final ChunkCoord radius, final int step) {
+        this(center, new ChunkCoord(center.getChunkX() - radius.getChunkX(), center.getChunkZ() - radius.getChunkZ()), new ChunkCoord(center.getChunkX() + radius.getChunkX(), center.getChunkZ() + radius.getChunkZ()), step);
     }
 
-    public ChunkCoordSpiral(ChunkCoord center, ChunkCoord radius) {
+    public ChunkCoordSpiral(final ChunkCoord center, final ChunkCoord radius) {
         this(center, radius, 1);
     }
 
     @Override
     public Iterator<ChunkCoord> iterator() {
         return new Iterator<>() {
-            int x = center.chunkX;
-            int z = center.chunkZ;
+            int x = ChunkCoordSpiral.this.center.getChunkX();
+            int z = ChunkCoordSpiral.this.center.getChunkZ();
 
             float n = 1;
             int floorN = 1;
@@ -60,31 +60,31 @@ public class ChunkCoordSpiral implements Iterable<ChunkCoord> {
 
             @Override
             public boolean hasNext() {
-                return returnCenter || x >= lowerBound.chunkX && x <= upperBound.chunkX && z >= lowerBound.chunkZ && z <= upperBound.chunkZ;
+                return ChunkCoordSpiral.this.returnCenter || this.x >= ChunkCoordSpiral.this.lowerBound.getChunkX() && this.x <= ChunkCoordSpiral.this.upperBound.getChunkX() && this.z >= ChunkCoordSpiral.this.lowerBound.getChunkZ() && this.z <= ChunkCoordSpiral.this.upperBound.getChunkZ();
             }
 
             @Override
             public ChunkCoord next() {
-                if (returnCenter) {
-                    returnCenter = false;
-                    return new ChunkCoord(x, z);
+                if (ChunkCoordSpiral.this.returnCenter) {
+                    ChunkCoordSpiral.this.returnCenter = false;
+                    return new ChunkCoord(this.x, this.z);
                 }
 
-                floorN = (int) Math.floor(n);
-                if (j < floorN) {
-                    switch (i % 4) {
-                        case 0 -> z += step;
-                        case 1 -> x += step;
-                        case 2 -> z -= step;
-                        case 3 -> x -= step;
+                this.floorN = (int) Math.floor(this.n);
+                if (this.j < this.floorN) {
+                    switch (this.i % 4) {
+                        case 0 -> this.z += ChunkCoordSpiral.this.step;
+                        case 1 -> this.x += ChunkCoordSpiral.this.step;
+                        case 2 -> this.z -= ChunkCoordSpiral.this.step;
+                        case 3 -> this.x -= ChunkCoordSpiral.this.step;
                     }
-                    j++;
-                    return new ChunkCoord(x, z);
+                    this.j++;
+                    return new ChunkCoord(this.x, this.z);
                 }
-                j = 0;
-                n += 0.5F;
-                i++;
-                return next();
+                this.j = 0;
+                this.n += 0.5F;
+                this.i++;
+                return this.next();
             }
         };
     }

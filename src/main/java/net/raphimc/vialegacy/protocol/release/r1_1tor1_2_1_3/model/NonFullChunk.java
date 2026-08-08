@@ -33,7 +33,7 @@ public class NonFullChunk extends BaseChunk {
     private final BlockPosition startPos;
     private final BlockPosition endPos;
 
-    public NonFullChunk(int x, int z, int bitmask, ChunkSection[] sections, BlockPosition startPos, BlockPosition endPos) {
+    public NonFullChunk(final int x, final int z, final int bitmask, final ChunkSection[] sections, final BlockPosition startPos, final BlockPosition endPos) {
         super(x, z, false, false, bitmask, sections, null, new CompoundTag(), new ArrayList<>());
 
         this.startPos = startPos;

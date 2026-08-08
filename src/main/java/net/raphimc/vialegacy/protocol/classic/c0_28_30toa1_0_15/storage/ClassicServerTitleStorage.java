@@ -25,7 +25,7 @@ public class ClassicServerTitleStorage extends StoredObject {
     private final String title;
     private final String motd;
 
-    public ClassicServerTitleStorage(UserConnection user, String title, String motd) {
+    public ClassicServerTitleStorage(final UserConnection user, final String title, final String motd) {
         super(user);
         this.title = title;
         this.motd = motd;

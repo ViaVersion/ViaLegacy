@@ -92,20 +92,21 @@ public abstract class LegacyItemRewriter<C extends ClientboundPacketType, S exte
         }
     }
 
-
     public void registerCreativeInventoryAction(final S packetType) {
         this.protocol.registerServerbound(packetType, new PacketHandlers() {
             @Override
             public void register() {
                 map(Types.SHORT); // slot
-                handler(wrapper -> handleServerboundItem(wrapper));
+                handler(wrapper -> LegacyItemRewriter.this.handleServerboundItem(wrapper));
             }
         });
     }
 
     @Override
     public Item handleItemToClient(final UserConnection user, final Item item) {
-        if (item == null) return null;
+        if (item == null) {
+            return null;
+        }
 
         for (RewriteEntry rewriteEntry : this.rewriteEntries) {
             if (rewriteEntry.rewrites(item)) {
@@ -113,7 +114,7 @@ public abstract class LegacyItemRewriter<C extends ClientboundPacketType, S exte
                 if (rewriteEntry.newItemMeta != -1) {
                     item.setData(rewriteEntry.newItemMeta);
                 }
-                item.setIdentifier(rewriteEntry.newItemID);
+                item.setIdentifier(rewriteEntry.newItemId);
             }
         }
 
@@ -122,7 +123,9 @@ public abstract class LegacyItemRewriter<C extends ClientboundPacketType, S exte
 
     @Override
     public Item handleItemToServer(final UserConnection user, final Item item) {
-        if (item == null) return null;
+        if (item == null) {
+            return null;
+        }
 
         for (NonExistentEntry nonExistentEntry : this.nonExistentItems) {
             if (nonExistentEntry.rewrites(item)) {
@@ -213,9 +216,13 @@ public abstract class LegacyItemRewriter<C extends ClientboundPacketType, S exte
 
     private void setRemappedTagWrite(final Item item) {
         final CompoundTag tag = item.tag();
-        if (tag == null) return;
+        if (tag == null) {
+            return;
+        }
         final CompoundTag viaLegacyTag = tag.removeUnchecked(this.nbtTagName());
-        if (viaLegacyTag == null) return;
+        if (viaLegacyTag == null) {
+            return;
+        }
 
         item.setIdentifier(viaLegacyTag.getNumberTag("Id").asInt());
         item.setData(viaLegacyTag.getNumberTag("Meta").asShort());
@@ -237,11 +244,10 @@ public abstract class LegacyItemRewriter<C extends ClientboundPacketType, S exte
         }
     }
 
-
-    private record RewriteEntry(int oldItemID, short oldItemMeta, int newItemID, short newItemMeta, String newItemName) {
+    private record RewriteEntry(int oldItemId, short oldItemMeta, int newItemId, short newItemMeta, String newItemName) {
 
         public boolean rewrites(final Item item) {
-            return item.identifier() == this.oldItemID && (this.oldItemMeta == -1 || this.oldItemMeta == item.data());
+            return item.identifier() == this.oldItemId && (this.oldItemMeta == -1 || this.oldItemMeta == item.data());
         }
 
     }

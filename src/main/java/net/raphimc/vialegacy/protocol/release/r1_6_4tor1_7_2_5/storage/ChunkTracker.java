@@ -210,60 +210,60 @@ public class ChunkTracker extends AbstractChunkTracker {
         super(0);
         this.b173 = user.getProtocolInfo().serverProtocolVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_7tob1_7_3);
 
-        this.registerReplacement(new IdAndData(BlockList1_6.signWall.blockId(), 0), new IdAndData(BlockList1_6.signWall.blockId(), 3));
+        this.registerReplacement(new IdAndData(BlockList1_6.SIGN_WALL, 0), new IdAndData(BlockList1_6.SIGN_WALL, 3));
         for (int i = 0; i < 16; i++) {
-            this.registerReplacement(new IdAndData(BlockList1_6.lockedChest.blockId(), i), new IdAndData(BlockList1_6.bedrock.blockId(), 0));
+            this.registerReplacement(new IdAndData(BlockList1_6.LOCKED_CHEST, i), new IdAndData(BlockList1_6.BEDROCK, 0));
         }
         if (user.getProtocolInfo().serverProtocolVersion().olderThanOrEqualTo(LegacyProtocolVersion.r1_1)) {
             for (int i = 9; i < 16; i++) {
-                this.registerReplacement(new IdAndData(BlockList1_6.doorWood.blockId(), i), new IdAndData(BlockList1_6.doorWood.blockId(), 8));
-                this.registerReplacement(new IdAndData(BlockList1_6.doorIron.blockId(), i), new IdAndData(BlockList1_6.doorIron.blockId(), 8));
+                this.registerReplacement(new IdAndData(BlockList1_6.DOOR_WOOD, i), new IdAndData(BlockList1_6.DOOR_WOOD, 8));
+                this.registerReplacement(new IdAndData(BlockList1_6.DOOR_IRON, i), new IdAndData(BlockList1_6.DOOR_IRON, 8));
             }
         }
 
         if (user.getProtocolInfo().serverProtocolVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_5tob1_5_2)) {
-            this.registerReplacement(new IdAndData(BlockList1_6.jukebox.blockId(), 2), new IdAndData(BlockList1_6.jukebox.blockId(), 1));
+            this.registerReplacement(new IdAndData(BlockList1_6.JUKEBOX, 2), new IdAndData(BlockList1_6.JUKEBOX, 1));
         }
         if (user.getProtocolInfo().serverProtocolVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_4tob1_4_1)) {
             for (int i = 1; i < 8; i++) {
-                this.registerReplacement(new IdAndData(BlockList1_6.sapling.blockId(), i), new IdAndData(BlockList1_6.sapling.blockId(), 0));
+                this.registerReplacement(new IdAndData(BlockList1_6.SAPLING, i), new IdAndData(BlockList1_6.SAPLING, 0));
             }
             for (int i = 9; i < 16; i++) {
-                this.registerReplacement(new IdAndData(BlockList1_6.sapling.blockId(), i), new IdAndData(BlockList1_6.sapling.blockId(), 8));
+                this.registerReplacement(new IdAndData(BlockList1_6.SAPLING, i), new IdAndData(BlockList1_6.SAPLING, 8));
             }
         }
         if (user.getProtocolInfo().serverProtocolVersion().olderThanOrEqualTo(LegacyProtocolVersion.b1_1_2)) {
             for (int i = 1; i < 16; i++) {
-                this.registerReplacement(new IdAndData(BlockList1_6.leaves.blockId(), i), new IdAndData(BlockList1_6.leaves.blockId(), 0));
+                this.registerReplacement(new IdAndData(BlockList1_6.LEAVES, i), new IdAndData(BlockList1_6.LEAVES, 0));
             }
         }
     }
 
     @Override
     protected void remapBlock(final IdAndData block, final int x, final int y, final int z) {
-        if (this.b173 && block.getId() == BlockList1_6.chest.blockId()) {
+        if (this.b173 && block.getId() == BlockList1_6.CHEST) {
             byte blockData = 3;
-            int rot1 = this.getBlockNotNull(x, y, z - 1).getId();
-            int rot2 = this.getBlockNotNull(x, y, z + 1).getId();
-            int rot3 = this.getBlockNotNull(x - 1, y, z).getId();
-            int rot4 = this.getBlockNotNull(x + 1, y, z).getId();
+            final int rot1 = this.getBlockNotNull(x, y, z - 1).getId();
+            final int rot2 = this.getBlockNotNull(x, y, z + 1).getId();
+            final int rot3 = this.getBlockNotNull(x - 1, y, z).getId();
+            final int rot4 = this.getBlockNotNull(x + 1, y, z).getId();
 
             int rot5;
-            if (rot3 == BlockList1_6.chest.blockId()) {
+            if (rot3 == BlockList1_6.CHEST) {
                 rot5 = this.getBlockNotNull(x - 1, y, z - 1).getId();
             } else {
                 rot5 = this.getBlockNotNull(x + 1, y, z - 1).getId();
             }
 
             int rot6;
-            if (rot3 == BlockList1_6.chest.blockId()) {
+            if (rot3 == BlockList1_6.CHEST) {
                 rot6 = this.getBlockNotNull(x - 1, y, z + 1).getId();
             } else {
                 rot6 = this.getBlockNotNull(x + 1, y, z + 1).getId();
             }
 
-            if (rot1 != BlockList1_6.chest.blockId() && rot2 != BlockList1_6.chest.blockId()) {
-                if (rot3 != BlockList1_6.chest.blockId() && rot4 != BlockList1_6.chest.blockId()) {
+            if (rot1 != BlockList1_6.CHEST && rot2 != BlockList1_6.CHEST) {
+                if (rot3 != BlockList1_6.CHEST && rot4 != BlockList1_6.CHEST) {
                     if (SOLID_BLOCKS.get(rot2) && !SOLID_BLOCKS.get(rot1)) {
                         blockData = 2;
                     }
@@ -285,13 +285,13 @@ public class ChunkTracker extends AbstractChunkTracker {
             } else {
                 blockData = 5;
 
-                if (rot1 == BlockList1_6.chest.blockId()) {
+                if (rot1 == BlockList1_6.CHEST) {
                     rot5 = this.getBlockNotNull(x - 1, y, z - 1).getId();
                 } else {
                     rot5 = this.getBlockNotNull(x - 1, y, z + 1).getId();
                 }
 
-                if (rot1 == BlockList1_6.chest.blockId()) {
+                if (rot1 == BlockList1_6.CHEST) {
                     rot6 = this.getBlockNotNull(x + 1, y, z - 1).getId();
                 } else {
                     rot6 = this.getBlockNotNull(x + 1, y, z + 1).getId();
@@ -308,10 +308,10 @@ public class ChunkTracker extends AbstractChunkTracker {
     }
 
     @Override
-    protected void postRemap(DataPalette palette) {
+    protected void postRemap(final DataPalette palette) {
         if (this.b173) {
-            palette.replaceId(BlockList1_6.chest.blockId() << 4, 0);
-            palette.replaceId(BlockList1_6.chest.blockId() << 4 | 1, 0);
+            palette.replaceId(BlockList1_6.CHEST << 4, 0);
+            palette.replaceId(BlockList1_6.CHEST << 4 | 1, 0);
         }
     }
 

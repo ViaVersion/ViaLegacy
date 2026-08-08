@@ -38,7 +38,7 @@ public abstract class AbstractTrackedEntity {
         return this.entityId;
     }
 
-    public void setEntityId(int entityId) {
+    public void setEntityId(final int entityId) {
         this.entityId = entityId;
     }
 
@@ -46,7 +46,7 @@ public abstract class AbstractTrackedEntity {
         return this.location;
     }
 
-    public void setLocation(Location location) {
+    public void setLocation(final Location location) {
         this.location = location;
     }
 
@@ -54,7 +54,7 @@ public abstract class AbstractTrackedEntity {
         return this.entityType;
     }
 
-    public void setEntityType(EntityTypes1_8.EntityType entityType) {
+    public void setEntityType(final EntityTypes1_8.EntityType entityType) {
         this.entityType = entityType;
     }
 
@@ -62,7 +62,7 @@ public abstract class AbstractTrackedEntity {
         return this.isRiding;
     }
 
-    public void setRiding(boolean riding) {
+    public void setRiding(final boolean riding) {
         this.isRiding = riding;
     }
 

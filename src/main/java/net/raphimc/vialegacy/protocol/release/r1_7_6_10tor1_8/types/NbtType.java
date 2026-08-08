@@ -25,18 +25,22 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.buffer.ByteBufOutputStream;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class NBTType extends Type<CompoundTag> {
+public class NbtType extends Type<CompoundTag> {
 
-    public NBTType() {
+    public NbtType() {
         super(CompoundTag.class);
     }
 
     @Override
-    public CompoundTag read(ByteBuf buffer) {
+    public CompoundTag read(final ByteBuf buffer) {
         final short length = buffer.readShort();
         if (length < 0) {
             return null;
@@ -45,13 +49,13 @@ public class NBTType extends Type<CompoundTag> {
         final ByteBuf data = buffer.readSlice(length);
         try (InputStream in = new GZIPInputStream(new ByteBufInputStream(data))) {
             return NBTIO.readTag(new DataInputStream(in), TagLimiter.create(TagLimiter.DEFAULT_MAX_BYTES, TagLimiter.DEFAULT_MAX_NESTING_LEVEL), true, CompoundTag.class);
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public void write(ByteBuf buffer, CompoundTag nbt) {
+    public void write(final ByteBuf buffer, final CompoundTag nbt) {
         if (nbt == null) {
             buffer.writeShort(-1);
             return;
@@ -61,7 +65,7 @@ public class NBTType extends Type<CompoundTag> {
         try {
             try (OutputStream out = new GZIPOutputStream(new ByteBufOutputStream(data))) {
                 NBTIO.writeTag(new DataOutputStream(out), nbt, true);
-            } catch (IOException e) {
+            } catch (final IOException e) {
                 throw new RuntimeException(e);
             }
 

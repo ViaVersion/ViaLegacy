@@ -29,28 +29,28 @@ public class NoOpAlphaInventoryProvider extends AlphaInventoryProvider {
     }
 
     @Override
-    public Item[] getMainInventoryItems(UserConnection user) {
+    public Item[] getMainInventoryItems(final UserConnection user) {
         return new Item[36];
     }
 
     @Override
-    public Item[] getCraftingInventoryItems(UserConnection user) {
+    public Item[] getCraftingInventoryItems(final UserConnection user) {
         return new Item[4];
     }
 
     @Override
-    public Item[] getArmorInventoryItems(UserConnection user) {
+    public Item[] getArmorInventoryItems(final UserConnection user) {
         return new Item[4];
     }
 
     @Override
-    public Item[] getContainerItems(UserConnection user) {
+    public Item[] getContainerItems(final UserConnection user) {
         final InventoryStorage inventoryStorage = user.get(InventoryStorage.class);
-        return inventoryStorage.containers.get(inventoryStorage.openContainerPos);
+        return inventoryStorage.getContainers().get(inventoryStorage.getOpenContainerPos());
     }
 
     @Override
-    public void addToInventory(UserConnection user, Item item) {
+    public void addToInventory(final UserConnection user, final Item item) {
     }
 
 }

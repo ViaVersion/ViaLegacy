@@ -36,17 +36,23 @@ public class ClassicPingTask implements Runnable {
     public void run() {
         for (UserConnection info : Via.getManager().getConnectionManager().getConnections()) {
             final ExtensionProtocolMetadataStorage protocolMetadata = info.get(ExtensionProtocolMetadataStorage.class);
-            if (protocolMetadata == null) continue;
-            if (!protocolMetadata.hasServerExtension(ClassicProtocolExtension.TWO_WAY_PING, 1)) continue;
+            if (protocolMetadata == null) {
+                continue;
+            }
+            if (!protocolMetadata.hasServerExtension(ClassicProtocolExtension.TWO_WAY_PING, 1)) {
+                continue;
+            }
             info.getChannel().eventLoop().submit(() -> {
-                if (!info.getChannel().isActive()) return;
+                if (!info.getChannel().isActive()) {
+                    return;
+                }
 
                 try {
                     final PacketWrapper pingRequest = PacketWrapper.create(ServerboundPacketsc0_30cpe.EXT_TWO_WAY_PING, info);
                     pingRequest.write(Types.BYTE, (byte) 0); // direction
                     pingRequest.write(Types.SHORT, (short) (ThreadLocalRandom.current().nextInt() % Short.MAX_VALUE)); // data
                     pingRequest.sendToServer(Protocolc0_30cpeToc0_28_30.class);
-                } catch (Throwable e) {
+                } catch (final Throwable e) {
                     ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error sending TwoWayPing extension ping packet", e);
                 }
             });

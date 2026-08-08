@@ -44,23 +44,29 @@ public class PlayerAirTimeUpdateTask implements Runnable {
             final PlayerAirTimeStorage playerAirTimeStorage = info.get(PlayerAirTimeStorage.class);
             if (playerAirTimeStorage != null) {
                 final PlayerInfoStorage playerInfoStorage = info.get(PlayerInfoStorage.class);
-                if (playerInfoStorage == null) continue;
+                if (playerInfoStorage == null) {
+                    continue;
+                }
                 info.getChannel().eventLoop().submit(() -> {
-                    if (!info.getChannel().isActive()) return;
+                    if (!info.getChannel().isActive()) {
+                        return;
+                    }
 
                     try {
-                        final IdAndData headBlock = info.get(ChunkTracker.class).getBlockNotNull(floor(playerInfoStorage.posX), floor(playerInfoStorage.posY + 1.62F), floor(playerInfoStorage.posZ));
-                        if (headBlock.getId() == BlockList1_6.waterMoving.blockId() || headBlock.getId() == BlockList1_6.waterStill.blockId()) {
-                            playerAirTimeStorage.sentPacket = false;
-                            playerAirTimeStorage.air--;
-                            if (playerAirTimeStorage.air < 0) playerAirTimeStorage.air = 0;
+                        final IdAndData headBlock = info.get(ChunkTracker.class).getBlockNotNull(floor(playerInfoStorage.getPosX()), floor(playerInfoStorage.getPosY() + 1.62F), floor(playerInfoStorage.getPosZ()));
+                        if (headBlock.getId() == BlockList1_6.WATER_MOVING || headBlock.getId() == BlockList1_6.WATER_STILL) {
+                            playerAirTimeStorage.setSentPacket(false);
+                            playerAirTimeStorage.setAir(playerAirTimeStorage.getAir() - 1);
+                            if (playerAirTimeStorage.getAir() < 0) {
+                                playerAirTimeStorage.setAir(0);
+                            }
                             this.sendAirTime(playerInfoStorage, playerAirTimeStorage, info);
-                        } else if (!playerAirTimeStorage.sentPacket) {
-                            playerAirTimeStorage.sentPacket = true;
-                            playerAirTimeStorage.air = playerAirTimeStorage.MAX_AIR;
+                        } else if (!playerAirTimeStorage.isSentPacket()) {
+                            playerAirTimeStorage.setSentPacket(true);
+                            playerAirTimeStorage.setAir(playerAirTimeStorage.getMaxAir());
                             this.sendAirTime(playerInfoStorage, playerAirTimeStorage, info);
                         }
-                    } catch (Throwable e) {
+                    } catch (final Throwable e) {
                         ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error updating air time", e);
                     }
                 });
@@ -70,13 +76,13 @@ public class PlayerAirTimeUpdateTask implements Runnable {
 
     private void sendAirTime(final PlayerInfoStorage playerInfoStorage, final PlayerAirTimeStorage playerAirTimeStorage, final UserConnection userConnection) {
         final PacketWrapper updateAirTime = PacketWrapper.create(ClientboundPackets1_0_0.SET_ENTITY_DATA, userConnection);
-        updateAirTime.write(Types.INT, playerInfoStorage.entityId); // entity id
-        updateAirTime.write(Types1_3_1.ENTITY_DATA_LIST, Lists.newArrayList(new EntityData(1, EntityDataTypes1_3_1.SHORT, Integer.valueOf(playerAirTimeStorage.air).shortValue()))); // entity data
+        updateAirTime.write(Types.INT, playerInfoStorage.getEntityId()); // entity id
+        updateAirTime.write(Types1_3_1.ENTITY_DATA_LIST, Lists.newArrayList(new EntityData(1, EntityDataTypes1_3_1.SHORT, Integer.valueOf(playerAirTimeStorage.getAir()).shortValue()))); // entity data
         updateAirTime.send(Protocolb1_8_0_1tor1_0_0_1.class);
     }
 
-    private static int floor(double f) {
-        int i = (int) f;
+    private static int floor(final double f) {
+        final int i = (int) f;
         return f < (double) i ? i - 1 : i;
     }
 

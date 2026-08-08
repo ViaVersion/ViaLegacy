@@ -69,9 +69,15 @@ public class Protocolr1_4_6_7Tor1_5_0_1 extends StatelessProtocol<ClientboundPac
                         speedY = wrapper.read(Types.SHORT); // velocity y
                         speedZ = wrapper.read(Types.SHORT); // velocity z
                     }
-                    if (typeId == 10) data = EntityTypes1_8.ObjectType.MINECART.getData();
-                    if (typeId == 11) data = EntityTypes1_8.ObjectType.CHEST_MINECART.getData();
-                    if (typeId == 12) data = EntityTypes1_8.ObjectType.FURNACE_MINECART.getData();
+                    if (typeId == 10) {
+                        data = EntityTypes1_8.ObjectType.MINECART.getData();
+                    }
+                    if (typeId == 11) {
+                        data = EntityTypes1_8.ObjectType.CHEST_MINECART.getData();
+                    }
+                    if (typeId == 12) {
+                        data = EntityTypes1_8.ObjectType.FURNACE_MINECART.getData();
+                    }
                     wrapper.set(Types.INT, 4, data);
                     if (data > 0) {
                         wrapper.write(Types.SHORT, speedX);
@@ -147,7 +153,7 @@ public class Protocolr1_4_6_7Tor1_5_0_1 extends StatelessProtocol<ClientboundPac
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolr1_4_6_7Tor1_5_0_1.class, ClientboundPackets1_4_6::getPacket));
     }
 

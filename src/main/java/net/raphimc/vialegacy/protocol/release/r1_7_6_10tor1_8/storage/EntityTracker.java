@@ -39,18 +39,18 @@ public class EntityTracker extends StoredObject {
     private final Int2ObjectMap<HologramPartEntity> hologramParts = new Int2ObjectOpenHashMap<>();
     private final Int2ObjectMap<HologramPartEntity> virtualHolograms = new Int2ObjectOpenHashMap<>();
 
-    private int playerID;
+    private int playerId;
 
-    public EntityTracker(UserConnection user) {
+    public EntityTracker(final UserConnection user) {
         super(user);
     }
 
-    public int getPlayerID() {
-        return this.playerID;
+    public int getPlayerId() {
+        return this.playerId;
     }
 
-    public void setPlayerID(final int playerID) {
-        this.playerID = playerID;
+    public void setPlayerId(final int playerId) {
+        this.playerId = playerId;
     }
 
     public Map<Integer, EntityTypes1_8.EntityType> getTrackedEntities() {
@@ -107,7 +107,7 @@ public class EntityTracker extends StoredObject {
             final double yPos = y / 32.0D;
             final double zPos = z / 32.0D;
 
-            Location newLoc;
+            final Location newLoc;
             if (relative) {
                 newLoc = new Location(oldLoc.getX() + xPos, oldLoc.getY() + yPos, oldLoc.getZ() + zPos);
             } else {
@@ -126,7 +126,7 @@ public class EntityTracker extends StoredObject {
                 if (entityDataIndex != null) {
                     try {
                         entityData.setTypeAndValue(entityDataIndex.getOldType(), entityData.getValue());
-                    } catch (Throwable ignored) {
+                    } catch (final Throwable ignored) {
                         continue;
                     }
                     entity.setEntityData(entityDataIndex, entityData.getValue());

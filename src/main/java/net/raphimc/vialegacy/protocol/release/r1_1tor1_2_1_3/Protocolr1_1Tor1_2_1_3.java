@@ -73,14 +73,14 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
             public void register() {
                 map(Types.INT); // entity id
                 map(Types1_6_4.STRING); // username
-                handler(wrapper -> wrapper.user().get(SeedStorage.class).seed = wrapper.read(Types.LONG)); // seed
+                handler(wrapper -> wrapper.user().get(SeedStorage.class).setSeed(wrapper.read(Types.LONG))); // seed
                 map(Types1_6_4.STRING); // level type
                 map(Types.INT); // game mode
                 map(Types.BYTE, Types.INT); // dimension id
                 map(Types.BYTE); // difficulty
                 map(Types.BYTE); // world height
                 map(Types.BYTE); // max players
-                handler(wrapper -> handleRespawn(wrapper.get(Types.INT, 2), wrapper.user()));
+                handler(wrapper -> Protocolr1_1Tor1_2_1_3.this.handleRespawn(wrapper.get(Types.INT, 2), wrapper.user()));
             }
         });
         this.registerClientbound(ClientboundPackets1_1.RESPAWN, new PacketHandlers() {
@@ -90,9 +90,9 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
                 map(Types.BYTE); // difficulty
                 map(Types.BYTE); // game mode
                 map(Types.SHORT); // world height
-                handler(wrapper -> wrapper.user().get(SeedStorage.class).seed = wrapper.read(Types.LONG)); // seed
+                handler(wrapper -> wrapper.user().get(SeedStorage.class).setSeed(wrapper.read(Types.LONG))); // seed
                 map(Types1_6_4.STRING); // level type
-                handler(wrapper -> handleRespawn(wrapper.get(Types.INT, 0), wrapper.user()));
+                handler(wrapper -> Protocolr1_1Tor1_2_1_3.this.handleRespawn(wrapper.get(Types.INT, 0), wrapper.user()));
             }
         });
         this.registerClientbound(ClientboundPackets1_1.ADD_MOB, new PacketHandlers() {
@@ -115,7 +115,7 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
                 map(Types.INT); // entity id
                 map(Types.BYTE); // yaw
                 map(Types.BYTE); // pitch
-                handler(wrapper -> sendEntityHeadLook(wrapper.get(Types.INT, 0), wrapper.get(Types.BYTE, 0), wrapper));
+                handler(wrapper -> Protocolr1_1Tor1_2_1_3.this.sendEntityHeadLook(wrapper.get(Types.INT, 0), wrapper.get(Types.BYTE, 0), wrapper));
             }
         });
         this.registerClientbound(ClientboundPackets1_1.MOVE_ENTITY_POS_ROT, new PacketHandlers() {
@@ -127,7 +127,7 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
                 map(Types.BYTE); // z
                 map(Types.BYTE); // yaw
                 map(Types.BYTE); // pitch
-                handler(wrapper -> sendEntityHeadLook(wrapper.get(Types.INT, 0), wrapper.get(Types.BYTE, 3), wrapper));
+                handler(wrapper -> Protocolr1_1Tor1_2_1_3.this.sendEntityHeadLook(wrapper.get(Types.INT, 0), wrapper.get(Types.BYTE, 3), wrapper));
             }
         });
         this.registerClientbound(ClientboundPackets1_1.TELEPORT_ENTITY, new PacketHandlers() {
@@ -139,7 +139,7 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
                 map(Types.INT); // z
                 map(Types.BYTE); // yaw
                 map(Types.BYTE); // pitch
-                handler(wrapper -> sendEntityHeadLook(wrapper.get(Types.INT, 0), wrapper.get(Types.BYTE, 0), wrapper));
+                handler(wrapper -> Protocolr1_1Tor1_2_1_3.this.sendEntityHeadLook(wrapper.get(Types.INT, 0), wrapper.get(Types.BYTE, 0), wrapper));
             }
         });
         this.registerClientbound(ClientboundPackets1_1.LEVEL_CHUNK, wrapper -> {
@@ -159,13 +159,17 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
                 wrapper.write(Types.INT, nonFullChunk.getZ());
                 wrapper.write(Types1_7_6.BLOCK_CHANGE_RECORD_ARRAY, nonFullChunk.asBlockChangeRecords().toArray(new BlockChangeRecord[0]));
 
-                pendingBlocksTracker.markReceived(new BlockPosition((nonFullChunk.getX() << 4) + nonFullChunk.getStartPos().x(), nonFullChunk.getStartPos().y(), (nonFullChunk.getZ() << 4) + nonFullChunk.getStartPos().z()), new BlockPosition((nonFullChunk.getX() << 4) + nonFullChunk.getEndPos().x() - 1, nonFullChunk.getEndPos().y() - 1, (nonFullChunk.getZ() << 4) + nonFullChunk.getEndPos().z() - 1));
+                pendingBlocksTracker.markReceived(new BlockPosition((nonFullChunk.getX() << 4) + nonFullChunk.getStartPos().x(), nonFullChunk.getStartPos()
+                    .y(), (nonFullChunk.getZ() << 4) + nonFullChunk.getStartPos().z()), new BlockPosition((nonFullChunk.getX() << 4) + nonFullChunk.getEndPos().x() - 1, nonFullChunk.getEndPos()
+                    .y() - 1, (nonFullChunk.getZ() << 4) + nonFullChunk.getEndPos().z() - 1));
                 return;
             }
             pendingBlocksTracker.markReceived(new BlockPosition(chunk.getX() << 4, 0, chunk.getZ() << 4), new BlockPosition((chunk.getX() << 4) + 15, chunk.getSections().length * 16, (chunk.getZ() << 4) + 15));
 
             for (ChunkSection section : chunk.getSections()) {
-                if (section == null) continue;
+                if (section == null) {
+                    continue;
+                }
                 final LegacyNibbleArray oldBlockLight = new LegacyNibbleArray(section.getLight().getBlockLight(), 4);
                 final NibbleArray newBlockLight = new NibbleArray(oldBlockLight.size());
                 final LegacyNibbleArray oldSkyLight = new LegacyNibbleArray(section.getLight().getSkyLight(), 4);
@@ -194,7 +198,7 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
             final int[] biomeData = new int[16 * 16];
             for (int z = 0; z < 16; z++) {
                 for (int x = 0; x < 16; x++) {
-                    biomeData[z << 4 | x] = seedStorage.biomeSource.getBiome(baseX + x, 0, baseZ + z).getId();
+                    biomeData[z << 4 | x] = seedStorage.getBiomeSource().getBiome(baseX + x, 0, baseZ + z).getId();
                 }
             }
             chunk.setBiomeData(biomeData);
@@ -265,9 +269,9 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
                     final int sfxId = wrapper.get(Types.INT, 0);
                     final int sfxData = wrapper.get(Types.INT, 1);
                     if (sfxId == 2001) { // Block Break effect
-                        final int blockID = sfxData & 255;
+                        final int blockId = sfxData & 255;
                         final int blockData = sfxData >> 8 & 255;
-                        wrapper.set(Types.INT, 1, blockID + (blockData << 12));
+                        wrapper.set(Types.INT, 1, blockId + (blockData << 12));
                     } else if (sfxId == 1009) { // Ghast fireball effect (volume 1) (sound packet would be a better replacement but changing the id is easier and the difference is minimal)
                         wrapper.set(Types.INT, 0, 1008); // Ghast fireball effect (volume 10)
                     }
@@ -325,21 +329,21 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
                     } else {
                         generatorVersion = MCVersion.vb1_8_1;
                     }
-                    seedStorage.biomeSource = BiomeSource.of(Dimension.OVERWORLD, generatorVersion, seedStorage.seed);
+                    seedStorage.setBiomeSource(BiomeSource.of(Dimension.OVERWORLD, generatorVersion, seedStorage.getSeed()));
                 } else if (user.getProtocolInfo().serverProtocolVersion().newerThanOrEqualTo(LegacyProtocolVersion.a1_0_15)) {
-                    seedStorage.biomeSource = new BetaOverworldBiomeSource(seedStorage.seed);
+                    seedStorage.setBiomeSource(new BetaOverworldBiomeSource(seedStorage.getSeed()));
                 } else {
-                    seedStorage.biomeSource = new PlainsBiomeSource();
+                    seedStorage.setBiomeSource(new PlainsBiomeSource());
                 }
             } else if (dimensionId == -1) { // Nether
-                seedStorage.biomeSource = BiomeSource.of(Dimension.NETHER, MCVersion.v1_1, seedStorage.seed);
+                seedStorage.setBiomeSource(BiomeSource.of(Dimension.NETHER, MCVersion.v1_1, seedStorage.getSeed()));
             } else if (dimensionId == 1) { // End
-                seedStorage.biomeSource = BiomeSource.of(Dimension.END, MCVersion.v1_1, seedStorage.seed);
+                seedStorage.setBiomeSource(BiomeSource.of(Dimension.END, MCVersion.v1_1, seedStorage.getSeed()));
             } else {
-                seedStorage.biomeSource = new PlainsBiomeSource();
+                seedStorage.setBiomeSource(new PlainsBiomeSource());
             }
         } else {
-            seedStorage.biomeSource = new PlainsBiomeSource();
+            seedStorage.setBiomeSource(new PlainsBiomeSource());
         }
     }
 
@@ -354,12 +358,12 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
     }
 
     @Override
-    public void register(ViaProviders providers) {
+    public void register(final ViaProviders providers) {
         Via.getPlatform().runRepeatingSync(new BlockReceiveInvalidatorTask(), 1L);
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolr1_1Tor1_2_1_3.class, ClientboundPackets1_1::getPacket));
         userConnection.addClientWorld(Protocolr1_1Tor1_2_1_3.class, new ClientWorld());
 

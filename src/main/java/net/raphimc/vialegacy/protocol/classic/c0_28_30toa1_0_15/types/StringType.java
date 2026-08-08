@@ -29,13 +29,13 @@ public class StringType extends Type<String> {
         super(String.class);
     }
 
-    public String read(ByteBuf buffer) {
+    public String read(final ByteBuf buffer) {
         final byte[] stringBytes = new byte[64];
         buffer.readBytes(stringBytes);
         return Cp437String.fromBytes(stringBytes).trim();
     }
 
-    public void write(ByteBuf buffer, String s) {
+    public void write(final ByteBuf buffer, final String s) {
         final byte[] bytes = new byte[64];
         final byte[] stringBytes = Cp437String.toBytes(s);
 

@@ -95,12 +95,12 @@ public class Protocolb1_8_0_1tor1_0_0_1 extends StatelessProtocol<ClientboundPac
     }
 
     @Override
-    public void register(ViaProviders providers) {
+    public void register(final ViaProviders providers) {
         Via.getPlatform().runRepeatingSync(new PlayerAirTimeUpdateTask(), 1L);
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolb1_8_0_1tor1_0_0_1.class, ClientboundPacketsb1_8::getPacket));
 
         userConnection.put(new PlayerAirTimeStorage());

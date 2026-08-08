@@ -23,9 +23,12 @@ import com.viaversion.viaversion.api.type.types.entitydata.EntityDataListType;
 
 import java.util.List;
 
-public class Typesb1_2 {
+public final class Typesb1_2 {
 
     public static final Type<EntityData> ENTITY_DATA = new EntityDataType();
     public static final Type<List<EntityData>> ENTITY_DATA_LIST = new EntityDataListType(ENTITY_DATA);
+
+    private Typesb1_2() {
+    }
 
 }

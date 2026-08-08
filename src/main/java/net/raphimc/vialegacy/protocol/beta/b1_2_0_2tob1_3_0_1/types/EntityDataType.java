@@ -22,7 +22,7 @@ import com.viaversion.viaversion.api.type.types.entitydata.OldEntityDataType;
 public class EntityDataType extends OldEntityDataType {
 
     @Override
-    protected com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType getType(int index) {
+    protected com.viaversion.viaversion.api.minecraft.entitydata.EntityDataType getType(final int index) {
         return EntityDataTypesb1_2.byId(index);
     }
 

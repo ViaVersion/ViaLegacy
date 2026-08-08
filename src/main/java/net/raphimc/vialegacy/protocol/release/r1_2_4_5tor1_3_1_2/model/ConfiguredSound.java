@@ -25,33 +25,33 @@ public class ConfiguredSound {
     private float volume;
     private float pitch;
 
-    public ConfiguredSound(Sound sound, float volume, float pitch) {
+    public ConfiguredSound(final Sound sound, final float volume, final float pitch) {
         this.sound = sound;
         this.volume = volume;
         this.pitch = pitch;
     }
 
     public Sound getSound() {
-        return sound;
+        return this.sound;
     }
 
-    public void setSound(Sound sound) {
+    public void setSound(final Sound sound) {
         this.sound = sound;
     }
 
     public float getVolume() {
-        return volume;
+        return this.volume;
     }
 
-    public void setVolume(float volume) {
+    public void setVolume(final float volume) {
         this.volume = volume;
     }
 
     public float getPitch() {
-        return pitch;
+        return this.pitch;
     }
 
-    public void setPitch(float pitch) {
+    public void setPitch(final float pitch) {
         this.pitch = pitch;
     }
 

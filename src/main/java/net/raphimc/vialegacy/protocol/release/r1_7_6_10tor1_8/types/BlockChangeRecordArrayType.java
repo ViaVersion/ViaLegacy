@@ -23,7 +23,11 @@ import com.viaversion.viaversion.api.type.Type;
 import io.netty.buffer.ByteBuf;
 import net.raphimc.vialegacy.ViaLegacy;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 import java.util.logging.Level;
 
 public class BlockChangeRecordArrayType extends Type<BlockChangeRecord[]> {
@@ -33,7 +37,7 @@ public class BlockChangeRecordArrayType extends Type<BlockChangeRecord[]> {
     }
 
     @Override
-    public BlockChangeRecord[] read(ByteBuf buffer) {
+    public BlockChangeRecord[] read(final ByteBuf buffer) {
         final int length = buffer.readUnsignedShort();
         final int dataLength = buffer.readInt();
         final byte[] data = new byte[dataLength];
@@ -46,14 +50,14 @@ public class BlockChangeRecordArrayType extends Type<BlockChangeRecord[]> {
                 final short blockId = dataInputStream.readShort();
                 blockChangeRecords[i] = new BlockChangeRecord1_8(position >> 12 & 15, position & 255, position >> 8 & 15, blockId);
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Block change record array length mismatch: Expected " + dataLength + " bytes", e);
         }
         return blockChangeRecords;
     }
 
     @Override
-    public void write(ByteBuf buffer, BlockChangeRecord[] records) {
+    public void write(final ByteBuf buffer, final BlockChangeRecord[] records) {
         final ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream(records.length * Short.BYTES * 2);
         final DataOutputStream dataOutputStream = new DataOutputStream(byteArrayOutputStream);
         try {
@@ -61,7 +65,7 @@ public class BlockChangeRecordArrayType extends Type<BlockChangeRecord[]> {
                 dataOutputStream.writeShort((short) (record.getSectionX() << 12 | record.getSectionZ() << 8 | record.getY(-1)));
                 dataOutputStream.writeShort((short) record.getBlockId());
             }
-        } catch (IOException e) {
+        } catch (final IOException e) {
             throw new RuntimeException(e);
         }
         final byte[] data = byteArrayOutputStream.toByteArray();

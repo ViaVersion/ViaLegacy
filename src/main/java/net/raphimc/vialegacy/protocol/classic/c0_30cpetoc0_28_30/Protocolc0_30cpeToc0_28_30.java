@@ -91,9 +91,9 @@ public class Protocolc0_30cpeToc0_28_30 extends StatelessProtocol<ClientboundPac
             protocolMetadataStorage.setExtensionCount(wrapper.read(Types.SHORT)); // extension count
 
             final ClassicProgressStorage classicProgressStorage = wrapper.user().get(ClassicProgressStorage.class);
-            classicProgressStorage.progress = 0;
-            classicProgressStorage.upperBound = protocolMetadataStorage.getExtensionCount();
-            classicProgressStorage.status = "Receiving extension list...";
+            classicProgressStorage.setProgress(0);
+            classicProgressStorage.setUpperBound(protocolMetadataStorage.getExtensionCount());
+            classicProgressStorage.setStatus("Receiving extension list...");
         });
         this.registerClientbound(ClientboundPacketsc0_30cpe.EXTENSION_PROTOCOL_ENTRY, null, wrapper -> {
             wrapper.cancel();
@@ -113,10 +113,10 @@ public class Protocolc0_30cpeToc0_28_30 extends StatelessProtocol<ClientboundPac
             protocolMetadataStorage.incrementReceivedExtensions();
 
             final ClassicProgressStorage classicProgressStorage = wrapper.user().get(ClassicProgressStorage.class);
-            classicProgressStorage.progress = protocolMetadataStorage.getReceivedExtensions();
+            classicProgressStorage.setProgress(protocolMetadataStorage.getReceivedExtensions());
 
             if (protocolMetadataStorage.getReceivedExtensions() >= protocolMetadataStorage.getExtensionCount()) {
-                classicProgressStorage.status = "Sending extension list...";
+                classicProgressStorage.setStatus("Sending extension list...");
                 final List<ClassicProtocolExtension> supportedExtensions = new ArrayList<>();
                 for (ClassicProtocolExtension protocolExtension : ClassicProtocolExtension.values()) {
                     if (protocolExtension.isSupported()) {
@@ -201,15 +201,18 @@ public class Protocolc0_30cpeToc0_28_30 extends StatelessProtocol<ClientboundPac
                     final BlockPosition pos = new BlockPosition(index % level.getSizeX(), (index / level.getSizeX()) / level.getSizeZ(), (index / level.getSizeX()) % level.getSizeZ());
                     final byte blockId = blocks[i];
                     level.setBlock(pos, blockId);
-                    if (!levelStorage.isChunkLoaded(pos)) continue;
+                    if (!levelStorage.isChunkLoaded(pos)) {
+                        continue;
+                    }
                     final IdAndData mappedBlock = remapper.mapper().get(blockId);
-                    records.computeIfAbsent(new ChunkCoord(pos.x() >> 4, pos.z() >> 4), k -> new ArrayList<>()).add(new BlockChangeRecord1_8(pos.x() & 15, pos.y(), pos.z() & 15, mappedBlock.toRawData()));
+                    records.computeIfAbsent(new ChunkCoord(pos.x() >> 4, pos.z() >> 4), k -> new ArrayList<>())
+                        .add(new BlockChangeRecord1_8(pos.x() & 15, pos.y(), pos.z() & 15, mappedBlock.toRawData()));
                 }
 
                 for (Map.Entry<ChunkCoord, List<BlockChangeRecord>> entry : records.entrySet()) {
                     final PacketWrapper multiBlockChange = PacketWrapper.create(ClientboundPacketsa1_0_15.CHUNK_BLOCKS_UPDATE, wrapper.user());
-                    multiBlockChange.write(Types.INT, entry.getKey().chunkX); // chunkX
-                    multiBlockChange.write(Types.INT, entry.getKey().chunkZ); // chunkZ
+                    multiBlockChange.write(Types.INT, entry.getKey().getChunkX()); // chunkX
+                    multiBlockChange.write(Types.INT, entry.getKey().getChunkZ()); // chunkZ
                     multiBlockChange.write(Types1_1.BLOCK_CHANGE_RECORD_ARRAY, entry.getValue().toArray(new BlockChangeRecord[0])); // blockChangeRecords
                     multiBlockChange.send(Protocola1_0_15Toa1_0_16_2.class);
                 }
@@ -246,7 +249,9 @@ public class Protocolc0_30cpeToc0_28_30 extends StatelessProtocol<ClientboundPac
                 map(Typesc0_30.STRING); // message
                 handler(wrapper -> {
                     final ExtensionProtocolMetadataStorage protocolMetadata = wrapper.user().get(ExtensionProtocolMetadataStorage.class);
-                    if (!protocolMetadata.hasServerExtension(ClassicProtocolExtension.LONGER_MESSAGES, 1)) return;
+                    if (!protocolMetadata.hasServerExtension(ClassicProtocolExtension.LONGER_MESSAGES, 1)) {
+                        return;
+                    }
                     wrapper.cancel();
 
                     String message = wrapper.get(Typesc0_30.STRING, 0);
@@ -269,7 +274,9 @@ public class Protocolc0_30cpeToc0_28_30 extends StatelessProtocol<ClientboundPac
                 map(Types.BOOLEAN); // place block
                 map(Types.BYTE); // block id
                 handler(wrapper -> {
-                    if (!wrapper.user().has(ExtBlockPermissionsStorage.class)) return;
+                    if (!wrapper.user().has(ExtBlockPermissionsStorage.class)) {
+                        return;
+                    }
 
                     final ExtBlockPermissionsStorage blockPermissions = wrapper.user().get(ExtBlockPermissionsStorage.class);
                     final ClassicLevel level = wrapper.user().get(ClassicLevelStorage.class).getClassicLevel();
@@ -302,12 +309,12 @@ public class Protocolc0_30cpeToc0_28_30 extends StatelessProtocol<ClientboundPac
     }
 
     @Override
-    public void register(ViaProviders providers) {
+    public void register(final ViaProviders providers) {
         Via.getPlatform().runRepeatingSync(new ClassicPingTask(), 20L);
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolc0_30cpeToc0_28_30.class, ClientboundPacketsc0_30cpe::getPacket));
 
         userConnection.put(new ExtensionProtocolMetadataStorage());
@@ -315,14 +322,18 @@ public class Protocolc0_30cpeToc0_28_30 extends StatelessProtocol<ClientboundPac
 
         final ClassicBlockRemapper previousRemapper = userConnection.get(ClassicBlockRemapper.class);
         userConnection.put(new ClassicBlockRemapper(i -> {
-            if (ClassicBlocks.MAPPING.containsKey(i)) return previousRemapper.mapper().get(i);
+            if (ClassicBlocks.MAPPING.containsKey(i)) {
+                return previousRemapper.mapper().get(i);
+            }
             final ExtensionProtocolMetadataStorage extensionProtocol = userConnection.get(ExtensionProtocolMetadataStorage.class);
             if (extensionProtocol.hasServerExtension(ClassicProtocolExtension.CUSTOM_BLOCKS, 1)) {
                 return ExtendedClassicBlocks.MAPPING.get(i);
             }
-            return new IdAndData(BlockList1_6.stone.blockId(), 0);
+            return new IdAndData(BlockList1_6.STONE, 0);
         }, o -> {
-            if (ClassicBlocks.REVERSE_MAPPING.containsKey(o)) return previousRemapper.reverseMapper().getInt(o);
+            if (ClassicBlocks.REVERSE_MAPPING.containsKey(o)) {
+                return previousRemapper.reverseMapper().getInt(o);
+            }
             final ExtensionProtocolMetadataStorage extensionProtocol = userConnection.get(ExtensionProtocolMetadataStorage.class);
             if (extensionProtocol.hasServerExtension(ClassicProtocolExtension.CUSTOM_BLOCKS, 1)) {
                 return ExtendedClassicBlocks.REVERSE_MAPPING.getInt(o);

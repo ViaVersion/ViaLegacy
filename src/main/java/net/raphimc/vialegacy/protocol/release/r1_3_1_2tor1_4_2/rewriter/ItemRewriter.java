@@ -45,8 +45,8 @@ public class ItemRewriter extends LegacyItemRewriter<ClientboundPackets1_3_1, Se
 
     @Override
     public Item handleItemToServer(final UserConnection user, final Item item) {
-        if (item != null && item.identifier() == ItemList1_6.emptyMap.itemId()) {
-            item.setIdentifier(ItemList1_6.map.itemId());
+        if (item != null && item.identifier() == ItemList1_6.EMPTY_MAP) {
+            item.setIdentifier(ItemList1_6.MAP);
         }
 
         return super.handleItemToServer(user, item);

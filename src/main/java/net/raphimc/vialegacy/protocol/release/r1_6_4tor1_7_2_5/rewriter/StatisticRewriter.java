@@ -20,7 +20,7 @@ package net.raphimc.vialegacy.protocol.release.r1_6_4tor1_7_2_5.rewriter;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectMap;
 import com.viaversion.viaversion.libs.fastutil.ints.Int2ObjectOpenHashMap;
 
-public class StatisticRewriter {
+public final class StatisticRewriter {
 
     private static final Int2ObjectMap<String> STATISTICS = new Int2ObjectOpenHashMap<>(764, 0.99F);
 
@@ -789,6 +789,9 @@ public class StatisticRewriter {
         STATISTICS.put(16974170, "stat.breakItem.346");
         STATISTICS.put(16974183, "stat.breakItem.359");
         STATISTICS.put(16974222, "stat.breakItem.398");
+    }
+
+    private StatisticRewriter() {
     }
 
     public static String map(final int stat) {

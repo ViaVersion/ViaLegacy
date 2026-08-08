@@ -24,11 +24,14 @@ import com.viaversion.viaversion.api.type.types.entitydata.EntityDataListType;
 
 import java.util.List;
 
-public class Types1_3_1 {
+public final class Types1_3_1 {
 
     public static final Type<Item> NBTLESS_ITEM = new NbtLessItemType();
 
     public static final Type<EntityData> ENTITY_DATA = new EntityDataType();
     public static final Type<List<EntityData>> ENTITY_DATA_LIST = new EntityDataListType(ENTITY_DATA);
+
+    private Types1_3_1() {
+    }
 
 }

@@ -25,7 +25,7 @@ import net.raphimc.vialegacy.api.splitter.PreNettyPacketType;
 import java.util.function.BiConsumer;
 
 import static net.raphimc.vialegacy.api.splitter.PreNettyTypes.readItemStackb1_1;
-import static net.raphimc.vialegacy.api.splitter.PreNettyTypes.readUTF;
+import static net.raphimc.vialegacy.api.splitter.PreNettyTypes.readUtf;
 
 public enum ServerboundPacketsb1_1 implements ServerboundPacketType, PreNettyPacketType {
 
@@ -33,12 +33,12 @@ public enum ServerboundPacketsb1_1 implements ServerboundPacketType, PreNettyPac
     }),
     LOGIN(1, (user, buf) -> {
         buf.skipBytes(4);
-        readUTF(buf);
-        readUTF(buf);
+        readUtf(buf);
+        readUtf(buf);
         buf.skipBytes(9);
     }),
-    HANDSHAKE(2, (user, buf) -> readUTF(buf)),
-    CHAT(3, (user, buf) -> readUTF(buf)),
+    HANDSHAKE(2, (user, buf) -> readUtf(buf)),
+    CHAT(3, (user, buf) -> readUtf(buf)),
     INTERACT(7, (user, buf) -> buf.skipBytes(9)),
     RESPAWN(9, (user, buf) -> {
     }),
@@ -61,14 +61,17 @@ public enum ServerboundPacketsb1_1 implements ServerboundPacketType, PreNettyPac
     CONTAINER_ACK(106, (user, buf) -> buf.skipBytes(4)),
     SIGN_UPDATE(130, (user, buf) -> {
         buf.skipBytes(10);
-        readUTF(buf);
-        readUTF(buf);
-        readUTF(buf);
-        readUTF(buf);
+        readUtf(buf);
+        readUtf(buf);
+        readUtf(buf);
+        readUtf(buf);
     }),
-    DISCONNECT(255, (user, buf) -> readUTF(buf));
+    DISCONNECT(255, (user, buf) -> readUtf(buf));
 
     private static final ServerboundPacketsb1_1[] REGISTRY = new ServerboundPacketsb1_1[256];
+
+    private final int id;
+    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     static {
         for (ServerboundPacketsb1_1 packet : values()) {
@@ -79,9 +82,6 @@ public enum ServerboundPacketsb1_1 implements ServerboundPacketType, PreNettyPac
     public static ServerboundPacketsb1_1 getPacket(final int id) {
         return REGISTRY[id];
     }
-
-    private final int id;
-    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     ServerboundPacketsb1_1(final int id, final BiConsumer<UserConnection, ByteBuf> packetReader) {
         this.id = id;

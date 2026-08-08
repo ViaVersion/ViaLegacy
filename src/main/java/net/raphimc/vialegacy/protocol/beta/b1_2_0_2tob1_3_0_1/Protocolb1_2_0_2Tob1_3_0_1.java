@@ -62,7 +62,7 @@ public class Protocolb1_2_0_2Tob1_3_0_1 extends StatelessProtocol<ClientboundPac
                 map(Types.BYTE); // yaw
                 map(Types.BYTE); // pitch
                 map(Typesb1_2.ENTITY_DATA_LIST, Typesb1_4.ENTITY_DATA_LIST); // entity data
-                handler(wrapper -> rewriteEntityData(wrapper.get(Typesb1_4.ENTITY_DATA_LIST, 0)));
+                handler(wrapper -> Protocolb1_2_0_2Tob1_3_0_1.this.rewriteEntityData(wrapper.get(Typesb1_4.ENTITY_DATA_LIST, 0)));
             }
         });
         this.registerClientbound(ClientboundPacketsb1_2.SET_ENTITY_DATA, new PacketHandlers() {
@@ -70,7 +70,7 @@ public class Protocolb1_2_0_2Tob1_3_0_1 extends StatelessProtocol<ClientboundPac
             public void register() {
                 map(Types.INT); // entity id
                 map(Typesb1_2.ENTITY_DATA_LIST, Typesb1_4.ENTITY_DATA_LIST); // entity data
-                handler(wrapper -> rewriteEntityData(wrapper.get(Typesb1_4.ENTITY_DATA_LIST, 0)));
+                handler(wrapper -> Protocolb1_2_0_2Tob1_3_0_1.this.rewriteEntityData(wrapper.get(Typesb1_4.ENTITY_DATA_LIST, 0)));
             }
         });
 
@@ -113,7 +113,9 @@ public class Protocolb1_2_0_2Tob1_3_0_1 extends StatelessProtocol<ClientboundPac
                 map(Types.INT); // entity id
                 map(Types.BYTE); // action id
                 handler(wrapper -> {
-                    if (wrapper.get(Types.BYTE, 0) > 2) wrapper.cancel();
+                    if (wrapper.get(Types.BYTE, 0) > 2) {
+                        wrapper.cancel();
+                    }
                 });
             }
         });
@@ -127,15 +129,14 @@ public class Protocolb1_2_0_2Tob1_3_0_1 extends StatelessProtocol<ClientboundPac
     }
 
     @Override
-    public void register(ViaProviders providers) {
+    public void register(final ViaProviders providers) {
         Via.getPlatform().runRepeatingSync(new BlockDigTickTask(), 1L);
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolb1_2_0_2Tob1_3_0_1.class, ClientboundPacketsb1_2::getPacket));
     }
-
 
     public static void sendBlockDigPacket(final UserConnection userConnection, final short status, final BlockPosition position, final short facing) {
         final PacketWrapper blockDig = PacketWrapper.create(ServerboundPacketsb1_2.PLAYER_ACTION, userConnection);

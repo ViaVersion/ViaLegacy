@@ -42,7 +42,7 @@ public class Protocolr1_2_1_3Tor1_2_4_5 extends StatelessProtocol<ClientboundPac
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolr1_2_1_3Tor1_2_4_5.class, ClientboundPackets1_2_1::getPacket));
     }
 

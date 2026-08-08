@@ -21,7 +21,11 @@ import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.StoredObject;
 import com.viaversion.viaversion.api.connection.UserConnection;
 import com.viaversion.viaversion.api.minecraft.BlockPosition;
-import com.viaversion.viaversion.api.minecraft.chunks.*;
+import com.viaversion.viaversion.api.minecraft.chunks.BaseChunk;
+import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSection;
+import com.viaversion.viaversion.api.minecraft.chunks.ChunkSectionImpl;
+import com.viaversion.viaversion.api.minecraft.chunks.PaletteType;
 import com.viaversion.viaversion.api.protocol.packet.PacketWrapper;
 import com.viaversion.viaversion.util.ChunkUtil;
 import net.raphimc.vialegacy.ViaLegacy;
@@ -48,13 +52,13 @@ public class ClassicLevelStorage extends StoredObject {
 
     private ClassicLevel classicLevel;
 
-    private int chunkXCount;
-    private int sectionYCount;
-    private int chunkZCount;
+    private int chunkCountX;
+    private int sectionCountY;
+    private int chunkCountZ;
 
-    private int subChunkXLength;
-    private int subChunkYLength;
-    private int subChunkZLength;
+    private int subChunkLengthX;
+    private int subChunkLengthY;
+    private int subChunkLengthZ;
 
     private int sectionBitmask;
 
@@ -66,7 +70,9 @@ public class ClassicLevelStorage extends StoredObject {
     }
 
     public void addDataPart(final byte[] part, final int partSize) {
-        if (this.netBuffer == null) throw new IllegalStateException("Level is already fully loaded");
+        if (this.netBuffer == null) {
+            throw new IllegalStateException("Level is already fully loaded");
+        }
         this.netBuffer.write(part, 0, partSize);
     }
 
@@ -78,30 +84,40 @@ public class ClassicLevelStorage extends StoredObject {
             dis.close();
             this.netBuffer = null;
             this.classicLevel = new ClassicLevel(sizeX, sizeY, sizeZ, blocks);
-        } catch (Throwable e) {
+        } catch (final Throwable e) {
             throw new IllegalStateException("Failed to load level", e);
         }
 
         final short maxChunkSectionCount = Via.getManager().getProviders().get(ClassicWorldHeightProvider.class).getMaxChunkSectionCount(this.user());
 
-        this.chunkXCount = sizeX >> 4;
-        if (sizeX % 16 != 0) this.chunkXCount++;
-        this.sectionYCount = sizeY >> 4;
-        if (sizeY % 16 != 0) this.sectionYCount++;
-        if (this.sectionYCount > maxChunkSectionCount) this.sectionYCount = maxChunkSectionCount;
-        this.chunkZCount = sizeZ >> 4;
-        if (sizeZ % 16 != 0) this.chunkZCount++;
-        this.subChunkXLength = Math.min(16, sizeX);
-        this.subChunkYLength = Math.min(16, sizeY);
-        this.subChunkZLength = Math.min(16, sizeZ);
+        this.chunkCountX = sizeX >> 4;
+        if (sizeX % 16 != 0) {
+            this.chunkCountX++;
+        }
+        this.sectionCountY = sizeY >> 4;
+        if (sizeY % 16 != 0) {
+            this.sectionCountY++;
+        }
+        if (this.sectionCountY > maxChunkSectionCount) {
+            this.sectionCountY = maxChunkSectionCount;
+        }
+        this.chunkCountZ = sizeZ >> 4;
+        if (sizeZ % 16 != 0) {
+            this.chunkCountZ++;
+        }
+        this.subChunkLengthX = Math.min(16, sizeX);
+        this.subChunkLengthY = Math.min(16, sizeY);
+        this.subChunkLengthZ = Math.min(16, sizeZ);
         this.sectionBitmask = 0;
-        for (int i = 0; i < this.sectionYCount; i++) this.sectionBitmask = (this.sectionBitmask << 1) | 1;
+        for (int i = 0; i < this.sectionCountY; i++) {
+            this.sectionBitmask = (this.sectionBitmask << 1) | 1;
+        }
 
         { // Sodium fix (Sodium requires a ring of empty chunks around the loaded chunks)
-            for (int chunkX = -1; chunkX <= this.chunkXCount; chunkX++) {
-                for (int chunkZ = -1; chunkZ <= this.chunkZCount; chunkZ++) {
-                    if (chunkX < 0 || chunkX >= this.chunkXCount || chunkZ < 0 || chunkZ >= this.chunkZCount) {
-                        final Chunk chunk = ChunkUtil.createEmptyChunk(chunkX, chunkZ, Math.max(8, this.sectionYCount), this.sectionBitmask);
+            for (int chunkX = -1; chunkX <= this.chunkCountX; chunkX++) {
+                for (int chunkZ = -1; chunkZ <= this.chunkCountZ; chunkZ++) {
+                    if (chunkX < 0 || chunkX >= this.chunkCountX || chunkZ < 0 || chunkZ >= this.chunkCountZ) {
+                        final Chunk chunk = ChunkUtil.createEmptyChunk(chunkX, chunkZ, Math.max(8, this.sectionCountY), this.sectionBitmask);
                         ChunkUtil.setDummySkylight(chunk, true);
                         final PacketWrapper chunkData = PacketWrapper.create(ClientboundPacketsa1_0_15.LEVEL_CHUNK, this.user());
                         chunkData.write(Types1_1.CHUNK, chunk);
@@ -114,7 +130,9 @@ public class ClassicLevelStorage extends StoredObject {
 
     public void tick() {
         final ClassicPositionTracker positionTracker = this.user().get(ClassicPositionTracker.class);
-        if (!positionTracker.spawned) return;
+        if (!positionTracker.isSpawned()) {
+            return;
+        }
 
         final long start = System.currentTimeMillis();
         this.user().getChannel().eventLoop().submit(() -> {
@@ -143,30 +161,36 @@ public class ClassicLevelStorage extends StoredObject {
     public void sendChunks(final ChunkCoord center, final int radius, int limit) {
         final ChunkCoordSpiral spiral = new ChunkCoordSpiral(center, new ChunkCoord(radius, radius));
         for (ChunkCoord coord : spiral) {
-            if (!this.shouldSend(coord)) continue;
-            if (limit-- <= 0) return;
+            if (!this.shouldSend(coord)) {
+                continue;
+            }
+            if (limit-- <= 0) {
+                return;
+            }
             this.sendChunk(coord);
         }
     }
 
     public void sendChunk(final ChunkCoord coord) {
-        if (!this.shouldSend(coord)) return;
+        if (!this.shouldSend(coord)) {
+            return;
+        }
         final ClassicBlockRemapper remapper = this.user().get(ClassicBlockRemapper.class);
 
-        this.classicLevel.calculateLight(coord.chunkX * 16, coord.chunkZ * 16, this.subChunkXLength, this.subChunkZLength);
+        this.classicLevel.calculateLight(coord.getChunkX() * 16, coord.getChunkZ() * 16, this.subChunkLengthX, this.subChunkLengthZ);
 
-        final ChunkSection[] modernSections = new ChunkSection[Math.max(8, this.sectionYCount)];
-        for (int sectionY = 0; sectionY < this.sectionYCount; sectionY++) {
+        final ChunkSection[] modernSections = new ChunkSection[Math.max(8, this.sectionCountY)];
+        for (int sectionY = 0; sectionY < this.sectionCountY; sectionY++) {
             final ChunkSection section = modernSections[sectionY] = new ChunkSectionImpl(true);
             section.palette(PaletteType.BLOCKS).addId(0);
             final LegacyNibbleArray skyLight = new LegacyNibbleArray(16 * 16 * 16, 4);
 
-            for (int y = 0; y < this.subChunkYLength; y++) {
+            for (int y = 0; y < this.subChunkLengthY; y++) {
                 final int totalY = y + (sectionY * 16);
-                for (int x = 0; x < this.subChunkXLength; x++) {
-                    final int totalX = x + (coord.chunkX * 16);
-                    for (int z = 0; z < this.subChunkZLength; z++) {
-                        final int totalZ = z + (coord.chunkZ * 16);
+                for (int x = 0; x < this.subChunkLengthX; x++) {
+                    final int totalX = x + (coord.getChunkX() * 16);
+                    for (int z = 0; z < this.subChunkLengthZ; z++) {
+                        final int totalZ = z + (coord.getChunkZ() * 16);
                         section.palette(PaletteType.BLOCKS).setIdAt(x, y, z, remapper.mapper().get(this.classicLevel.getBlock(totalX, totalY, totalZ)).toRawData());
                         skyLight.set(x, y, z, this.classicLevel.isLit(totalX, totalY, totalZ) ? 15 : 9);
                     }
@@ -178,15 +202,17 @@ public class ClassicLevelStorage extends StoredObject {
 
         this.loadedChunks.add(coord);
 
-        final Chunk viaChunk = new BaseChunk(coord.chunkX, coord.chunkZ, true, false, this.sectionBitmask, modernSections, new int[256], new ArrayList<>());
+        final Chunk viaChunk = new BaseChunk(coord.getChunkX(), coord.getChunkZ(), true, false, this.sectionBitmask, modernSections, new int[256], new ArrayList<>());
         final PacketWrapper chunkData = PacketWrapper.create(ClientboundPacketsa1_0_15.LEVEL_CHUNK, this.user());
         chunkData.write(Types1_1.CHUNK, viaChunk);
         chunkData.send(Protocolc0_28_30Toa1_0_15.class);
     }
 
     private boolean shouldSend(final ChunkCoord coord) {
-        if (!this.hasReceivedLevel()) return false;
-        boolean isInBounds = (coord.chunkX >= 0 && coord.chunkX < chunkXCount) && coord.chunkZ >= 0 && coord.chunkZ < chunkZCount;
+        if (!this.hasReceivedLevel()) {
+            return false;
+        }
+        final boolean isInBounds = (coord.getChunkX() >= 0 && coord.getChunkX() < this.chunkCountX) && coord.getChunkZ() >= 0 && coord.getChunkZ() < this.chunkCountZ;
         return isInBounds && !this.isChunkLoaded(coord);
     }
 

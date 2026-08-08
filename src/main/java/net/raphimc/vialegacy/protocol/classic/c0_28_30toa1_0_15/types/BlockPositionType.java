@@ -28,12 +28,12 @@ public class BlockPositionType extends Type<BlockPosition> {
     }
 
     @Override
-    public BlockPosition read(ByteBuf buffer) {
+    public BlockPosition read(final ByteBuf buffer) {
         return new BlockPosition(buffer.readShort(), (int) buffer.readShort(), buffer.readShort());
     }
 
     @Override
-    public void write(ByteBuf buffer, BlockPosition position) {
+    public void write(final ByteBuf buffer, final BlockPosition position) {
         buffer.writeShort(position.x());
         buffer.writeShort(position.y());
         buffer.writeShort(position.z());

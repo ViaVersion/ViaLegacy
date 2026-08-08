@@ -17,7 +17,6 @@
  */
 package net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.rewriter;
 
-
 import com.viaversion.nbt.tag.CompoundTag;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.UserConnection;
@@ -464,7 +463,7 @@ public class TextRewriter {
                     }
 
                     legacyHolder.setData(SNbt.V1_8.serialize(tag));
-                } catch (Throwable e) {
+                } catch (final Throwable e) {
                     if (Via.getConfig().logTextComponentConversionErrors()) {
                         ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error remapping NBT in show_item:" + legacyHolder.getData(), e);
                     }

@@ -64,28 +64,36 @@ public enum Particle1_7_6 {
     ITEM_TAKE("take"),
     MOB_APPEARANCE("mobappearance");
 
-    public final String name;
-    public final int extra;
+    private final String name;
+    private final int extra;
 
-    private static final HashMap<String, Particle1_7_6> particleMap = new HashMap<>();
+    private static final HashMap<String, Particle1_7_6> PARTICLE_MAP = new HashMap<>();
 
-    Particle1_7_6(String name) {
+    Particle1_7_6(final String name) {
         this(name, 0);
     }
 
-    Particle1_7_6(String name, int extra) {
+    Particle1_7_6(final String name, final int extra) {
         this.name = name;
         this.extra = extra;
     }
 
-    public static Particle1_7_6 find(String part) {
-        return particleMap.get(part);
+    public static Particle1_7_6 find(final String part) {
+        return PARTICLE_MAP.get(part);
     }
 
     static {
         for (Particle1_7_6 particle : values()) {
-            particleMap.put(particle.name, particle);
+            PARTICLE_MAP.put(particle.name, particle);
         }
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public int getExtra() {
+        return this.extra;
     }
 
 }

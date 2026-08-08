@@ -21,7 +21,11 @@ import com.google.common.base.Joiner;
 import com.viaversion.viaversion.api.Via;
 import com.viaversion.viaversion.api.connection.ProtocolInfo;
 import com.viaversion.viaversion.api.connection.UserConnection;
-import com.viaversion.viaversion.api.minecraft.*;
+import com.viaversion.viaversion.api.minecraft.BlockChangeRecord;
+import com.viaversion.viaversion.api.minecraft.BlockPosition;
+import com.viaversion.viaversion.api.minecraft.ClientWorld;
+import com.viaversion.viaversion.api.minecraft.Environment;
+import com.viaversion.viaversion.api.minecraft.GameProfile;
 import com.viaversion.viaversion.api.minecraft.chunks.Chunk;
 import com.viaversion.viaversion.api.minecraft.entities.EntityTypes1_8;
 import com.viaversion.viaversion.api.minecraft.entitydata.EntityData;
@@ -60,25 +64,25 @@ import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.provider.GameProfi
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.rewriter.EntityDataRewriter;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.rewriter.ItemRewriter;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.rewriter.TextRewriter;
-import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.storage.*;
+import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.storage.ChunkTracker;
+import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.storage.EntityTracker;
+import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.storage.MapStorage;
+import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.storage.TablistStorage;
+import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.storage.WindowTracker;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.types.Types1_7_6;
 
 import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets1_7_2, ClientboundPackets1_8, ServerboundPackets1_7_2, ServerboundPackets1_8> {
 
-    private final ItemRewriter itemRewriter = new ItemRewriter(this);
-    private final TextRewriter chatComponentRewriter = new TextRewriter(this);
-    private final EntityDataRewriter entityDataRewriter = new EntityDataRewriter(this);
-
-    public Protocolr1_7_6_10Tor1_8() {
-        super(ClientboundPackets1_7_2.class, ClientboundPackets1_8.class, ServerboundPackets1_7_2.class, ServerboundPackets1_8.class);
-    }
-
     public static final ValueTransformer<String, String> LEGACY_TO_JSON = new ValueTransformer<>(Types.STRING, Types.STRING) {
         @Override
-        public String transform(PacketWrapper packetWrapper, String message) {
+        public String transform(final PacketWrapper packetWrapper, final String message) {
             final JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("text", message);
             return jsonObject.toString();
@@ -87,12 +91,20 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
 
     public static final ValueTransformer<String, String> LEGACY_TO_JSON_TRANSLATE = new ValueTransformer<>(Types.STRING, Types.STRING) {
         @Override
-        public String transform(PacketWrapper packetWrapper, String message) {
+        public String transform(final PacketWrapper packetWrapper, final String message) {
             final JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("translate", message);
             return jsonObject.toString();
         }
     };
+
+    private final ItemRewriter itemRewriter = new ItemRewriter(this);
+    private final TextRewriter chatComponentRewriter = new TextRewriter(this);
+    private final EntityDataRewriter entityDataRewriter = new EntityDataRewriter(this);
+
+    public Protocolr1_7_6_10Tor1_8() {
+        super(ClientboundPackets1_7_2.class, ClientboundPackets1_8.class, ServerboundPackets1_7_2.class, ServerboundPackets1_8.class);
+    }
 
     @Override
     protected void registerPackets() {
@@ -143,7 +155,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     final byte dimensionId = wrapper.get(Types.BYTE, 0);
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                     tracker.trackEntity(entityId, EntityTypes1_8.EntityType.PLAYER);
-                    tracker.setPlayerID(entityId);
+                    tracker.setPlayerId(entityId);
                     wrapper.user().getClientWorld(Protocolr1_7_6_10Tor1_8.class).setEnvironment(dimensionId);
 
                     wrapper.send(Protocolr1_7_6_10Tor1_8.class);
@@ -166,7 +178,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
         this.registerClientbound(ClientboundPackets1_7_2.CHAT, new PacketHandlers() {
             @Override
             public void register() {
-                handler(wrapper -> wrapper.write(Types.STRING, chatComponentRewriter.toClient(wrapper.user(), wrapper.read(Types.STRING)))); // message
+                handler(wrapper -> wrapper.write(Types.STRING, Protocolr1_7_6_10Tor1_8.this.chatComponentRewriter.toClient(wrapper.user(), wrapper.read(Types.STRING)))); // message
                 create(Types.BYTE, (byte) 0); // position
             }
         });
@@ -176,7 +188,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 map(Types.INT, Types.VAR_INT); // entity id
                 map(Types.SHORT); // slot
                 map(Types1_7_6.ITEM, Types.ITEM1_8); // item
-                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.user(), wrapper.get(Types.ITEM1_8, 0)));
+                handler(wrapper -> Protocolr1_7_6_10Tor1_8.this.itemRewriter.handleItemToClient(wrapper.user(), wrapper.get(Types.ITEM1_8, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.SET_DEFAULT_SPAWN_POSITION, new PacketHandlers() {
@@ -205,7 +217,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     if (wrapper.user().getClientWorld(Protocolr1_7_6_10Tor1_8.class).setEnvironment(wrapper.get(Types.INT, 0))) {
                         wrapper.user().get(ChunkTracker.class).clear();
                         entityTracker.clear();
-                        entityTracker.trackEntity(entityTracker.getPlayerID(), EntityTypes1_8.EntityType.PLAYER);
+                        entityTracker.trackEntity(entityTracker.getPlayerId(), EntityTypes1_8.EntityType.PLAYER);
                     }
 
                     final ProtocolInfo protocolInfo = wrapper.user().getProtocolInfo();
@@ -238,7 +250,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     defaultEntityData.add(new EntityData(EntityDataIndex1_7_6.HUMAN_ABSORPTION_HEARTS.getNewIndex(), EntityDataTypes1_8.FLOAT, 0F));
                     defaultEntityData.add(new EntityData(EntityDataIndex1_7_6.HUMAN_SCORE.getNewIndex(), EntityDataTypes1_8.INT, 0));
                     final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_DATA, wrapper.user());
-                    setEntityData.write(Types.VAR_INT, entityTracker.getPlayerID()); // entity id
+                    setEntityData.write(Types.VAR_INT, entityTracker.getPlayerId()); // entity id
                     setEntityData.write(Types.ENTITY_DATA_LIST1_8, defaultEntityData); // entity data
                     setEntityData.send(Protocolr1_7_6_10Tor1_8.class);
                 });
@@ -264,7 +276,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.ADD_PLAYER, wrapper -> {
-            final int entityID = wrapper.passthrough(Types.VAR_INT); // entity id
+            final int entityId = wrapper.passthrough(Types.VAR_INT); // entity id
             final UUID uuid = UUID.fromString(wrapper.read(Types.STRING)); // uuid
             wrapper.write(Types.UUID, uuid);
             final String name = wrapper.read(Types.STRING); // name
@@ -284,15 +296,15 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
 
             final short itemId = wrapper.read(Types.SHORT); // item in hand
             final Item currentItem = new DataItem(itemId, (byte) 1, (short) 0, null);
-            itemRewriter.handleItemToClient(wrapper.user(), currentItem);
+            this.itemRewriter.handleItemToClient(wrapper.user(), currentItem);
             wrapper.write(Types.SHORT, (short) currentItem.identifier());
 
             final List<EntityData> entityDataList = wrapper.read(Types1_7_6.ENTITY_DATA_LIST); // entity data
-            entityDataRewriter.transform(wrapper.user(), EntityTypes1_8.EntityType.PLAYER, entityDataList);
+            this.entityDataRewriter.transform(wrapper.user(), EntityTypes1_8.EntityType.PLAYER, entityDataList);
             wrapper.write(Types.ENTITY_DATA_LIST1_8, entityDataList);
 
             wrapper.user().get(TablistStorage.class).sendTempEntry(new TabListEntry(new GameProfile(name, uuid, properties)));
-            wrapper.user().get(EntityTracker.class).trackEntity(entityID, EntityTypes1_8.EntityType.PLAYER);
+            wrapper.user().get(EntityTracker.class).trackEntity(entityId, EntityTypes1_8.EntityType.PLAYER);
         });
         this.registerClientbound(ClientboundPackets1_7_2.TAKE_ITEM_ENTITY, new PacketHandlers() {
             @Override
@@ -315,19 +327,19 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 map(Types.INT); // data
                 handler(wrapper -> {
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                    final int entityID = wrapper.get(Types.VAR_INT, 0);
-                    final int typeID = wrapper.get(Types.BYTE, 0);
+                    final int entityId = wrapper.get(Types.VAR_INT, 0);
+                    final int typeId = wrapper.get(Types.BYTE, 0);
                     int x = wrapper.get(Types.INT, 0);
                     int y = wrapper.get(Types.INT, 1);
                     int z = wrapper.get(Types.INT, 2);
                     byte yaw = wrapper.get(Types.BYTE, 2);
                     int data = wrapper.get(Types.INT, 3);
-                    final EntityTypes1_8.EntityType type = EntityTypes1_8.ObjectType.getEntityType(typeID, data);
+                    final EntityTypes1_8.EntityType type = EntityTypes1_8.ObjectType.getEntityType(typeId, data);
                     if (type == null) {
                         return;
                     }
-                    tracker.trackEntity(entityID, type);
-                    tracker.updateEntityLocation(entityID, x, y, z, false);
+                    tracker.trackEntity(entityId, type);
+                    tracker.updateEntityLocation(entityId, x, y, z, false);
 
                     if (type == EntityTypes1_8.ObjectType.ITEM_FRAME.getType()) {
                         yaw = switch (data) {
@@ -350,14 +362,14 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                             default -> yaw;
                         };
                     } else if (type == EntityTypes1_8.ObjectType.FALLING_BLOCK.getType()) {
-                        final int id = data & 0xffff;
+                        final int id = data & 0xFFFF;
                         final int metadata = data >> 16;
                         final IdAndData block = new IdAndData(id, metadata);
                         wrapper.user().get(ChunkTracker.class).remapBlockParticle(block);
                         data = block.getId() | block.getData() << 12;
                     }
 
-                    y = realignEntityY(type, y);
+                    y = Protocolr1_7_6_10Tor1_8.this.realignEntityY(type, y);
 
                     wrapper.set(Types.INT, 0, x);
                     wrapper.set(Types.INT, 1, y);
@@ -384,22 +396,22 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 map(Types1_7_6.ENTITY_DATA_LIST, Types.ENTITY_DATA_LIST1_8); // entity data
                 handler(wrapper -> {
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
-                    final int entityID = wrapper.get(Types.VAR_INT, 0);
-                    final int typeID = wrapper.get(Types.UNSIGNED_BYTE, 0);
+                    final int entityId = wrapper.get(Types.VAR_INT, 0);
+                    final int typeId = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     final int x = wrapper.get(Types.INT, 0);
                     final int y = wrapper.get(Types.INT, 1);
                     final int z = wrapper.get(Types.INT, 2);
                     final List<EntityData> entityDataList = wrapper.get(Types.ENTITY_DATA_LIST1_8, 0);
-                    final EntityTypes1_8.EntityType entityType = EntityTypes1_8.EntityType.findById(typeID);
+                    final EntityTypes1_8.EntityType entityType = EntityTypes1_8.EntityType.findById(typeId);
                     if (entityType == null) {
                         wrapper.cancel();
                         return;
                     }
-                    tracker.trackEntity(entityID, entityType);
-                    tracker.updateEntityLocation(entityID, x, y, z, false);
-                    tracker.updateEntityData(entityID, entityDataList);
+                    tracker.trackEntity(entityId, entityType);
+                    tracker.updateEntityLocation(entityId, x, y, z, false);
+                    tracker.updateEntityData(entityId, entityDataList);
 
-                    entityDataRewriter.transform(wrapper.user(), entityType, entityDataList);
+                    Protocolr1_7_6_10Tor1_8.this.entityDataRewriter.transform(wrapper.user(), entityType, entityDataList);
                 });
             }
         });
@@ -423,8 +435,8 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     }
                     wrapper.set(Types.BLOCK_POSITION1_8, 0, new BlockPosition(pos.x() + modX, pos.y(), pos.z() + modZ));
 
-                    final int entityID = wrapper.get(Types.VAR_INT, 0);
-                    wrapper.user().get(EntityTracker.class).trackEntity(entityID, EntityTypes1_8.EntityType.PAINTING);
+                    final int entityId = wrapper.get(Types.VAR_INT, 0);
+                    wrapper.user().get(EntityTracker.class).trackEntity(entityId, EntityTypes1_8.EntityType.PAINTING);
                 });
             }
         });
@@ -437,10 +449,10 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 map(Types.INT); // z
                 map(Types.SHORT); // count
                 handler(wrapper -> {
-                    final int entityID = wrapper.get(Types.VAR_INT, 0);
-                    wrapper.user().get(EntityTracker.class).trackEntity(entityID, EntityTypes1_8.EntityType.EXPERIENCE_ORB);
+                    final int entityId = wrapper.get(Types.VAR_INT, 0);
+                    wrapper.user().get(EntityTracker.class).trackEntity(entityId, EntityTypes1_8.EntityType.EXPERIENCE_ORB);
 
-                    wrapper.set(Types.INT, 1, realignEntityY(EntityTypes1_8.EntityType.EXPERIENCE_ORB, wrapper.get(Types.INT, 1)));
+                    wrapper.set(Types.INT, 1, Protocolr1_7_6_10Tor1_8.this.realignEntityY(EntityTypes1_8.EntityType.EXPERIENCE_ORB, wrapper.get(Types.INT, 1)));
                 });
             }
         });
@@ -559,7 +571,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
 
                     final EntityTypes1_8.EntityType type = entityTracker.getTrackedEntities().get(entityId);
                     if (type != null) {
-                        wrapper.set(Types.INT, 1, realignEntityY(type, y));
+                        wrapper.set(Types.INT, 1, Protocolr1_7_6_10Tor1_8.this.realignEntityY(type, y));
                     }
                 });
             }
@@ -596,11 +608,13 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 handler(wrapper -> {
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                     final List<EntityData> entityDataList = wrapper.get(Types.ENTITY_DATA_LIST1_8, 0);
-                    final int entityID = wrapper.get(Types.VAR_INT, 0);
-                    if (tracker.getTrackedEntities().containsKey(entityID)) {
-                        tracker.updateEntityData(entityID, entityDataList);
-                        entityDataRewriter.transform(wrapper.user(), tracker.getTrackedEntities().get(entityID), entityDataList);
-                        if (entityDataList.isEmpty()) wrapper.cancel();
+                    final int entityId = wrapper.get(Types.VAR_INT, 0);
+                    if (tracker.getTrackedEntities().containsKey(entityId)) {
+                        tracker.updateEntityData(entityId, entityDataList);
+                        Protocolr1_7_6_10Tor1_8.this.entityDataRewriter.transform(wrapper.user(), tracker.getTrackedEntities().get(entityId), entityDataList);
+                        if (entityDataList.isEmpty()) {
+                            wrapper.cancel();
+                        }
                     } else {
                         wrapper.cancel();
                     }
@@ -756,9 +770,11 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 final IdAndData block = chunkTracker.getBlockNotNull(pos);
                 if (block.getId() != 0) {
                     double var21 = Math.min(0.2F + (float) data / 15.0F, 10.0F);
-                    if (var21 > 2.5D) var21 = 2.5D;
-                    final float var25 = randomFloatClamp(rnd, 0.0F, ((float) Math.PI * 2F));
-                    final double var26 = randomFloatClamp(rnd, 0.75F, 1.0F);
+                    if (var21 > 2.5D) {
+                        var21 = 2.5D;
+                    }
+                    final float var25 = this.randomFloatClamp(rnd, 0.0F, ((float) Math.PI * 2F));
+                    final double var26 = this.randomFloatClamp(rnd, 0.75F, 1.0F);
 
                     final float offsetY = (float) (0.20000000298023224D + var21 / 100.0D);
                     final float offsetX = (float) (Math.cos(var25) * 0.2F * var26 * var26 * (var21 + 0.2D));
@@ -786,9 +802,9 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     }
                 } else if (!disableRelativeVolume && effectId == 2001) { // block break effect
                     final ChunkTracker chunkTracker = wrapper.user().get(ChunkTracker.class);
-                    final int blockID = data & 4095;
+                    final int blockId = data & 4095;
                     final int blockData = data >> 12 & 255;
-                    final IdAndData block = new IdAndData(blockID, blockData);
+                    final IdAndData block = new IdAndData(blockId, blockData);
                     chunkTracker.remapBlockParticle(block);
                     data = block.getId() | (block.getData() << 12);
                 }
@@ -822,20 +838,24 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             if (particle == Particle1_7_6.ICON_CRACK) {
                 final int id = Integer.parseInt(parts[1]);
                 int damage = 0;
-                if (parts.length > 2) damage = Integer.parseInt(parts[2]);
+                if (parts.length > 2) {
+                    damage = Integer.parseInt(parts[2]);
+                }
                 final DataItem item = new DataItem(id, (byte) 1, (short) damage, null);
-                itemRewriter.handleItemToClient(wrapper.user(), item);
+                this.itemRewriter.handleItemToClient(wrapper.user(), item);
                 wrapper.write(Types.VAR_INT, item.identifier()); // particle data
-                if (item.data() != 0)
+                if (item.data() != 0) {
                     wrapper.write(Types.VAR_INT, (int) item.data()); // particle data
+                }
             } else if (particle == Particle1_7_6.BLOCK_CRACK || particle == Particle1_7_6.BLOCK_DUST) {
                 final int id = Integer.parseInt(parts[1]);
                 final int metadata = Integer.parseInt(parts[2]);
                 final IdAndData block = new IdAndData(id, metadata);
                 wrapper.user().get(ChunkTracker.class).remapBlockParticle(block);
                 wrapper.write(Types.VAR_INT, block.getId() | block.getData() << 12); // particle data
-            } else if (particle.extra > 0)
+            } else if (particle.getExtra() > 0) {
                 throw new IllegalStateException("Tried to write particle which requires extra data, but no handler was found");
+            }
         });
         this.registerClientbound(ClientboundPackets1_7_2.GAME_EVENT, new PacketHandlers() {
             @Override
@@ -859,7 +879,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             short slots = wrapper.read(Types.UNSIGNED_BYTE); // slots
             boolean useProvidedWindowTitle = wrapper.read(Types.BOOLEAN); // use provided title
 
-            wrapper.user().get(WindowTracker.class).types.put(windowId, windowType);
+            wrapper.user().get(WindowTracker.class).getTypes().put(windowId, windowType);
 
             final String inventoryName;
             switch (windowType) {
@@ -940,7 +960,9 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             wrapper.write(Types.STRING, inventoryName);
             wrapper.write(Types.STRING, title);
             wrapper.write(Types.UNSIGNED_BYTE, slots);
-            if (windowType == 11) wrapper.passthrough(Types.INT); // entity id
+            if (windowType == 11) {
+                wrapper.passthrough(Types.INT); // entity id
+            }
         });
         this.registerClientbound(ClientboundPackets1_7_2.CONTAINER_SET_SLOT, new PacketHandlers() {
             @Override
@@ -949,11 +971,13 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     final byte windowId = wrapper.passthrough(Types.BYTE); // window id
                     short slot = wrapper.read(Types.SHORT); // slot
                     final short windowType = wrapper.user().get(WindowTracker.class).get(windowId);
-                    if (windowType == 4/*enchanting_table*/ && slot >= 1) slot += 1;
+                    if (windowType == 4/*enchanting_table*/ && slot >= 1) {
+                        slot += 1;
+                    }
                     wrapper.write(Types.SHORT, slot);
                 });
                 map(Types1_7_6.ITEM, Types.ITEM1_8); // item
-                handler(wrapper -> itemRewriter.handleItemToClient(wrapper.user(), wrapper.get(Types.ITEM1_8, 0)));
+                handler(wrapper -> Protocolr1_7_6_10Tor1_8.this.itemRewriter.handleItemToClient(wrapper.user(), wrapper.get(Types.ITEM1_8, 0)));
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.CONTAINER_SET_CONTENT, new PacketHandlers() {
@@ -971,7 +995,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                         items[1] = new DataItem(351/*lapis_lazuli*/, (byte) 3, (short) 4, null);
                     }
                     for (Item item : items) {
-                        itemRewriter.handleItemToClient(wrapper.user(), item);
+                        Protocolr1_7_6_10Tor1_8.this.itemRewriter.handleItemToClient(wrapper.user(), item);
                     }
                     wrapper.write(Types.ITEM1_8_SHORT_ARRAY, items);
                 });
@@ -1021,25 +1045,27 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
 
             final MapStorage mapStorage = wrapper.user().get(MapStorage.class);
             MapData mapData = mapStorage.getMapData(id);
-            if (mapData == null) mapStorage.putMapData(id, mapData = new MapData());
+            if (mapData == null) {
+                mapStorage.putMapData(id, mapData = new MapData());
+            }
 
             if (data[0] == 1) {
                 final int count = (data.length - 1) / 3;
-                mapData.mapIcons = new MapIcon[count];
+                mapData.setMapIcons(new MapIcon[count]);
 
                 for (int i = 0; i < count; i++) {
-                    mapData.mapIcons[i] = new MapIcon((byte) (data[i * 3 + 1] >> 4), (byte) (data[i * 3 + 1] & 0xF), data[i * 3 + 2], data[i * 3 + 3]);
+                    mapData.getMapIcons()[i] = new MapIcon((byte) (data[i * 3 + 1] >> 4), (byte) (data[i * 3 + 1] & 0xF), data[i * 3 + 2], data[i * 3 + 3]);
                 }
             } else if (data[0] == 2) {
-                mapData.scale = data[1];
+                mapData.setScale(data[1]);
             }
 
-            wrapper.write(Types.BYTE, mapData.scale);
-            wrapper.write(Types.VAR_INT, mapData.mapIcons.length);
-            for (MapIcon mapIcon : mapData.mapIcons) {
-                wrapper.write(Types.BYTE, (byte) (mapIcon.direction << 4 | mapIcon.type & 0xF));
-                wrapper.write(Types.BYTE, mapIcon.x);
-                wrapper.write(Types.BYTE, mapIcon.z);
+            wrapper.write(Types.BYTE, mapData.getScale());
+            wrapper.write(Types.VAR_INT, mapData.getMapIcons().length);
+            for (MapIcon mapIcon : mapData.getMapIcons()) {
+                wrapper.write(Types.BYTE, (byte) (mapIcon.getDirection() << 4 | mapIcon.getType() & 0xF));
+                wrapper.write(Types.BYTE, mapIcon.getX());
+                wrapper.write(Types.BYTE, mapIcon.getZ());
             }
 
             if (data[0] == 0) {
@@ -1078,29 +1104,29 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             final short ping = wrapper.read(Types.SHORT); // ping
 
             final TablistStorage tablistStorage = wrapper.user().get(TablistStorage.class);
-            TabListEntry entry = tablistStorage.tablist.get(name);
+            TabListEntry entry = tablistStorage.getTablist().get(name);
 
             if (entry == null && online) { // add entry
-                tablistStorage.tablist.put(name, entry = new TabListEntry(name, ping));
+                tablistStorage.getTablist().put(name, entry = new TabListEntry(name, ping));
                 wrapper.write(Types.VAR_INT, 0); // action
                 wrapper.write(Types.VAR_INT, 1); // count
-                wrapper.write(Types.UUID, entry.gameProfile.id()); // uuid
-                wrapper.write(Types.STRING, entry.gameProfile.name()); // name
-                wrapper.write(Types.PROFILE_PROPERTY_ARRAY, entry.gameProfile.properties()); // properties
+                wrapper.write(Types.UUID, entry.getGameProfile().id()); // uuid
+                wrapper.write(Types.STRING, entry.getGameProfile().name()); // name
+                wrapper.write(Types.PROFILE_PROPERTY_ARRAY, entry.getGameProfile().properties()); // properties
                 wrapper.write(Types.VAR_INT, 0); // gamemode
-                wrapper.write(Types.VAR_INT, entry.ping); // ping
+                wrapper.write(Types.VAR_INT, entry.getPing()); // ping
                 wrapper.write(Types.OPTIONAL_STRING, null); // display name
             } else if (entry != null && !online) { // remove entry
-                tablistStorage.tablist.remove(name);
+                tablistStorage.getTablist().remove(name);
                 wrapper.write(Types.VAR_INT, 4); // action
                 wrapper.write(Types.VAR_INT, 1); // count
-                wrapper.write(Types.UUID, entry.gameProfile.id()); // uuid
+                wrapper.write(Types.UUID, entry.getGameProfile().id()); // uuid
             } else if (entry != null) { // update ping
-                entry.ping = ping;
+                entry.setPing(ping);
                 wrapper.write(Types.VAR_INT, 2); // action
                 wrapper.write(Types.VAR_INT, 1); // count
-                wrapper.write(Types.UUID, entry.gameProfile.id()); // uuid
-                wrapper.write(Types.VAR_INT, entry.ping); // ping
+                wrapper.write(Types.UUID, entry.getGameProfile().id()); // uuid
+                wrapper.write(Types.VAR_INT, entry.getPing()); // ping
             } else {
                 wrapper.cancel();
             }
@@ -1175,17 +1201,17 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                             final int count = wrapper.passthrough(Types.UNSIGNED_BYTE); // count
                             for (int i = 0; i < count; i++) {
                                 Item item = wrapper.read(Types1_7_6.ITEM);
-                                itemRewriter.handleItemToClient(wrapper.user(), item);
+                                Protocolr1_7_6_10Tor1_8.this.itemRewriter.handleItemToClient(wrapper.user(), item);
                                 wrapper.write(Types.ITEM1_8, item); // item 1
 
                                 item = wrapper.read(Types1_7_6.ITEM);
-                                itemRewriter.handleItemToClient(wrapper.user(), item);
+                                Protocolr1_7_6_10Tor1_8.this.itemRewriter.handleItemToClient(wrapper.user(), item);
                                 wrapper.write(Types.ITEM1_8, item); // item 3
 
                                 final boolean has3Items = wrapper.passthrough(Types.BOOLEAN); // has 3 items
                                 if (has3Items) {
                                     item = wrapper.read(Types1_7_6.ITEM);
-                                    itemRewriter.handleItemToClient(wrapper.user(), item);
+                                    Protocolr1_7_6_10Tor1_8.this.itemRewriter.handleItemToClient(wrapper.user(), item);
                                     wrapper.write(Types.ITEM1_8, item); // item 2
                                 }
 
@@ -1217,7 +1243,8 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                         info.setUsername(name);
                     }
                     if (info.getUuid() == null) {
-                        info.setUuid(ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class).getMojangUuid(name) : GameProfileUtil.getOfflinePlayerUuid(name));
+                        info.setUuid(ViaLegacy.getConfig().isLegacySkinLoading() ? Via.getManager().getProviders().get(GameProfileFetcher.class)
+                            .getMojangUuid(name) : GameProfileUtil.getOfflinePlayerUuid(name));
                     }
                 });
             }
@@ -1305,9 +1332,9 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 handler(wrapper -> {
                     final short direction = wrapper.get(Types.UNSIGNED_BYTE, 0);
                     final Item item = wrapper.get(Types1_7_6.ITEM, 0);
-                    itemRewriter.handleItemToServer(wrapper.user(), item);
+                    Protocolr1_7_6_10Tor1_8.this.itemRewriter.handleItemToServer(wrapper.user(), item);
 
-                    if (item != null && item.identifier() == ItemList1_6.writtenBook.itemId() && direction == 255) { // If placed item is a book then cancel it and send a MC|BOpen to the client
+                    if (item != null && item.identifier() == ItemList1_6.WRITTEN_BOOK && direction == 255) { // If placed item is a book then cancel it and send a MC|BOpen to the client
                         final PacketWrapper openBook = PacketWrapper.create(ClientboundPackets1_8.CUSTOM_PAYLOAD, wrapper.user());
                         openBook.write(Types.STRING, "MC|BOpen"); // channel
                         openBook.send(Protocolr1_7_6_10Tor1_8.class);
@@ -1318,7 +1345,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
         });
         this.registerServerbound(ServerboundPackets1_8.SWING, wrapper -> {
             final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
-            wrapper.write(Types.INT, entityTracker.getPlayerID()); // entity id
+            wrapper.write(Types.INT, entityTracker.getPlayerId()); // entity id
             wrapper.write(Types.BYTE, (byte) 1); // animation
         });
         this.registerServerbound(ServerboundPackets1_8.PLAYER_COMMAND, new PacketHandlers() {
@@ -1371,7 +1398,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 map(Types.SHORT); // transaction id
                 map(Types.BYTE); // action
                 map(Types.ITEM1_8, Types1_7_6.ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
+                handler(wrapper -> Protocolr1_7_6_10Tor1_8.this.itemRewriter.handleItemToServer(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
             }
         });
         this.registerServerbound(ServerboundPackets1_8.SET_CREATIVE_MODE_SLOT, new PacketHandlers() {
@@ -1379,7 +1406,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             public void register() {
                 map(Types.SHORT); // slot
                 map(Types.ITEM1_8, Types1_7_6.ITEM); // item
-                handler(wrapper -> itemRewriter.handleItemToServer(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
+                handler(wrapper -> Protocolr1_7_6_10Tor1_8.this.itemRewriter.handleItemToServer(wrapper.user(), wrapper.get(Types1_7_6.ITEM, 0)));
             }
         });
         this.registerServerbound(ServerboundPackets1_8.SIGN_UPDATE, new PacketHandlers() {
@@ -1390,7 +1417,9 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     for (int i = 0; i < 4; i++) {
                         final JsonElement component = wrapper.read(Types.COMPONENT); // line
                         String text = TextComponentSerializer.V1_8.deserialize(component).asUnformattedString();
-                        if (text.length() > 15) text = text.substring(0, 15);
+                        if (text.length() > 15) {
+                            text = text.substring(0, 15);
+                        }
                         wrapper.write(Types.STRING, text);
                     }
                 });
@@ -1429,7 +1458,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     switch (channel) {
                         case "MC|BEdit", "MC|BSign" -> {
                             final Item item = wrapper.read(Types.ITEM1_8); // book
-                            itemRewriter.handleItemToServer(wrapper.user(), item);
+                            Protocolr1_7_6_10Tor1_8.this.itemRewriter.handleItemToServer(wrapper.user(), item);
                             wrapper.write(Types1_7_6.ITEM, item); // book
                         }
                         case "MC|Brand", "MC|ItemName" -> {
@@ -1463,7 +1492,8 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                                 for (String registeredChannel : registeredChannels) {
                                     if (registeredChannel.length() > 16) {
                                         if (Via.getConfig().logOtherConversionWarnings()) {
-                                            ViaLegacy.getPlatform().getLogger().warning("Ignoring serverbound plugin channel register of '" + registeredChannel + "', as it is longer than 16 characters");
+                                            ViaLegacy.getPlatform().getLogger()
+                                                .warning("Ignoring serverbound plugin channel register of '" + registeredChannel + "', as it is longer than 16 characters");
                                         }
                                         continue;
                                     }
@@ -1491,39 +1521,42 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
         this.cancelServerbound(ServerboundPackets1_8.RESOURCE_PACK);
     }
 
-    private float randomFloatClamp(Random rnd, float min, float max) {
+    private float randomFloatClamp(final Random rnd, final float min, final float max) {
         return min >= max ? min : rnd.nextFloat() * (max - min) + min;
     }
 
     private int realignEntityY(final EntityTypes1_8.EntityType type, final int y) {
-        float yPos = y / 32F;
+        final float yPos = y / 32F;
         float yOffset = 0F;
-        if (type.isOrHasParent(EntityTypes1_8.ObjectType.FALLING_BLOCK.getType()))
+        if (type.isOrHasParent(EntityTypes1_8.ObjectType.FALLING_BLOCK.getType())) {
             yOffset = 0.98F / 2F;
-        if (type.isOrHasParent(EntityTypes1_8.ObjectType.TNT_PRIMED.getType()))
+        }
+        if (type.isOrHasParent(EntityTypes1_8.ObjectType.TNT_PRIMED.getType())) {
             yOffset = 0.98F / 2F;
-        if (type.isOrHasParent(EntityTypes1_8.ObjectType.ENDER_CRYSTAL.getType()))
+        }
+        if (type.isOrHasParent(EntityTypes1_8.ObjectType.ENDER_CRYSTAL.getType())) {
             yOffset = 1F;
-        else if (type.isOrHasParent(EntityTypes1_8.ObjectType.MINECART.getType()))
+        } else if (type.isOrHasParent(EntityTypes1_8.ObjectType.MINECART.getType())) {
             yOffset = 0.7F / 2F;
-        else if (type.isOrHasParent(EntityTypes1_8.ObjectType.BOAT.getType()))
+        } else if (type.isOrHasParent(EntityTypes1_8.ObjectType.BOAT.getType())) {
             yOffset = 0.6F / 2F;
-        else if (type.isOrHasParent(EntityTypes1_8.ObjectType.ITEM.getType()))
+        } else if (type.isOrHasParent(EntityTypes1_8.ObjectType.ITEM.getType())) {
             yOffset = 0.24F / 2F; // Should be 0.25F but that causes items to fall through the ground on modern client versions
-        else if (type.isOrHasParent(EntityTypes1_8.ObjectType.LEASH.getType()))
+        } else if (type.isOrHasParent(EntityTypes1_8.ObjectType.LEASH.getType())) {
             yOffset = 0.5F;
-        else if (type.isOrHasParent(EntityTypes1_8.EntityType.EXPERIENCE_ORB))
+        } else if (type.isOrHasParent(EntityTypes1_8.EntityType.EXPERIENCE_ORB)) {
             yOffset = 0.5F / 2F;
+        }
         return (int) Math.floor((yPos - yOffset) * 32F);
     }
 
     @Override
-    public void register(ViaProviders providers) {
+    public void register(final ViaProviders providers) {
         providers.require(GameProfileFetcher.class);
     }
 
     @Override
-    public void init(UserConnection userConnection) {
+    public void init(final UserConnection userConnection) {
         userConnection.addClientWorld(Protocolr1_7_6_10Tor1_8.class, new ClientWorld());
         userConnection.put(new TablistStorage(userConnection));
         userConnection.put(new WindowTracker());

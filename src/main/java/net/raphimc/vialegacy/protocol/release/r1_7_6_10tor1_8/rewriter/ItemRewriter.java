@@ -74,10 +74,14 @@ public class ItemRewriter extends LegacyItemRewriter<ClientboundPackets1_7_2, Se
     @Override
     public Item handleItemToClient(final UserConnection user, final Item item) {
         super.handleItemToClient(user, item);
-        if (item == null) return null;
+        if (item == null) {
+            return null;
+        }
 
-        if (item.identifier() == ItemList1_6.skull.itemId() && item.data() == 3 && item.tag() != null) { // player_skull
-            if (!item.tag().contains("SkullOwner")) return item;
+        if (item.identifier() == ItemList1_6.SKULL && item.data() == 3 && item.tag() != null) { // player_skull
+            if (!item.tag().contains("SkullOwner")) {
+                return item;
+            }
 
             String skullOwnerName = null;
             if (!item.tag().getString("SkullOwner", "").isEmpty()) {
@@ -106,9 +110,11 @@ public class ItemRewriter extends LegacyItemRewriter<ClientboundPackets1_7_2, Se
 
                 gameProfileFetcher.getMojangUuidAsync(skullOwnerName).thenAccept(gameProfileFetcher::getGameProfile);
             }
-        } else if (item.identifier() == ItemList1_6.writtenBook.itemId() && item.tag() != null) {
+        } else if (item.identifier() == ItemList1_6.WRITTEN_BOOK && item.tag() != null) {
             final ListTag<StringTag> pages = item.tag().getListTag("pages", StringTag.class);
-            if (pages == null) return item;
+            if (pages == null) {
+                return item;
+            }
 
             for (int i = 0; i < pages.size(); i++) {
                 final String text = pages.get(i).getValue();
@@ -121,17 +127,23 @@ public class ItemRewriter extends LegacyItemRewriter<ClientboundPackets1_7_2, Se
 
     @Override
     public Item handleItemToServer(final UserConnection user, final Item item) {
-        if (item == null) return null;
+        if (item == null) {
+            return null;
+        }
 
         NOT_VALID:
-        if (item.identifier() == ItemList1_6.skull.itemId() && item.data() == 3 && item.tag() != null) { // player_skull
-            if (!item.tag().contains("1_7_SkullOwner")) break NOT_VALID;
+        if (item.identifier() == ItemList1_6.SKULL && item.data() == 3 && item.tag() != null) { // player_skull
+            if (!item.tag().contains("1_7_SkullOwner")) {
+                break NOT_VALID;
+            }
             if (item.tag().get("1_7_SkullOwner") instanceof StringTag) {
                 item.tag().put("SkullOwner", item.tag().remove("1_7_SkullOwner"));
             }
-        } else if (item.identifier() == ItemList1_6.writtenBook.itemId() && item.tag() != null) {
+        } else if (item.identifier() == ItemList1_6.WRITTEN_BOOK && item.tag() != null) {
             final ListTag<StringTag> pages = item.tag().getListTag("pages", StringTag.class);
-            if (pages == null) break NOT_VALID;
+            if (pages == null) {
+                break NOT_VALID;
+            }
 
             for (int i = 0; i < pages.size(); i++) {
                 final String text = pages.get(i).getValue();

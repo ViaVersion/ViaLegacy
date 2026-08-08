@@ -32,11 +32,13 @@ public class BlockDigTickTask implements Runnable {
             final BlockDigStorage blockDigStorage = info.get(BlockDigStorage.class);
             if (blockDigStorage != null) {
                 info.getChannel().eventLoop().submit(() -> {
-                    if (!info.getChannel().isActive()) return;
+                    if (!info.getChannel().isActive()) {
+                        return;
+                    }
 
                     try {
                         blockDigStorage.tick();
-                    } catch (Throwable e) {
+                    } catch (final Throwable e) {
                         ViaLegacy.getPlatform().getLogger().log(Level.WARNING, "Error while ticking BlockDigStorage", e);
                     }
                 });

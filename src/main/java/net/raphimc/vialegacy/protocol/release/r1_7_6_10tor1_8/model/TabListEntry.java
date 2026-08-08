@@ -24,11 +24,8 @@ import java.util.UUID;
 
 public class TabListEntry {
 
-    public GameProfile gameProfile;
-    public int ping;
-    public int gameMode;
-
-    public boolean resolved;
+    private final GameProfile gameProfile;
+    private int ping;
 
     public TabListEntry(final String name, final UUID uuid) {
         this(new GameProfile(name, uuid));
@@ -36,11 +33,22 @@ public class TabListEntry {
 
     public TabListEntry(final GameProfile gameProfile) {
         this.gameProfile = gameProfile;
-        this.resolved = true;
     }
 
     public TabListEntry(final String name, final short ping) {
         this.gameProfile = new GameProfile(name, UUID.nameUUIDFromBytes(("LegacyPlayer:" + name).getBytes(StandardCharsets.UTF_8)));
+        this.ping = ping;
+    }
+
+    public GameProfile getGameProfile() {
+        return this.gameProfile;
+    }
+
+    public int getPing() {
+        return this.ping;
+    }
+
+    public void setPing(final int ping) {
         this.ping = ping;
     }
 

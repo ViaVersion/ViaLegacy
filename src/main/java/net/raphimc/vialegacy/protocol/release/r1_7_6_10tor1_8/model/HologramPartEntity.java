@@ -30,7 +30,11 @@ import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.Protocolr1_7_6_10T
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.data.EntityDataIndex1_7_6;
 import net.raphimc.vialegacy.protocol.release.r1_7_6_10tor1_8.storage.EntityTracker;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class HologramPartEntity {
 
@@ -109,7 +113,7 @@ public class HologramPartEntity {
     private void spawnHologramPartEntities() {
         {
             final PacketWrapper spawnMob = PacketWrapper.create(ClientboundPackets1_8.ADD_MOB, this.user);
-            spawnMob.write(Types.VAR_INT, this.entityId); // entity id
+            spawnMob.write(Types.VAR_INT, this.getEntityId()); // entity id
             spawnMob.write(Types.UNSIGNED_BYTE, (short) this.entityType.getId()); // type id
             spawnMob.write(Types.INT, (int) (this.location.getX() * 32F)); // x
             spawnMob.write(Types.INT, (int) (this.location.getY() * 32F)); // y
@@ -124,13 +128,14 @@ public class HologramPartEntity {
             spawnMob.send(Protocolr1_7_6_10Tor1_8.class);
         }
         if (this.vehicleEntity != null) {
-            final int objectId = Arrays.stream(EntityTypes1_8.ObjectType.values()).filter(o -> o.getType() == this.vehicleEntity.entityType).map(EntityTypes1_8.ObjectType::getId).findFirst().orElse(-1);
+            final int objectId = Arrays.stream(EntityTypes1_8.ObjectType.values()).filter(o -> o.getType() == this.vehicleEntity.entityType).map(EntityTypes1_8.ObjectType::getId).findFirst()
+                .orElse(-1);
             if (objectId == -1) {
                 throw new IllegalStateException("Could not find object id for entity type " + this.vehicleEntity.entityType);
             }
 
             final PacketWrapper spawnEntity = PacketWrapper.create(ClientboundPackets1_8.ADD_ENTITY, this.user);
-            spawnEntity.write(Types.VAR_INT, this.vehicleEntity.entityId); // entity id
+            spawnEntity.write(Types.VAR_INT, this.vehicleEntity.getEntityId()); // entity id
             spawnEntity.write(Types.BYTE, (byte) objectId); // type id
             spawnEntity.write(Types.INT, (int) (this.vehicleEntity.location.getX() * 32F)); // x
             spawnEntity.write(Types.INT, (int) (this.vehicleEntity.location.getY() * 32F)); // y
@@ -141,13 +146,13 @@ public class HologramPartEntity {
             spawnEntity.send(Protocolr1_7_6_10Tor1_8.class);
 
             final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_DATA, this.user);
-            setEntityData.write(Types.VAR_INT, this.vehicleEntity.entityId); // entity id
+            setEntityData.write(Types.VAR_INT, this.vehicleEntity.getEntityId()); // entity id
             setEntityData.write(Types.ENTITY_DATA_LIST1_8, this.vehicleEntity.get1_8EntityData()); // entity data
             setEntityData.send(Protocolr1_7_6_10Tor1_8.class);
 
             final PacketWrapper attachEntity = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_LINK, this.user);
-            attachEntity.write(Types.INT, this.entityId); // entity id
-            attachEntity.write(Types.INT, this.vehicleEntity.entityId); // vehicle id
+            attachEntity.write(Types.INT, this.getEntityId()); // entity id
+            attachEntity.write(Types.INT, this.vehicleEntity.getEntityId()); // vehicle id
             attachEntity.write(Types.UNSIGNED_BYTE, (short) 0); // leash state
             attachEntity.send(Protocolr1_7_6_10Tor1_8.class);
         }
@@ -155,7 +160,7 @@ public class HologramPartEntity {
 
     private void destroyHologramPartEntities() {
         final PacketWrapper destroyEntities = PacketWrapper.create(ClientboundPackets1_8.REMOVE_ENTITIES, this.user);
-        destroyEntities.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{this.entityId, this.vehicleEntity.entityId}); // entity ids
+        destroyEntities.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{this.getEntityId(), this.vehicleEntity.getEntityId()}); // entity ids
         destroyEntities.scheduleSend(Protocolr1_7_6_10Tor1_8.class);
     }
 
@@ -177,7 +182,9 @@ public class HologramPartEntity {
     }
 
     private void destroyArmorStand() {
-        if (this.mappedEntityId == null) return;
+        if (this.mappedEntityId == null) {
+            return;
+        }
 
         final PacketWrapper destroyEntities = PacketWrapper.create(ClientboundPackets1_8.REMOVE_ENTITIES, this.user);
         destroyEntities.write(Types.VAR_INT_ARRAY_PRIMITIVE, new int[]{this.mappedEntityId}); // entity ids
@@ -185,7 +192,9 @@ public class HologramPartEntity {
     }
 
     private void updateArmorStand() {
-        if (this.mappedEntityId == null) return;
+        if (this.mappedEntityId == null) {
+            return;
+        }
 
         final PacketWrapper setEntityData = PacketWrapper.create(ClientboundPackets1_8.SET_ENTITY_DATA, this.user);
         setEntityData.write(Types.VAR_INT, this.mappedEntityId); // entity id
@@ -204,17 +213,29 @@ public class HologramPartEntity {
     }
 
     private boolean isHologram() {
-        if (this.entityType != EntityTypes1_8.EntityType.HORSE) return false;
-        if (this.vehicleEntity == null) return false;
-        if (this.riderEntity != null) return false;
-        if (this.vehicleEntity.riderEntity != this) return false;
-        if (this.vehicleEntity.vehicleEntity != null) return false;
+        if (this.entityType != EntityTypes1_8.EntityType.HORSE) {
+            return false;
+        }
+        if (this.vehicleEntity == null) {
+            return false;
+        }
+        if (this.riderEntity != null) {
+            return false;
+        }
+        if (this.vehicleEntity.riderEntity != this) {
+            return false;
+        }
+        if (this.vehicleEntity.vehicleEntity != null) {
+            return false;
+        }
 
         return ((int) this.getEntityData(EntityDataIndex1_7_6.ENTITY_AGEABLE_AGE)) <= -44_000;
     }
 
     private boolean wouldBeInvisible() {
-        if (this.entityType != EntityTypes1_8.EntityType.HORSE) return false;
+        if (this.entityType != EntityTypes1_8.EntityType.HORSE) {
+            return false;
+        }
 
         final int age = (int) this.getEntityData(EntityDataIndex1_7_6.ENTITY_AGEABLE_AGE);
         return age >= -50_000;
@@ -264,7 +285,9 @@ public class HologramPartEntity {
             }
 
             for (HologramPartEntity entity = vehicleEntity.vehicleEntity; entity != null; entity = entity.riderEntity) {
-                if (entity == this) return;
+                if (entity == this) {
+                    return;
+                }
             }
 
             this.vehicleEntity = vehicleEntity;

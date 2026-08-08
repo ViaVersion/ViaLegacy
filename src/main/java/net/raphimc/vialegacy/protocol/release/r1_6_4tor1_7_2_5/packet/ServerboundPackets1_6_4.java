@@ -87,8 +87,10 @@ public enum ServerboundPackets1_6_4 implements ServerboundPacketType, PreNettyPa
     CLIENT_COMMAND(205, (user, buf) -> buf.skipBytes(1)),
     CUSTOM_PAYLOAD(250, (user, buf) -> {
         readString(buf);
-        short s = buf.readShort();
-        for (int i = 0; i < s; i++) buf.readByte();
+        final short s = buf.readShort();
+        for (int i = 0; i < s; i++) {
+            buf.readByte();
+        }
     }),
     SHARED_KEY(252, (user, buf) -> {
         readByteArray(buf);
@@ -98,7 +100,7 @@ public enum ServerboundPackets1_6_4 implements ServerboundPacketType, PreNettyPa
         buf.skipBytes(2);
         readString(buf);
         buf.skipBytes(2);
-        byte x = buf.readByte();
+        final byte x = buf.readByte();
         if (x >= 73) {
             readString(buf);
             buf.skipBytes(4);
@@ -107,6 +109,9 @@ public enum ServerboundPackets1_6_4 implements ServerboundPacketType, PreNettyPa
     DISCONNECT(255, (user, buf) -> readString(buf));
 
     private static final ServerboundPackets1_6_4[] REGISTRY = new ServerboundPackets1_6_4[256];
+
+    private final int id;
+    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     static {
         for (ServerboundPackets1_6_4 packet : values()) {
@@ -117,9 +122,6 @@ public enum ServerboundPackets1_6_4 implements ServerboundPacketType, PreNettyPa
     public static ServerboundPackets1_6_4 getPacket(final int id) {
         return REGISTRY[id];
     }
-
-    private final int id;
-    private final BiConsumer<UserConnection, ByteBuf> packetReader;
 
     ServerboundPackets1_6_4(final int id, final BiConsumer<UserConnection, ByteBuf> packetReader) {
         this.id = id;

@@ -25,16 +25,16 @@ public class BlockDataRewriter extends AbstractBlockRemapper {
 
     public BlockDataRewriter() {
         for (int i = 1; i < 16; i++) { // cobblestone
-            this.registerReplacement(new IdAndData(BlockList1_6.cobblestone.blockId(), i), new IdAndData(BlockList1_6.cobblestone.blockId(), 0));
+            this.registerReplacement(new IdAndData(BlockList1_6.COBBLESTONE, i), new IdAndData(BlockList1_6.COBBLESTONE, 0));
         }
         for (int i = 1; i < 16; i++) { // sand
-            this.registerReplacement(new IdAndData(BlockList1_6.sand.blockId(), i), new IdAndData(BlockList1_6.sand.blockId(), 0));
+            this.registerReplacement(new IdAndData(BlockList1_6.SAND, i), new IdAndData(BlockList1_6.SAND, 0));
         }
         for (int i = 1; i < 16; i++) { // gravel
-            this.registerReplacement(new IdAndData(BlockList1_6.gravel.blockId(), i), new IdAndData(BlockList1_6.gravel.blockId(), 0));
+            this.registerReplacement(new IdAndData(BlockList1_6.GRAVEL, i), new IdAndData(BlockList1_6.GRAVEL, 0));
         }
         for (int i = 1; i < 16; i++) { // obsidian
-            this.registerReplacement(new IdAndData(BlockList1_6.obsidian.blockId(), i), new IdAndData(BlockList1_6.obsidian.blockId(), 0));
+            this.registerReplacement(new IdAndData(BlockList1_6.OBSIDIAN, i), new IdAndData(BlockList1_6.OBSIDIAN, 0));
         }
     }
 
