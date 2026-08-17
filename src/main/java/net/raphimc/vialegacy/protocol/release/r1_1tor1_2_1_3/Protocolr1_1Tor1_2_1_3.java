@@ -313,7 +313,7 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
     }
 
     private void handleRespawn(final int dimensionId, final UserConnection user) {
-        if (user.getClientWorld(Protocolr1_1Tor1_2_1_3.class).setEnvironment(dimensionId)) {
+        if (user.storables(Protocolr1_1Tor1_2_1_3.class).clientWorld().setEnvironment(dimensionId)) {
             user.get(PendingBlocksTracker.class).clear();
         }
 
@@ -365,7 +365,7 @@ public class Protocolr1_1Tor1_2_1_3 extends StatelessProtocol<ClientboundPackets
     @Override
     public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolr1_1Tor1_2_1_3.class, ClientboundPackets1_1::getPacket));
-        userConnection.addClientWorld(Protocolr1_1Tor1_2_1_3.class, new ClientWorld());
+        userConnection.storables(this).setClientWorld(new ClientWorld());
 
         userConnection.put(new SeedStorage());
         userConnection.put(new PendingBlocksTracker(userConnection));

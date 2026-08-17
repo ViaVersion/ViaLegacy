@@ -113,7 +113,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                     });
                     handler(wrapper -> {
                         final byte dimensionId = wrapper.get(Types.BYTE, 0);
-                        wrapper.user().getClientWorld(Protocolr1_6_4Tor1_7_2_5.class).setEnvironment(dimensionId);
+                        wrapper.user().storables(Protocolr1_6_4Tor1_7_2_5.class).clientWorld().setEnvironment(dimensionId);
 
                         wrapper.user().put(new ChunkTracker(wrapper.user()));
                     });
@@ -156,7 +156,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
                 read(Types.SHORT); // world height
                 map(Types1_6_4.STRING, Types.STRING); // worldType
                 handler(wrapper -> {
-                    if (wrapper.user().getClientWorld(Protocolr1_6_4Tor1_7_2_5.class).setEnvironment(wrapper.get(Types.INT, 0))) {
+                    if (wrapper.user().storables(Protocolr1_6_4Tor1_7_2_5.class).clientWorld().setEnvironment(wrapper.get(Types.INT, 0))) {
                         wrapper.user().get(ChunkTracker.class).clear();
                     }
                 });
@@ -409,7 +409,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
             }
         });
         this.registerClientbound(ClientboundPackets1_6_4.LEVEL_CHUNK, wrapper -> {
-            final Chunk chunk = wrapper.passthrough(Types1_7_6.getChunk(wrapper.user().getClientWorld(Protocolr1_6_4Tor1_7_2_5.class).getEnvironment()));
+            final Chunk chunk = wrapper.passthrough(Types1_7_6.getChunk(wrapper.user().storables(Protocolr1_6_4Tor1_7_2_5.class).clientWorld().getEnvironment()));
             wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
         });
         this.registerClientbound(ClientboundPackets1_6_4.CHUNK_BLOCKS_UPDATE, new PacketHandlers() {
@@ -1131,7 +1131,7 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
     @Override
     public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolr1_6_4Tor1_7_2_5.class, ClientboundPackets1_6_4::getPacket));
-        userConnection.addClientWorld(Protocolr1_6_4Tor1_7_2_5.class, new ClientWorld());
+        userConnection.storables(this).setClientWorld(new ClientWorld());
 
         userConnection.put(new ProtocolMetadataStorage());
         userConnection.put(new PlayerInfoStorage());

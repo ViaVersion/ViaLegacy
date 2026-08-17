@@ -133,7 +133,7 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
                 map(Types.BYTE); // world height
                 map(Types.BYTE); // max players
                 handler(wrapper -> {
-                    wrapper.user().getClientWorld(Protocolr1_2_4_5Tor1_3_1_2.class).setEnvironment(wrapper.get(Types.BYTE, 1));
+                    wrapper.user().storables(Protocolr1_2_4_5Tor1_3_1_2.class).clientWorld().setEnvironment(wrapper.get(Types.BYTE, 1));
                     final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                     entityTracker.setPlayerId(wrapper.get(Types.INT, 0));
                     entityTracker.getTrackedEntities().put(entityTracker.getPlayerId(), new TrackedLivingEntity(entityTracker.getPlayerId(), new Location(8, 64, 8), EntityTypes1_8.EntityType.PLAYER));
@@ -161,7 +161,7 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
                 map(Types.SHORT); // world height
                 map(Types1_6_4.STRING); // level type
                 handler(wrapper -> {
-                    if (wrapper.user().getClientWorld(Protocolr1_2_4_5Tor1_3_1_2.class).setEnvironment(wrapper.get(Types.INT, 0))) {
+                    if (wrapper.user().storables(Protocolr1_2_4_5Tor1_3_1_2.class).clientWorld().setEnvironment(wrapper.get(Types.INT, 0))) {
                         wrapper.user().get(ChestStateTracker.class).clear();
                         final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
                         entityTracker.getTrackedEntities().clear();
@@ -449,10 +449,10 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
             } else {
                 chunk = new BaseChunk(chunkX, chunkZ, true, false, 0, new ChunkSection[16], null, new ArrayList<>());
             }
-            wrapper.write(Types1_7_6.getChunk(wrapper.user().getClientWorld(Protocolr1_2_4_5Tor1_3_1_2.class).getEnvironment()), chunk);
+            wrapper.write(Types1_7_6.getChunk(wrapper.user().storables(Protocolr1_2_4_5Tor1_3_1_2.class).clientWorld().getEnvironment()), chunk);
         });
         this.registerClientbound(ClientboundPackets1_2_4.LEVEL_CHUNK, wrapper -> {
-            final Environment dimension = wrapper.user().getClientWorld(Protocolr1_2_4_5Tor1_3_1_2.class).getEnvironment();
+            final Environment dimension = wrapper.user().storables(Protocolr1_2_4_5Tor1_3_1_2.class).clientWorld().getEnvironment();
             Chunk chunk = wrapper.read(Types1_2_4.CHUNK);
 
             wrapper.user().get(ChestStateTracker.class).unload(chunk.getX(), chunk.getZ());
@@ -806,7 +806,7 @@ public class Protocolr1_2_4_5Tor1_3_1_2 extends StatelessProtocol<ClientboundPac
     @Override
     public void init(final UserConnection userConnection) {
         userConnection.put(new PreNettySplitter(Protocolr1_2_4_5Tor1_3_1_2.class, ClientboundPackets1_2_4::getPacket));
-        userConnection.addClientWorld(Protocolr1_2_4_5Tor1_3_1_2.class, new ClientWorld());
+        userConnection.storables(this).setClientWorld(new ClientWorld());
 
         userConnection.put(new ChestStateTracker());
         userConnection.put(new EntityTracker(userConnection));

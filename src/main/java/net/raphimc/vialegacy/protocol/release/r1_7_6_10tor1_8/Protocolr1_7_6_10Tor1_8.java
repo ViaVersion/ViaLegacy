@@ -156,7 +156,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                     final EntityTracker tracker = wrapper.user().get(EntityTracker.class);
                     tracker.trackEntity(entityId, EntityTypes1_8.EntityType.PLAYER);
                     tracker.setPlayerId(entityId);
-                    wrapper.user().getClientWorld(Protocolr1_7_6_10Tor1_8.class).setEnvironment(dimensionId);
+                    wrapper.user().storables(Protocolr1_7_6_10Tor1_8.class).clientWorld().setEnvironment(dimensionId);
 
                     wrapper.send(Protocolr1_7_6_10Tor1_8.class);
                     wrapper.cancel();
@@ -214,7 +214,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
                 map(Types.STRING); // worldType
                 handler(wrapper -> {
                     final EntityTracker entityTracker = wrapper.user().get(EntityTracker.class);
-                    if (wrapper.user().getClientWorld(Protocolr1_7_6_10Tor1_8.class).setEnvironment(wrapper.get(Types.INT, 0))) {
+                    if (wrapper.user().storables(Protocolr1_7_6_10Tor1_8.class).clientWorld().setEnvironment(wrapper.get(Types.INT, 0))) {
                         wrapper.user().get(ChunkTracker.class).clear();
                         entityTracker.clear();
                         entityTracker.trackEntity(entityTracker.getPlayerId(), EntityTypes1_8.EntityType.PLAYER);
@@ -667,7 +667,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
             }
         });
         this.registerClientbound(ClientboundPackets1_7_2.LEVEL_CHUNK, wrapper -> {
-            final Environment dimension = wrapper.user().getClientWorld(Protocolr1_7_6_10Tor1_8.class).getEnvironment();
+            final Environment dimension = wrapper.user().storables(Protocolr1_7_6_10Tor1_8.class).clientWorld().getEnvironment();
 
             final Chunk chunk = wrapper.read(Types1_7_6.getChunk(dimension));
             wrapper.user().get(ChunkTracker.class).trackAndRemap(chunk);
@@ -1557,7 +1557,7 @@ public class Protocolr1_7_6_10Tor1_8 extends AbstractProtocol<ClientboundPackets
 
     @Override
     public void init(final UserConnection userConnection) {
-        userConnection.addClientWorld(Protocolr1_7_6_10Tor1_8.class, new ClientWorld());
+        userConnection.storables(this).setClientWorld(new ClientWorld());
         userConnection.put(new TablistStorage(userConnection));
         userConnection.put(new WindowTracker());
         userConnection.put(new EntityTracker(userConnection));
