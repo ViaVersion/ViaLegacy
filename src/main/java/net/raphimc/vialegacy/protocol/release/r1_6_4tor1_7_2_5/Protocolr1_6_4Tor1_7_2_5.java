@@ -876,8 +876,8 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
         });
         this.registerServerboundTransition(ServerboundStatusPackets.STATUS_REQUEST, ServerboundPackets1_6_4.SERVER_PING, wrapper -> {
             final HandshakeStorage handshakeStorage = wrapper.user().get(HandshakeStorage.class);
-            final String ip = handshakeStorage.getHostname();
-            final int port = handshakeStorage.getPort();
+            final String ip = handshakeStorage.hostname();
+            final int port = handshakeStorage.port();
             wrapper.write(Types.UNSIGNED_BYTE, (short) 1); // always 1
             wrapper.write(Types.UNSIGNED_BYTE, (short) ServerboundPackets1_6_4.CUSTOM_PAYLOAD.getId()); // packet id
             wrapper.write(Types1_6_4.STRING, "MC|PingHost"); // channel
@@ -899,8 +899,8 @@ public class Protocolr1_6_4Tor1_7_2_5 extends StatelessTransitionProtocol<Client
 
             wrapper.write(Types.UNSIGNED_BYTE, (short) wrapper.user().getProtocolInfo().serverProtocolVersion().getVersion()); // protocol id
             wrapper.write(Types1_6_4.STRING, name); // user name
-            wrapper.write(Types1_6_4.STRING, handshakeStorage.getHostname()); // hostname
-            wrapper.write(Types.INT, handshakeStorage.getPort()); // port
+            wrapper.write(Types1_6_4.STRING, handshakeStorage.hostname()); // hostname
+            wrapper.write(Types.INT, handshakeStorage.port()); // port
 
             final ProtocolInfo info = wrapper.user().getProtocolInfo();
             // Set the information early

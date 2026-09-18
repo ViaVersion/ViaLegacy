@@ -97,7 +97,7 @@ public abstract class LegacyItemRewriter<C extends ClientboundPacketType, S exte
             @Override
             public void register() {
                 map(Types.SHORT); // slot
-                handler(wrapper -> LegacyItemRewriter.this.handleServerboundItem(wrapper));
+                handler(LegacyItemRewriter.this::handleServerboundItem);
             }
         });
     }

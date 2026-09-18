@@ -23,7 +23,6 @@ import java.io.File;
 import java.net.URL;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Logger;
 
 public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.platform.ViaLegacyConfig {
@@ -65,10 +64,6 @@ public class ViaLegacyConfig extends Config implements net.raphimc.vialegacy.pla
     @Override
     public URL getDefaultConfigURL() {
         return this.getClass().getClassLoader().getResource("assets/vialegacy/vialegacy.yml");
-    }
-
-    @Override
-    protected void handleConfig(final Map<String, Object> map) {
     }
 
     @Override
