@@ -124,7 +124,7 @@ public class Protocolr1_0_0_1Tor1_1 extends StatelessProtocol<ClientboundPackets
             }
         });
 
-        //C->S Packet27Position is unused (no need to handle or remap)
+        // C->S Packet27Position is unused (no need to handle or remap)
     }
 
     @Override

@@ -203,7 +203,7 @@ public final class SoundRewriter {
         SOUNDS.put("random.eat", "random.eat");
         SOUNDS.put("random.explode", "random.explode");
         SOUNDS.put("random.fizz", "random.fizz");
-        SOUNDS.put("random.fuse", "creeper.primed"); //similar to: game.tnt.primed
+        SOUNDS.put("random.fuse", "creeper.primed"); // similar to: game.tnt.primed
         SOUNDS.put("random.glass", "dig.glass");
         SOUNDS.put("random.levelup", "random.levelup");
         SOUNDS.put("random.orb", "random.orb");
